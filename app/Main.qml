@@ -28,6 +28,18 @@ ApplicationWindow {
     height: 600
     visibility: Window.Maximized
     title: qsTr("PreCess")
+
+    // 控制台可视化全局参数
+    property bool consoleVisible: false
+
+    // 使用Shortcut组件代替Keys处理，更可靠
+    Shortcut {
+        sequence: "F10"
+        onActivated: {
+            root.consoleVisible = !root.consoleVisible
+        }
+    }
+
     menuBar: MenuBar{
         //height:30
         Menu{
@@ -249,7 +261,6 @@ ApplicationWindow {
                 myItem.setEdgeRender(objectList.curModelId, !myItem.cur_edge_render)
             }
         }
-
     }
 
     // Rectangle{
@@ -450,6 +461,30 @@ ApplicationWindow {
             Component.onCompleted:{
                 selector.comboBoxSelectionChanged()
             }
+        }
+    }
+
+    // 控制台容器 - 放在最底层，覆盖整个窗口底部
+    Item {
+        id: consoleContainer
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: parent.height * 0.3
+        z: 1000  // 确保在最上层显示
+
+        JavaScriptConsole {
+            id: myConsole
+            anchors.fill: parent
+            consoleVisible: root.consoleVisible
+        
+            onCloseRequested: {
+                root.consoleVisible = false
+            }
+        }
+
+        Component.onCompleted: {
+            console.log("控制台已加载，按F10切换显示")
         }
     }
 }
