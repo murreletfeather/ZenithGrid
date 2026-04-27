@@ -2,6 +2,11 @@
 #include "ModelManager.h"
 #include <catch2/catch_test_macros.hpp>
 
+TEST_CASE("Fail to test Jenkins stale build")
+{
+    REQUIRE(false);
+}
+
 TEST_CASE("ModelManager add nullptr")
 {
     ModelManager manager;
