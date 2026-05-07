@@ -12,6 +12,7 @@
 #include "ModelData.h"
 
 #include "ModelOperator.h"
+#include "GeometryRegistry.h"
 
 #include <unordered_map>
 
@@ -61,11 +62,25 @@ public:
      */
     std::optional<ModelOperator> getModelOperator(Index model_id) const;
 
+    Component* findComponent(Index component_id) const;
+    std::optional<Index> findModelIdByComponent(Index component_id) const;
+    std::vector<Index> getComponentIds(Index model_id) const;
+
+    GeometryRegistry& geomRegistry();
+    const GeometryRegistry& geomRegistry() const;
+
 private:
     ModelData* getModel(Index model_id) const;
 
+    Index allocateComponentId() noexcept;
+
+    GeometryRegistry geom_registry_;
+
     std::unordered_map<Index, std::unique_ptr<ModelData>> models_;
+    std::unordered_map<Index, Index> component_to_model_;
+    std::unordered_map<Index, Component*> component_index_;
     Index max_index_{ -1 }; //!< 最大索引值，用于唯一标识模型
+    Index next_component_id_ { 0 }; //!< component_id 全局发号器（只增不减）
     ModelObserver* observer_{ nullptr };                     //!< 全局模型观察者，用于捕获模型事件
 
     friend class QModelQuery;
