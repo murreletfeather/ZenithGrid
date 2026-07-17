@@ -61,7 +61,7 @@ ApplicationWindow {
                         var info = modelData
                         App.activeOperation = {
                             info: info,
-                            execute: function(model, args) { QModelManager.editSystem.call(info.name, model, args) }
+                            execute: function(model, args) { return QModelManager.editSystem.call(info.name, model, args) }
                         }
                     }
                 }
@@ -126,7 +126,7 @@ ApplicationWindow {
                         var info = modelData
                         App.activeOperation = {
                             info: info,
-                            execute: function(model, args) { QModelManager.algorithmSystem.call(info.name, model, args) }
+                            execute: function(model, args) { return QModelManager.algorithmSystem.call(info.name, model, args) }
                         }
                     }
                 }

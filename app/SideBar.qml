@@ -15,11 +15,13 @@ import app.model.systems.algo
 Item{
     id: root
     property var parameters: []
+    property var resultText: ""
 
     readonly property var activeOp: App.activeOperation
 
     onActiveOpChanged: {
         parameters = []
+        resultText = ""
     }
     Button{
         id: commitButton
@@ -31,11 +33,27 @@ Item{
         height:30
         onClicked:{
             if (root.activeOp && root.activeOp.execute)
-                root.activeOp.execute(App.selection.activeModelId, root.parameters)
+                root.resultText = root.activeOp.execute(App.selection.activeModelId, root.parameters)
+        }
+    }
+    TextArea {
+        id: resultArea
+        anchors.top: commitButton.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 80
+        readOnly: true
+        text: root.resultText
+        wrapMode: TextEdit.Wrap
+        visible: text.length > 0
+        background: Rectangle {
+            color: "#f0f0f0"
+            border.color: "#d0d0d0"
+            border.width: 1
         }
     }
     Item{
-        anchors.top: commitButton.bottom
+        anchors.top: resultArea.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
