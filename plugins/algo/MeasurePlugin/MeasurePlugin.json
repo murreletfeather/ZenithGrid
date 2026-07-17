@@ -1,0 +1,7 @@
+{
+  "system": "AlgorithmSystem",
+  "handler": {
+    "name": "MeasurePlugin",
+    "display_name": "测量"
+  }
+}
