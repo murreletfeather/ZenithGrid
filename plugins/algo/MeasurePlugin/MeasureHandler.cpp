@@ -232,22 +232,11 @@ std::vector<Vec3> collectPositions(const MeshData& mesh, const ModelLayer& manag
 
     switch (type) {
     case ElementEnum::Vertex:
+    case ElementEnum::Edge:
+        // 边选择的 ids 即每条边端点的顶点 id（EdgeSelectorHighlight 约定），与点一样按顶点处理
         for (Index id : ids) {
             if (isValidVertexId(mesh, manager, id))
                 positions.push_back(getPosition(mesh, manager, id));
-        }
-        break;
-    case ElementEnum::Edge:
-        for (Index id : ids) {
-            const Index base = 2 * id;
-            if (base + 1 >= static_cast<Index>(mesh.edge_vertices_.size()))
-                continue;
-            const Index v0 = mesh.edge_vertices_[base];
-            const Index v1 = mesh.edge_vertices_[base + 1];
-            if (isValidVertexId(mesh, manager, v0))
-                positions.push_back(getPosition(mesh, manager, v0));
-            if (isValidVertexId(mesh, manager, v1))
-                positions.push_back(getPosition(mesh, manager, v1));
         }
         break;
     case ElementEnum::Face:
@@ -321,19 +310,19 @@ std::string formatEdgeLength(const MeshData& mesh, const ModelLayer& manager, co
     double total = 0.0;
     std::ostringstream oss;
 
-    for (size_t i = 0; i < ids.size(); ++i) {
-        const Index id = ids[i];
-        const Index base = 2 * id;
-        if (base + 1 >= static_cast<Index>(mesh.edge_vertices_.size())) {
-            oss << "边 " << id << ": 无效索引\n";
+    // 边选择的 ids 是每条边两个端点的顶点 id 对，逐对计算长度
+    for (size_t i = 0; i + 1 < ids.size(); i += 2) {
+        const Index v0 = ids[i];
+        const Index v1 = ids[i + 1];
+        const size_t edge_no = i / 2;
+        if (!isValidVertexId(mesh, manager, v0) || !isValidVertexId(mesh, manager, v1)) {
+            oss << "边 " << edge_no << ": 无效顶点\n";
             continue;
         }
 
-        const Vec3 a = getPosition(mesh, manager, mesh.edge_vertices_[base]);
-        const Vec3 b = getPosition(mesh, manager, mesh.edge_vertices_[base + 1]);
-        const double len = length(a - b);
+        const double len = length(getPosition(mesh, manager, v1) - getPosition(mesh, manager, v0));
         total += len;
-        oss << "边 " << id << ": " << toString(len) << "\n";
+        oss << "边 " << edge_no << ": " << toString(len) << "\n";
     }
 
     oss << "累计长度: " << toString(total);
@@ -471,12 +460,14 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
             const Vec3& c = getPosition(*mesh, manager, selection.ids[2]);
             return formatAngle(a, b, c);
         }
-        if (selection.type == ElementEnum::Edge && selection.ids.size() == 2) {
-            const Index base0 = 2 * selection.ids[0];
-            const Index base1 = 2 * selection.ids[1];
-            if (base0 + 1 < static_cast<Index>(mesh->edge_vertices_.size()) && base1 + 1 < static_cast<Index>(mesh->edge_vertices_.size())) {
-                const Vec3 u = getPosition(*mesh, manager, mesh->edge_vertices_[base0 + 1]) - getPosition(*mesh, manager, mesh->edge_vertices_[base0]);
-                const Vec3 v = getPosition(*mesh, manager, mesh->edge_vertices_[base1 + 1]) - getPosition(*mesh, manager, mesh->edge_vertices_[base1]);
+        if (selection.type == ElementEnum::Edge && selection.ids.size() == 4) {
+            // 边选择的 ids 是每条边两个端点的顶点 id（EdgeSelectorHighlight 约定）
+            const auto& ids = selection.ids;
+            const bool valid = isValidVertexId(*mesh, manager, ids[0]) && isValidVertexId(*mesh, manager, ids[1])
+                && isValidVertexId(*mesh, manager, ids[2]) && isValidVertexId(*mesh, manager, ids[3]);
+            if (valid) {
+                const Vec3 u = getPosition(*mesh, manager, ids[1]) - getPosition(*mesh, manager, ids[0]);
+                const Vec3 v = getPosition(*mesh, manager, ids[3]) - getPosition(*mesh, manager, ids[2]);
                 std::ostringstream oss;
                 oss << "Angle: " << toString(angleBetween(u, v)) << " deg";
                 return oss.str();
@@ -496,7 +487,8 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
         return formatRadius(a, b, c);
     }
     case MeasureType::Length: {
-        if (selection.type != ElementEnum::Edge) {
+        // 边选择的 ids 是每条边两个端点的顶点 id 对，数量应为正偶数
+        if (selection.type != ElementEnum::Edge || selection.ids.empty() || selection.ids.size() % 2 != 0) {
             spdlog::error("MeasureHandler::execute: 长度测量需要选择边");
             return std::string("错误：长度测量需要选择边");
         }

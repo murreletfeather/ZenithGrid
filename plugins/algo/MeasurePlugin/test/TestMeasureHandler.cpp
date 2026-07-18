@@ -36,6 +36,11 @@ std::shared_ptr<Selection> makeVertexSelection(const std::vector<Index>& ids)
     return std::make_shared<Selection>(Selection { ids, ElementEnum::Vertex, 0 });
 }
 
+std::shared_ptr<Selection> makeEdgeSelection(const std::vector<Index>& ids)
+{
+    return std::make_shared<Selection>(Selection { ids, ElementEnum::Edge, 0 });
+}
+
 } // namespace
 
 TEST_CASE("MeasureHandler args_type is correct")
@@ -86,4 +91,86 @@ TEST_CASE("MeasureHandler: distance between two vertices")
     REQUIRE(result != nullptr);
     CHECK(result->find("Distance") != std::string::npos);
     CHECK(result->find("1.000000") != std::string::npos);
+}
+
+TEST_CASE("MeasureHandler: length of edges selected as endpoint vertex id pairs")
+{
+    auto mesh = std::make_unique<MeshData>(MakeMeshData());
+    auto c = std::make_unique<ComponentData>();
+    c->id = -1;
+    c->name = "Comp";
+    c->mesh = std::move(mesh);
+
+    ComponentDatas comps;
+    comps.push_back(std::move(c));
+
+    ModelLayer mgr;
+    const Index model_id = mgr.addModel("test", std::move(comps));
+
+    auto cids = mgr.modelById(model_id)->componentIds();
+    REQUIRE(cids.size() == 1);
+
+    ComponentData* comp = mgr.findComponent(cids[0]);
+    REQUIRE(comp);
+    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
+
+    MeshData* mesh_ptr = comp->asMeshData();
+    REQUIRE(mesh_ptr);
+    const Index base = mesh_ptr->local_to_global_[0];
+
+    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(3); // 长度
+    // 边选择的 ids 是端点顶点 id 对：{12,13} 与 {0,1} 长度均为 1
+    auto selection = makeEdgeSelection({ base + 12, base + 13, base + 0, base + 1 });
+    selection->component_id = cids[0];
+    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
+
+    MockModelIOSystem io_sys;
+    HandlerContext ctx { io_sys, comp_op };
+
+    MeasureHandler handler;
+    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
+    const std::string* result = std::any_cast<std::string>(&result_any);
+    REQUIRE(result != nullptr);
+    CHECK(result->find("累计长度: 2.000000") != std::string::npos);
+}
+
+TEST_CASE("MeasureHandler: angle between two edges selected as endpoint vertex id pairs")
+{
+    auto mesh = std::make_unique<MeshData>(MakeMeshData());
+    auto c = std::make_unique<ComponentData>();
+    c->id = -1;
+    c->name = "Comp";
+    c->mesh = std::move(mesh);
+
+    ComponentDatas comps;
+    comps.push_back(std::move(c));
+
+    ModelLayer mgr;
+    const Index model_id = mgr.addModel("test", std::move(comps));
+
+    auto cids = mgr.modelById(model_id)->componentIds();
+    REQUIRE(cids.size() == 1);
+
+    ComponentData* comp = mgr.findComponent(cids[0]);
+    REQUIRE(comp);
+    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
+
+    MeshData* mesh_ptr = comp->asMeshData();
+    REQUIRE(mesh_ptr);
+    const Index base = mesh_ptr->local_to_global_[0];
+
+    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(1); // 角度
+    // 边 {0,1} 方向 (1,0,0)，边 {0,3} 方向 (0,1,0)，夹角 90°
+    auto selection = makeEdgeSelection({ base + 0, base + 1, base + 0, base + 3 });
+    selection->component_id = cids[0];
+    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
+
+    MockModelIOSystem io_sys;
+    HandlerContext ctx { io_sys, comp_op };
+
+    MeasureHandler handler;
+    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
+    const std::string* result = std::any_cast<std::string>(&result_any);
+    REQUIRE(result != nullptr);
+    CHECK(result->find("Angle: 90.000000 deg") != std::string::npos);
 }
