@@ -7,9 +7,25 @@
 #include "ArgObject.h"
 #include "ComponentData.h"
 #include "ComponentOperator.h"
+#include "GeometryData.h"
+#include "GeometryRegistry.h"
 #include "MeshData.h"
 #include "ModelLayer.h"
 #include "Selection.h"
+
+#include <Bnd_Box.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepGProp.hxx>
+#include <BRep_Tool.hxx>
+#include <GeomAbs_CurveType.hxx>
+#include <GProp_GProps.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <gp_Circ.hxx>
+#include <gp_Pnt.hxx>
+#include <gp_Vec.hxx>
 
 #include <spdlog/spdlog.h>
 
@@ -404,6 +420,307 @@ std::string formatCentroid(const std::vector<Vec3>& positions)
     oss << "重心: " << vecString(centroid);
     return oss.str();
 }
+
+// ---------------- 几何（OCC）测量：选择 id 为 GeometryRegistry 分配的全局几何 id ----------------
+
+Vec3 toVec3(const gp_Pnt& p)
+{
+    return { p.X(), p.Y(), p.Z() };
+}
+
+//! @brief 按选择类型从几何注册表查找子形状，找不到返回 nullptr
+const TopoDS_Shape* findGeometryShape(const GeometryRegistry& reg, ElementEnum::Type type, Index id)
+{
+    switch (type) {
+    case ElementEnum::GeometryVertex:
+        return reg.getVertex(id);
+    case ElementEnum::GeometryEdge:
+        return reg.getEdge(id);
+    case ElementEnum::GeometryFace:
+        return reg.getFace(id);
+    case ElementEnum::GeometrySolid:
+        return reg.getSolid(id);
+    default:
+        return nullptr;
+    }
+}
+
+//! @brief 收集选择中有效的几何子形状
+std::vector<TopoDS_Shape> collectGeometryShapes(const GeometryRegistry& reg,
+    ElementEnum::Type type, const std::vector<Index>& ids)
+{
+    std::vector<TopoDS_Shape> shapes;
+    shapes.reserve(ids.size());
+    for (Index id : ids) {
+        if (const TopoDS_Shape* s = findGeometryShape(reg, type, id))
+            shapes.push_back(*s);
+    }
+    return shapes;
+}
+
+//! @brief 取几何点坐标
+bool geometryVertexPoint(const GeometryRegistry& reg, Index id, Vec3& out)
+{
+    const TopoDS_Shape* s = reg.getVertex(id);
+    if (!s)
+        return false;
+    out = toVec3(BRep_Tool::Pnt(TopoDS::Vertex(*s)));
+    return true;
+}
+
+//! @brief 取几何边中点处的切向作为边方向
+bool geometryEdgeDirection(const TopoDS_Edge& edge, Vec3& out)
+{
+    BRepAdaptor_Curve curve(edge);
+    const double u = 0.5 * (curve.FirstParameter() + curve.LastParameter());
+    gp_Pnt p;
+    gp_Vec v;
+    curve.D1(u, p, v);
+    if (v.Magnitude() < std::numeric_limits<double>::epsilon())
+        return false;
+    v.Normalize();
+    out = { v.X(), v.Y(), v.Z() };
+    return true;
+}
+
+std::string formatGeometryEdgeLength(const GeometryRegistry& reg, const std::vector<Index>& ids)
+{
+    double total = 0.0;
+    std::ostringstream oss;
+
+    for (Index id : ids) {
+        const TopoDS_Shape* s = reg.getEdge(id);
+        if (!s) {
+            oss << "边 " << id << ": 无效索引\n";
+            continue;
+        }
+        GProp_GProps props;
+        BRepGProp::LinearProperties(*s, props);
+        const double len = props.Mass();
+        total += len;
+        oss << "边 " << id << ": " << toString(len) << "\n";
+    }
+
+    oss << "累计长度: " << toString(total);
+    return oss.str();
+}
+
+std::string formatGeometryFaceArea(const GeometryRegistry& reg, const std::vector<Index>& ids)
+{
+    double total = 0.0;
+    std::ostringstream oss;
+
+    for (Index id : ids) {
+        const TopoDS_Shape* s = reg.getFace(id);
+        if (!s) {
+            oss << "面 " << id << ": 无效索引\n";
+            continue;
+        }
+        GProp_GProps props;
+        BRepGProp::SurfaceProperties(*s, props);
+        const double area = std::abs(props.Mass());
+        total += area;
+        oss << "面 " << id << ": " << toString(area) << "\n";
+    }
+
+    oss << "总面积: " << toString(total);
+    return oss.str();
+}
+
+std::string formatGeometrySolidVolume(const GeometryRegistry& reg, const std::vector<Index>& ids)
+{
+    double total = 0.0;
+    std::ostringstream oss;
+
+    for (Index id : ids) {
+        const TopoDS_Shape* s = reg.getSolid(id);
+        if (!s) {
+            oss << "体 " << id << ": 无效索引\n";
+            continue;
+        }
+        GProp_GProps props;
+        BRepGProp::VolumeProperties(*s, props);
+        const double volume = std::abs(props.Mass());
+        total += volume;
+        oss << "体 " << id << ": " << toString(volume) << "\n";
+    }
+
+    oss << "总体积: " << toString(total);
+    return oss.str();
+}
+
+std::string formatGeometryBoundingBox(const std::vector<TopoDS_Shape>& shapes)
+{
+    Bnd_Box box;
+    for (const auto& s : shapes)
+        BRepBndLib::AddOptimal(s, box, false); // 不依赖三角剖分，直接按解析几何求界
+
+    if (box.IsVoid())
+        return std::string("错误：无法计算包围盒");
+
+    Standard_Real xmin = 0.0, ymin = 0.0, zmin = 0.0, xmax = 0.0, ymax = 0.0, zmax = 0.0;
+    box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
+    const Vec3 min { xmin, ymin, zmin };
+    const Vec3 max { xmax, ymax, zmax };
+    const Vec3 size = max - min;
+
+    std::ostringstream oss;
+    oss << "包围盒:\n"
+        << "min: " << vecString(min) << "\n"
+        << "max: " << vecString(max) << "\n"
+        << "size: " << vecString(size);
+    return oss.str();
+}
+
+//! @brief 按边长 / 面积 / 体积加权的重心
+std::string formatGeometryCentroid(const GeometryRegistry& reg,
+    ElementEnum::Type type, const std::vector<Index>& ids)
+{
+    double total_mass = 0.0;
+    Vec3 sum { 0.0, 0.0, 0.0 };
+
+    for (Index id : ids) {
+        const TopoDS_Shape* s = findGeometryShape(reg, type, id);
+        if (!s)
+            continue;
+
+        GProp_GProps props;
+        switch (type) {
+        case ElementEnum::GeometryEdge:
+            BRepGProp::LinearProperties(*s, props);
+            break;
+        case ElementEnum::GeometryFace:
+            BRepGProp::SurfaceProperties(*s, props);
+            break;
+        case ElementEnum::GeometrySolid:
+            BRepGProp::VolumeProperties(*s, props);
+            break;
+        default:
+            continue;
+        }
+
+        const double mass = std::abs(props.Mass());
+        if (mass < std::numeric_limits<double>::epsilon())
+            continue;
+        sum = sum + toVec3(props.CentreOfMass()) * mass;
+        total_mass += mass;
+    }
+
+    if (total_mass < std::numeric_limits<double>::epsilon())
+        return std::string("错误：未找到可计算重心的几何对象");
+
+    std::ostringstream oss;
+    oss << "重心: " << vecString(sum / total_mass);
+    return oss.str();
+}
+
+//! @brief 几何组件（STEP/IGES 等，无网格数据）的测量入口
+std::string executeGeometryMeasure(const GeometryRegistry& reg, MeasureType measure_type, const Selection& selection)
+{
+    switch (measure_type) {
+    case MeasureType::Distance: {
+        if (selection.type != ElementEnum::GeometryVertex || selection.ids.size() != 2) {
+            return std::string("错误：距离测量需要选择两个几何点");
+        }
+        Vec3 a, b;
+        if (!geometryVertexPoint(reg, selection.ids[0], a) || !geometryVertexPoint(reg, selection.ids[1], b))
+            return std::string("错误：无效的几何点 id");
+        return formatDistance(a, b);
+    }
+    case MeasureType::Angle: {
+        if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
+            Vec3 a, b, c;
+            if (!geometryVertexPoint(reg, selection.ids[0], a)
+                || !geometryVertexPoint(reg, selection.ids[1], b)
+                || !geometryVertexPoint(reg, selection.ids[2], c))
+                return std::string("错误：无效的几何点 id");
+            return formatAngle(a, b, c);
+        }
+        if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 2) {
+            const TopoDS_Shape* e0 = reg.getEdge(selection.ids[0]);
+            const TopoDS_Shape* e1 = reg.getEdge(selection.ids[1]);
+            Vec3 u, v;
+            if (!e0 || !e1
+                || !geometryEdgeDirection(TopoDS::Edge(*e0), u)
+                || !geometryEdgeDirection(TopoDS::Edge(*e1), v))
+                return std::string("错误：无效的几何边 id 或边方向无法计算");
+            std::ostringstream oss;
+            oss << "Angle: " << toString(angleBetween(u, v)) << " deg";
+            return oss.str();
+        }
+        return std::string("错误：角度测量需要选择三个几何点或两条几何边");
+    }
+    case MeasureType::Radius: {
+        if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
+            Vec3 a, b, c;
+            if (!geometryVertexPoint(reg, selection.ids[0], a)
+                || !geometryVertexPoint(reg, selection.ids[1], b)
+                || !geometryVertexPoint(reg, selection.ids[2], c))
+                return std::string("错误：无效的几何点 id");
+            return formatRadius(a, b, c);
+        }
+        if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 1) {
+            const TopoDS_Shape* s = reg.getEdge(selection.ids[0]);
+            if (!s)
+                return std::string("错误：无效的几何边 id");
+            BRepAdaptor_Curve curve(TopoDS::Edge(*s));
+            if (curve.GetType() != GeomAbs_Circle)
+                return std::string("错误：所选边不是圆弧，无法直接测半径（可改选三个几何点）");
+            const gp_Circ circ = curve.Circle();
+            std::ostringstream oss;
+            oss << "Radius: " << toString(circ.Radius()) << "\n"
+                << "Center: " << vecString(toVec3(circ.Location()));
+            return oss.str();
+        }
+        return std::string("错误：半径测量需要选择三个几何点或一条圆弧边");
+    }
+    case MeasureType::Length: {
+        if (selection.type != ElementEnum::GeometryEdge || selection.ids.empty()) {
+            return std::string("错误：长度测量需要选择几何边");
+        }
+        return formatGeometryEdgeLength(reg, selection.ids);
+    }
+    case MeasureType::Area: {
+        if (selection.type != ElementEnum::GeometryFace || selection.ids.empty()) {
+            return std::string("错误：面积测量需要选择几何面");
+        }
+        return formatGeometryFaceArea(reg, selection.ids);
+    }
+    case MeasureType::Volume: {
+        if (selection.type != ElementEnum::GeometrySolid || selection.ids.empty()) {
+            return std::string("错误：体积测量需要选择几何体");
+        }
+        return formatGeometrySolidVolume(reg, selection.ids);
+    }
+    case MeasureType::BoundingBox: {
+        const auto shapes = collectGeometryShapes(reg, selection.type, selection.ids);
+        if (shapes.empty()) {
+            return std::string("错误：未找到有效的几何对象");
+        }
+        return formatGeometryBoundingBox(shapes);
+    }
+    case MeasureType::Centroid: {
+        if (selection.type == ElementEnum::GeometryVertex) {
+            std::vector<Vec3> points;
+            points.reserve(selection.ids.size());
+            for (Index id : selection.ids) {
+                Vec3 p;
+                if (geometryVertexPoint(reg, id, p))
+                    points.push_back(p);
+            }
+            if (points.empty())
+                return std::string("错误：未找到有效的几何点");
+            return formatCentroid(points);
+        }
+        if (selection.ids.empty()) {
+            return std::string("错误：未找到有效的几何对象");
+        }
+        return formatGeometryCentroid(reg, selection.type, selection.ids);
+    }
+    }
+
+    return std::string("错误：未知测量类型");
+}
 }
 
 std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core::ArgObject>& args)
@@ -433,14 +750,19 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
         spdlog::error("MeasureHandler::execute: 找不到选择对象所在的组件");
         return std::string("错误：找不到选择对象所在的组件");
     }
+    ModelLayer& manager = context.cur_component.manager();
+    const MeasureType measure_type = toMeasureType(*type_index);
+
     MeshData* mesh = comp->asMeshData();
     if (!mesh) {
-        spdlog::error("MeasureHandler::execute: 选择对象所在组件没有网格数据");
-        return std::string("错误：选择对象所在组件没有网格数据");
+        // 无网格但有几何（STEP/IGES）：走 OCC 几何测量
+        if (comp->geometry) {
+            comp->geometry->ensureIndexBuilt(manager.geomRegistry());
+            return executeGeometryMeasure(manager.geomRegistry(), measure_type, selection);
+        }
+        spdlog::error("MeasureHandler::execute: 选择对象所在组件没有网格或几何数据");
+        return std::string("错误：选择对象所在组件没有网格或几何数据");
     }
-
-    const ModelLayer& manager = context.cur_component.manager();
-    const MeasureType measure_type = toMeasureType(*type_index);
 
     switch (measure_type) {
     case MeasureType::Distance: {
