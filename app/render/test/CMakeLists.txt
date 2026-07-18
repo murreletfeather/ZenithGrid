@@ -40,6 +40,18 @@ target_link_libraries(TestVertexSelectorHighlight PRIVATE
 )
 vtk_module_autoinit(TARGETS TestVertexSelectorHighlight MODULES VTK::InteractionStyle VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::RenderingOpenGL2 VTK::FiltersGeometry)
 
+# TestMeasureManager
+add_executable(TestMeasureManager TestMeasureManager.cpp)
+target_link_libraries(TestMeasureManager PRIVATE
+    vtkPart TestDeps
+    spdlog::spdlog
+    VTK::InteractionStyle VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::RenderingOpenGL2 VTK::FiltersGeometry
+
+    TKIVtk
+    TKPrim TKBRep TKGeomBase TKMath TKernel TKTopAlgo
+)
+vtk_module_autoinit(TARGETS TestMeasureManager MODULES VTK::InteractionStyle VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::RenderingOpenGL2 VTK::FiltersGeometry)
+
 # TestMeshActor
 add_executable(TestMeshActor TestMeshActor.cpp)
 target_link_libraries(TestMeshActor PRIVATE 
