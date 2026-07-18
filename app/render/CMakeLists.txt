@@ -18,6 +18,7 @@ add_library(vtkPart STATIC
     ComponentSelectorHighlight.cpp
     MeshActorManagerSelectOp.cpp
     GeometryActorManagerSelectOp.cpp
+    MeasureManager.cpp
     renderStrategy/AttributeOperator.cpp
     renderStrategy/AttriRenderStrategyScalar.cpp
     renderStrategy/AttriRenderStrategyVector.cpp
