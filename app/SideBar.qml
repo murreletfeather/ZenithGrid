@@ -18,10 +18,57 @@ Item{
     property var resultText: ""
 
     readonly property var activeOp: App.activeOperation
+    readonly property bool isMeasureOp: !!(activeOp && activeOp.info && activeOp.info.name === "MeasurePlugin")
+    property int measureMode: 0 // 0=交互模式 1=尺寸标注
 
     onActiveOpChanged: {
         parameters = []
         resultText = ""
+        measurePanel.lineCount = 0
+        measurePanel.hasPending = false
+        measurePanel.measureResult = ""
+        updateMeasureActive()
+    }
+    onMeasureModeChanged: updateMeasureActive()
+    // activeOp 变化通知触发时 isMeasureOp 绑定可能尚未刷新（链式绑定），
+    // 直接监听 isMeasureOp 才能保证首次打开测量就正确进入交互模式
+    onIsMeasureOpChanged: updateMeasureActive()
+
+    // 交互测量与尺寸标注互斥：进出交互模式时开关渲染窗口的测量交互
+    function updateMeasureActive() {
+        var active = isMeasureOp && measureMode === 0
+        var rw = App.registry.renderWindow
+        if (rw) {
+            rw.setMeasureMode(active)
+            measureConn.target = active ? rw : null
+        }
+        if (active) {
+            App.selection.listeningSelectorIndex = -1
+            App.selection.selectMode = "None"
+        }
+    }
+    // 测量插件专用：面板内切换交互模式/尺寸标注
+    Row{
+        id: measureModeSwitch
+        visible: root.isMeasureOp
+        height: visible ? 34 : 0
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        spacing: 8
+        RadioButton{
+            text: "交互模式"
+            // 关闭互斥自动写回，避免破坏 checked 绑定；互斥由 measureMode 驱动
+            autoExclusive: false
+            checked: root.measureMode === 0
+            onClicked: root.measureMode = 0
+        }
+        RadioButton{
+            text: "尺寸标注"
+            autoExclusive: false
+            checked: root.measureMode === 1
+            onClicked: root.measureMode = 1
+        }
     }
 
     // 写入参数值；功能的参数为持久参数，修改即时写回功能系统实时生效
@@ -35,10 +82,11 @@ Item{
         id: commitButton
         text: "执行"
         enabled: !!(root.activeOp && root.activeOp.info && (root.activeOp.isFeature || App.selection.activeModelId >= 0))
-        anchors.top: parent.top
+        visible: !root.isMeasureOp || root.measureMode === 1
+        anchors.top: measureModeSwitch.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height:30
+        height: visible ? 30 : 0
         onClicked:{
             if (root.activeOp && root.activeOp.execute)
                 root.resultText = root.activeOp.execute(App.selection.activeComponentId, root.parameters)
@@ -55,7 +103,8 @@ Item{
         readOnly: true
         text: root.resultText
         wrapMode: TextEdit.Wrap
-        visible: text.length > 0
+        // 尺寸标注结果只在标注页显示，避免覆盖交互模式面板
+        visible: text.length > 0 && (!root.isMeasureOp || root.measureMode === 1)
         background: Rectangle {
             color: "#f0f0f0"
             border.color: "#d0d0d0"
@@ -68,6 +117,7 @@ Item{
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         clip: true
+        visible: !root.isMeasureOp || root.measureMode === 1
         ColumnLayout{
             anchors.fill: parent
             ListView{
@@ -116,6 +166,58 @@ Item{
                     }
                 }
             }
+        }
+    }
+
+    // 交互测量面板：说明、结果与清除
+    Column{
+        id: measurePanel
+        visible: root.isMeasureOp && root.measureMode === 0
+        anchors.top: measureModeSwitch.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 4
+        spacing: 8
+        property int lineCount: 0
+        property bool hasPending: false
+        property string measureResult: ""
+
+        Text{
+            width: parent.width
+            wrapMode: Text.Wrap
+            text: "依次点击拾取两点构成一条直线并显示长度；可连续画多条线，两线共端点时自动显示夹角；同一点连点两次取消当前起笔。"
+        }
+        Text{
+            text: "已完成直线: " + measurePanel.lineCount + " 条" + (measurePanel.hasPending ? "（已选第 1 点，再点第 2 点成线）" : "")
+        }
+        TextArea{
+            width: parent.width
+            height: 80
+            readOnly: true
+            text: measurePanel.measureResult
+            wrapMode: TextEdit.Wrap
+            visible: text.length > 0
+            background: Rectangle {
+                color: "#f0f0f0"
+                border.color: "#d0d0d0"
+                border.width: 1
+            }
+        }
+        Button{
+            text: "清除"
+            onClicked: {
+                var rw = App.registry.renderWindow
+                if (rw) rw.clearMeasure()
+            }
+        }
+    }
+    Connections{
+        id: measureConn
+        target: null
+        function onMeasureUpdated(lineCount, hasPending, resultText) {
+            measurePanel.lineCount = lineCount
+            measurePanel.hasPending = hasPending
+            measurePanel.measureResult = resultText
         }
     }
 

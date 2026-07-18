@@ -1,5 +1,6 @@
 #include "QRenderWindow.h"
 #include "renderStrategy/AttributeCommon.h"
+#include "MeasureManager.h"
 #include "MeshActorManager.h"
 #include "QModelQuery.h"
 #include "QRenderWindowStyle.h"
@@ -47,6 +48,15 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     renderWindow->GetInteractor()->SetInteractorStyle(vtk->style_);
 
     renderWindow->AddRenderer(vtk->renderer_);
+
+    // 叠加渲染层：测量文字标注置顶显示（SetLayer(1) 自动 PreserveColorBuffer，
+    // 每帧只清深度、保留颜色，文字不被模型遮挡）
+    renderWindow->SetNumberOfLayers(2);
+    vtk->overlay_renderer_->SetLayer(1);
+    vtk->overlay_renderer_->InteractiveOff();
+    vtk->overlay_renderer_->SetActiveCamera(vtk->renderer_->GetActiveCamera()); // 共享相机，免逐帧同步
+    renderWindow->AddRenderer(vtk->overlay_renderer_);
+
     this->data_ = vtk.GetPointer();
     vtk->mesh_actor_manager_ = std::make_unique<MeshActorManager>(vtk->global_points_.GetPointer());
     vtk->mesh_actor_manager_->bindRender(vtk->renderer_);
@@ -56,6 +66,16 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     select_manager_ = std::make_unique<SelectManager>(*vtk->renderer_,
         vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op());
     vtk->style_->SetSelectManager(this->select_manager_.get());
+
+    // 几何拾取器全程序单一实例：测量复用选择系统的 picker（多实例激活冲突见 MeasureManager 注释）
+    measure_manager_ = std::make_unique<MeasureManager>(*vtk->renderer_, *vtk->overlay_renderer_,
+        vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op(),
+        *select_manager_->geometryPicker());
+    vtk->style_->SetMeasureManager(measure_manager_.get());
+    measure_manager_->onChanged = [this]() {
+        emit measureUpdated(measure_manager_->lineCount(), measure_manager_->hasPending(),
+            QString::fromStdString(measure_manager_->resultText()));
+    };
 
     vtk->orientationWidget->AnimateOff();
     vtk->orientationWidget->SetParentRenderer(vtk->renderer_);
@@ -394,6 +414,26 @@ void QRenderWindow::clearSelection()
 {
     dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
         this->select_manager_->clearSelection();
+    });
+}
+
+void QRenderWindow::setMeasureMode(bool on)
+{
+    dispatch_async([on, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        Data* vtk = Data::SafeDownCast(userData);
+        if (on) {
+            // 测量与选择互斥，避免点击被两边同时处理
+            this->select_manager_->setSelectMode("None");
+        }
+        measure_manager_->setActive(on);
+        vtk->style_->SetMeasureMode(on);
+    });
+}
+
+void QRenderWindow::clearMeasure()
+{
+    dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        measure_manager_->clear();
     });
 }
 

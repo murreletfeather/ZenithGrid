@@ -106,6 +106,11 @@ void GeometrySelectManager::clearSelection()
     highlight_data_->Initialize();
 }
 
+IVtkTools_ShapePicker* GeometrySelectManager::picker() const
+{
+    return picker_.Get();
+}
+
 std::unique_ptr<Selection> GeometrySelectManager::getSelection()
 {
     auto result = std::make_unique<Selection>();

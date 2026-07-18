@@ -95,6 +95,11 @@ void SelectManager::refreshComponentHighlight()
     geom_->clearSelection();
 }
 
+IVtkTools_ShapePicker* SelectManager::geometryPicker() const
+{
+    return geom_->picker();
+}
+
 std::unique_ptr<Selection> SelectManager::getSelection()
 {
     if (select_mode_ == SelectMode::Component) {
