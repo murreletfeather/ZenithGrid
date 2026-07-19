@@ -19,6 +19,7 @@
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkAxisActor2D.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -58,6 +59,8 @@ public:
         std::unique_ptr<GeometryActorManager> geometry_actor_manager_;
 
         vtkNew<vtkDisplaySizedImplicitPlaneWidget> plane_widget_;
+
+        vtkNew<vtkAxisActor2D> scale_bar_axis_; //> 比例尺标尺轴（叠加层左下角，刻度随相机缩放更新）
 
         vtkNew<vtkPoints> global_points_;
     };
@@ -102,6 +105,12 @@ public:
      * @brief 清空当前测量组及视图内标注
      */
     Q_INVOKABLE void clearMeasure();
+
+    /**
+     * @brief 显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度）
+     * @param on 是否显示
+     */
+    Q_INVOKABLE void setScaleBarVisible(bool on);
 
     /**
      * @brief 改变渲染模式
