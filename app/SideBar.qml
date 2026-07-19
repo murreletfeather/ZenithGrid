@@ -40,6 +40,8 @@ Item{
         var rw = App.registry.renderWindow
         if (rw) {
             rw.setMeasureMode(active)
+            // 比例尺随测量插件激活显隐（交互模式与尺寸标注均显示）
+            rw.setScaleBarVisible(isMeasureOp)
             measureConn.target = active ? rw : null
         }
         if (active) {
