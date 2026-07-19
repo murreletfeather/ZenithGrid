@@ -25,6 +25,10 @@ public:
     void clearSelection();
     std::unique_ptr<Selection> getSelection();
 
+    //! @brief 共享的几何拾取器：选择系统与测量等功能复用同一实例。同一形状在多个
+    //! IVtkTools_ShapePicker 实例上激活同一选择模式时，仅最先激活的实例能正常拾取
+    IVtkTools_ShapePicker* picker() const;
+
 private:
     GeometrySelectorHighlight* getOrCreateSelector(Index component_id);
 

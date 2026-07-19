@@ -19,6 +19,7 @@
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkAxisActor2D.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -27,6 +28,7 @@
 
 class MeshActor;
 class SelectManager;
+class MeasureManager;
 class GeometryActorManager;
 class MeshActorManager;
 class QRenderWindowStyle;
@@ -47,6 +49,7 @@ public:
         vtkTypeMacro(Data, vtkObject);
 
         vtkNew<vtkRenderer> renderer_;
+        vtkNew<vtkRenderer> overlay_renderer_; //> 叠加层：测量文字标注置顶，不被模型遮挡
 
         /*std::unordered_map<Index, std::unique_ptr<MeshActor>> models_;*/
         vtkNew<QRenderWindowStyle> style_;
@@ -56,6 +59,8 @@ public:
         std::unique_ptr<GeometryActorManager> geometry_actor_manager_;
 
         vtkNew<vtkDisplaySizedImplicitPlaneWidget> plane_widget_;
+
+        vtkNew<vtkAxisActor2D> scale_bar_axis_; //> 比例尺标尺轴（叠加层底部中央，刻度随相机缩放更新）
 
         vtkNew<vtkPoints> global_points_;
     };
@@ -89,6 +94,23 @@ public:
      * @param select_mode
      */
     Q_INVOKABLE void clearSelection();
+
+    /**
+     * @brief 进入/退出交互测量模式（与选择互斥，进入时会清空选择模式）
+     * @param on 是否开启
+     */
+    Q_INVOKABLE void setMeasureMode(bool on);
+
+    /**
+     * @brief 清空当前测量组及视图内标注
+     */
+    Q_INVOKABLE void clearMeasure();
+
+    /**
+     * @brief 显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度）
+     * @param on 是否显示
+     */
+    Q_INVOKABLE void setScaleBarVisible(bool on);
 
     /**
      * @brief 改变渲染模式
@@ -169,6 +191,8 @@ signals:
     void curEdgeRenderChanged();
     void clicked();
     void rightClicked();
+    //! @brief 测量状态变化（渲染线程触发，Qt 自动排队到 GUI 线程）
+    void measureUpdated(int lineCount, bool hasPending, QString resultText);
 
 private:
     bool edge_render_ {};
@@ -177,6 +201,7 @@ private:
     vtkNew<vtkCamera> _camera;
 
     std::unique_ptr<SelectManager> select_manager_;
+    std::unique_ptr<MeasureManager> measure_manager_;
     MeshActor* cur_actor_ {};
     Index cur_component_id_;
 
