@@ -11,6 +11,7 @@
 class vtkRenderer;
 class MeshSelectManager;
 class GeometrySelectManager;
+class IVtkTools_ShapePicker;
 class MeshActorManagerSelectOp;
 class GeometryActorManagerSelectOp;
 class ComponentSelectorHighlight;
@@ -22,6 +23,8 @@ public:
     ~SelectManager();
     void select(double posx, double posy);
     void setSelectMode(const std::string& select_mode);
+    //! @brief 选择系统持有的几何拾取器（供测量等复用，全程序保持单一实例）
+    IVtkTools_ShapePicker* geometryPicker() const;
     void clearSelection();
     void refreshComponentHighlight();
     std::unique_ptr<Selection> getSelection();
