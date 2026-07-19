@@ -82,8 +82,12 @@ Item{
         anchors.right: parent.right
         height: visible ? 30 : 0
         onClicked:{
-            if (root.activeOp && root.activeOp.execute)
+            if (root.activeOp && root.activeOp.execute) {
                 root.resultText = root.activeOp.execute(App.selection.activeModelId, root.parameters)
+                // 尺寸标注结果改用弹窗展示，其他算法仍走侧栏
+                if (root.isMeasureOp && root.measureMode === 1)
+                    App.showDialog("测量结果", root.resultText)
+            }
         }
     }
     TextArea {
@@ -91,12 +95,13 @@ Item{
         anchors.top: commitButton.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 80
+        // 不可见时不占锚定布局高度，避免留下空白
+        height: visible ? 80 : 0
         readOnly: true
         text: root.resultText
         wrapMode: TextEdit.Wrap
-        // 尺寸标注结果只在标注页显示，避免覆盖交互模式面板
-        visible: text.length > 0 && (!root.isMeasureOp || root.measureMode === 1)
+        // 测量结果改用弹窗展示，侧栏结果区只服务其他算法
+        visible: text.length > 0 && !root.isMeasureOp
         background: Rectangle {
             color: "#f0f0f0"
             border.color: "#d0d0d0"

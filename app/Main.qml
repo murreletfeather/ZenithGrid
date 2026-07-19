@@ -238,7 +238,15 @@ ApplicationWindow {
         }
     }
 
+    // 全局可复用弹窗（经 App.showDialog 调用）：初始停靠右下角避免遮挡中心视野，标题栏可拖动
+    AppDialog {
+        id: appDialog
+        x: parent.width - width - 20
+        y: parent.height - height - 60
+    }
+
     Component.onCompleted: {
+        App.registry.appDialog = appDialog
         Qt.callLater(function() {
             for (let i = 0; i < commandLineArgs.length; ++i) {
                 let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
