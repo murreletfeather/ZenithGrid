@@ -390,6 +390,12 @@ std::string formatSolidVolume(const MeshData& mesh, const ModelLayer& manager, c
 
 std::string formatBoundingBox(const std::vector<Vec3>& positions)
 {
+    // 防御性判空：防止被其他路径以空容器调用时越界访问首元素
+    if (positions.empty()) {
+        spdlog::error("formatBoundingBox: positions 为空");
+        return std::string("错误：没有可用的几何数据");
+    }
+
     Vec3 min = positions[0];
     Vec3 max = positions[0];
 
@@ -412,6 +418,12 @@ std::string formatBoundingBox(const std::vector<Vec3>& positions)
 
 std::string formatCentroid(const std::vector<Vec3>& positions)
 {
+    // 防御性判空：防止空容器时除零产生 NaN
+    if (positions.empty()) {
+        spdlog::error("formatCentroid: positions 为空");
+        return std::string("错误：没有可用的几何数据");
+    }
+
     Vec3 sum = { 0.0, 0.0, 0.0 };
     for (const auto& p : positions)
         sum = sum + p;
