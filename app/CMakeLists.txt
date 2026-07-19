@@ -24,6 +24,7 @@ qt_add_qml_module(${MYNAME}
             JavaScriptConsole.qml
             PreferencesWindow.qml
             OutputLog.qml
+            AppDialog.qml
 )
 target_link_libraries(${MYNAME}
     PRIVATE
