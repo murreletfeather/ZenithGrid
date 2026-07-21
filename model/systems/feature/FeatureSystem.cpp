@@ -4,6 +4,7 @@
 #include "FeatureSystem.h"
 #include "FeatureHandler.h"
 #include "FeatureRegistrar.h"
+#include "InteractiveHandler.h"
 #include "ModelLayer.h"
 
 #include <spdlog/spdlog.h>
@@ -47,6 +48,8 @@ bool FeatureSystem::registerHandler(const HandlerMetaData& meta_data, SystemHand
     info->name = meta_data.name;
     info->display_name = meta_data.display_name;
     info->description = meta_data.description;
+    info->result_display = meta_data.result_display;
+    info->interactive = meta_data.interactive;
     info->arg_types = registrar.argTypes();
     info->menus = registrar.menuItems();
     info->key_bindings = registrar.keyBindings();
@@ -129,6 +132,15 @@ const FeatureParams* FeatureSystem::params(const std::string& unique_name) const
 {
     auto it = entries_.find(unique_name);
     return it == entries_.end() ? nullptr : it->second.params.get();
+}
+
+interaction::InteractiveHandler* FeatureSystem::interactiveHandler(const std::string& unique_name)
+{
+    auto it = entries_.find(unique_name);
+    if (it == entries_.end() || !it->second.handler) {
+        return nullptr;
+    }
+    return dynamic_cast<interaction::InteractiveHandler*>(it->second.handler.get());
 }
 
 void FeatureSystem::setOnFeatureInfosChanged(std::function<void()> callback)
