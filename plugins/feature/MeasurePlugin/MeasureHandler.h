@@ -1,17 +1,17 @@
 /**
  * @file MeasureHandler.h
- * @brief 测量处理器声明：距离、角度、半径、长度、面积、体积、包围盒与重心
+ * @brief 测量功能处理器声明：距离、角度、半径、长度、面积、体积、包围盒与重心
  * @author 范成通 email 1941804585@qq.com
  */
 #pragma once
-#include "AlgorithmHandler.h"
+#include "FeatureHandler.h"
 #include "InteractiveHandler.h"
 #include <any>
 #include <optional>
 #include <thread>
 #include <vector>
 
-namespace systems::algo {
+namespace systems::feature {
 
 using systems::interaction::AnnotationBatch;
 using systems::interaction::AnnotationLine;
@@ -19,29 +19,31 @@ using systems::interaction::InteractiveHandler;
 using systems::interaction::PickInfo;
 
 /**
- * @brief 测量处理器：同时实现尺寸标注（AlgorithmHandler）与交互测量（InteractiveHandler）
+ * @brief 测量功能处理器：同时实现尺寸标注（FeatureHandler）与交互测量（InteractiveHandler）
  *
- * 尺寸标注：选择对象 + 执行 → 返回结果文本（GUI 线程调用）。
+ * 尺寸标注：功能参数（测量类型 + 选择对象）+ 菜单执行 → 返回结果文本（GUI 线程调用）。
  * 交互测量：两点成线、共端点两线自动标注夹角（渲染线程经 InteractionService 驱动）。
  *
  * @par 线程模型与共享约束（修改前必读）
- * - execute()/args_type() 由 **GUI 线程**调用（QML → QAlgorithmSystemAdaptor → AlgorithmSystem::call）。
+ * - setup()/execute() 由 **GUI 线程**调用（FeatureSystem 注册与菜单触发）。
  * - onPick/onHover/annotations/resultText/clear/onActivate/onDeactivate 由 **渲染线程**调用
  *   （InteractionService 经 dispatch_async 驱动）。
- * - 因此约定：**execute()/args_type() 不得读写交互状态成员**
+ * - 因此约定：**setup()/execute() 不得读写交互状态成员**
  *   （pending_、has_preview_、preview_、lines_、angles_、annotations_）；
  *   **交互事件方法不得触碰标注执行路径的状态**（execute 当前是无状态的，新增状态前必须评审）。
  * - 本类**无锁**。UI 层的模式互斥（交互模式隐藏执行按钮、参数模式停止交互）只是当前的安全网，
  *   不是设计依据；确需跨两侧共享状态时，先加锁或经设计评审，不得直接访问。
  *   上述线程模型由 assertExecuteThread()/assertInteractiveThread() 在调试期以 assert 强制。
  */
-class MeasureHandler : public AlgorithmHandler, public InteractiveHandler {
+class MeasureHandler : public FeatureHandler, public InteractiveHandler {
 public:
     MeasureHandler() = default;
     ~MeasureHandler() override = default;
 
-    std::any execute(HandlerContext& context, const std::vector<core::ArgObject>& args) override;
-    std::vector<core::ArgType> args_type() const override;
+    //! @brief 声明功能参数（测量类型、选择对象）与菜单项
+    void setup(FeatureRegistrar& reg) override;
+    //! @brief 尺寸标注：按参数中的测量类型与选择对象执行，返回结果文本
+    std::any execute(FeatureContext& ctx) override;
 
     //! @brief 交互测量状态查询（测试与面板用）
     int lineCount() const { return static_cast<int>(lines_.size()); }
@@ -76,7 +78,7 @@ private:
     //! @brief 由当前状态重建标注集
     void refreshAnnotations();
 
-    //! @brief 线程亲和守卫（仅调试期生效）：execute/args_type 必须在构造线程（GUI）调用
+    //! @brief 线程亲和守卫（仅调试期生效）：setup/execute 必须在构造线程（GUI）调用
     void assertExecuteThread() const;
     //! @brief 线程亲和守卫（仅调试期生效）：交互方法必须始终在单一线程上调用
     //! （应用内为渲染线程；测试单线程环境下与构造线程相同也合法）

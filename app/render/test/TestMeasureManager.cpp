@@ -37,7 +37,7 @@
 
 #include <vector>
 
-using systems::algo::MeasureHandler;
+using systems::feature::MeasureHandler;
 
 // 自定义交互器：左键确认交互拾取点，悬停动态预览
 class MeasurePickInteractorStyle : public vtkInteractorStyleTrackballCamera {

@@ -1,17 +1,19 @@
 /**
  * @file TestMeasureHandler.cpp
- * @brief 测量处理器的单元测试
+ * @brief 测量功能处理器的单元测试
  * @author 范成通 email 1941804585@qq.com
  */
 
 #include "MeasureHandler.h"
 #include "ArgObject.h"
 #include "ComponentData.h"
-#include "ComponentOperator.h"
+#include "EventBus.h"
+#include "FeatureContext.h"
+#include "FeatureParams.h"
+#include "FeatureRegistrar.h"
 #include "GeometryData.h"
 #include "MakeMeshData.h"
 #include "MeshData.h"
-#include "ModelIOSystemBase.h"
 #include "ModelLayer.h"
 #include "Selection.h"
 
@@ -21,19 +23,13 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include <any>
+#include <memory>
+#include <optional>
 #include <string>
 
-using namespace systems::algo;
+using namespace systems::feature;
 
 namespace {
-
-class MockModelIOSystem : public systems::io::ModelIOSystemBase {
-public:
-    void read(const std::filesystem::path&, const std::string&, const std::vector<std::any>&) override {}
-    void write(Index, const std::filesystem::path&, const std::string&, const std::vector<std::any>&) override {}
-    void writeComponents(const std::vector<Index>&, const std::filesystem::path&,
-        const std::string&, const std::vector<std::any>&) override {}
-};
 
 std::shared_ptr<Selection> makeVertexSelection(const std::vector<Index>& ids)
 {
@@ -49,6 +45,43 @@ std::shared_ptr<Selection> makeGeometrySelection(ElementEnum::Type type, const s
 {
     return std::make_shared<Selection>(Selection { ids, type, 0 });
 }
+
+//! @brief 功能测试环境：手工装配 FeatureContext（参数集 + 活动组件 provider），替代原算法 HandlerContext
+struct FeatureTestEnv {
+    ModelLayer mgr;
+    core::EventBus bus;
+    MeasureHandler handler;
+    FeatureRegistrar registrar;
+    std::optional<Index> active_component;
+    std::unique_ptr<FeatureParams> params;
+    std::unique_ptr<FeatureContext> ctx;
+
+    FeatureTestEnv()
+    {
+        // 参数声明直接取自被测功能的 setup，避免测试中重复维护一份
+        handler.setup(registrar);
+        params = std::make_unique<FeatureParams>(registrar.argTypes());
+        ctx = std::make_unique<FeatureContext>(FeatureContext {
+            mgr,
+            bus,
+            *params,
+            []() -> std::optional<Index> { return std::nullopt; },
+            [this]() { return active_component; },
+            [this](Index component_id) { return mgr.getComponentOperator(component_id); },
+        });
+    }
+
+    //! @brief 写入功能参数并执行尺寸标注，返回结果字符串
+    std::string executeMeasure(int measure_type_index, std::shared_ptr<Selection> selection)
+    {
+        params->setValue(0, core::ArgObject::create<ArgTypeEnum::Combo>(measure_type_index));
+        params->setValue(1, core::ArgObject::create<ArgTypeEnum::Selector>(std::move(selection)));
+        auto result_any = handler.execute(*ctx);
+        if (const std::string* result = std::any_cast<std::string>(&result_any))
+            return *result;
+        return {};
+    }
+};
 
 //! @brief 在 10×10×10 的 OCC 立方体几何组件上执行一次测量，返回结果字符串
 std::string executeGeometryMeasureOnBox(int measure_type_index, ElementEnum::Type sel_type, int local_id)
@@ -69,17 +102,16 @@ std::string executeGeometryMeasureOnBox(int measure_type_index, ElementEnum::Typ
     ComponentDatas comps;
     comps.push_back(std::move(c));
 
-    ModelLayer mgr;
-    const Index model_id = mgr.addModel("box", std::move(comps));
-    auto cids = mgr.modelById(model_id)->componentIds();
+    FeatureTestEnv env;
+    const Index model_id = env.mgr.addModel("box", std::move(comps));
+    auto cids = env.mgr.modelById(model_id)->componentIds();
     if (cids.size() != 1)
         return {};
 
-    ComponentData* comp = mgr.findComponent(cids[0]);
+    ComponentData* comp = env.mgr.findComponent(cids[0]);
     if (!comp)
         return {};
-    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
-    comp->geometry->ensureIndexBuilt(mgr.geomRegistry());
+    comp->geometry->ensureIndexBuilt(env.mgr.geomRegistry());
 
     Index gid = -1;
     switch (sel_type) {
@@ -96,30 +128,23 @@ std::string executeGeometryMeasureOnBox(int measure_type_index, ElementEnum::Typ
         break;
     }
 
-    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(measure_type_index);
     auto selection = makeGeometrySelection(sel_type, { gid });
     selection->component_id = cids[0];
-    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
-
-    MockModelIOSystem io_sys;
-    HandlerContext ctx { io_sys, comp_op };
-
-    MeasureHandler handler;
-    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
-    if (const std::string* result = std::any_cast<std::string>(&result_any))
-        return *result;
-    return {};
+    return env.executeMeasure(measure_type_index, selection);
 }
 
 } // namespace
 
-TEST_CASE("MeasureHandler args_type is correct")
+TEST_CASE("MeasureHandler setup declares measure parameters and menu")
 {
     MeasureHandler handler;
-    auto args = handler.args_type();
-    REQUIRE(args.size() == 2);
-    CHECK(args[0].type == ArgTypeEnum::Combo);
-    CHECK(args[1].type == ArgTypeEnum::Selector);
+    FeatureRegistrar reg;
+    handler.setup(reg);
+
+    REQUIRE(reg.argTypes().size() == 2);
+    CHECK(reg.argTypes()[0].type == ArgTypeEnum::Combo);
+    CHECK(reg.argTypes()[1].type == ArgTypeEnum::Selector);
+    REQUIRE(reg.menuItems().size() == 1);
 }
 
 TEST_CASE("MeasureHandler: distance between two vertices")
@@ -133,34 +158,24 @@ TEST_CASE("MeasureHandler: distance between two vertices")
     ComponentDatas comps;
     comps.push_back(std::move(c));
 
-    ModelLayer mgr;
-    const Index model_id = mgr.addModel("test", std::move(comps));
+    FeatureTestEnv env;
+    const Index model_id = env.mgr.addModel("test", std::move(comps));
 
-    auto cids = mgr.modelById(model_id)->componentIds();
+    auto cids = env.mgr.modelById(model_id)->componentIds();
     REQUIRE(cids.size() == 1);
 
-    ComponentData* comp = mgr.findComponent(cids[0]);
+    ComponentData* comp = env.mgr.findComponent(cids[0]);
     REQUIRE(comp);
-    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
 
     MeshData* mesh_ptr = comp->asMeshData();
     REQUIRE(mesh_ptr);
     const Index base = mesh_ptr->local_to_global_[0];
 
-    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(0); // 距离
     auto selection = makeVertexSelection({ base + 0, base + 1 });
     selection->component_id = cids[0];
-    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
-
-    MockModelIOSystem io_sys;
-    HandlerContext ctx { io_sys, comp_op };
-
-    MeasureHandler handler;
-    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
-    const std::string* result = std::any_cast<std::string>(&result_any);
-    REQUIRE(result != nullptr);
-    CHECK(result->find("Distance") != std::string::npos);
-    CHECK(result->find("1.000000") != std::string::npos);
+    const std::string result = env.executeMeasure(0, selection); // 距离
+    CHECK(result.find("Distance") != std::string::npos);
+    CHECK(result.find("1.000000") != std::string::npos);
 }
 
 TEST_CASE("MeasureHandler: length of edges selected as endpoint vertex id pairs")
@@ -174,34 +189,24 @@ TEST_CASE("MeasureHandler: length of edges selected as endpoint vertex id pairs"
     ComponentDatas comps;
     comps.push_back(std::move(c));
 
-    ModelLayer mgr;
-    const Index model_id = mgr.addModel("test", std::move(comps));
+    FeatureTestEnv env;
+    const Index model_id = env.mgr.addModel("test", std::move(comps));
 
-    auto cids = mgr.modelById(model_id)->componentIds();
+    auto cids = env.mgr.modelById(model_id)->componentIds();
     REQUIRE(cids.size() == 1);
 
-    ComponentData* comp = mgr.findComponent(cids[0]);
+    ComponentData* comp = env.mgr.findComponent(cids[0]);
     REQUIRE(comp);
-    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
 
     MeshData* mesh_ptr = comp->asMeshData();
     REQUIRE(mesh_ptr);
     const Index base = mesh_ptr->local_to_global_[0];
 
-    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(3); // 长度
     // 边选择的 ids 是端点顶点 id 对：{12,13} 与 {0,1} 长度均为 1
     auto selection = makeEdgeSelection({ base + 12, base + 13, base + 0, base + 1 });
     selection->component_id = cids[0];
-    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
-
-    MockModelIOSystem io_sys;
-    HandlerContext ctx { io_sys, comp_op };
-
-    MeasureHandler handler;
-    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
-    const std::string* result = std::any_cast<std::string>(&result_any);
-    REQUIRE(result != nullptr);
-    CHECK(result->find("累计长度: 2.000000") != std::string::npos);
+    const std::string result = env.executeMeasure(3, selection); // 长度
+    CHECK(result.find("累计长度: 2.000000") != std::string::npos);
 }
 
 TEST_CASE("MeasureHandler: angle between two edges selected as endpoint vertex id pairs")
@@ -215,34 +220,24 @@ TEST_CASE("MeasureHandler: angle between two edges selected as endpoint vertex i
     ComponentDatas comps;
     comps.push_back(std::move(c));
 
-    ModelLayer mgr;
-    const Index model_id = mgr.addModel("test", std::move(comps));
+    FeatureTestEnv env;
+    const Index model_id = env.mgr.addModel("test", std::move(comps));
 
-    auto cids = mgr.modelById(model_id)->componentIds();
+    auto cids = env.mgr.modelById(model_id)->componentIds();
     REQUIRE(cids.size() == 1);
 
-    ComponentData* comp = mgr.findComponent(cids[0]);
+    ComponentData* comp = env.mgr.findComponent(cids[0]);
     REQUIRE(comp);
-    ComponentOperator comp_op(cids[0], *comp, mgr, nullptr);
 
     MeshData* mesh_ptr = comp->asMeshData();
     REQUIRE(mesh_ptr);
     const Index base = mesh_ptr->local_to_global_[0];
 
-    core::ArgObject type_arg = core::ArgObject::create<ArgTypeEnum::Combo>(1); // 角度
     // 边 {0,1} 方向 (1,0,0)，边 {0,3} 方向 (0,1,0)，夹角 90°
     auto selection = makeEdgeSelection({ base + 0, base + 1, base + 0, base + 3 });
     selection->component_id = cids[0];
-    core::ArgObject sel_arg = core::ArgObject::create<ArgTypeEnum::Selector>(selection);
-
-    MockModelIOSystem io_sys;
-    HandlerContext ctx { io_sys, comp_op };
-
-    MeasureHandler handler;
-    auto result_any = handler.execute(ctx, { type_arg, sel_arg });
-    const std::string* result = std::any_cast<std::string>(&result_any);
-    REQUIRE(result != nullptr);
-    CHECK(result->find("Angle: 90.000000 deg") != std::string::npos);
+    const std::string result = env.executeMeasure(1, selection); // 角度
+    CHECK(result.find("Angle: 90.000000 deg") != std::string::npos);
 }
 
 TEST_CASE("MeasureHandler: geometry edge length on OCC box")

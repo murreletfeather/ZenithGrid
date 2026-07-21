@@ -1,4 +1,4 @@
-precess_add_algo_plugin(MeasurePlugin
+precess_add_feature_plugin(MeasurePlugin
 	SOURCES "MeasureHandler.cpp"
 	PLUGIN_H "MeasurePlugin.h"
 )

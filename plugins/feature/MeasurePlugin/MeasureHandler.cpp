@@ -7,7 +7,9 @@
 #include "MeasureHandler.h"
 #include "ArgObject.h"
 #include "ComponentData.h"
-#include "ComponentOperator.h"
+#include "FeatureContext.h"
+#include "FeatureParams.h"
+#include "FeatureRegistrar.h"
 #include "GeometryData.h"
 #include "GeometryRegistry.h"
 #include "MeshData.h"
@@ -39,7 +41,7 @@
 #include <sstream>
 #include <string>
 
-namespace systems::algo {
+namespace systems::feature {
 
 namespace {
 using Vec3 = std::array<double, 3>;
@@ -895,21 +897,26 @@ std::string selectorContent()
 }
 }
 
-std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core::ArgObject>& args)
+void MeasureHandler::setup(FeatureRegistrar& reg)
 {
     assertExecuteThread();
-    if (args.size() < 2) {
-        spdlog::error("MeasureHandler::execute: 参数不足");
-        return std::string("错误：参数不足");
-    }
+    // Combo 内容全部由测量操作注册表生成，名称与下标天然一致
+    reg.addParameter({ ArgTypeEnum::Combo, "测量类型", comboContent() + "|0" });
+    reg.addParameter({ ArgTypeEnum::Selector, "选择对象", selectorContent() });
+    reg.addMenuItem({ "工具", "测量" });
+}
 
-    const int* type_index = args[0].get<ArgTypeEnum::Combo>();
+std::any MeasureHandler::execute(FeatureContext& ctx)
+{
+    assertExecuteThread();
+
+    const int* type_index = ctx.params.value(0).get<ArgTypeEnum::Combo>();
     if (!type_index) {
         spdlog::error("MeasureHandler::execute: 测量类型参数无效");
         return std::string("错误：测量类型参数无效");
     }
 
-    const auto selection_ptr = args[1].get<ArgTypeEnum::Selector>();
+    const auto selection_ptr = ctx.params.value(1).get<ArgTypeEnum::Selector>();
     if (!selection_ptr || !*selection_ptr) {
         spdlog::error("MeasureHandler::execute: 选择对象参数无效");
         return std::string("错误：选择对象参数无效");
@@ -917,13 +924,20 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
 
     const auto& selection = **selection_ptr;
 
-    const Index selected_component_id = selection.component_id >= 0 ? selection.component_id : context.cur_component.componentId();
-    ComponentData* comp = context.cur_component.manager().findComponent(selected_component_id);
+    // 选择集未带组件 id 时回退当前活动组件
+    Index selected_component_id = selection.component_id;
+    if (selected_component_id < 0) {
+        const auto active_component = ctx.activeComponent ? ctx.activeComponent() : std::nullopt;
+        if (active_component) {
+            selected_component_id = *active_component;
+        }
+    }
+    ComponentData* comp = ctx.model.findComponent(selected_component_id);
     if (!comp) {
         spdlog::error("MeasureHandler::execute: 找不到选择对象所在的组件");
         return std::string("错误：找不到选择对象所在的组件");
     }
-    ModelLayer& manager = context.cur_component.manager();
+    ModelLayer& manager = ctx.model;
     const MeasureOp* op = findMeasureOp(*type_index);
     if (!op) {
         spdlog::error("MeasureHandler::execute: 未知测量类型下标 {}", *type_index);
@@ -944,17 +958,6 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
     }
 
     return op->mesh_exec(*mesh, manager, selection);
-}
-
-std::vector<core::ArgType> MeasureHandler::args_type() const
-{
-    assertExecuteThread();
-    // Combo 内容全部由测量操作注册表生成，名称与下标天然一致
-    const std::string combo = comboContent() + "|0";
-    return {
-        { ArgTypeEnum::Combo, "测量类型", combo },
-        { ArgTypeEnum::Selector, "选择对象", selectorContent() }
-    };
 }
 
 // ---------------- InteractiveHandler：交互测量（两点成线，共端点两线自动标注夹角） ----------------
@@ -1154,4 +1157,4 @@ void MeasureHandler::clear()
     refreshAnnotations();
 }
 
-} // namespace systems::algo
+} // namespace systems::feature
