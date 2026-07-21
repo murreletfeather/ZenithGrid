@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace systems::algo {
+namespace systems::interaction {
 
 /**
  * @brief 视口交互处理器接口
@@ -45,6 +45,6 @@ public:
     virtual void clear() { }
 };
 
-} // namespace systems::algo
+} // namespace systems::interaction
 
 #endif // INTERACTIVE_HANDLER_H

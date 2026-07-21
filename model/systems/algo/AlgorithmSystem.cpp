@@ -88,12 +88,12 @@ vector<AlgorithmInfo*> AlgorithmSystem::getAlgorithmInfos()
     return infos;
 }
 
-InteractiveHandler* AlgorithmSystem::interactiveHandler(const string& unique_name)
+interaction::InteractiveHandler* AlgorithmSystem::interactiveHandler(const string& unique_name)
 {
     auto it = handlers_.find(unique_name);
     if (it == handlers_.end() || !it->second)
         return nullptr;
-    return dynamic_cast<InteractiveHandler*>(it->second.get());
+    return dynamic_cast<interaction::InteractiveHandler*>(it->second.get());
 }
 
 std::optional<std::vector<core::ArgType>> AlgorithmSystem::getArgTypes(const std::string& unique_name)

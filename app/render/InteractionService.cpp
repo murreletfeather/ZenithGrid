@@ -32,8 +32,8 @@
 
 namespace {
 
-using systems::algo::AnnotationBatch;
-using systems::algo::PickInfo;
+using systems::interaction::AnnotationBatch;
+using systems::interaction::PickInfo;
 
 //! @brief 创建统一风格的 3D 面向相机文字标注（置顶层内不被模型遮挡）
 vtkSmartPointer<vtkBillboardTextActor3D> makeTextActor(vtkRenderer* renderer)
@@ -147,7 +147,7 @@ InteractionService::~InteractionService()
     }
 }
 
-void InteractionService::start(systems::algo::InteractiveHandler* handler)
+void InteractionService::start(systems::interaction::InteractiveHandler* handler)
 {
     if (handler_ == handler)
         return;

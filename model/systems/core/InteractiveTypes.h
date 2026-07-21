@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-namespace systems::algo {
+namespace systems::interaction {
 
 //! @brief 拾取结果：渲染层解析好的吸附点（世界坐标 + 两套全局顶点 id）
 struct PickInfo {
@@ -55,6 +55,6 @@ struct AnnotationBatch {
     }
 };
 
-} // namespace systems::algo
+} // namespace systems::interaction
 
 #endif // INTERACTIVE_TYPES_H

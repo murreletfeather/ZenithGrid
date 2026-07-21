@@ -13,6 +13,11 @@
 
 namespace systems::algo {
 
+using systems::interaction::AnnotationBatch;
+using systems::interaction::AnnotationLine;
+using systems::interaction::InteractiveHandler;
+using systems::interaction::PickInfo;
+
 /**
  * @brief 测量处理器：同时实现尺寸标注（AlgorithmHandler）与交互测量（InteractiveHandler）
  *

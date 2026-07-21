@@ -21,7 +21,7 @@ class MeshActorManagerSelectOp;
 class GeometryActorManagerSelectOp;
 class IVtkTools_ShapePicker;
 
-namespace systems::algo {
+namespace systems::interaction {
 class InteractiveHandler;
 }
 
@@ -40,7 +40,7 @@ public:
     ~InteractionService();
 
     //! @brief 启动某个交互处理器（几何拾取切到顶点模式，handler onActivate 后刷新标注）
-    void start(systems::algo::InteractiveHandler* handler);
+    void start(systems::interaction::InteractiveHandler* handler);
     //! @brief 停止交互（handler onDeactivate、还原几何拾取模式、清空标注）
     void stop();
     bool isActive() const { return handler_ != nullptr; }
@@ -57,7 +57,7 @@ public:
 
 private:
     //! @brief 网格顶点优先、几何顶点兜底的吸附解析；命中时 out.valid 置 true
-    bool snapToPickInfo(double posx, double posy, systems::algo::PickInfo& out);
+    bool snapToPickInfo(double posx, double posy, systems::interaction::PickInfo& out);
     //! @brief 拉取 handler 标注集并刷新全部 actor
     void refreshAnnotations();
     void emitResult();
@@ -68,7 +68,7 @@ private:
     GeometryActorManagerSelectOp* geom_op_ {};
     IVtkTools_ShapePicker* geom_picker_ {};
 
-    systems::algo::InteractiveHandler* handler_ {};
+    systems::interaction::InteractiveHandler* handler_ {};
 
     vtkSmartPointer<vtkHardwarePicker> mesh_picker_;
 

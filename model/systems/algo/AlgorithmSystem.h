@@ -24,9 +24,12 @@ namespace systems::io {
 class ModelIOSystem;
 }
 
+namespace systems::interaction {
+class InteractiveHandler;
+}
+
 namespace systems::algo {
 class AlgorithmHandler;
-class InteractiveHandler;
 struct HandlerMetaData {
     std::string name {}; // 算法唯一名称，用作索引
     std::string display_name {}; // 算法UI展示用名称
@@ -66,7 +69,7 @@ public:
      * @param unique_name 算法唯一名称
      * @return handler 实现 InteractiveHandler 时返回接口指针，否则为 nullptr
      */
-    InteractiveHandler* interactiveHandler(const std::string& unique_name);
+    interaction::InteractiveHandler* interactiveHandler(const std::string& unique_name);
     /**
      * @brief 获取参数类型
      * @param unique_name 算法唯一名称
