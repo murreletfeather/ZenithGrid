@@ -5,6 +5,7 @@
 #include "AlgorithmSystem.h"
 #include "AlgorithmHandler.h"
 #include "ArgObject.h"
+#include "InteractiveHandler.h"
 #include "ModelIOSystem.h"
 #include "ModelLayer.h"
 #include <cassert>
@@ -54,6 +55,7 @@ bool AlgorithmSystem::registerHandler(const HandlerMetaData& meta_data, SystemHa
     info->name = meta_data.name;
     info->display_name = meta_data.display_name;
     info->result_display = meta_data.result_display;
+    info->interactive = meta_data.interactive;
     info->arg_types = handler->args_type();
     this->algorithm_infos_[meta_data.name] = std::move(info);
 
@@ -84,6 +86,14 @@ vector<AlgorithmInfo*> AlgorithmSystem::getAlgorithmInfos()
         infos.push_back(algo_info.get());
     }
     return infos;
+}
+
+InteractiveHandler* AlgorithmSystem::interactiveHandler(const string& unique_name)
+{
+    auto it = handlers_.find(unique_name);
+    if (it == handlers_.end() || !it->second)
+        return nullptr;
+    return dynamic_cast<InteractiveHandler*>(it->second.get());
 }
 
 std::optional<std::vector<core::ArgType>> AlgorithmSystem::getArgTypes(const std::string& unique_name)

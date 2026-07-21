@@ -44,6 +44,7 @@ HandlerMetaData AlgorithmSystemRegister::toMetaData(const QJsonObject& meta_data
     handle_data.name = meta_data.value("name").toString().toStdString();
     handle_data.display_name = meta_data.value("display_name").toString().toStdString();
     handle_data.result_display = meta_data.value("result_display").toString().toStdString();
+    handle_data.interactive = meta_data.value("interactive").toBool();
     return handle_data;
 }
 }
