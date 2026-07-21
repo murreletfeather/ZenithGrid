@@ -21,6 +21,7 @@
 #include <BRep_Tool.hxx>
 #include <GeomAbs_CurveType.hxx>
 #include <GProp_GProps.hxx>
+#include <QtGlobal>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -896,6 +897,7 @@ std::string selectorContent()
 
 std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core::ArgObject>& args)
 {
+    assertExecuteThread();
     if (args.size() < 2) {
         spdlog::error("MeasureHandler::execute: 参数不足");
         return std::string("错误：参数不足");
@@ -946,6 +948,7 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
 
 std::vector<core::ArgType> MeasureHandler::args_type() const
 {
+    assertExecuteThread();
     // Combo 内容全部由测量操作注册表生成，名称与下标天然一致
     const std::string combo = comboContent() + "|0";
     return {
@@ -960,6 +963,18 @@ namespace {
 constexpr double kEps = 1e-9;
 }
 
+void MeasureHandler::assertExecuteThread() const
+{
+    Q_ASSERT(std::this_thread::get_id() == gui_thread_id_);
+}
+
+void MeasureHandler::assertInteractiveThread() const
+{
+    if (interactive_thread_id_ == std::thread::id())
+        interactive_thread_id_ = std::this_thread::get_id();
+    Q_ASSERT(std::this_thread::get_id() == interactive_thread_id_);
+}
+
 bool MeasureHandler::samePoint(const PickInfo& a, const PickInfo& b)
 {
     if (a.mesh_id >= 0 && a.mesh_id == b.mesh_id)
@@ -972,6 +987,7 @@ bool MeasureHandler::samePoint(const PickInfo& a, const PickInfo& b)
 
 bool MeasureHandler::onPick(const PickInfo& pick)
 {
+    assertInteractiveThread();
     if (!pick.valid)
         return false;
 
@@ -990,6 +1006,7 @@ bool MeasureHandler::onPick(const PickInfo& pick)
 
 bool MeasureHandler::onHover(const PickInfo& pick)
 {
+    assertInteractiveThread();
     // 未吸附或无起笔：清除已有预览；本来无预览则无需刷新
     if (!pending_ || !pick.valid) {
         if (!has_preview_)
@@ -1109,6 +1126,7 @@ void MeasureHandler::refreshAnnotations()
 
 std::string MeasureHandler::resultText() const
 {
+    assertInteractiveThread();
     if (lines_.empty() && !pending_)
         return {};
 
@@ -1128,6 +1146,7 @@ std::string MeasureHandler::resultText() const
 
 void MeasureHandler::clear()
 {
+    assertInteractiveThread();
     pending_.reset();
     has_preview_ = false;
     lines_.clear();
