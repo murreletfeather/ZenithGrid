@@ -28,7 +28,7 @@ namespace systems::algo {
  *   **交互事件方法不得触碰标注执行路径的状态**（execute 当前是无状态的，新增状态前必须评审）。
  * - 本类**无锁**。UI 层的模式互斥（交互模式隐藏执行按钮、参数模式停止交互）只是当前的安全网，
  *   不是设计依据；确需跨两侧共享状态时，先加锁或经设计评审，不得直接访问。
- *   上述线程模型由 assertExecuteThread()/assertInteractiveThread() 在调试期以 Q_ASSERT 强制。
+ *   上述线程模型由 assertExecuteThread()/assertInteractiveThread() 在调试期以 assert 强制。
  */
 class MeasureHandler : public AlgorithmHandler, public InteractiveHandler {
 public:

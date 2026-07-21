@@ -21,7 +21,6 @@
 #include <BRep_Tool.hxx>
 #include <GeomAbs_CurveType.hxx>
 #include <GProp_GProps.hxx>
-#include <QtGlobal>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -33,6 +32,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cmath>
 #include <limits>
 #include <numeric>
@@ -965,14 +965,14 @@ constexpr double kEps = 1e-9;
 
 void MeasureHandler::assertExecuteThread() const
 {
-    Q_ASSERT(std::this_thread::get_id() == gui_thread_id_);
+    assert(std::this_thread::get_id() == gui_thread_id_);
 }
 
 void MeasureHandler::assertInteractiveThread() const
 {
     if (interactive_thread_id_ == std::thread::id())
         interactive_thread_id_ = std::this_thread::get_id();
-    Q_ASSERT(std::this_thread::get_id() == interactive_thread_id_);
+    assert(std::this_thread::get_id() == interactive_thread_id_);
 }
 
 bool MeasureHandler::samePoint(const PickInfo& a, const PickInfo& b)
