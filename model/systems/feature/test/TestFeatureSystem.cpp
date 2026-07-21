@@ -4,6 +4,7 @@
 #include "FeatureHandler.h"
 #include "FeatureRegistrar.h"
 #include "FeatureSystem.h"
+#include "InteractiveHandler.h"
 #include "ModelLayer.h"
 
 #include <catch2/catch_test_macros.hpp>
@@ -78,6 +79,18 @@ HandlerMetaData makeMetaData()
     meta_data.description = "测试用功能";
     return meta_data;
 }
+
+/**
+ * @brief 同时实现视口交互接口的假功能：验证 interactiveHandler 查询
+ */
+class FakeInteractiveHandler : public FeatureHandler, public systems::interaction::InteractiveHandler {
+public:
+    bool onPick(const systems::interaction::PickInfo&) override { return false; }
+    const systems::interaction::AnnotationBatch& annotations() const override { return annotations_; }
+
+private:
+    systems::interaction::AnnotationBatch annotations_;
+};
 }
 
 TEST_CASE("FeatureSystem::registerHandler collects declarations and activates", "[FeatureSystem]")
@@ -240,4 +253,55 @@ TEST_CASE("FeatureSystem re-registering same name replaces old handler", "[Featu
     REQUIRE(first_deactivate_count == 1);
     REQUIRE(raw_second->activate_count == 1);
     REQUIRE(system.getFeatureInfos().size() == 1);
+}
+
+TEST_CASE("FeatureSystem propagates result_display and interactive metadata to FeatureInfo", "[FeatureSystem]")
+{
+    core::EventBus bus;
+    ModelLayer model_layer;
+    FeatureSystem system(model_layer, bus);
+
+    auto meta_data = makeMetaData();
+    meta_data.result_display = "popup";
+    meta_data.interactive = true;
+    FeatureSystem::SystemHandlerPtr handler { new FakeFeatureHandler };
+    REQUIRE(system.registerHandler(meta_data, std::move(handler)));
+
+    auto infos = system.getFeatureInfos();
+    REQUIRE(infos.size() == 1);
+    REQUIRE(infos[0]->result_display == "popup");
+    REQUIRE(infos[0]->interactive);
+
+    // 未声明时为空串与 false
+    FeatureSystem::SystemHandlerPtr plain { new FakeFeatureHandler };
+    auto plain_meta = makeMetaData();
+    plain_meta.name = "PlainFeature";
+    REQUIRE(system.registerHandler(plain_meta, std::move(plain)));
+    infos = system.getFeatureInfos();
+    REQUIRE(infos.size() == 2);
+    for (const FeatureInfo* info : infos) {
+        if (info->name == "PlainFeature") {
+            REQUIRE(info->result_display.empty());
+            REQUIRE_FALSE(info->interactive);
+        }
+    }
+}
+
+TEST_CASE("FeatureSystem::interactiveHandler returns interface only for capable handlers", "[FeatureSystem]")
+{
+    core::EventBus bus;
+    ModelLayer model_layer;
+    FeatureSystem system(model_layer, bus);
+
+    FeatureSystem::SystemHandlerPtr plain { new FakeFeatureHandler };
+    REQUIRE(system.registerHandler(makeMetaData(), std::move(plain)));
+
+    auto interactive_meta = makeMetaData();
+    interactive_meta.name = "InteractiveFeature";
+    FeatureSystem::SystemHandlerPtr interactive { new FakeInteractiveHandler };
+    REQUIRE(system.registerHandler(interactive_meta, std::move(interactive)));
+
+    REQUIRE(system.interactiveHandler("FakeFeature") == nullptr);
+    REQUIRE(system.interactiveHandler("InteractiveFeature") != nullptr);
+    REQUIRE(system.interactiveHandler("NoSuchFeature") == nullptr);
 }

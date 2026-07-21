@@ -1,6 +1,12 @@
 #include "QRenderWindow.h"
 #include "renderStrategy/AttributeCommon.h"
+#include "AlgorithmSystem.h"
+#include "FeatureSystem.h"
+#include "InteractionService.h"
+#include "InteractiveHandler.h"
 #include "MeshActorManager.h"
+#include "QAlgorithmSystemAdaptor.h"
+#include "QFeatureSystemAdaptor.h"
 #include "QModelQuery.h"
 #include "QRenderWindowStyle.h"
 #include "QSelection.h"
@@ -14,9 +20,50 @@
 #include <vtkCallbackCommand.h>
 #include <vtkDisplaySizedImplicitPlaneRepresentation.h>
 #include <vtkDisplaySizedImplicitPlaneWidget.h>
+#include <vtkInteractorObserver.h>
 #include <vtkMapper.h>
+#include <vtkMath.h>
 #include <vtkObjectFactory.h>
 #include <vtkPlane.h>
+
+#include <cmath>
+
+namespace {
+//! @brief 每帧渲染前把比例尺段的像素长度换算为世界长度写入 Range，使刻度值随相机缩放更新
+//! （与 vtkLegendScaleActor::UpdateAxisRange 同法：按相机焦点深度反投影轴两端点）
+class ScaleBarRangeUpdater : public vtkCommand {
+public:
+    static ScaleBarRangeUpdater* New() { return new ScaleBarRangeUpdater; }
+
+    vtkAxisActor2D* axis_ {};
+    vtkRenderer* renderer_ {};
+
+    void Execute(vtkObject*, unsigned long, void*) override
+    {
+        if (!axis_ || !renderer_ || !renderer_->GetActiveCamera())
+            return;
+
+        // 相机焦点的显示深度
+        double focal[3];
+        renderer_->GetActiveCamera()->GetFocalPoint(focal);
+        double focal_display[4];
+        vtkInteractorObserver::ComputeWorldToDisplay(renderer_, focal[0], focal[1], focal[2], focal_display);
+
+        // 轴两端点（归一化视口坐标）反投影到焦平面，求段的世界长度
+        const int* size = renderer_->GetSize();
+        const double* v1 = axis_->GetPositionCoordinate()->GetValue();
+        const double* v2 = axis_->GetPosition2Coordinate()->GetValue();
+        double w1[4], w2[4];
+        vtkInteractorObserver::ComputeDisplayToWorld(
+            renderer_, v1[0] * size[0], v1[1] * size[1], focal_display[2], w1);
+        vtkInteractorObserver::ComputeDisplayToWorld(
+            renderer_, v2[0] * size[0], v2[1] * size[1], focal_display[2], w2);
+
+        axis_->SetRange(0.0, std::sqrt(vtkMath::Distance2BetweenPoints(w1, w2)));
+    }
+};
+}
+
 QRenderWindow::QRenderWindow()
 {
     connect(this, &QQuickItem::widthChanged, this, &QRenderWindow::resetCamera);
@@ -47,6 +94,33 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     renderWindow->GetInteractor()->SetInteractorStyle(vtk->style_);
 
     renderWindow->AddRenderer(vtk->renderer_);
+
+    // 叠加渲染层：测量文字标注置顶显示（SetLayer(1) 自动 PreserveColorBuffer，
+    // 每帧只清深度、保留颜色，文字不被模型遮挡）
+    renderWindow->SetNumberOfLayers(2);
+    vtk->overlay_renderer_->SetLayer(1);
+    vtk->overlay_renderer_->InteractiveOff();
+    vtk->overlay_renderer_->SetActiveCamera(vtk->renderer_->GetActiveCamera()); // 共享相机，免逐帧同步
+    renderWindow->AddRenderer(vtk->overlay_renderer_);
+
+    // 比例尺（叠加层底部中央的一段标尺轴）：端点视口位置固定，ScaleBarRangeUpdater
+    // 每帧把段长换算为世界长度写入 Range，刻度值随缩放自动更新
+    vtk->scale_bar_axis_->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+    vtk->scale_bar_axis_->GetPositionCoordinate()->SetValue(0.39, 0.05);
+    vtk->scale_bar_axis_->GetPosition2Coordinate()->SetCoordinateSystemToNormalizedViewport();
+    vtk->scale_bar_axis_->GetPosition2Coordinate()->SetValue(0.61, 0.05);
+    vtk->scale_bar_axis_->SetNumberOfLabels(3);
+    vtk->scale_bar_axis_->SetLabelFormat("%.6g");
+    vtk->scale_bar_axis_->SetTitleVisibility(false);
+    vtk->scale_bar_axis_->PickableOff();
+    vtk->scale_bar_axis_->SetVisibility(false);
+    vtk->overlay_renderer_->AddActor(vtk->scale_bar_axis_);
+
+    vtkNew<ScaleBarRangeUpdater> scale_bar_updater;
+    scale_bar_updater->axis_ = vtk->scale_bar_axis_.GetPointer();
+    scale_bar_updater->renderer_ = vtk->overlay_renderer_.GetPointer();
+    vtk->overlay_renderer_->AddObserver(vtkCommand::StartEvent, scale_bar_updater);
+
     this->data_ = vtk.GetPointer();
     vtk->mesh_actor_manager_ = std::make_unique<MeshActorManager>(vtk->global_points_.GetPointer());
     vtk->mesh_actor_manager_->bindRender(vtk->renderer_);
@@ -56,6 +130,15 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     select_manager_ = std::make_unique<SelectManager>(*vtk->renderer_,
         vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op());
     vtk->style_->SetSelectManager(this->select_manager_.get());
+
+    // 通用交互服务：几何拾取复用选择系统的 picker（全程序单一实例，多实例激活会冲突）
+    interaction_service_ = std::make_unique<InteractionService>(*vtk->renderer_, *vtk->overlay_renderer_,
+        vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op(),
+        *select_manager_->geometryPicker());
+    vtk->style_->SetInteractionService(interaction_service_.get());
+    interaction_service_->onResultChanged = [this](const std::string& text) {
+        emit interactionUpdated(QString::fromStdString(text));
+    };
 
     vtk->orientationWidget->AnimateOff();
     vtk->orientationWidget->SetParentRenderer(vtk->renderer_);
@@ -333,6 +416,10 @@ QSelection* QRenderWindow::selectedIDs()
         return nullptr;
     }
 
+    // 保留 SelectManager 实际拾取到的 component_id；如果拾取器未提供，再退到当前活动组件
+    if (data->component_id < 0) {
+        data->component_id = this->cur_component_id_;
+    }
     QSelection* selection = new QSelection(std::move(data));
     QJSEngine::setObjectOwnership(selection, QJSEngine::JavaScriptOwnership);
     return selection;
@@ -390,6 +477,61 @@ void QRenderWindow::clearSelection()
 {
     dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
         this->select_manager_->clearSelection();
+    });
+}
+
+void QRenderWindow::setAlgorithmAdaptor(QObject* adaptor)
+{
+    algo_adaptor_ = qobject_cast<systems::algo::QAlgorithmSystemAdaptor*>(adaptor);
+}
+
+void QRenderWindow::setFeatureAdaptor(QObject* adaptor)
+{
+    feature_adaptor_ = qobject_cast<systems::feature::QFeatureSystemAdaptor*>(adaptor);
+}
+
+void QRenderWindow::startInteraction(QString name)
+{
+    dispatch_async([name, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        // 功能系统的交互 handler 优先，查不到再回退算法系统
+        systems::interaction::InteractiveHandler* handler = nullptr;
+        if (auto* feature_system = feature_adaptor_ ? feature_adaptor_->featureSystem() : nullptr) {
+            handler = feature_system->interactiveHandler(name.toStdString());
+        }
+        if (!handler) {
+            if (auto* algo_system = algo_adaptor_ ? algo_adaptor_->algorithmSystem() : nullptr) {
+                handler = algo_system->interactiveHandler(name.toStdString());
+            }
+        }
+        if (!handler) {
+            spdlog::error("QRenderWindow::startInteraction: {} 未声明视口交互能力", name.toStdString());
+            return;
+        }
+        // 交互与选择互斥，避免点击被两边同时处理
+        this->select_manager_->setSelectMode("None");
+        interaction_service_->start(handler);
+    });
+}
+
+void QRenderWindow::stopInteraction()
+{
+    dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        interaction_service_->stop();
+    });
+}
+
+void QRenderWindow::clearInteraction()
+{
+    dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        interaction_service_->clear();
+    });
+}
+
+void QRenderWindow::setScaleBarVisible(bool on)
+{
+    dispatch_async([on](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        Data* vtk = Data::SafeDownCast(userData);
+        vtk->scale_bar_axis_->SetVisibility(on);
     });
 }
 

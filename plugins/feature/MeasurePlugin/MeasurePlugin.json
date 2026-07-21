@@ -1,0 +1,10 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "MeasurePlugin",
+    "display_name": "测量",
+    "description": "交互式测量与尺寸标注：两点成线、共点夹角、距离/角度/半径/长度/面积/体积/包围盒/重心",
+    "result_display": "popup",
+    "interactive": true
+  }
+}

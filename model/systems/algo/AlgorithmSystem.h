@@ -24,11 +24,17 @@ namespace systems::io {
 class ModelIOSystem;
 }
 
+namespace systems::interaction {
+class InteractiveHandler;
+}
+
 namespace systems::algo {
 class AlgorithmHandler;
 struct HandlerMetaData {
     std::string name {}; // 算法唯一名称，用作索引
     std::string display_name {}; // 算法UI展示用名称
+    std::string result_display {}; //> 结果展示方式："popup" 弹窗展示，空或其他值默认侧栏展示
+    bool interactive {}; //> 是否声明视口交互能力（插件 handler 同时实现 InteractiveHandler）
 };
 
 class AlgorithmSystem {
@@ -58,6 +64,12 @@ public:
      * @brief 获取已注册算法类型信息
      */
     std::vector<AlgorithmInfo*> getAlgorithmInfos();
+    /**
+     * @brief 按唯一名称获取算法的视口交互处理器
+     * @param unique_name 算法唯一名称
+     * @return handler 实现 InteractiveHandler 时返回接口指针，否则为 nullptr
+     */
+    interaction::InteractiveHandler* interactiveHandler(const std::string& unique_name);
     /**
      * @brief 获取参数类型
      * @param unique_name 算法唯一名称

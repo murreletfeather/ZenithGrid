@@ -33,6 +33,8 @@ struct FeatureInfo {
     std::string name; //> 功能唯一名称，用作索引
     std::string display_name; //> 功能 UI 展示用名称
     std::string description; //> 功能描述
+    std::string result_display; //> 结果展示方式："popup" 弹窗展示，空或其他值默认侧栏展示
+    bool interactive = false; //> 是否声明视口交互能力（功能 handler 同时实现 InteractiveHandler）
     std::vector<core::ArgType> arg_types; //> 功能参数类型列表
     std::vector<MenuContribution> menus; //> 菜单贡献项列表
     std::vector<KeyBinding> key_bindings; //> 按键绑定列表

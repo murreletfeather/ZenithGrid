@@ -19,6 +19,7 @@
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkCameraOrientationWidget.h>
+#include <vtkAxisActor2D.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -27,10 +28,17 @@
 
 class MeshActor;
 class SelectManager;
+class InteractionService;
 class GeometryActorManager;
 class MeshActorManager;
 class QRenderWindowStyle;
 class vtkDisplaySizedImplicitPlaneWidget;
+namespace systems::algo {
+class QAlgorithmSystemAdaptor;
+}
+namespace systems::feature {
+class QFeatureSystemAdaptor;
+}
 
 struct QRenderWindow : QQuickVTKItem { // 结构体继承QQuickVTKItem
     Q_OBJECT
@@ -47,6 +55,7 @@ public:
         vtkTypeMacro(Data, vtkObject);
 
         vtkNew<vtkRenderer> renderer_;
+        vtkNew<vtkRenderer> overlay_renderer_; //> 叠加层：测量文字标注置顶，不被模型遮挡
 
         /*std::unordered_map<Index, std::unique_ptr<MeshActor>> models_;*/
         vtkNew<QRenderWindowStyle> style_;
@@ -56,6 +65,8 @@ public:
         std::unique_ptr<GeometryActorManager> geometry_actor_manager_;
 
         vtkNew<vtkDisplaySizedImplicitPlaneWidget> plane_widget_;
+
+        vtkNew<vtkAxisActor2D> scale_bar_axis_; //> 比例尺标尺轴（叠加层左下角，刻度随相机缩放更新）
 
         vtkNew<vtkPoints> global_points_;
     };
@@ -89,6 +100,40 @@ public:
      * @param select_mode
      */
     Q_INVOKABLE void clearSelection();
+
+    /**
+     * @brief 注入算法系统适配器（启动交互时按名称解析 InteractiveHandler）
+     * @param adaptor QModelManager.algorithmSystem
+     */
+    Q_INVOKABLE void setAlgorithmAdaptor(QObject* adaptor);
+
+    /**
+     * @brief 注入功能系统适配器（启动交互时优先按功能名解析 InteractiveHandler）
+     * @param adaptor QModelManager.featureSystem
+     */
+    Q_INVOKABLE void setFeatureAdaptor(QObject* adaptor);
+
+    /**
+     * @brief 启动指定功能/算法的视口交互（与选择互斥，进入时会清空选择模式）
+     * @param name 功能或算法唯一名称（其 handler 须实现 InteractiveHandler）
+     */
+    Q_INVOKABLE void startInteraction(QString name);
+
+    /**
+     * @brief 停止当前视口交互并清空标注
+     */
+    Q_INVOKABLE void stopInteraction();
+
+    /**
+     * @brief 清空当前交互处理器的状态与视图内标注
+     */
+    Q_INVOKABLE void clearInteraction();
+
+    /**
+     * @brief 显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度）
+     * @param on 是否显示
+     */
+    Q_INVOKABLE void setScaleBarVisible(bool on);
 
     /**
      * @brief 改变渲染模式
@@ -171,6 +216,8 @@ signals:
     void curEdgeRenderChanged();
     void clicked();
     void rightClicked();
+    //! @brief 交互结果文本变化（渲染线程触发，Qt 自动排队到 GUI 线程）
+    void interactionUpdated(QString resultText);
 
 private:
     bool edge_render_ {};
@@ -179,6 +226,9 @@ private:
     vtkNew<vtkCamera> _camera;
 
     std::unique_ptr<SelectManager> select_manager_;
+    std::unique_ptr<InteractionService> interaction_service_;
+    systems::algo::QAlgorithmSystemAdaptor* algo_adaptor_ {};
+    systems::feature::QFeatureSystemAdaptor* feature_adaptor_ {};
     MeshActor* cur_actor_ {};
     Index cur_component_id_;
 

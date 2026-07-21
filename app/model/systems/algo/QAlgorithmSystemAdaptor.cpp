@@ -4,6 +4,42 @@
 #include "QArgObject.h"
 #include <spdlog/spdlog.h>
 
+#include <any>
+
+namespace {
+QVariant anyToQVariant(const std::any& value)
+{
+    if (!value.has_value())
+        return {};
+
+    if (value.type() == typeid(std::string))
+        return QString::fromStdString(std::any_cast<std::string>(value));
+
+    if (value.type() == typeid(double))
+        return std::any_cast<double>(value);
+
+    if (value.type() == typeid(long long))
+        return static_cast<qlonglong>(std::any_cast<long long>(value));
+
+    if (value.type() == typeid(int))
+        return std::any_cast<int>(value);
+
+    if (value.type() == typeid(bool))
+        return std::any_cast<bool>(value);
+
+    if (value.type() == typeid(std::vector<double>)) {
+        const auto& vec = std::any_cast<const std::vector<double>&>(value);
+        QVariantList list;
+        list.reserve((int)vec.size());
+        for (double v : vec)
+            list.append(v);
+        return list;
+    }
+
+    return {};
+}
+}
+
 namespace systems::algo {
 QAlgorithmSystemAdaptor::QAlgorithmSystemAdaptor(AlgorithmSystem& algo_system)
     : algo_system_(&algo_system)
@@ -44,7 +80,7 @@ QVariant QAlgorithmSystemAdaptor::call(const QString& unique_name, Index model, 
     }
 
     auto result = algo_system_->call(unique_name.toStdString(), model, std::move(converted_args));
-    return {};
+    return anyToQVariant(result);
 }
 
 QList<QAlgorithmInfo*> QAlgorithmSystemAdaptor::getAlgorithmsInfo() const
@@ -59,6 +95,8 @@ QList<QAlgorithmInfo*> QAlgorithmSystemAdaptor::getAlgorithmsInfo() const
             QString::fromStdString(algo_info->name),
             QString::fromStdString(algo_info->display_name),
             QString::fromStdString(algo_info->description),
+            QString::fromStdString(algo_info->result_display),
+            algo_info->interactive,
             std::move(args)));
     }
     return infos;

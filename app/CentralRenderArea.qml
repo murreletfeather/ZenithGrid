@@ -49,6 +49,15 @@ Page {
                 }
             }
             ToolButton {
+                text: "比例尺"
+                checkable: true
+                Layout.preferredWidth: 50
+                Layout.fillHeight: true
+                onClicked: {
+                    myItem.setScaleBarVisible(checked)
+                }
+            }
+            ToolButton {
                 text: "重置视图"
                 Layout.preferredWidth: 70
                 Layout.fillHeight: true
@@ -252,6 +261,9 @@ Page {
 
     Component.onCompleted: {
         App.registry.renderWindow = myItem
+        // 注入系统适配器：startInteraction 按名称解析 InteractiveHandler（功能优先，算法兜底）
+        myItem.setAlgorithmAdaptor(QModelManager.algorithmSystem)
+        myItem.setFeatureAdaptor(QModelManager.featureSystem)
         Qt.callLater(function() { myItem.resetCamera() })
     }
 }

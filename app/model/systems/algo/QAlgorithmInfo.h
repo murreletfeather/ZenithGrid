@@ -13,25 +13,34 @@ class QAlgorithmInfo : public QObject {
     Q_PROPERTY(QString name READ name CONSTANT)
     Q_PROPERTY(QString display_name READ displayName CONSTANT)
     Q_PROPERTY(QString description READ description CONSTANT)
+    Q_PROPERTY(QString result_display READ resultDisplay CONSTANT)
+    Q_PROPERTY(bool interactive READ interactive CONSTANT)
     Q_PROPERTY(QList<QArgType*> arg_types READ argTypes CONSTANT)
 public:
-    QAlgorithmInfo(QString name, QString display_name, QString description, QList<QArgType*> arg_types, QObject* parent = nullptr)
+    QAlgorithmInfo(QString name, QString display_name, QString description, QString result_display,
+        bool interactive, QList<QArgType*> arg_types, QObject* parent = nullptr)
         : QObject(parent)
         , name_(std::move(name))
         , display_name_(std::move(display_name))
         , description_(std::move(description))
+        , result_display_(std::move(result_display))
+        , interactive_(interactive)
         , arg_types_(std::move(arg_types))
     {
     }
     QString name() const { return name_; }
     QString displayName() const { return display_name_; }
     QString description() const { return description_; }
+    QString resultDisplay() const { return result_display_; }
+    bool interactive() const { return interactive_; }
     QList<QArgType*> argTypes() const { return arg_types_; }
 
 private:
     QString name_; //> 算法唯一名称，用作索引
     QString display_name_; //> 算法UI展示用名称
     QString description_; //> 算法描述
+    QString result_display_; //> 结果展示方式："popup" 弹窗展示，空或其他值默认侧栏展示
+    bool interactive_ = false; //> 是否声明视口交互能力
     QList<QArgType*> arg_types_; //> 算法参数类型列表
 };
 #endif // !Q_ALGORITHM_INFO_H

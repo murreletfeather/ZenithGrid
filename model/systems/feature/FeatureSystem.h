@@ -27,6 +27,10 @@ namespace core {
 class ArgObject;
 }
 
+namespace systems::interaction {
+class InteractiveHandler;
+}
+
 namespace systems::feature {
 class FeatureHandler;
 
@@ -34,6 +38,8 @@ struct HandlerMetaData {
     std::string name {}; //> 功能唯一名称，用作索引
     std::string display_name {}; //> 功能 UI 展示用名称
     std::string description {}; //> 功能描述
+    std::string result_display {}; //> 结果展示方式："popup" 弹窗展示，空或其他值默认侧栏展示
+    bool interactive {}; //> 是否声明视口交互能力（功能 handler 同时实现 InteractiveHandler）
 };
 
 /**
@@ -85,6 +91,12 @@ public:
      * @brief 获取功能的参数集（UI 展示当前值用），功能不存在时为 nullptr
      */
     const FeatureParams* params(const std::string& unique_name) const;
+    /**
+     * @brief 按唯一名称获取功能的视口交互处理器
+     * @param unique_name 功能唯一名称
+     * @return handler 实现 InteractiveHandler 时返回接口指针，否则为 nullptr
+     */
+    interaction::InteractiveHandler* interactiveHandler(const std::string& unique_name);
     /**
      * @brief 设置功能信息变更回调函数
      */

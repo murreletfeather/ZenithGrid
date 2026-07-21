@@ -63,7 +63,7 @@ ApplicationWindow {
                         var info = modelData
                         App.activeOperation = {
                             info: info,
-                            execute: function(model, args) { QModelManager.editSystem.call(info.name, model, args) }
+                            execute: function(model, args) { return QModelManager.editSystem.call(info.name, model, args) }
                         }
                     }
                 }
@@ -129,7 +129,7 @@ ApplicationWindow {
                         App.activeOperation = {
                             info: info,
                             execute: function(component, args) {
-                                QModelManager.algorithmSystem.call(info.name, component, args)
+                                return QModelManager.algorithmSystem.call(info.name, component, args)
                             }
                         }
                     }
@@ -319,12 +319,20 @@ ApplicationWindow {
         }
     }
 
+    // 全局可复用弹窗（经 App.showDialog 调用）：初始停靠右下角避免遮挡中心视野，标题栏可拖动
+    AppDialog {
+        id: appDialog
+        x: parent.width - width - 20
+        y: parent.height - height - 60
+    }
+
     Component.onCompleted: {
         // 构建功能菜单并同步当前活动模型/组件到功能系统
         rebuildFeatureMenus()
         QModelManager.featureSystem.setActiveModel(App.selection.activeModelId)
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
+        App.registry.appDialog = appDialog
         Qt.callLater(function() {
             for (let i = 0; i < commandLineArgs.length; ++i) {
                 let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
