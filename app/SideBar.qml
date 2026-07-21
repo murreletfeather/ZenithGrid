@@ -91,10 +91,12 @@ Item{
         height: visible ? 30 : 0
         onClicked:{
             if (root.activeOp && root.activeOp.execute) {
-                root.resultText = root.activeOp.execute(App.selection.activeModelId, root.parameters)
-                // 尺寸标注结果改用弹窗展示，其他算法仍走侧栏
-                if (root.isMeasureOp && root.measureMode === 1)
-                    App.showDialog("测量结果", root.resultText)
+                var r = root.activeOp.execute(App.selection.activeModelId, root.parameters)
+                // 结果路由由插件声明的 result_display 决定：popup 走弹窗，其余走侧栏
+                if (root.activeOp.info && root.activeOp.info.result_display === "popup")
+                    App.showDialog(root.activeOp.info.display_name + "结果", r)
+                else
+                    root.resultText = r
             }
         }
     }
@@ -108,8 +110,8 @@ Item{
         readOnly: true
         text: root.resultText
         wrapMode: TextEdit.Wrap
-        // 测量结果改用弹窗展示，侧栏结果区只服务其他算法
-        visible: text.length > 0 && !root.isMeasureOp
+        // 声明 popup 的插件结果走弹窗，侧栏结果区只服务其余算法
+        visible: text.length > 0 && !(root.activeOp && root.activeOp.info && root.activeOp.info.result_display === "popup")
         background: Rectangle {
             color: "#f0f0f0"
             border.color: "#d0d0d0"
