@@ -261,8 +261,9 @@ Page {
 
     Component.onCompleted: {
         App.registry.renderWindow = myItem
-        // 注入算法系统适配器：startInteraction 按名称解析 InteractiveHandler
+        // 注入系统适配器：startInteraction 按名称解析 InteractiveHandler（功能优先，算法兜底）
         myItem.setAlgorithmAdaptor(QModelManager.algorithmSystem)
+        myItem.setFeatureAdaptor(QModelManager.featureSystem)
         Qt.callLater(function() { myItem.resetCamera() })
     }
 }

@@ -36,6 +36,9 @@ class vtkDisplaySizedImplicitPlaneWidget;
 namespace systems::algo {
 class QAlgorithmSystemAdaptor;
 }
+namespace systems::feature {
+class QFeatureSystemAdaptor;
+}
 
 struct QRenderWindow : QQuickVTKItem { // 结构体继承QQuickVTKItem
     Q_OBJECT
@@ -105,8 +108,14 @@ public:
     Q_INVOKABLE void setAlgorithmAdaptor(QObject* adaptor);
 
     /**
-     * @brief 启动指定算法的视口交互（与选择互斥，进入时会清空选择模式）
-     * @param name 算法唯一名称（其 handler 须实现 InteractiveHandler）
+     * @brief 注入功能系统适配器（启动交互时优先按功能名解析 InteractiveHandler）
+     * @param adaptor QModelManager.featureSystem
+     */
+    Q_INVOKABLE void setFeatureAdaptor(QObject* adaptor);
+
+    /**
+     * @brief 启动指定功能/算法的视口交互（与选择互斥，进入时会清空选择模式）
+     * @param name 功能或算法唯一名称（其 handler 须实现 InteractiveHandler）
      */
     Q_INVOKABLE void startInteraction(QString name);
 
@@ -219,6 +228,7 @@ private:
     std::unique_ptr<SelectManager> select_manager_;
     std::unique_ptr<InteractionService> interaction_service_;
     systems::algo::QAlgorithmSystemAdaptor* algo_adaptor_ {};
+    systems::feature::QFeatureSystemAdaptor* feature_adaptor_ {};
     MeshActor* cur_actor_ {};
     Index cur_component_id_;
 

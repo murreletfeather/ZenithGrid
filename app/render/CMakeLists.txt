@@ -49,6 +49,7 @@ qt_add_qml_module(renderQml
 )
 target_link_libraries(renderQml PRIVATE 
     vtkPart modelQml 
+    FeatureSystem # startInteraction 经功能系统解析 InteractiveHandler
     VTK::GUISupportQtQuick VTK::CommonColor VTK::RenderingAnnotation
 )
 vtk_module_autoinit(TARGETS renderQml MODULES 

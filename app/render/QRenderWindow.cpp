@@ -1,9 +1,12 @@
 #include "QRenderWindow.h"
 #include "renderStrategy/AttributeCommon.h"
 #include "AlgorithmSystem.h"
+#include "FeatureSystem.h"
 #include "InteractionService.h"
+#include "InteractiveHandler.h"
 #include "MeshActorManager.h"
 #include "QAlgorithmSystemAdaptor.h"
+#include "QFeatureSystemAdaptor.h"
 #include "QModelQuery.h"
 #include "QRenderWindowStyle.h"
 #include "QSelection.h"
@@ -482,17 +485,26 @@ void QRenderWindow::setAlgorithmAdaptor(QObject* adaptor)
     algo_adaptor_ = qobject_cast<systems::algo::QAlgorithmSystemAdaptor*>(adaptor);
 }
 
+void QRenderWindow::setFeatureAdaptor(QObject* adaptor)
+{
+    feature_adaptor_ = qobject_cast<systems::feature::QFeatureSystemAdaptor*>(adaptor);
+}
+
 void QRenderWindow::startInteraction(QString name)
 {
     dispatch_async([name, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
-        auto* algo_system = algo_adaptor_ ? algo_adaptor_->algorithmSystem() : nullptr;
-        if (!algo_system) {
-            spdlog::error("QRenderWindow::startInteraction: 算法系统未注入");
-            return;
+        // 功能系统的交互 handler 优先，查不到再回退算法系统
+        systems::interaction::InteractiveHandler* handler = nullptr;
+        if (auto* feature_system = feature_adaptor_ ? feature_adaptor_->featureSystem() : nullptr) {
+            handler = feature_system->interactiveHandler(name.toStdString());
         }
-        auto* handler = algo_system->interactiveHandler(name.toStdString());
         if (!handler) {
-            spdlog::error("QRenderWindow::startInteraction: 算法 {} 未声明视口交互能力", name.toStdString());
+            if (auto* algo_system = algo_adaptor_ ? algo_adaptor_->algorithmSystem() : nullptr) {
+                handler = algo_system->interactiveHandler(name.toStdString());
+            }
+        }
+        if (!handler) {
+            spdlog::error("QRenderWindow::startInteraction: {} 未声明视口交互能力", name.toStdString());
             return;
         }
         // 交互与选择互斥，避免点击被两边同时处理

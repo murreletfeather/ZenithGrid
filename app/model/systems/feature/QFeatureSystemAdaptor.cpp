@@ -6,7 +6,46 @@
 #include "QFeatureInfo.h"
 #include <spdlog/spdlog.h>
 
+#include <any>
+#include <string>
+#include <vector>
+
 namespace systems::feature {
+namespace {
+//! @brief 功能结果 std::any → QVariant（与算法系统适配器的转换规则保持一致）
+QVariant anyToQVariant(const std::any& value)
+{
+    if (!value.has_value())
+        return {};
+
+    if (value.type() == typeid(std::string))
+        return QString::fromStdString(std::any_cast<std::string>(value));
+
+    if (value.type() == typeid(double))
+        return std::any_cast<double>(value);
+
+    if (value.type() == typeid(long long))
+        return static_cast<qlonglong>(std::any_cast<long long>(value));
+
+    if (value.type() == typeid(int))
+        return std::any_cast<int>(value);
+
+    if (value.type() == typeid(bool))
+        return std::any_cast<bool>(value);
+
+    if (value.type() == typeid(std::vector<double>)) {
+        const auto& vec = std::any_cast<const std::vector<double>&>(value);
+        QVariantList list;
+        list.reserve((int)vec.size());
+        for (double v : vec)
+            list.append(v);
+        return list;
+    }
+
+    return {};
+}
+}
+
 QFeatureSystemAdaptor::QFeatureSystemAdaptor(FeatureSystem& feature_system)
     : feature_system_(&feature_system)
 {
@@ -17,8 +56,7 @@ QFeatureSystemAdaptor::QFeatureSystemAdaptor(FeatureSystem& feature_system)
 
 QVariant QFeatureSystemAdaptor::invoke(const QString& unique_name)
 {
-    feature_system_->invoke(unique_name.toStdString());
-    return {};
+    return anyToQVariant(feature_system_->invoke(unique_name.toStdString()));
 }
 
 bool QFeatureSystemAdaptor::setParameter(const QString& unique_name, int index, const QVariant& value)
@@ -75,7 +113,9 @@ QList<QFeatureInfo*> QFeatureSystemAdaptor::getFeaturesInfo() const
             QString::fromStdString(feature_info->display_name),
             QString::fromStdString(feature_info->description),
             std::move(menu_path),
-            std::move(args)));
+            std::move(args),
+            QString::fromStdString(feature_info->result_display),
+            feature_info->interactive));
     }
     return infos;
 }
