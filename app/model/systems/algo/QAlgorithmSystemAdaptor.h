@@ -33,6 +33,11 @@ public:
      */
     QList<QAlgorithmInfo*> getAlgorithmsInfo() const;
 
+    /**
+     * @brief 获取底层算法系统指针（解析 InteractiveHandler 等系统级接口用）
+     */
+    AlgorithmSystem* algorithmSystem() const { return algo_system_; }
+
 signals:
     void algorithmsInfoChanged();
 

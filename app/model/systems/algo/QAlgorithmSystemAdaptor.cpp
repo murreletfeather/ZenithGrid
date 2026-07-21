@@ -96,6 +96,7 @@ QList<QAlgorithmInfo*> QAlgorithmSystemAdaptor::getAlgorithmsInfo() const
             QString::fromStdString(algo_info->display_name),
             QString::fromStdString(algo_info->description),
             QString::fromStdString(algo_info->result_display),
+            algo_info->interactive,
             std::move(args)));
     }
     return infos;
