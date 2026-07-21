@@ -2,6 +2,7 @@
   "system": "AlgorithmSystem",
   "handler": {
     "name": "MeasurePlugin",
-    "display_name": "测量"
+    "display_name": "测量",
+    "result_display": "popup"
   }
 }

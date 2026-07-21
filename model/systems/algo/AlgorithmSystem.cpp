@@ -53,6 +53,7 @@ bool AlgorithmSystem::registerHandler(const HandlerMetaData& meta_data, SystemHa
     auto info = std::make_unique<AlgorithmInfo>();
     info->name = meta_data.name;
     info->display_name = meta_data.display_name;
+    info->result_display = meta_data.result_display;
     info->arg_types = handler->args_type();
     this->algorithm_infos_[meta_data.name] = std::move(info);
 
