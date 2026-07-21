@@ -43,7 +43,7 @@ vtk_module_autoinit(TARGETS TestVertexSelectorHighlight MODULES VTK::Interaction
 # TestMeasureManager
 add_executable(TestMeasureManager TestMeasureManager.cpp)
 target_link_libraries(TestMeasureManager PRIVATE
-    vtkPart TestDeps
+    vtkPart TestDeps MeasurePluginlib
     spdlog::spdlog
     VTK::InteractionStyle VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::RenderingOpenGL2 VTK::FiltersGeometry
 

@@ -18,7 +18,7 @@ add_library(vtkPart STATIC
     ComponentSelectorHighlight.cpp
     MeshActorManagerSelectOp.cpp
     GeometryActorManagerSelectOp.cpp
-    MeasureManager.cpp
+    InteractionService.cpp
     renderStrategy/AttributeOperator.cpp
     renderStrategy/AttriRenderStrategyScalar.cpp
     renderStrategy/AttriRenderStrategyVector.cpp
@@ -30,6 +30,7 @@ target_include_directories(vtkPart PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}   # 头文件路径
 )
 target_link_libraries(vtkPart PUBLIC Core)
+target_link_libraries(vtkPart PUBLIC AlgorithmSystem) # InteractiveHandler 接口头文件随 vtkPart 头文件传播
 target_link_libraries(vtkPart
     PRIVATE
         Data

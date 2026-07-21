@@ -1,7 +1,9 @@
 #include "QRenderWindow.h"
 #include "renderStrategy/AttributeCommon.h"
-#include "MeasureManager.h"
+#include "AlgorithmSystem.h"
+#include "InteractionService.h"
 #include "MeshActorManager.h"
+#include "QAlgorithmSystemAdaptor.h"
 #include "QModelQuery.h"
 #include "QRenderWindowStyle.h"
 #include "QSelection.h"
@@ -126,14 +128,13 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
         vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op());
     vtk->style_->SetSelectManager(this->select_manager_.get());
 
-    // 几何拾取器全程序单一实例：测量复用选择系统的 picker（多实例激活冲突见 MeasureManager 注释）
-    measure_manager_ = std::make_unique<MeasureManager>(*vtk->renderer_, *vtk->overlay_renderer_,
+    // 通用交互服务：几何拾取复用选择系统的 picker（全程序单一实例，多实例激活会冲突）
+    interaction_service_ = std::make_unique<InteractionService>(*vtk->renderer_, *vtk->overlay_renderer_,
         vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op(),
         *select_manager_->geometryPicker());
-    vtk->style_->SetMeasureManager(measure_manager_.get());
-    measure_manager_->onChanged = [this]() {
-        emit measureUpdated(measure_manager_->lineCount(), measure_manager_->hasPending(),
-            QString::fromStdString(measure_manager_->resultText()));
+    vtk->style_->SetInteractionService(interaction_service_.get());
+    interaction_service_->onResultChanged = [this](const std::string& text) {
+        emit interactionUpdated(QString::fromStdString(text));
     };
 
     vtk->orientationWidget->AnimateOff();
@@ -448,23 +449,41 @@ void QRenderWindow::clearSelection()
     });
 }
 
-void QRenderWindow::setMeasureMode(bool on)
+void QRenderWindow::setAlgorithmAdaptor(QObject* adaptor)
 {
-    dispatch_async([on, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
-        Data* vtk = Data::SafeDownCast(userData);
-        if (on) {
-            // 测量与选择互斥，避免点击被两边同时处理
-            this->select_manager_->setSelectMode("None");
+    algo_adaptor_ = qobject_cast<systems::algo::QAlgorithmSystemAdaptor*>(adaptor);
+}
+
+void QRenderWindow::startInteraction(QString name)
+{
+    dispatch_async([name, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        auto* algo_system = algo_adaptor_ ? algo_adaptor_->algorithmSystem() : nullptr;
+        if (!algo_system) {
+            spdlog::error("QRenderWindow::startInteraction: 算法系统未注入");
+            return;
         }
-        measure_manager_->setActive(on);
-        vtk->style_->SetMeasureMode(on);
+        auto* handler = algo_system->interactiveHandler(name.toStdString());
+        if (!handler) {
+            spdlog::error("QRenderWindow::startInteraction: 算法 {} 未声明视口交互能力", name.toStdString());
+            return;
+        }
+        // 交互与选择互斥，避免点击被两边同时处理
+        this->select_manager_->setSelectMode("None");
+        interaction_service_->start(handler);
     });
 }
 
-void QRenderWindow::clearMeasure()
+void QRenderWindow::stopInteraction()
 {
     dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
-        measure_manager_->clear();
+        interaction_service_->stop();
+    });
+}
+
+void QRenderWindow::clearInteraction()
+{
+    dispatch_async([this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        interaction_service_->clear();
     });
 }
 

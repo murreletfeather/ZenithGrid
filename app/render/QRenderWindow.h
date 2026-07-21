@@ -28,11 +28,14 @@
 
 class MeshActor;
 class SelectManager;
-class MeasureManager;
+class InteractionService;
 class GeometryActorManager;
 class MeshActorManager;
 class QRenderWindowStyle;
 class vtkDisplaySizedImplicitPlaneWidget;
+namespace systems::algo {
+class QAlgorithmSystemAdaptor;
+}
 
 struct QRenderWindow : QQuickVTKItem { // 结构体继承QQuickVTKItem
     Q_OBJECT
@@ -96,15 +99,26 @@ public:
     Q_INVOKABLE void clearSelection();
 
     /**
-     * @brief 进入/退出交互测量模式（与选择互斥，进入时会清空选择模式）
-     * @param on 是否开启
+     * @brief 注入算法系统适配器（启动交互时按名称解析 InteractiveHandler）
+     * @param adaptor QModelManager.algorithmSystem
      */
-    Q_INVOKABLE void setMeasureMode(bool on);
+    Q_INVOKABLE void setAlgorithmAdaptor(QObject* adaptor);
 
     /**
-     * @brief 清空当前测量组及视图内标注
+     * @brief 启动指定算法的视口交互（与选择互斥，进入时会清空选择模式）
+     * @param name 算法唯一名称（其 handler 须实现 InteractiveHandler）
      */
-    Q_INVOKABLE void clearMeasure();
+    Q_INVOKABLE void startInteraction(QString name);
+
+    /**
+     * @brief 停止当前视口交互并清空标注
+     */
+    Q_INVOKABLE void stopInteraction();
+
+    /**
+     * @brief 清空当前交互处理器的状态与视图内标注
+     */
+    Q_INVOKABLE void clearInteraction();
 
     /**
      * @brief 显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度）
@@ -191,8 +205,8 @@ signals:
     void curEdgeRenderChanged();
     void clicked();
     void rightClicked();
-    //! @brief 测量状态变化（渲染线程触发，Qt 自动排队到 GUI 线程）
-    void measureUpdated(int lineCount, bool hasPending, QString resultText);
+    //! @brief 交互结果文本变化（渲染线程触发，Qt 自动排队到 GUI 线程）
+    void interactionUpdated(QString resultText);
 
 private:
     bool edge_render_ {};
@@ -201,7 +215,8 @@ private:
     vtkNew<vtkCamera> _camera;
 
     std::unique_ptr<SelectManager> select_manager_;
-    std::unique_ptr<MeasureManager> measure_manager_;
+    std::unique_ptr<InteractionService> interaction_service_;
+    systems::algo::QAlgorithmSystemAdaptor* algo_adaptor_ {};
     MeshActor* cur_actor_ {};
     Index cur_component_id_;
 
