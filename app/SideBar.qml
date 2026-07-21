@@ -19,27 +19,29 @@ Item{
 
     readonly property var activeOp: App.activeOperation
     readonly property bool isMeasureOp: !!(activeOp && activeOp.info && activeOp.info.name === "MeasurePlugin")
-    property int measureMode: 0 // 0=交互模式 1=尺寸标注
+    readonly property bool hasInteractive: !!(activeOp && activeOp.info && activeOp.info.interactive)
+    property int measureMode: 0 // 0=交互模式 1=参数执行
 
     onActiveOpChanged: {
         parameters = []
         resultText = ""
-        measurePanel.lineCount = 0
-        measurePanel.hasPending = false
         measurePanel.measureResult = ""
         updateMeasureActive()
     }
     onMeasureModeChanged: updateMeasureActive()
-    // activeOp 变化通知触发时 isMeasureOp 绑定可能尚未刷新（链式绑定），
-    // 直接监听 isMeasureOp 才能保证首次打开测量就正确进入交互模式
-    onIsMeasureOpChanged: updateMeasureActive()
+    // activeOp 变化通知触发时 hasInteractive 绑定可能尚未刷新（链式绑定），
+    // 直接监听才能保证首次打开交互插件就正确进入交互模式
+    onHasInteractiveChanged: updateMeasureActive()
 
-    // 交互测量与尺寸标注互斥：进出交互模式时开关渲染窗口的测量交互
+    // 视口交互与参数执行互斥：进出交互模式时按插件名启停渲染窗口的交互服务
     function updateMeasureActive() {
-        var active = isMeasureOp && measureMode === 0
+        var active = hasInteractive && measureMode === 0
         var rw = App.registry.renderWindow
         if (rw) {
-            rw.setMeasureMode(active)
+            if (active)
+                rw.startInteraction(activeOp.info.name)
+            else
+                rw.stopInteraction()
             measureConn.target = active ? rw : null
         }
         if (active) {
@@ -47,10 +49,10 @@ Item{
             App.selection.selectMode = "None"
         }
     }
-    // 测量插件专用：面板内切换交互模式/尺寸标注
+    // 声明视口交互能力的插件专用：面板内切换交互模式/参数执行
     Row{
         id: measureModeSwitch
-        visible: root.isMeasureOp
+        visible: root.hasInteractive
         height: visible ? 34 : 0
         anchors.top: parent.top
         anchors.left: parent.left
@@ -64,7 +66,7 @@ Item{
             onClicked: root.measureMode = 0
         }
         RadioButton{
-            text: "尺寸标注"
+            text: root.isMeasureOp ? "尺寸标注" : "参数执行"
             autoExclusive: false
             checked: root.measureMode === 1
             onClicked: root.measureMode = 1
@@ -82,7 +84,7 @@ Item{
         id: commitButton
         text: "执行"
         enabled: !!(root.activeOp && root.activeOp.info && (root.activeOp.isFeature || App.selection.activeModelId >= 0))
-        visible: !root.isMeasureOp || root.measureMode === 1
+        visible: !(root.hasInteractive && root.measureMode === 0)
         anchors.top: measureModeSwitch.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -124,7 +126,7 @@ Item{
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         clip: true
-        visible: !root.isMeasureOp || root.measureMode === 1
+        visible: !(root.hasInteractive && root.measureMode === 0)
         ColumnLayout{
             anchors.fill: parent
             ListView{
@@ -185,17 +187,12 @@ Item{
         anchors.right: parent.right
         anchors.margins: 4
         spacing: 8
-        property int lineCount: 0
-        property bool hasPending: false
         property string measureResult: ""
 
         Text{
             width: parent.width
             wrapMode: Text.Wrap
             text: "依次点击拾取两点构成一条直线并显示长度；可连续画多条线，两线共端点时自动显示夹角；同一点连点两次取消当前起笔。"
-        }
-        Text{
-            text: "已完成直线: " + measurePanel.lineCount + " 条" + (measurePanel.hasPending ? "（已选第 1 点，再点第 2 点成线）" : "")
         }
         TextArea{
             width: parent.width
@@ -214,16 +211,14 @@ Item{
             text: "清除"
             onClicked: {
                 var rw = App.registry.renderWindow
-                if (rw) rw.clearMeasure()
+                if (rw) rw.clearInteraction()
             }
         }
     }
     Connections{
         id: measureConn
         target: null
-        function onMeasureUpdated(lineCount, hasPending, resultText) {
-            measurePanel.lineCount = lineCount
-            measurePanel.hasPending = hasPending
+        function onInteractionUpdated(resultText) {
             measurePanel.measureResult = resultText
         }
     }

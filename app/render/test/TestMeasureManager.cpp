@@ -4,7 +4,8 @@
  * @author 范成通 email 1941804585@qq.com
  */
 #include "MakeMeshDataVtk.h"
-#include "MeasureManager.h"
+#include "InteractionService.h"
+#include "MeasureHandler.h"
 #include "GeometryActorManager.h"
 #include "GeometryActorSelectOp.h"
 #include "GeometryRegistry.h"
@@ -36,22 +37,24 @@
 
 #include <vector>
 
-// 自定义交互器：左键确认测量点，悬停动态预览
+using systems::algo::MeasureHandler;
+
+// 自定义交互器：左键确认交互拾取点，悬停动态预览
 class MeasurePickInteractorStyle : public vtkInteractorStyleTrackballCamera {
 public:
     static MeasurePickInteractorStyle* New();
     vtkTypeMacro(MeasurePickInteractorStyle, vtkInteractorStyleTrackballCamera);
 
-    void SetMeasureManager(MeasureManager* measure_manager)
+    void SetInteractionService(InteractionService* service)
     {
-        this->measure_manager_ = measure_manager;
+        this->interaction_service_ = service;
     }
 
     void OnLeftButtonUp() override
     {
         int* pos = this->GetInteractor()->GetEventPosition();
-        if (measure_manager_) {
-            measure_manager_->pick(pos[0], pos[1]);
+        if (interaction_service_ && interaction_service_->isActive()) {
+            interaction_service_->pick(pos[0], pos[1]);
             this->GetInteractor()->Render();
         }
         vtkInteractorStyleTrackballCamera::OnLeftButtonUp();
@@ -60,15 +63,15 @@ public:
     void OnMouseMove() override
     {
         vtkInteractorStyleTrackballCamera::OnMouseMove();
-        if (measure_manager_ && this->State == VTKIS_NONE) {
+        if (interaction_service_ && interaction_service_->isActive() && this->State == VTKIS_NONE) {
             int* pos = this->GetInteractor()->GetEventPosition();
-            measure_manager_->hover(pos[0], pos[1]);
+            interaction_service_->hover(pos[0], pos[1]);
             this->GetInteractor()->Render();
         }
     }
 
 private:
-    MeasureManager* measure_manager_ {};
+    InteractionService* interaction_service_ {};
 };
 
 vtkStandardNewMacro(MeasurePickInteractorStyle);
@@ -116,14 +119,15 @@ int main(int argc, char* argv[])
     renderer->AddActor(sel_highlight_actor);
     GeometrySelectManager sel_mgr(*renderer, *sel_highlight_actor, geometry_manager.op());
 
-    // 先构造测量管理器（注册 pick list）再加载网格，保证 actor 进入拾取列表
-    MeasureManager measure_manager(*renderer, *overlay_renderer, mesh_manager.op(),
+    // 交互服务 + 测量插件的交互处理器（与应用内 startInteraction 同构）
+    MeasureHandler measure_handler;
+    InteractionService interaction_service(*renderer, *overlay_renderer, mesh_manager.op(),
         geometry_manager.op(), *sel_mgr.picker());
-    measure_manager.setActive(true);
-    measure_manager.onChanged = [&measure_manager]() {
-        spdlog::info("lines: {}, result:\n{}", measure_manager.lineCount(), measure_manager.resultText());
+    interaction_service.onResultChanged = [&measure_handler](const std::string& text) {
+        spdlog::info("lines: {}, result:\n{}", measure_handler.lineCount(), text);
     };
-    style->SetMeasureManager(&measure_manager);
+    interaction_service.start(&measure_handler);
+    style->SetInteractionService(&interaction_service);
 
     mesh_manager.loadMesh(0, test_mesh_data, renderer.GetPointer(), ModelRenderMode::Face);
 
@@ -136,19 +140,19 @@ int main(int argc, char* argv[])
             const auto& wp = mesh.vertex_positions_[index];
             double display[3];
             vtkInteractorObserver::ComputeWorldToDisplay(renderer.GetPointer(), wp[0], wp[1], wp[2], display);
-            measure_manager.pick(display[0], display[1]);
+            interaction_service.pick(display[0], display[1]);
             spdlog::info("pick v{} -> lines={}, pending={}", index,
-                measure_manager.lineCount(), measure_manager.hasPending());
+                measure_handler.lineCount(), measure_handler.hasPending());
             renderWindow->Render();
         };
         pick_vertex(0);
         pick_vertex(1);
         pick_vertex(1);
         pick_vertex(2);
-        const bool ok = measure_manager.lineCount() == 2
-            && measure_manager.resultText().find("夹角") != std::string::npos;
+        const bool ok = measure_handler.lineCount() == 2
+            && measure_handler.resultText().find("夹角") != std::string::npos;
         spdlog::info("measure self-check {}: lines={}, result:\n{}",
-            ok ? "PASS" : "FAIL", measure_manager.lineCount(), measure_manager.resultText());
+            ok ? "PASS" : "FAIL", measure_handler.lineCount(), measure_handler.resultText());
     }
 
     // ============ 几何（OCC，iges/stp 场景）拾取自检 ============
@@ -183,21 +187,21 @@ int main(int argc, char* argv[])
 
         // 端到端：pick 两个几何顶点，应新增一条线
         if (box_vertices.size() >= 2) {
-            const int before = measure_manager.lineCount();
+            const int before = measure_handler.lineCount();
             double d[2];
             to_display(box_vertices[0], d);
-            measure_manager.pick(d[0], d[1]);
+            interaction_service.pick(d[0], d[1]);
             spdlog::info("geom pick v0 -> lines={}, pending={}",
-                measure_manager.lineCount(), measure_manager.hasPending());
+                measure_handler.lineCount(), measure_handler.hasPending());
             renderWindow->Render();
             to_display(box_vertices[1], d);
-            measure_manager.pick(d[0], d[1]);
+            interaction_service.pick(d[0], d[1]);
             spdlog::info("geom pick v1 -> lines={}, pending={}",
-                measure_manager.lineCount(), measure_manager.hasPending());
+                measure_handler.lineCount(), measure_handler.hasPending());
             renderWindow->Render();
             spdlog::info("geometry end-to-end {}: lines={}",
-                measure_manager.lineCount() == before + 1 ? "PASS" : "FAIL",
-                measure_manager.lineCount());
+                measure_handler.lineCount() == before + 1 ? "PASS" : "FAIL",
+                measure_handler.lineCount());
         }
 
         // geom_index 等局部对象须存活到交互结束
