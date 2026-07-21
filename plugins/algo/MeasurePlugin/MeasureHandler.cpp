@@ -93,29 +93,20 @@ enum class MeasureType {
     Centroid
 };
 
-MeasureType toMeasureType(int index)
-{
-    switch (index) {
-    case 0:
-        return MeasureType::Distance;
-    case 1:
-        return MeasureType::Angle;
-    case 2:
-        return MeasureType::Radius;
-    case 3:
-        return MeasureType::Length;
-    case 4:
-        return MeasureType::Area;
-    case 5:
-        return MeasureType::Volume;
-    case 6:
-        return MeasureType::BoundingBox;
-    case 7:
-        return MeasureType::Centroid;
-    default:
-        return MeasureType::Distance;
-    }
-}
+//! @brief 网格测量实现签名
+using MeshExecFn = std::string (*)(const MeshData&, const ModelLayer&, const Selection&);
+//! @brief 几何测量实现签名
+using GeomExecFn = std::string (*)(const GeometryRegistry&, const Selection&);
+
+//! @brief 测量操作表项：名称、选择器模式与两套实现的统一注册处（新增类型只需在 kMeasureOps 加一行）
+struct MeasureOp {
+    MeasureType type;
+    const char* name; //> Combo 显示名（表内顺序即下标）
+    const char* mesh_selector_modes; //> 网格组件的选择器模式
+    const char* geom_selector_modes; //> 几何组件的选择器模式
+    MeshExecFn mesh_exec; //> 网格实现
+    GeomExecFn geom_exec; //> 几何实现（nullptr 表示暂不支持几何模型）
+};
 
 bool isValidVertexId(const MeshData& mesh, const ModelLayer& manager, Index id)
 {
@@ -627,112 +618,273 @@ std::string formatGeometryCentroid(const GeometryRegistry& reg,
     return oss.str();
 }
 
-//! @brief 几何组件（STEP/IGES 等，无网格数据）的测量入口
-std::string executeGeometryMeasure(const GeometryRegistry& reg, MeasureType measure_type, const Selection& selection)
+// ---------------- 几何（OCC）测量实现：选择 id 为 GeometryRegistry 分配的全局几何 id ----------------
+
+std::string geomDistance(const GeometryRegistry& reg, const Selection& selection)
 {
-    switch (measure_type) {
-    case MeasureType::Distance: {
-        if (selection.type != ElementEnum::GeometryVertex || selection.ids.size() != 2) {
-            return std::string("错误：距离测量需要选择两个几何点");
-        }
-        Vec3 a, b;
-        if (!geometryVertexPoint(reg, selection.ids[0], a) || !geometryVertexPoint(reg, selection.ids[1], b))
-            return std::string("错误：无效的几何点 id");
-        return formatDistance(a, b);
+    if (selection.type != ElementEnum::GeometryVertex || selection.ids.size() != 2) {
+        return std::string("错误：距离测量需要选择两个几何点");
     }
-    case MeasureType::Angle: {
-        if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
-            Vec3 a, b, c;
-            if (!geometryVertexPoint(reg, selection.ids[0], a)
-                || !geometryVertexPoint(reg, selection.ids[1], b)
-                || !geometryVertexPoint(reg, selection.ids[2], c))
-                return std::string("错误：无效的几何点 id");
-            return formatAngle(a, b, c);
+    Vec3 a, b;
+    if (!geometryVertexPoint(reg, selection.ids[0], a) || !geometryVertexPoint(reg, selection.ids[1], b))
+        return std::string("错误：无效的几何点 id");
+    return formatDistance(a, b);
+}
+
+std::string geomAngle(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
+        Vec3 a, b, c;
+        if (!geometryVertexPoint(reg, selection.ids[0], a)
+            || !geometryVertexPoint(reg, selection.ids[1], b)
+            || !geometryVertexPoint(reg, selection.ids[2], c))
+            return std::string("错误：无效的几何点 id");
+        return formatAngle(a, b, c);
+    }
+    if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 2) {
+        const TopoDS_Shape* e0 = reg.getEdge(selection.ids[0]);
+        const TopoDS_Shape* e1 = reg.getEdge(selection.ids[1]);
+        Vec3 u, v;
+        if (!e0 || !e1
+            || !geometryEdgeDirection(TopoDS::Edge(*e0), u)
+            || !geometryEdgeDirection(TopoDS::Edge(*e1), v))
+            return std::string("错误：无效的几何边 id 或边方向无法计算");
+        std::ostringstream oss;
+        oss << "Angle: " << toString(angleBetween(u, v)) << " deg";
+        return oss.str();
+    }
+    return std::string("错误：角度测量需要选择三个几何点或两条几何边");
+}
+
+std::string geomRadius(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
+        Vec3 a, b, c;
+        if (!geometryVertexPoint(reg, selection.ids[0], a)
+            || !geometryVertexPoint(reg, selection.ids[1], b)
+            || !geometryVertexPoint(reg, selection.ids[2], c))
+            return std::string("错误：无效的几何点 id");
+        return formatRadius(a, b, c);
+    }
+    if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 1) {
+        const TopoDS_Shape* s = reg.getEdge(selection.ids[0]);
+        if (!s)
+            return std::string("错误：无效的几何边 id");
+        BRepAdaptor_Curve curve(TopoDS::Edge(*s));
+        if (curve.GetType() != GeomAbs_Circle)
+            return std::string("错误：所选边不是圆弧，无法直接测半径（可改选三个几何点）");
+        const gp_Circ circ = curve.Circle();
+        std::ostringstream oss;
+        oss << "Radius: " << toString(circ.Radius()) << "\n"
+            << "Center: " << vecString(toVec3(circ.Location()));
+        return oss.str();
+    }
+    return std::string("错误：半径测量需要选择三个几何点或一条圆弧边");
+}
+
+std::string geomLength(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type != ElementEnum::GeometryEdge || selection.ids.empty()) {
+        return std::string("错误：长度测量需要选择几何边");
+    }
+    return formatGeometryEdgeLength(reg, selection.ids);
+}
+
+std::string geomArea(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type != ElementEnum::GeometryFace || selection.ids.empty()) {
+        return std::string("错误：面积测量需要选择几何面");
+    }
+    return formatGeometryFaceArea(reg, selection.ids);
+}
+
+std::string geomVolume(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type != ElementEnum::GeometrySolid || selection.ids.empty()) {
+        return std::string("错误：体积测量需要选择几何体");
+    }
+    return formatGeometrySolidVolume(reg, selection.ids);
+}
+
+std::string geomBoundingBox(const GeometryRegistry& reg, const Selection& selection)
+{
+    const auto shapes = collectGeometryShapes(reg, selection.type, selection.ids);
+    if (shapes.empty()) {
+        return std::string("错误：未找到有效的几何对象");
+    }
+    return formatGeometryBoundingBox(shapes);
+}
+
+std::string geomCentroid(const GeometryRegistry& reg, const Selection& selection)
+{
+    if (selection.type == ElementEnum::GeometryVertex) {
+        std::vector<Vec3> points;
+        points.reserve(selection.ids.size());
+        for (Index id : selection.ids) {
+            Vec3 p;
+            if (geometryVertexPoint(reg, id, p))
+                points.push_back(p);
         }
-        if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 2) {
-            const TopoDS_Shape* e0 = reg.getEdge(selection.ids[0]);
-            const TopoDS_Shape* e1 = reg.getEdge(selection.ids[1]);
-            Vec3 u, v;
-            if (!e0 || !e1
-                || !geometryEdgeDirection(TopoDS::Edge(*e0), u)
-                || !geometryEdgeDirection(TopoDS::Edge(*e1), v))
-                return std::string("错误：无效的几何边 id 或边方向无法计算");
+        if (points.empty())
+            return std::string("错误：未找到有效的几何点");
+        return formatCentroid(points);
+    }
+    if (selection.ids.empty()) {
+        return std::string("错误：未找到有效的几何对象");
+    }
+    return formatGeometryCentroid(reg, selection.type, selection.ids);
+}
+
+// ---------------- 网格测量实现 ----------------
+
+std::string meshDistance(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    if (selection.type != ElementEnum::Vertex || selection.ids.size() != 2) {
+        spdlog::error("MeasureHandler::execute: 距离测量需要选择两个点");
+        return std::string("错误：距离测量需要选择两个点");
+    }
+    const Vec3& a = getPosition(mesh, manager, selection.ids[0]);
+    const Vec3& b = getPosition(mesh, manager, selection.ids[1]);
+    return formatDistance(a, b);
+}
+
+std::string meshAngle(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    if (selection.type == ElementEnum::Vertex && selection.ids.size() == 3) {
+        const Vec3& a = getPosition(mesh, manager, selection.ids[0]);
+        const Vec3& b = getPosition(mesh, manager, selection.ids[1]);
+        const Vec3& c = getPosition(mesh, manager, selection.ids[2]);
+        return formatAngle(a, b, c);
+    }
+    if (selection.type == ElementEnum::Edge && selection.ids.size() == 4) {
+        // 边选择的 ids 是每条边两个端点的顶点 id（EdgeSelectorHighlight 约定）
+        const auto& ids = selection.ids;
+        const bool valid = isValidVertexId(mesh, manager, ids[0]) && isValidVertexId(mesh, manager, ids[1])
+            && isValidVertexId(mesh, manager, ids[2]) && isValidVertexId(mesh, manager, ids[3]);
+        if (valid) {
+            const Vec3 u = getPosition(mesh, manager, ids[1]) - getPosition(mesh, manager, ids[0]);
+            const Vec3 v = getPosition(mesh, manager, ids[3]) - getPosition(mesh, manager, ids[2]);
             std::ostringstream oss;
             oss << "Angle: " << toString(angleBetween(u, v)) << " deg";
             return oss.str();
         }
-        return std::string("错误：角度测量需要选择三个几何点或两条几何边");
     }
-    case MeasureType::Radius: {
-        if (selection.type == ElementEnum::GeometryVertex && selection.ids.size() == 3) {
-            Vec3 a, b, c;
-            if (!geometryVertexPoint(reg, selection.ids[0], a)
-                || !geometryVertexPoint(reg, selection.ids[1], b)
-                || !geometryVertexPoint(reg, selection.ids[2], c))
-                return std::string("错误：无效的几何点 id");
-            return formatRadius(a, b, c);
-        }
-        if (selection.type == ElementEnum::GeometryEdge && selection.ids.size() == 1) {
-            const TopoDS_Shape* s = reg.getEdge(selection.ids[0]);
-            if (!s)
-                return std::string("错误：无效的几何边 id");
-            BRepAdaptor_Curve curve(TopoDS::Edge(*s));
-            if (curve.GetType() != GeomAbs_Circle)
-                return std::string("错误：所选边不是圆弧，无法直接测半径（可改选三个几何点）");
-            const gp_Circ circ = curve.Circle();
-            std::ostringstream oss;
-            oss << "Radius: " << toString(circ.Radius()) << "\n"
-                << "Center: " << vecString(toVec3(circ.Location()));
-            return oss.str();
-        }
-        return std::string("错误：半径测量需要选择三个几何点或一条圆弧边");
-    }
-    case MeasureType::Length: {
-        if (selection.type != ElementEnum::GeometryEdge || selection.ids.empty()) {
-            return std::string("错误：长度测量需要选择几何边");
-        }
-        return formatGeometryEdgeLength(reg, selection.ids);
-    }
-    case MeasureType::Area: {
-        if (selection.type != ElementEnum::GeometryFace || selection.ids.empty()) {
-            return std::string("错误：面积测量需要选择几何面");
-        }
-        return formatGeometryFaceArea(reg, selection.ids);
-    }
-    case MeasureType::Volume: {
-        if (selection.type != ElementEnum::GeometrySolid || selection.ids.empty()) {
-            return std::string("错误：体积测量需要选择几何体");
-        }
-        return formatGeometrySolidVolume(reg, selection.ids);
-    }
-    case MeasureType::BoundingBox: {
-        const auto shapes = collectGeometryShapes(reg, selection.type, selection.ids);
-        if (shapes.empty()) {
-            return std::string("错误：未找到有效的几何对象");
-        }
-        return formatGeometryBoundingBox(shapes);
-    }
-    case MeasureType::Centroid: {
-        if (selection.type == ElementEnum::GeometryVertex) {
-            std::vector<Vec3> points;
-            points.reserve(selection.ids.size());
-            for (Index id : selection.ids) {
-                Vec3 p;
-                if (geometryVertexPoint(reg, id, p))
-                    points.push_back(p);
-            }
-            if (points.empty())
-                return std::string("错误：未找到有效的几何点");
-            return formatCentroid(points);
-        }
-        if (selection.ids.empty()) {
-            return std::string("错误：未找到有效的几何对象");
-        }
-        return formatGeometryCentroid(reg, selection.type, selection.ids);
-    }
-    }
+    spdlog::error("MeasureHandler::execute: 角度测量需要选择三个点或两条边");
+    return std::string("错误：角度测量需要选择三个点或两条边");
+}
 
-    return std::string("错误：未知测量类型");
+std::string meshRadius(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    if (selection.type != ElementEnum::Vertex || selection.ids.size() != 3) {
+        spdlog::error("MeasureHandler::execute: 半径测量需要选择三个点");
+        return std::string("错误：半径测量需要选择三个点");
+    }
+    const Vec3& a = getPosition(mesh, manager, selection.ids[0]);
+    const Vec3& b = getPosition(mesh, manager, selection.ids[1]);
+    const Vec3& c = getPosition(mesh, manager, selection.ids[2]);
+    return formatRadius(a, b, c);
+}
+
+std::string meshLength(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    // 边选择的 ids 是每条边两个端点的顶点 id 对，数量应为正偶数
+    if (selection.type != ElementEnum::Edge || selection.ids.empty() || selection.ids.size() % 2 != 0) {
+        spdlog::error("MeasureHandler::execute: 长度测量需要选择边");
+        return std::string("错误：长度测量需要选择边");
+    }
+    return formatEdgeLength(mesh, manager, selection.ids);
+}
+
+std::string meshArea(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    if (selection.type != ElementEnum::Face) {
+        spdlog::error("MeasureHandler::execute: 面积测量需要选择面");
+        return std::string("错误：面积测量需要选择面");
+    }
+    return formatFaceArea(mesh, manager, selection.ids);
+}
+
+std::string meshVolume(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    if (selection.type != ElementEnum::Solid) {
+        spdlog::error("MeasureHandler::execute: 体积测量需要选择体");
+        return std::string("错误：体积测量需要选择体");
+    }
+    return formatSolidVolume(mesh, manager, selection.ids);
+}
+
+std::string meshBoundingBox(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    const auto positions = collectPositions(mesh, manager, selection.type, selection.ids);
+    if (positions.empty()) {
+        spdlog::error("MeasureHandler::execute: 未找到可用顶点");
+        return std::string("错误：未找到可用顶点");
+    }
+    return formatBoundingBox(positions);
+}
+
+std::string meshCentroid(const MeshData& mesh, const ModelLayer& manager, const Selection& selection)
+{
+    const auto positions = collectPositions(mesh, manager, selection.type, selection.ids);
+    if (positions.empty()) {
+        spdlog::error("MeasureHandler::execute: 未找到可用顶点");
+        return std::string("错误：未找到可用顶点");
+    }
+    return formatCentroid(positions);
+}
+
+//! @brief 测量操作注册表：新增测量类型只需在此加一行，args_type/校验/分发全部由表生成
+const MeasureOp kMeasureOps[] = {
+    { MeasureType::Distance, "距离", "Vertex", "GeometryVertex", meshDistance, geomDistance },
+    { MeasureType::Angle, "角度", "Vertex,Edge", "GeometryVertex,GeometryEdge", meshAngle, geomAngle },
+    { MeasureType::Radius, "半径", "Vertex", "GeometryVertex,GeometryEdge", meshRadius, geomRadius },
+    { MeasureType::Length, "长度", "Edge", "GeometryEdge", meshLength, geomLength },
+    { MeasureType::Area, "面积", "Face", "GeometryFace", meshArea, geomArea },
+    { MeasureType::Volume, "体积", "Solid", "GeometrySolid", meshVolume, geomVolume },
+    { MeasureType::BoundingBox, "包围盒", "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshBoundingBox, geomBoundingBox },
+    { MeasureType::Centroid, "重心", "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshCentroid, geomCentroid },
+};
+
+//! @brief 按下标查注册表，越界返回 nullptr
+const MeasureOp* findMeasureOp(int index)
+{
+    if (index < 0 || index >= static_cast<int>(sizeof(kMeasureOps) / sizeof(kMeasureOps[0])))
+        return nullptr;
+    return &kMeasureOps[index];
+}
+
+//! @brief 由注册表生成 Combo 内容（名称与下标天然一致）
+std::string comboContent()
+{
+    std::string out;
+    for (const MeasureOp& op : kMeasureOps) {
+        if (!out.empty())
+            out += ",";
+        out += op.name;
+    }
+    return out;
+}
+
+//! @brief 由注册表生成选择器内容：网格模式按 Vertex,Edge,Face,Solid 规范序取并集
+std::string selectorContent()
+{
+    static const char* canonical[] = { "Vertex", "Edge", "Face", "Solid" };
+    std::string out;
+    for (const char* mode : canonical) {
+        bool used = false;
+        for (const MeasureOp& op : kMeasureOps) {
+            if (std::string(op.mesh_selector_modes).find(mode) != std::string::npos) {
+                used = true;
+                break;
+            }
+        }
+        if (used) {
+            if (!out.empty())
+                out += ",";
+            out += mode;
+        }
+    }
+    return out;
 }
 }
 
@@ -764,105 +916,35 @@ std::any MeasureHandler::execute(HandlerContext& context, const std::vector<core
         return std::string("错误：找不到选择对象所在的组件");
     }
     ModelLayer& manager = context.cur_component.manager();
-    const MeasureType measure_type = toMeasureType(*type_index);
+    const MeasureOp* op = findMeasureOp(*type_index);
+    if (!op) {
+        spdlog::error("MeasureHandler::execute: 未知测量类型下标 {}", *type_index);
+        return std::string("错误：未知测量类型");
+    }
 
     MeshData* mesh = comp->asMeshData();
     if (!mesh) {
         // 无网格但有几何（STEP/IGES）：走 OCC 几何测量
         if (comp->geometry) {
             comp->geometry->ensureIndexBuilt(manager.geomRegistry());
-            return executeGeometryMeasure(manager.geomRegistry(), measure_type, selection);
+            if (!op->geom_exec)
+                return std::string("错误：") + op->name + "测量暂不支持几何模型";
+            return op->geom_exec(manager.geomRegistry(), selection);
         }
         spdlog::error("MeasureHandler::execute: 选择对象所在组件没有网格或几何数据");
         return std::string("错误：选择对象所在组件没有网格或几何数据");
     }
 
-    switch (measure_type) {
-    case MeasureType::Distance: {
-        if (selection.type != ElementEnum::Vertex || selection.ids.size() != 2) {
-            spdlog::error("MeasureHandler::execute: 距离测量需要选择两个点");
-            return std::string("错误：距离测量需要选择两个点");
-        }
-        const Vec3& a = getPosition(*mesh, manager, selection.ids[0]);
-        const Vec3& b = getPosition(*mesh, manager, selection.ids[1]);
-        return formatDistance(a, b);
-    }
-    case MeasureType::Angle: {
-        if (selection.type == ElementEnum::Vertex && selection.ids.size() == 3) {
-            const Vec3& a = getPosition(*mesh, manager, selection.ids[0]);
-            const Vec3& b = getPosition(*mesh, manager, selection.ids[1]);
-            const Vec3& c = getPosition(*mesh, manager, selection.ids[2]);
-            return formatAngle(a, b, c);
-        }
-        if (selection.type == ElementEnum::Edge && selection.ids.size() == 4) {
-            // 边选择的 ids 是每条边两个端点的顶点 id（EdgeSelectorHighlight 约定）
-            const auto& ids = selection.ids;
-            const bool valid = isValidVertexId(*mesh, manager, ids[0]) && isValidVertexId(*mesh, manager, ids[1])
-                && isValidVertexId(*mesh, manager, ids[2]) && isValidVertexId(*mesh, manager, ids[3]);
-            if (valid) {
-                const Vec3 u = getPosition(*mesh, manager, ids[1]) - getPosition(*mesh, manager, ids[0]);
-                const Vec3 v = getPosition(*mesh, manager, ids[3]) - getPosition(*mesh, manager, ids[2]);
-                std::ostringstream oss;
-                oss << "Angle: " << toString(angleBetween(u, v)) << " deg";
-                return oss.str();
-            }
-        }
-        spdlog::error("MeasureHandler::execute: 角度测量需要选择三个点或两条边");
-        return std::string("错误：角度测量需要选择三个点或两条边");
-    }
-    case MeasureType::Radius: {
-        if (selection.type != ElementEnum::Vertex || selection.ids.size() != 3) {
-            spdlog::error("MeasureHandler::execute: 半径测量需要选择三个点");
-            return std::string("错误：半径测量需要选择三个点");
-        }
-        const Vec3& a = getPosition(*mesh, manager, selection.ids[0]);
-        const Vec3& b = getPosition(*mesh, manager, selection.ids[1]);
-        const Vec3& c = getPosition(*mesh, manager, selection.ids[2]);
-        return formatRadius(a, b, c);
-    }
-    case MeasureType::Length: {
-        // 边选择的 ids 是每条边两个端点的顶点 id 对，数量应为正偶数
-        if (selection.type != ElementEnum::Edge || selection.ids.empty() || selection.ids.size() % 2 != 0) {
-            spdlog::error("MeasureHandler::execute: 长度测量需要选择边");
-            return std::string("错误：长度测量需要选择边");
-        }
-        return formatEdgeLength(*mesh, manager, selection.ids);
-    }
-    case MeasureType::Area: {
-        if (selection.type != ElementEnum::Face) {
-            spdlog::error("MeasureHandler::execute: 面积测量需要选择面");
-            return std::string("错误：面积测量需要选择面");
-        }
-        return formatFaceArea(*mesh, manager, selection.ids);
-    }
-    case MeasureType::Volume: {
-        if (selection.type != ElementEnum::Solid) {
-            spdlog::error("MeasureHandler::execute: 体积测量需要选择体");
-            return std::string("错误：体积测量需要选择体");
-        }
-        return formatSolidVolume(*mesh, manager, selection.ids);
-    }
-    case MeasureType::BoundingBox:
-    case MeasureType::Centroid: {
-        const auto positions = collectPositions(*mesh, manager, selection.type, selection.ids);
-        if (positions.empty()) {
-            spdlog::error("MeasureHandler::execute: 未找到可用顶点");
-            return std::string("错误：未找到可用顶点");
-        }
-        if (measure_type == MeasureType::BoundingBox)
-            return formatBoundingBox(positions);
-        return formatCentroid(positions);
-    }
-    }
-
-    return std::string("错误：未知测量类型");
+    return op->mesh_exec(*mesh, manager, selection);
 }
 
 std::vector<core::ArgType> MeasureHandler::args_type() const
 {
+    // Combo 内容全部由测量操作注册表生成，名称与下标天然一致
+    const std::string combo = comboContent() + "|0";
     return {
-        { ArgTypeEnum::Combo, "测量类型", "距离,角度,半径,长度,面积,体积,包围盒,重心|0" },
-        { ArgTypeEnum::Selector, "选择对象", "Vertex,Edge,Face,Solid" }
+        { ArgTypeEnum::Combo, "测量类型", combo },
+        { ArgTypeEnum::Selector, "选择对象", selectorContent() }
     };
 }
 
