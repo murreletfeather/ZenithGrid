@@ -76,18 +76,25 @@ std::string fillHoles(ComponentOperator& comp, CgalMesh& sm)
         return std::string("网格无孔洞（未发现边界环）");
 
     std::vector<CgalMesh::Face_index> new_faces;
-    for (const auto h : border_cycles)
-        PMP::triangulate_hole(sm, h, CGAL::parameters::face_output_iterator(std::back_inserter(new_faces)));
+    std::size_t success_count = 0;
+    for (const auto h : border_cycles) {
+        std::vector<CgalMesh::Face_index> hole_faces;
+        PMP::triangulate_hole(sm, h, CGAL::parameters::face_output_iterator(std::back_inserter(hole_faces)));
+        if (!hole_faces.empty()) {
+            ++success_count;
+            new_faces.insert(new_faces.end(), hole_faces.begin(), hole_faces.end());
+        }
+    }
 
-    if (new_faces.empty())
+    if (success_count == 0)
         return std::string("孔洞修补失败（边界可能为非流形，无法三角化）");
 
     if (!writeBack(comp, sm))
         return std::string("错误：修复结果写回组件失败");
 
     std::ostringstream oss;
-    oss << "已修补 " << border_cycles.size() << " 个孔洞，新增 " << new_faces.size()
-        << " 个三角面，网格已更新";
+    oss << "已修补 " << success_count << "/" << border_cycles.size()
+        << " 个孔洞，新增 " << new_faces.size() << " 个三角面，网格已更新";
     return oss.str();
 }
 
