@@ -75,7 +75,6 @@ std::string fillHoles(ComponentOperator& comp, CgalMesh& sm)
     if (border_cycles.empty())
         return std::string("网格无孔洞（未发现边界环）");
 
-    const std::size_t before = sm.number_of_faces();
     std::vector<CgalMesh::Face_index> new_faces;
     for (const auto h : border_cycles)
         PMP::triangulate_hole(sm, h, CGAL::parameters::face_output_iterator(std::back_inserter(new_faces)));
