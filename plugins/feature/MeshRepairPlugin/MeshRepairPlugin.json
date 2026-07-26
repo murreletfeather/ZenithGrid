@@ -1,0 +1,8 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "MeshRepair",
+    "display_name": "网格修复",
+    "description": "基于 CGAL PMP 的补洞、自交检测与退化清理"
+  }
+}
