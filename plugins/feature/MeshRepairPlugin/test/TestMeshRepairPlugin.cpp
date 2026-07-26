@@ -145,7 +145,7 @@ RepairResult executeRepair(MeshData mesh_data, int op_index)
 TEST_CASE("MeshRepair fills a hole in an open pyramid", "[MeshRepairPlugin]")
 {
     const RepairResult r = executeRepair(makeOpenPyramidMesh(), 0);
-    REQUIRE(r.text.find("已修补 1 个孔洞") != std::string::npos);
+    REQUIRE(r.text.find("已修补 1/1 个孔洞") != std::string::npos);
     REQUIRE(r.face_count == 6); // 4 侧面 + 底面四边形补成 2 个三角面
 }
 
