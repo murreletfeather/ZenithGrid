@@ -1,2 +1,3 @@
 add_subdirectory(FeatureDemoPlugin)
 add_subdirectory(MeshQualityPlugin)
+add_subdirectory(MeshRepairPlugin)
