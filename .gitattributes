@@ -1,0 +1,2 @@
+# 翻译源文件由 lupdate 生成（平台默认 LF），仓库约定 CRLF；固定行尾避免每次提取产生全文件 diff
+app/i18n/*.ts text eol=crlf

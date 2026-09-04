@@ -68,7 +68,10 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     switch (role) {
     case Qt::DisplayRole:
     case NameRole:
-        // 自动命名按当前界面语言显示（自动命名英文存储，仅已知模式翻译；自定义名称透传）
+        // 模型名（文件名为来源）一律透传；组件与层级节点按当前界面语言显示自动命名
+        // （自动命名英文存储，仅已知模式翻译；自定义名称透传）
+        if (node->nodeType == TreeNode::NodeType::Model)
+            return node->name;
         return systems::displayTranslateTreeNodeName(node->name);
 
     case NumberRole:

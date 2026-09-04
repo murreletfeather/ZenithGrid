@@ -48,18 +48,15 @@ Item{
     }
 
     // 语言切换后重建当前操作：信息对象（参数名/描述/选项）按新语言重新取得，参数值保留。
-    // 重建经"置空再置回"触发 onActiveOpChanged 面板重建；活动功能会经历退出再进入
-    //（setFeatureActive 幂等，交互功能现场随之重建，可接受）
+    // 直接以新操作对象替换（不经"置空"过渡）：避免触发 deactivate/取消功能渲染，
+    // 面板仍会重建（新 info 引用的 arg_types 与旧引用不同）
     Connections {
         target: QLanguageManager
         function onCurrentLanguageChanged() {
             const op = App.activeOperation
             if (!op)
                 return
-            App.activeOperation = null
-            Qt.callLater(function() {
-                App.activeOperation = (op.refresh && op.refresh(root.parameters)) || op
-            })
+            App.activeOperation = (op.refresh && op.refresh(root.parameters)) || op
         }
     }
 
@@ -193,12 +190,14 @@ Item{
 
             Component.onCompleted: {
                 if(model && model.content){
-                    let parts = model.content.split("|")
+                    // 先整串翻译再拆分：词表条目为整串（是,否 / 补洞,自交检测,退化清理|0），
+                    // 逐项查找会落空；几何 QML 源串已 qsTr 翻译，二次翻译未命中时原样透传
+                    const translated = qsTranslate("PreCess", model.content)
+                    let parts = translated.split("|")
                     let items = parts[0].split(",")
                     comboModel.clear()
                     for(let i=0; i<items.length; i++){
-                        // Combo 选项按当前语言翻译（注册串存源语言）；qsTranslate 支持运行时源串
-                        comboModel.append({"text": qsTranslate("PreCess", items[i])})
+                        comboModel.append({"text": items[i]})
                     }
                     const parameterValue = root.parameters[index]
                     let defaultIndex = parameterValue !== undefined

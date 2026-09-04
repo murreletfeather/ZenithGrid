@@ -63,7 +63,15 @@ void QLanguageManager::setLanguage(const QString& code)
     if (target == current_language_)
         return;
 
-    installTranslator(target);
+    // 恒执行装载/卸载：源语言分支负责卸载已安装的翻译器（切回中文必须移除英文翻译器），
+    // 装载失败仅可能发生在非源语言（qm 内嵌缺失等异常），此时回退源语言：
+    // 保证语言状态与界面实际文案一致，且不持久化装载失败的目标
+    const bool loaded = loadTranslator(target);
+    if (!loaded && target != kSourceLanguage) {
+        target = kSourceLanguage;
+        if (target == current_language_)
+            return;
+    }
 
     current_language_ = target;
     // 同步模型树自动命名的显示语言（zh_CN → 中文映射，其余语言用英文存储原名）
@@ -86,7 +94,7 @@ QString QLanguageManager::displayName(const QString& code) const
     return code;
 }
 
-void QLanguageManager::installTranslator(const QString& code)
+bool QLanguageManager::loadTranslator(const QString& code)
 {
     QCoreApplication* app = QCoreApplication::instance();
     if (translator_loaded_ && app)
@@ -95,16 +103,17 @@ void QLanguageManager::installTranslator(const QString& code)
 
     // 源语言不需要翻译文件
     if (code == kSourceLanguage)
-        return;
+        return true;
 
     const QString path = kTranslationPrefix + code + kTranslationSuffix;
     if (translator_.load(path)) {
         translator_loaded_ = true;
         if (app)
             app->installTranslator(&translator_);
-    } else {
-        qWarning() << "QLanguageManager: 翻译文件装载失败，界面保持源语言：" << path;
+        return true;
     }
+    qWarning() << "QLanguageManager: 翻译文件装载失败，回退源语言：" << path;
+    return false;
 }
 
 QString QLanguageManager::detectSystemLanguage()

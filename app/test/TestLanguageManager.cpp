@@ -58,11 +58,11 @@ TEST_CASE("language switch state machine and persistence", "[app][language]")
     QCoreApplication app(kArgc, kArgv);
     QLanguageManager manager;
 
+    // 测试 exe 内嵌 /i18n/app_en_US.qm（见 app/test/CMakeLists.txt），可走真实装载路径
     manager.setLanguage("en_US");
     REQUIRE(manager.currentLanguage() == "en_US");
+    REQUIRE(manager.translatorLoaded());
     REQUIRE(readPersistedLanguage() == "en_US");
-    // 测试程序未嵌入 en_US.qm，装载失败不阻断切换（界面保持源语言文案）
-    REQUIRE_FALSE(manager.translatorLoaded());
 
     // 切回源语言：卸载翻译器
     manager.setLanguage("zh_CN");
@@ -84,6 +84,27 @@ TEST_CASE("idempotent repeated language switch", "[app][language]")
     manager.setLanguage("en_US");
     manager.setLanguage("en_US");
     REQUIRE(manager.currentLanguage() == "en_US");
+    REQUIRE(manager.translatorLoaded());
+    manager.setLanguage("zh_CN");
+    REQUIRE(manager.currentLanguage() == "zh_CN");
+}
+
+TEST_CASE("switch back to source language uninstalls loaded translator", "[app][language]")
+{
+    setTestSettingsScope();
+    QCoreApplication app(kArgc, kArgv);
+    QLanguageManager manager;
+
+    // 测试 exe 内嵌 /i18n/app_en_US.qm（见 app/test/CMakeLists.txt）：
+    // 真实装载→卸载路径，防止"切回中文不卸载英文翻译器"回归
+    manager.setLanguage("en_US");
+    REQUIRE(manager.currentLanguage() == "en_US");
+    REQUIRE(manager.translatorLoaded());
+
+    manager.setLanguage("zh_CN");
+    REQUIRE(manager.currentLanguage() == "zh_CN");
+    REQUIRE_FALSE(manager.translatorLoaded());
+    REQUIRE(readPersistedLanguage() == "zh_CN");
 }
 
 TEST_CASE("language choice persists across instances", "[app][language]")
@@ -92,12 +113,12 @@ TEST_CASE("language choice persists across instances", "[app][language]")
     {
         QCoreApplication app(kArgc, kArgv);
         QLanguageManager manager;
-        manager.setLanguage("en_US");
+        manager.setLanguage("zh_CN");
     }
     {
         QCoreApplication app(kArgc, kArgv);
         QLanguageManager manager;
         manager.applySavedLanguage();
-        REQUIRE(manager.currentLanguage() == "en_US");
+        REQUIRE(manager.currentLanguage() == "zh_CN");
     }
 }

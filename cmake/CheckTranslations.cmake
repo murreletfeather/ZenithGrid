@@ -20,7 +20,8 @@ if(_vanished_matches)
         "CheckTranslations: 发现 ${_vanished_count} 条 vanished 翻译条目。\n"
         "  通常原因：lupdate 扫描范围缩水（检查 qt_add_translations 的 SOURCE_TARGETS 是否遗漏主目标）\n"
         "  或源串已被删除。请先运行: cmake --build <build-dir> --target update_translations\n"
-        "  并确认这些条目在源码中仍然存在；若源串确已删除，请经 Qt Linguist 清理后重试。")
+        "  并确认这些条目在源码中仍然存在；若为合法删除字符串的流程，请运行 update_translations\n"
+        "  后在 Qt Linguist 中删除 vanished 条目后重试。")
 endif()
 
 list(LENGTH _unfinished_matches _unfinished_count)

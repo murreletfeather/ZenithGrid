@@ -53,8 +53,9 @@ signals:
     void translatorLoadedChanged();
 
 private:
-    /// @brief 卸载旧翻译并按需装载目标语言的 .qm，装载失败仅告警不中断切换
-    void installTranslator(const QString& code);
+    /// @brief 卸载旧翻译并按需装载目标语言的 .qm
+    /// @return 装载成功返回 true；源语言恒为 true；失败时已卸载并告警，由调用方回退源语言
+    bool loadTranslator(const QString& code);
 
     /// @brief 按系统语言检测默认语言：中文环境用 zh_CN，其余用 en_US
     static QString detectSystemLanguage();
