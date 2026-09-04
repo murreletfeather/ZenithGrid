@@ -120,17 +120,17 @@
         </message>
         <message>
             <location line="+6" />
-            <location line="+49" />
+            <location line="+52" />
             <source>偏好设置</source>
             <translation>Preferences</translation>
         </message>
         <message>
-            <location line="-20" />
+            <location line="-22" />
             <source>导入</source>
             <translation>Import</translation>
         </message>
         <message>
-            <location line="+10" />
+            <location line="+11" />
             <source>导出</source>
             <translation>Export</translation>
         </message>
@@ -148,7 +148,7 @@
             <translation>Not selected</translation>
         </message>
         <message>
-            <location line="+52" />
+            <location line="+51" />
             <source>分量</source>
             <translation>components</translation>
         </message>
@@ -158,7 +158,7 @@
             <translation>Not supported yet</translation>
         </message>
         <message>
-            <location line="+39" />
+            <location line="+38" />
             <source>渲染策略</source>
             <translation>Render Mode</translation>
         </message>
@@ -370,7 +370,57 @@
             <translation>Surface Lines Only</translation>
         </message>
         <message>
-            <location line="+10" />
+            <location line="+11" />
+            <source>拓扑诊断</source>
+            <translation>Topology Diagnostics</translation>
+        </message>
+        <message>
+            <location line="+22" />
+            <source>边界边</source>
+            <translation>Boundary Edge</translation>
+        </message>
+        <message>
+            <location line="+6" />
+            <source>边界面</source>
+            <translation>Boundary Face</translation>
+        </message>
+        <message>
+            <location line="+6" />
+            <source>非流形边</source>
+            <translation>Non-Manifold Edge</translation>
+        </message>
+        <message>
+            <location line="+6" />
+            <source>非流形点</source>
+            <translation>Non-Manifold Vertex</translation>
+        </message>
+        <message>
+            <location line="+6" />
+            <source>孤立边</source>
+            <translation>Isolated Edge</translation>
+        </message>
+        <message>
+            <location line="+6" />
+            <source>孤立点</source>
+            <translation>Isolated Vertex</translation>
+        </message>
+        <message>
+            <location line="+7" />
+            <source>二面角边</source>
+            <translation>Dihedral Edge</translation>
+        </message>
+        <message>
+            <location line="+7" />
+            <source>最小二面角</source>
+            <translation>Min Dihedral Angle</translation>
+        </message>
+        <message>
+            <location line="+21" />
+            <source>最大二面角</source>
+            <translation>Max Dihedral Angle</translation>
+        </message>
+        <message>
+            <location line="+23" />
             <source>裁剪</source>
             <translation>Clip</translation>
         </message>
@@ -1230,11 +1280,16 @@ Press F10 to toggle the console
             <source>偏好设置</source>
             <translation>Preferences</translation>
         </message>
+        <message>
+            <location line="+56" />
+            <source>松开鼠标以导入模型文件</source>
+            <translation>Release mouse to import the model file</translation>
+        </message>
     </context>
     <context>
         <name>ObjectTree</name>
         <message>
-            <location filename="../ObjectTree.qml" line="+78" />
+            <location filename="../ObjectTree.qml" line="+86" />
             <source>显示全部</source>
             <translation>Show All</translation>
         </message>
@@ -1698,7 +1753,7 @@ Press F10 to toggle the console
             <translation>Restore Defaults</translation>
         </message>
         <message>
-            <location line="+6" />
+            <location line="+8" />
             <source>应用</source>
             <translation>Apply</translation>
         </message>
@@ -1799,7 +1854,7 @@ Press F10 to toggle the console
     <context>
         <name>SideBar</name>
         <message>
-            <location filename="../SideBar.qml" line="+74" />
+            <location filename="../SideBar.qml" line="+71" />
             <source>执行</source>
             <translation>Execute</translation>
         </message>
@@ -1814,7 +1869,7 @@ Press F10 to toggle the console
             <translation>Confirm</translation>
         </message>
         <message>
-            <location line="+269" />
+            <location line="+271" />
             <source>无</source>
             <translation>None</translation>
         </message>

@@ -328,8 +328,8 @@ Page {
 
             ToolButton {
                 id: topologyDiagnosticBtn
-                text: "拓扑诊断"
-                Layout.preferredWidth: 70
+                text: qsTr("拓扑诊断")
+                // 宽度随当前语言自适应（隐式宽度），译文变长自动展宽
                 Layout.fillHeight: true
                 onClicked: topologyDiagnosticMenu.open()
 
@@ -350,51 +350,51 @@ Page {
                     }
 
                     MenuItem {
-                        text: "边界边"
+                        text: qsTr("边界边")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(0, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
-                        text: "边界面"
+                        text: qsTr("边界面")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(1, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
-                        text: "非流形边"
+                        text: qsTr("非流形边")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(2, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
-                        text: "非流形点"
+                        text: qsTr("非流形点")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(3, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
-                        text: "孤立边"
+                        text: qsTr("孤立边")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(4, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
-                        text: "孤立点"
+                        text: qsTr("孤立点")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(5, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuSeparator {}
                     MenuItem {
-                        text: "二面角边"
+                        text: qsTr("二面角边")
                         checkable: true
                         onToggled: myItem.setTopologyDiagnosticCategoryEnabled(6, checked)
                         onTriggered: topologyDiagnosticMenu.keepOpenAfterTrigger()
                     }
                     MenuItem {
                         id: minimumDihedralItem
-                        text: "最小二面角"
+                        text: qsTr("最小二面角")
                         contentItem: RowLayout {
                             Label { text: minimumDihedralItem.text; Layout.fillWidth: true }
                             SpinBox {
@@ -415,7 +415,7 @@ Page {
                     }
                     MenuItem {
                         id: maximumDihedralItem
-                        text: "最大二面角"
+                        text: qsTr("最大二面角")
                         contentItem: RowLayout {
                             Label { text: maximumDihedralItem.text; Layout.fillWidth: true }
                             SpinBox {
