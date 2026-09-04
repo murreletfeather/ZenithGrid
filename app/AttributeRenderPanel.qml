@@ -74,7 +74,7 @@ Item {
 
     function canApply() {
         let attr = selectedAttribute()
-        if (!attr || !attr.renderable || !App.registry.renderWindow)
+        if (!attr || !App.registry.renderWindow)
             return false
 
         if (modeCombo.currentIndex === 0 && attr.componentCount !== 3)
@@ -139,7 +139,6 @@ Item {
                 color: root.selectedIndex === index ? "#cfe8ff" : "transparent"
                 border.color: "#d0d0d0"
                 border.width: 1
-                opacity: modelData.renderable ? 1.0 : 0.45
 
                 RowLayout {
                     anchors.fill: parent
@@ -176,7 +175,6 @@ Item {
                     id: attributeMouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    enabled: modelData.renderable
                     onClicked: {
                         root.selectedIndex = index
                         modeCombo.currentIndex = root.inferMode(modelData)
