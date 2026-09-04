@@ -63,12 +63,20 @@ public:
     Q_INVOKABLE QModelIndex findIndexByNodeId(int nodeId, int depth) const;
     Q_INVOKABLE void setAllVisibility(bool visible);
 
+    /**
+     * @brief 界面语言切换后通知各行名重新取值（轻量：不加锁展开/选中状态）
+     *
+     * 节点名按当前界面语言显示（见 DisplayTranslate.h），语言切换后经本方法
+     * 递归重发 NameRole 的 dataChanged，QML 视图重新读取即可切换语言。
+     */
+    Q_INVOKABLE void notifyNamesChanged();
+
     QObject* getModelQuery() const { return modelQuery_; }
     void setModelQuery(QObject* query);
 
 private:
     TreeNode* getNode(const QModelIndex& index) const;
-    void emitDescendantDataChanged(const QModelIndex& parentIndex);
+    void emitDescendantDataChanged(const QModelIndex& parentIndex, const QVector<int>& roles = QVector<int> { IsVisibleRole });
     void setComponentVisibility(TreeNode* node, bool visible);
     void syncSubNodes(TreeNode* node);
     void propagateUp(TreeNode* node);

@@ -1,5 +1,7 @@
 #include "QLanguageManager.h"
 
+#include "DisplayTranslate.h"
+
 #include <QCoreApplication>
 #include <QLocale>
 #include <QQmlEngine>
@@ -19,6 +21,8 @@ QLanguageManager::QLanguageManager(QQmlEngine* engine, QObject* parent)
     , engine_(engine)
     , current_language_(kSourceLanguage)
 {
+    // 同步模型树自动命名的显示语言（默认为源语言 zh_CN）
+    systems::setDisplayLanguage(current_language_);
 }
 
 QVariantList QLanguageManager::languageOptions() const
@@ -62,6 +66,8 @@ void QLanguageManager::setLanguage(const QString& code)
     installTranslator(target);
 
     current_language_ = target;
+    // 同步模型树自动命名的显示语言（zh_CN → 中文映射，其余语言用英文存储原名）
+    systems::setDisplayLanguage(target);
     persistLanguage(target);
     emit currentLanguageChanged(target);
     emit translatorLoadedChanged();

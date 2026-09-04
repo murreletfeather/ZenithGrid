@@ -1,4 +1,5 @@
 #include "TreeModel.h"
+#include "DisplayTranslate.h"
 #include "QModelQuery.h"
 
 #include <QVariantList>
@@ -67,7 +68,8 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     switch (role) {
     case Qt::DisplayRole:
     case NameRole:
-        return node->name;
+        // 自动命名按当前界面语言显示（自动命名英文存储，仅已知模式翻译；自定义名称透传）
+        return systems::displayTranslateTreeNodeName(node->name);
 
     case NumberRole:
         return node->number;
@@ -345,6 +347,15 @@ void TreeModel::setAllVisibility(bool visible)
         emitDescendantDataChanged(index(r, 0, QModelIndex()));
 }
 
+void TreeModel::notifyNamesChanged()
+{
+    for (int row = 0; row < rowCount(); ++row) {
+        QModelIndex top = index(row, 0);
+        emit dataChanged(top, top, { NameRole });
+        emitDescendantDataChanged(top, { NameRole });
+    }
+}
+
 void TreeModel::syncSubNodes(TreeNode* node)
 {
     for (TreeNode* child : node->children) {
@@ -374,13 +385,13 @@ void TreeModel::propagateUp(TreeNode* node) {
     }
 }
 
-void TreeModel::emitDescendantDataChanged(const QModelIndex& parentIndex)
+void TreeModel::emitDescendantDataChanged(const QModelIndex& parentIndex, const QVector<int>& roles)
 {
     int count = rowCount(parentIndex);
     for (int i = 0; i < count; ++i) {
         QModelIndex child = index(i, 0, parentIndex);
-        emit dataChanged(child, child, { IsVisibleRole });
-        emitDescendantDataChanged(child);
+        emit dataChanged(child, child, roles);
+        emitDescendantDataChanged(child, roles);
     }
 }
 

@@ -1,4 +1,5 @@
 #include "QModelQuery.h"
+#include "DisplayTranslate.h"
 #include "ModelLayer.h"
 #include "MeshData.h"
 #include "GeometryData.h"
@@ -253,7 +254,8 @@ QString QModelQuery::getComponentName(Index component_id) const
     if (!component) {
         return QString();
     }
-    return QString::fromLocal8Bit(component->name);
+    // 与对象树一致的显示翻译（自动命名英文存储，仅已知模式翻译；自定义名称透传）
+    return systems::displayTranslateTreeNodeName(QString::fromLocal8Bit(component->name));
 }
 
 Q_INVOKABLE QStringList QModelQuery::getModelAttriName(Index model_id) const

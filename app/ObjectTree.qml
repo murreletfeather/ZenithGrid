@@ -56,6 +56,14 @@ Pane {
         function onComponentChanged(componentId) { refreshTimer.restart() }
     }
 
+    // 语言切换：轻量重发 NameRole 变更（保留展开/选中状态），节点名按新语言重新取值
+    Connections {
+        target: QLanguageManager
+        function onCurrentLanguageChanged() {
+            treeModel.notifyNamesChanged()
+        }
+    }
+
     Rectangle {
         id: headerBar
         anchors { left: parent.left; right: parent.right; top: parent.top }
