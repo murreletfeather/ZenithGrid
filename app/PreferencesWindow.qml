@@ -189,6 +189,8 @@ Item {
                 text: qsTr("恢复默认")
                 implicitWidth: 70
                 implicitHeight: 26
+                // 默认语言为简体中文：恢复默认即切回源语言（卸载翻译器，界面文案回中文）
+                onClicked: QLanguageManager.setLanguage("zh_CN")
             }
 
             Button {
