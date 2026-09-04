@@ -1,5 +1,6 @@
 #include "QAlgorithmSystemAdaptor.h"
 #include "AlgorithmSystem.h"
+#include "DisplayTranslate.h"
 #include "QAlgorithmInfo.h"
 #include "QArgObject.h"
 #include <spdlog/spdlog.h>
@@ -53,12 +54,12 @@ QList<QAlgorithmInfo*> QAlgorithmSystemAdaptor::getAlgorithmsInfo() const
     for (const auto& algo_info : algo_system_->getAlgorithmInfos()) {
         QList<QArgType*> args;
         for (const auto& arg_type : algo_info->arg_types) {
-            args << new QArgType(arg_type);
+            args << new QArgType(displayTranslatedArg(arg_type));
         }
         infos.append(new QAlgorithmInfo(
             QString::fromStdString(algo_info->name),
-            QString::fromStdString(algo_info->display_name),
-            QString::fromStdString(algo_info->description),
+            displayTranslate(algo_info->display_name),
+            displayTranslate(algo_info->description),
             std::move(args)));
     }
     return infos;

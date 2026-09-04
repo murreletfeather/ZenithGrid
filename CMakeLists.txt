@@ -45,7 +45,7 @@ if(NOT freetype_FOUND)
     endif()
 endif()
 
-find_package("Qt${VTK_QT_VERSION}" REQUIRED COMPONENTS Gui Quick QuickControls2)
+find_package("Qt${VTK_QT_VERSION}" REQUIRED COMPONENTS Gui Quick QuickControls2 LinguistTools)
 message(STATUS "QT_VERSION: Qt${VTK_QT_VERSION}")
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()

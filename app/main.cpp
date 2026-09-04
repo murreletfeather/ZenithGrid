@@ -1,6 +1,7 @@
+#include "QFeatureSystemAdaptor.h"
+#include "QLanguageManager.h"
 #include "QLogManager.h"
 #include "QModelManager.h"
-#include "QFeatureSystemAdaptor.h"
 #include <QKeyEvent>
 #include <QQuickVTKItem.h>
 #include <QtQml/QQmlApplicationEngine>
@@ -49,6 +50,8 @@ int main(int argc, char* argv[])
     QModelManager::argv0 = argv[0];
 
     QGuiApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("PreCess");
+    QCoreApplication::setApplicationName("PreCess");
     app.setWindowIcon(QIcon(":/images/PreCess.ico"));
     KDDockWidgets::initFrontend(KDDockWidgets::FrontendType::QtQuick);
 
@@ -56,6 +59,11 @@ int main(int argc, char* argv[])
 
     QQmlApplicationEngine engine;
     KDDockWidgets::QtQuick::Platform::instance()->setQmlEngine(&engine);
+
+    // 语言管理器：先恢复持久化语言并装载翻译，再加载界面，避免首屏闪回源语言
+    QLanguageManager language_manager(&engine);
+    engine.rootContext()->setContextProperty("QLanguageManager", &language_manager);
+    language_manager.applySavedLanguage();
 
     // 收集命令行参数（跳过第一个参数，它是程序路径）
     QStringList arguments_str = app.arguments().mid(1);
@@ -78,6 +86,9 @@ int main(int argc, char* argv[])
         if (auto* feature_adaptor = model_manager->getFeatureSystemAdaptor()) {
             app.installEventFilter(new KeyEventForwarder(*feature_adaptor, &app));
         }
+        // 语言切换桥接：通知模型层各系统重发信息变更回调，动态注册的字符串按新语言重建
+        QObject::connect(&language_manager, &QLanguageManager::currentLanguageChanged, model_manager,
+            [model_manager](const QString& code) { model_manager->setLanguage(code); });
     }
 
     return app.exec();

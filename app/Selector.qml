@@ -25,18 +25,21 @@ RowLayout {
         id: selectModeComboBox
         model: [
             { text: "...", value: "None" },
-            { text: "组件", value: "Component" },
-            { text: "点", value: "Vertex" },
-            { text: "边", value: "Edge" },
-            { text: "面", value: "Face" },
-            { text: "体", value: "Solid" },
-            { text: "几何点", value: "GeometryVertex" },
-            { text: "几何边", value: "GeometryEdge" },
-            { text: "几何面", value: "GeometryFace" },
-            { text: "几何体", value: "GeometrySolid" },
+            { text: qsTr("组件"), value: "Component" },
+            { text: qsTr("点"), value: "Vertex" },
+            { text: qsTr("边"), value: "Edge" },
+            { text: qsTr("面"), value: "Face" },
+            { text: qsTr("体"), value: "Solid" },
+            { text: qsTr("几何点"), value: "GeometryVertex" },
+            { text: qsTr("几何边"), value: "GeometryEdge" },
+            { text: qsTr("几何面"), value: "GeometryFace" },
+            { text: qsTr("几何体"), value: "GeometrySolid" },
         ]
         textRole: "text"
         valueRole: "value"
+        // 宽度为隐式宽度与最大项宽度的较大值：保证弹窗项完整显示（如 Geometry Solid）
+        Layout.preferredWidth: Math.max(implicitWidth, 140)
+        Layout.minimumWidth: 0
 
         // 绑定建立在自己的属性上——ComboBox 内部不会碰它，绑定不会被用户交互破坏
         property string sourceMode: App.selection.selectMode
@@ -55,18 +58,18 @@ RowLayout {
     }
     Button{
         id: selectClearButton
-        text: "清除选择"
+        text: qsTr("清除选择")
         onClicked: root.clearButtonClicked()
         opacity: enabled ? 1.0 : 0.6
     }
     CheckBox {
-        text: "按角度扩散"
+        text: qsTr("按角度扩散")
         checked: root.faceSelectByAngle
         visible: App.selection.selectMode === "Face"
         onClicked: root.faceSelectionSpreadEdited(checked, root.faceSelectAngle)
     }
     Label {
-        text: "角度"
+        text: qsTr("角度")
         visible: App.selection.selectMode === "Face" && root.faceSelectByAngle
     }
     TextField {
@@ -85,7 +88,7 @@ RowLayout {
         }
     }
     Button{
-        text: "确认"
+        text: qsTr("确认")
         onClicked: {
             root.confirmButtonClicked()
             App.selection.confirmed(root.selection)

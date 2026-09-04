@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include "GmshMeshHandler.h"
 
 #include "ArgObject.h"
@@ -21,6 +22,15 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "Gmsh渐进式划分网格");
+}
+}
 
 using core::ArgType;
 
@@ -312,17 +322,17 @@ void systems::algo::GmshMeshHandler::removeExpiredStates(const ModelLayer& model
 std::vector<ArgType> systems::algo::GmshMeshHandler::args_type() const
 {
     return {
-        ArgType { ArgTypeEnum::Selector, "选择几何面", "GeometryFace" },
-        ArgType { ArgTypeEnum::Combo, "操作模式", "划分,删除,重划分" },
-        ArgType { ArgTypeEnum::Text, "目标网格尺寸(留空自动)", "" },
-        ArgType { ArgTypeEnum::Text, "最小网格尺寸(留空默认)", "" },
-        ArgType { ArgTypeEnum::Text, "最大网格尺寸(留空默认)", "" },
-        ArgType { ArgTypeEnum::Combo, "二维网格算法", kGmshMeshAlgorithmComboText },
-        ArgType { ArgTypeEnum::Combo, "网格类型", kGmshSurfaceMeshTypeComboText },
-        ArgType { ArgTypeEnum::Text, "平滑次数(留空默认)", "" },
-        ArgType { ArgTypeEnum::Combo, "四边形重组算法", kGmshRecombinationAlgorithmComboText },
-        ArgType { ArgTypeEnum::Text, "四边形最低质量(0~1，留空默认)", "" },
-        ArgType { ArgTypeEnum::Text, "结构化网格边划分数(留空自动)", "" },
-        ArgType { ArgTypeEnum::Bool, "是否导出网格", "false" }
+        ArgType { ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "选择几何面"), "GeometryFace" },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "操作模式"), QT_TRANSLATE_NOOP("PreCess", "划分,删除,重划分") },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "目标网格尺寸(留空自动)"), "" },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "最小网格尺寸(留空默认)"), "" },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "最大网格尺寸(留空默认)"), "" },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "二维网格算法"), kGmshMeshAlgorithmComboText },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "网格类型"), kGmshSurfaceMeshTypeComboText },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "平滑次数(留空默认)"), "" },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "四边形重组算法"), kGmshRecombinationAlgorithmComboText },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "四边形最低质量(0~1，留空默认)"), "" },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "结构化网格边划分数(留空自动)"), "" },
+        ArgType { ArgTypeEnum::Bool, QT_TRANSLATE_NOOP("PreCess", "是否导出网格"), "false" }
     };
 }

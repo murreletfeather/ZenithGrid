@@ -55,12 +55,12 @@ Page {
             ToolButton {
                 id: geoBtn
                 readonly property var geoLabels: [
-                    "几何·面·有边", "几何·面·无边", "几何·透·75%", "几何·透·50%",
-                    "几何·透·25%", "几何·线·带曲面线", "几何·线·无曲面线", "几何·隐"
+                    qsTr("几何·面·有边"), qsTr("几何·面·无边"), qsTr("几何·透·75%"), qsTr("几何·透·50%"),
+                    qsTr("几何·透·25%"), qsTr("几何·线·带曲面线"), qsTr("几何·线·无曲面线"), qsTr("几何·隐")
                 ]
                 readonly property int menuItemHeight: 28
                 readonly property int subMenuCloseDelay: 500
-                text: myItem ? (myItem.geometryStyle >= 0 && myItem.geometryStyle < geoLabels.length ? geoLabels[myItem.geometryStyle] : "几何") : "几何"
+                text: myItem ? (myItem.geometryStyle >= 0 && myItem.geometryStyle < geoLabels.length ? geoLabels[myItem.geometryStyle] : qsTr("几何")) : qsTr("几何")
                 Layout.fillHeight: true
                 onClicked: geoMenu.open()
 
@@ -78,7 +78,7 @@ Page {
 
                     MenuItem {
                         id: geoFaceCat
-                        text: "面 ▶"
+                        text: qsTr("面 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -93,7 +93,7 @@ Page {
                     }
                     MenuItem {
                         id: geoTransCat
-                        text: "透 ▶"
+                        text: qsTr("透 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -108,7 +108,7 @@ Page {
                     }
                     MenuItem {
                         id: geoWireCat
-                        text: "线 ▶"
+                        text: qsTr("线 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -122,7 +122,7 @@ Page {
                         onTriggered: geoWireMenu.popup(geoBtn, geoMenu.width, geoMenu.y + geoMenu.topPadding + 2 * geoBtn.menuItemHeight)
                     }
                     MenuItem {
-                        text: "隐"
+                        text: qsTr("隐")
                         checkable: true
                         checked: myItem.geometryStyle === 7
                         onTriggered: myItem.setGeometryStyle(myItem.geometryStyle === 7 ? 0 : 7)
@@ -132,14 +132,14 @@ Page {
                 Menu {
                     id: geoFaceMenu
                     MenuItem {
-                        text: "有边"
+                        text: qsTr("有边")
                         checkable: true
                         checked: myItem.geometryStyle === 0
                         onHoveredChanged: { if (hovered) geoSubCloseTimer.stop() }
                         onTriggered: myItem.setGeometryStyle(0)
                     }
                     MenuItem {
-                        text: "无边"
+                        text: qsTr("无边")
                         checkable: true
                         checked: myItem.geometryStyle === 1
                         onHoveredChanged: { if (hovered) geoSubCloseTimer.stop() }
@@ -173,14 +173,14 @@ Page {
                 Menu {
                     id: geoWireMenu
                     MenuItem {
-                        text: "带曲面线"
+                        text: qsTr("带曲面线")
                         checkable: true
                         checked: myItem.geometryStyle === 5
                         onHoveredChanged: { if (hovered) geoSubCloseTimer.stop() }
                         onTriggered: myItem.setGeometryStyle(5)
                     }
                     MenuItem {
-                        text: "无曲面线"
+                        text: qsTr("无曲面线")
                         checkable: true
                         checked: myItem.geometryStyle === 6
                         onHoveredChanged: { if (hovered) geoSubCloseTimer.stop() }
@@ -192,12 +192,12 @@ Page {
             ToolButton {
                 id: meshBtn
                 readonly property var meshLabels: [
-                    "网格·面·带网格线", "网格·面·无线", "网格·透·75%", "网格·透·50%",
-                    "网格·透·25%", "网格·线·带内部线", "网格·线·仅表面线", "网格·隐"
+                    qsTr("网格·面·带网格线"), qsTr("网格·面·无线"), qsTr("网格·透·75%"), qsTr("网格·透·50%"),
+                    qsTr("网格·透·25%"), qsTr("网格·线·带内部线"), qsTr("网格·线·仅表面线"), qsTr("网格·隐")
                 ]
                 readonly property int menuItemHeight: 28
                 readonly property int subMenuCloseDelay: 500
-                text: myItem ? (myItem.meshStyle >= 0 && myItem.meshStyle < meshLabels.length ? meshLabels[myItem.meshStyle] : "网格") : "网格"
+                text: myItem ? (myItem.meshStyle >= 0 && myItem.meshStyle < meshLabels.length ? meshLabels[myItem.meshStyle] : qsTr("网格")) : qsTr("网格")
                 Layout.fillHeight: true
                 onClicked: meshMenu.open()
 
@@ -215,7 +215,7 @@ Page {
 
                     MenuItem {
                         id: meshFaceCat
-                        text: "面 ▶"
+                        text: qsTr("面 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
@@ -230,7 +230,7 @@ Page {
                     }
                     MenuItem {
                         id: meshTransCat
-                        text: "透 ▶"
+                        text: qsTr("透 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
@@ -245,7 +245,7 @@ Page {
                     }
                     MenuItem {
                         id: meshWireCat
-                        text: "线 ▶"
+                        text: qsTr("线 ▶")
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
@@ -259,7 +259,7 @@ Page {
                         onTriggered: meshWireMenu.popup(meshBtn, meshMenu.width, meshMenu.y + meshMenu.topPadding + 2 * meshBtn.menuItemHeight)
                     }
                     MenuItem {
-                        text: "隐"
+                        text: qsTr("隐")
                         checkable: true
                         checked: myItem.meshStyle === 7
                         onTriggered: myItem.setMeshStyle(myItem.meshStyle === 7 ? 0 : 7)
@@ -269,14 +269,14 @@ Page {
                 Menu {
                     id: meshFaceMenu
                     MenuItem {
-                        text: "带网格线"
+                        text: qsTr("带网格线")
                         checkable: true
                         checked: myItem.meshStyle === 0
                         onHoveredChanged: { if (hovered) meshSubCloseTimer.stop() }
                         onTriggered: myItem.setMeshStyle(0)
                     }
                     MenuItem {
-                        text: "无线"
+                        text: qsTr("无线")
                         checkable: true
                         checked: myItem.meshStyle === 1
                         onHoveredChanged: { if (hovered) meshSubCloseTimer.stop() }
@@ -310,14 +310,14 @@ Page {
                 Menu {
                     id: meshWireMenu
                     MenuItem {
-                        text: "带内部线"
+                        text: qsTr("带内部线")
                         checkable: true
                         checked: myItem.meshStyle === 5
                         onHoveredChanged: { if (hovered) meshSubCloseTimer.stop() }
                         onTriggered: myItem.setMeshStyle(5)
                     }
                     MenuItem {
-                        text: "仅表面线"
+                        text: qsTr("仅表面线")
                         checkable: true
                         checked: myItem.meshStyle === 6
                         onHoveredChanged: { if (hovered) meshSubCloseTimer.stop() }
@@ -327,26 +327,24 @@ Page {
             }
 
             ToolButton {
-                text: "裁剪"
+                text: qsTr("裁剪")
                 checkable: true
-                Layout.preferredWidth: 50
+                // 宽度随当前语言自适应（隐式宽度），译文变长自动展宽
                 Layout.fillHeight: true
                 onClicked: {
                     myItem.setMeshClip(checked)
                 }
             }
             ToolButton {
-                text: "比例尺"
+                text: qsTr("比例尺")
                 checkable: true
-                Layout.preferredWidth: 50
                 Layout.fillHeight: true
                 onClicked: {
                     myItem.setScaleBarVisible(checked)
                 }
             }
             ToolButton {
-                text: "重置视图"
-                Layout.preferredWidth: 70
+                text: qsTr("重置视图")
                 Layout.fillHeight: true
                 onClicked: myItem.resetCamera()
             }
@@ -522,7 +520,7 @@ Page {
             }
 
             StyledMenuItem {
-                text: "隐藏"
+                text: qsTr("隐藏")
                 shown: viewportMenu.pickedIds.length > 0
                 onTriggered: {
                     for (let i = 0; i < viewportMenu.pickedIds.length; i++)
@@ -531,7 +529,7 @@ Page {
             }
 
             StyledMenuItem {
-                text: "隔离"
+                text: qsTr("隔离")
                 shown: viewportMenu.pickedIds.length > 0
                 onTriggered: {
                     if (viewportMenu.pickedIds.length > 0)
@@ -540,7 +538,7 @@ Page {
             }
 
             StyledMenuItem {
-                text: "显示"
+                text: qsTr("显示")
                 shown: viewportMenu.pickedIds.length > 0
                 onTriggered: {
                     for (let i = 0; i < viewportMenu.pickedIds.length; i++)
@@ -553,19 +551,19 @@ Page {
             }
 
             StyledMenuItem {
-                text: "全部隐藏"
+                text: qsTr("全部隐藏")
                 shown: viewportMenu.pickedIds.length === 0
                 onTriggered: App.registry.objectTree.hideAllNodes()
             }
 
             StyledMenuItem {
-                text: "全部显示"
+                text: qsTr("全部显示")
                 shown: viewportMenu.pickedIds.length === 0
                 onTriggered: App.registry.objectTree.showAllNodes()
             }
 
             StyledMenuItem {
-                text: "反转显示"
+                text: qsTr("反转显示")
                 shown: true
                 onTriggered: App.registry.objectTree.reverseDisplayed()
             }

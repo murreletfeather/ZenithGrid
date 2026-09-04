@@ -4,6 +4,7 @@
  * @author 范成通 email 1941804585@qq.com
  */
 
+#include <QCoreApplication>
 #include "MeasureHandler.h"
 #include "EventBus.h"
 #include "FeatureContext.h"
@@ -17,6 +18,15 @@
 #include <limits>
 #include <sstream>
 #include <string>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "测量");
+}
+}
 
 namespace systems::feature {
 
@@ -84,8 +94,8 @@ bool samePoint(const systems::interaction::PickInfo& a, const systems::interacti
 void MeasureHandler::setup(FeatureRegistrar& reg, FeatureContext& ctx)
 {
     // "清除"按钮参数：无值触发器，点击发布 ParameterChangedEvent，功能内部订阅并清空
-    reg.addParameter({ ArgTypeEnum::Button, "清除", "" });
-    reg.addMenuItem({ "工具", "测量" });
+    reg.addParameter({ ArgTypeEnum::Button, QT_TRANSLATE_NOOP("PreCess", "清除"), "" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "工具"), "测量" });
 
     // 标注集绑定到交互状态：渲染层事件后从 InteractionState.annotations 拉取绘制
     annotations_ = &ctx.interaction.annotations();

@@ -34,6 +34,11 @@ public:
      */
     QList<QEditInfo*> getEditsInfo() const;
 
+    /**
+     * @brief 通知界面语言切换：重发 editInfoChanged，QML 按新语言重新读取编辑操作信息
+     */
+    void notifyLanguageChanged() { emit editInfoChanged(); }
+
 signals:
     void editInfoChanged();
 

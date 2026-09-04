@@ -59,6 +59,7 @@ function(precess_add_algo_plugin TARGET)
     add_library(${target_lib} STATIC ${plug_SOURCES})
     target_link_libraries(${target_lib} PUBLIC
         Core Data DataOps AlgorithmSystem
+        Qt6::Core
         $<COMPILE_ONLY:IOSystem>
         spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>
     )
@@ -99,6 +100,7 @@ function(precess_add_edit_plugin TARGET)
     add_library(${target_lib} STATIC ${plug_SOURCES})
     target_link_libraries(${target_lib} PUBLIC
         Core Data DataOps EditSystem
+        Qt6::Core
         spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>
     )
     target_include_directories(${target_lib} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -138,6 +140,7 @@ function(precess_add_feature_plugin TARGET)
     add_library(${target_lib} STATIC ${plug_SOURCES})
     target_link_libraries(${target_lib} PUBLIC
         Core Data DataOps FeatureSystem
+        Qt6::Core
         spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>
     )
     target_include_directories(${target_lib} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

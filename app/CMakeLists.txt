@@ -15,6 +15,8 @@ qt_add_qml_module(${MYNAME}
             TreeModel.cpp
             QLogManager.h
             QLogManager.cpp
+            QLanguageManager.h
+            QLanguageManager.cpp
         QML_FILES
             Main.qml
             AppToolbar.qml
@@ -28,6 +30,36 @@ qt_add_qml_module(${MYNAME}
             PreferencesWindow.qml
             OutputLog.qml
 )
+
+# 国际化：中文为源语言（界面字符串以中文编写），仅打包英文翻译 en_US.qm；
+# lupdate 自动扫描本目标源码（含 QML 文件）维护 i18n/app_en_US.ts，
+# 插件与适配器源码经 SOURCE_TARGETS 一并扫描（QT_TRANSLATE_NOOP 声明的动态注册字符串），
+# lrelease 编译的 .qm 以 /i18n 前缀嵌入资源，QLanguageManager 运行时按需装载
+qt_add_translations(${MYNAME}
+    TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/i18n/app_en_US.ts
+    RESOURCE_PREFIX /i18n
+    LUPDATE_OPTIONS -locations relative
+    SOURCE_TARGETS
+        # 必须包含 app 目标本体：显式传 SOURCE_TARGETS 时 lupdate 只扫描列表内目标，
+        # 遗漏主目标会把 QML 源串标 vanished、被 lrelease 丢弃（qm 缺 QML 上下文）
+        ${MYNAME}
+        FeatureSystemQml EditSystemQml AlgorithmSystemQml IOSystemQml
+        FeatureDemoPluginlib MeasurePluginlib DimensionPluginlib MeshQualityPluginlib MeshRepairPluginlib
+        CreateFacePluginlib DeleteFacePluginlib
+        TetGenPluginlib TetGenLibPluginlib GmshPluginlib CmdExecutePluginlib
+)
+
+# 翻译检查：构建时校验 ts 无 vanished 条目（lupdate 扫描范围缩水的回归防护，
+# vanished 条目会被 lrelease 丢弃导致 .qm 缺失 QML 上下文）
+add_custom_target(check_translations
+    COMMAND ${CMAKE_COMMAND} -DTS_FILE=${CMAKE_CURRENT_SOURCE_DIR}/i18n/app_en_US.ts
+            -P ${CMAKE_SOURCE_DIR}/cmake/CheckTranslations.cmake
+    COMMENT "检查 app_en_US.ts 中是否存在 vanished 条目"
+    VERBATIM
+)
+add_dependencies(${MYNAME} check_translations)
+
+add_subdirectory(test)
 target_link_libraries(${MYNAME}
     PRIVATE
     renderQml renderQmlplugin modelQml modelQmlplugin

@@ -47,6 +47,22 @@ Item{
         }
     }
 
+    // 语言切换后重建当前操作：信息对象（参数名/描述/选项）按新语言重新取得，参数值保留。
+    // 重建经"置空再置回"触发 onActiveOpChanged 面板重建；活动功能会经历退出再进入
+    //（setFeatureActive 幂等，交互功能现场随之重建，可接受）
+    Connections {
+        target: QLanguageManager
+        function onCurrentLanguageChanged() {
+            const op = App.activeOperation
+            if (!op)
+                return
+            App.activeOperation = null
+            Qt.callLater(function() {
+                App.activeOperation = (op.refresh && op.refresh(root.parameters)) || op
+            })
+        }
+    }
+
     RowLayout{
         id: buttonRow
         anchors.top: parent.top
@@ -55,7 +71,7 @@ Item{
         height: 30
         Button{
             id: commitButton
-            text: "执行"
+            text: qsTr("执行")
             enabled: !!(root.activeOp && root.activeOp.info)
             Layout.fillWidth: true
             onClicked:{
@@ -74,7 +90,7 @@ Item{
         }
         Button{
             id: confirmButton
-            text: "确认"
+            text: qsTr("确认")
             enabled: !!(root.activeOp && root.activeOp.info)
             Layout.fillWidth: true
             // 确认 = 结束当前操作，取消操作选中；再次执行需重新点选算法
@@ -181,7 +197,8 @@ Item{
                     let items = parts[0].split(",")
                     comboModel.clear()
                     for(let i=0; i<items.length; i++){
-                        comboModel.append({"text":items[i]})
+                        // Combo 选项按当前语言翻译（注册串存源语言）；qsTranslate 支持运行时源串
+                        comboModel.append({"text": qsTranslate("PreCess", items[i])})
                     }
                     const parameterValue = root.parameters[index]
                     let defaultIndex = parameterValue !== undefined
@@ -342,12 +359,12 @@ Item{
             }
             Text{
                 id:selectedItems
-                text: value ? value.size():"无"
+                text: value ? value.size() : qsTr("无")
             }
 
             Button{
                 id: selectStartButton
-                text: "开始选择"
+                text: qsTr("开始选择")
                 checked: App.selection.listeningSelectorIndex === index
                 onClicked: {
                     if (!checked) {

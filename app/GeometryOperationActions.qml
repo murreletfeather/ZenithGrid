@@ -26,7 +26,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("X 坐标"), content: "0", description: "" },
             { type: QArgType.Float, name: qsTr("Y 坐标"), content: "0", description: "" },
             { type: QArgType.Float, name: qsTr("Z 坐标"), content: "0", description: "" },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -41,7 +41,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("X 方向长度"), content: "10", description: qsTr("必须大于 0") },
             { type: QArgType.Float, name: qsTr("Y 方向长度"), content: "10", description: qsTr("必须大于 0") },
             { type: QArgType.Float, name: qsTr("Z 方向长度"), content: "10", description: qsTr("必须大于 0") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -59,7 +59,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("轴向 Y"), content: "0", description: qsTr("轴向不能为零向量") },
             { type: QArgType.Float, name: qsTr("轴向 Z"), content: "1", description: qsTr("轴向不能为零向量") },
             { type: QArgType.Float, name: qsTr("扫掠角（度）"), content: "360", description: qsTr("范围为 (0, 360]") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -78,7 +78,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("轴向 Y"), content: "0", description: qsTr("轴向不能为零向量") },
             { type: QArgType.Float, name: qsTr("轴向 Z"), content: "1", description: qsTr("轴向不能为零向量") },
             { type: QArgType.Float, name: qsTr("扫掠角（度）"), content: "360", description: qsTr("范围为 (0, 360]") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -97,7 +97,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("最小纬度（度）"), content: "-90", description: qsTr("范围为 [-90, 90)，且小于最大纬度") },
             { type: QArgType.Float, name: qsTr("最大纬度（度）"), content: "90", description: qsTr("范围为 (-90, 90]，且大于最小纬度") },
             { type: QArgType.Float, name: qsTr("经度扫掠角（度）"), content: "360", description: qsTr("范围为 (0, 360]") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -112,7 +112,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("终点 X"), content: "10", description: "" },
             { type: QArgType.Float, name: qsTr("终点 Y"), content: "0", description: "" },
             { type: QArgType.Float, name: qsTr("终点 Z"), content: "0", description: "" },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -136,7 +136,7 @@ QtObject {
             { type: QArgType.Float, name: qsTr("宽度"), content: "10", description: qsTr("沿平面第一个坐标轴的长度") },
             { type: QArgType.Float, name: qsTr("高度"), content: "10", description: qsTr("沿平面第二个坐标轴的长度") },
             { type: QArgType.Combo, name: qsTr("平面"), content: "XY,YZ,XZ|0", description: qsTr("矩形所在的全局坐标平面") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -152,7 +152,7 @@ QtObject {
             { type: QArgType.Combo, name: qsTr("平面"), content: "XY,YZ,XZ|0", description: qsTr("圆面所在的全局坐标平面") },
             { type: QArgType.Float, name: qsTr("起始角（度）"), content: "0", description: qsTr("完整圆盘时忽略") },
             { type: QArgType.Float, name: qsTr("扫掠角（度）"), content: "360", description: qsTr("范围为 (0, 360]") },
-            { type: QArgType.Combo, name: qsTr("写入目标"), content: "添加到当前 Component,新建 Component,新建 Model|0", description: qsTr("选择几何创建结果的组织位置") }
+            { type: QArgType.Combo, name: qsTr("写入目标"), content: qsTr("添加到当前 Component,新建 Component,新建 Model|0"), description: qsTr("选择几何创建结果的组织位置") }
         ]
     })
 
@@ -190,12 +190,38 @@ QtObject {
 
     // 启动参数侧栏操作，并在需要拾取时设置选择模式和参数下标。
     function activate(operation, selectMode, selectorIndex) {
+        // 语言切换后的操作信息重建：createXxxInfo 属性绑定已在 retranslate 后重新求值，
+        // 按名重新取得新语言的信息并携带当前参数返回新操作对象
+        operation.refresh = function(params) {
+            const fresh = root.infoByName(operation.info.name)
+            if (!fresh)
+                return null
+            const rebuilt = Object.assign({}, operation, {
+                info: fresh,
+                defaultParameters: params.slice()
+            })
+            return rebuilt
+        }
         App.activeOperation = operation
         if (selectMode)
             App.selection.selectMode = selectMode
         if (selectorIndex >= 0)
             App.selection.listeningSelectorIndex = selectorIndex
         root.operationActivated()
+    }
+
+    // 按信息名取得内置几何操作的当前信息声明（含按新语言求值的 qsTr）
+    function infoByName(name) {
+        const infos = [root.createPointInfo, root.createBoxInfo, root.createCylinderInfo,
+            root.createConeInfo, root.createSphereInfo,
+            root.createLineByCoordinatesInfo, root.createLineFromVerticesInfo,
+            root.createRectangleFaceInfo, root.createDiskFaceInfo,
+            root.createFaceFromEdgesInfo, root.deleteGeometryInfo, root.extrudeFaceInfo]
+        for (const info of infos) {
+            if (info.name === name)
+                return info
+        }
+        return null
     }
 
     // 根据当前业务选择计算独立几何操作的默认写入目标。

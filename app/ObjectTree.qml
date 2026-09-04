@@ -307,7 +307,7 @@ Pane {
 
                 MenuItem {
                     id: hideItem
-                    text: "隐藏"
+                    text: qsTr("隐藏")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -330,7 +330,7 @@ Pane {
 
                 MenuItem {
                     id: isolateItem
-                    text: "隔离"
+                    text: qsTr("隔离")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -361,7 +361,7 @@ Pane {
 
                 MenuItem {
                     id: showItem
-                    text: "显示"
+                    text: qsTr("显示")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -386,7 +386,7 @@ Pane {
 
                 MenuItem {
                     id: deleteItem
-                    text: "删除"
+                    text: qsTr("删除")
                     implicitHeight: 30
 
                     background: Rectangle {

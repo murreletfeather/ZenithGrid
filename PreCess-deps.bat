@@ -115,6 +115,24 @@ if not defined qtPath (
     cmake --build . --parallel --target install
     popd
     popd
+
+    REM Clone and build qttools 6.8.3 (internationalization toolchain: lupdate / lrelease / lconvert / linguist + Qt6LinguistTools)
+    REM 仅构建 linguist 子模块相关产物，designer / assistant 等工具通过 feature 开关关闭；qdoc 与 clangcpp 解析器依赖 libclang，未提供时自动关闭
+    git clone --single-branch --depth 1 --branch v6.8.3 https://code.qt.io/qt/qttools.git
+    pushd "%sourcePath%/qttools"
+    cmake -S . -B ./build "-GNinja Multi-Config" ^
+        "-DCMAKE_TOOLCHAIN_FILE=%depsPath%\Qt6.8.3\lib\cmake\Qt6\qt.toolchain.cmake" ^
+        "-DCMAKE_INSTALL_PREFIX=%depsPath%\Qt6.8.3" ^
+        "-DCMAKE_CONFIGURATION_TYPES=Release;Debug" ^
+        -DFEATURE_assistant=OFF -DFEATURE_designer=OFF -DFEATURE_distancefieldgenerator=OFF ^
+        -DFEATURE_pixeltool=OFF -DFEATURE_qdbus=OFF -DFEATURE_qtattributionsscanner=OFF ^
+        -DFEATURE_qtdiag=OFF -DFEATURE_qtplugininfo=OFF ^
+        -DQT_BUILD_TESTS=OFF -DQT_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_MESSAGE=LAZY
+    pushd build
+    cmake --build . --config Release --parallel --target install
+    cmake --build . --config Debug --parallel --target install
+    popd
+    popd
 ) else (
     echo 使用外部 Qt: !qtPath!
 )

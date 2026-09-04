@@ -34,6 +34,11 @@ public:
      */
     QList<QAlgorithmInfo*> getAlgorithmsInfo() const;
 
+    /**
+     * @brief 通知界面语言切换：重发 algorithmsInfoChanged，QML 按新语言重新读取算法信息
+     */
+    void notifyLanguageChanged() { emit algorithmsInfoChanged(); }
+
 signals:
     void algorithmsInfoChanged();
 

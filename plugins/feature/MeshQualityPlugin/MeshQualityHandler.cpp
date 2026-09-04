@@ -1,4 +1,5 @@
 #include "MeshQualityHandler.h"
+#include <QCoreApplication>
 
 #include "ComponentOperator.h"
 #include "EventBus.h"
@@ -27,6 +28,15 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "网格质量");
+}
+}
 
 namespace systems::feature {
 namespace {
@@ -396,19 +406,20 @@ namespace {
 
 void MeshQualityHandler::setup(FeatureRegistrar& reg, FeatureContext&)
 {
+    // 注册串存源语言（中文），QT_TRANSLATE_NOOP 供 lupdate 提取，显示层按当前语言翻译
     reg.addParameter({
         ArgTypeEnum::Selector,
-        "目标 Component",
+        QT_TRANSLATE_NOOP("PreCess", "目标 Component"),
         "Component",
-        "选择一个需要计算网格质量的 Component",
+        QT_TRANSLATE_NOOP("PreCess", "选择一个需要计算网格质量的 Component"),
     });
     reg.addParameter({
         ArgTypeEnum::Combo,
-        "质量指标",
-        "Scaled Jacobian,Equiangle Skew,Edge Ratio,最小角,最大角,Warpage,Tet Collapse|0",
-        "选择要计算并写入面、体属性的网格质量指标",
+        QT_TRANSLATE_NOOP("PreCess", "质量指标"),
+        QT_TRANSLATE_NOOP("PreCess", "Scaled Jacobian,Equiangle Skew,Edge Ratio,最小角,最大角,Warpage,Tet Collapse|0"),
+        QT_TRANSLATE_NOOP("PreCess", "选择要计算并写入面、体属性的网格质量指标"),
     });
-    reg.addMenuItem({ "功能/网格", "网格质量" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "功能/网格"), "网格质量" });
 }
 
 void MeshQualityHandler::deactivate(FeatureContext& ctx)

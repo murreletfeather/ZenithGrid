@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include "CmdExecuteHandler.h"
 #include "ArgObject.h"
 #include "ModelIOSystemBase.h"
@@ -5,6 +6,15 @@
 #include "ComponentData.h"
 #include <filesystem>
 #include <spdlog/spdlog.h>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "执行cmd命令");
+}
+}
 
 using core::ArgType;
 std::any systems::algo::CmdExecuteHandler::execute(HandlerContext& context, const std::vector<core::ArgObject>& args)
@@ -73,7 +83,7 @@ std::vector<ArgType> systems::algo::CmdExecuteHandler::args_type() const
 {
     // 复用CmdExecuteCommand参数模型
     return {
-        ArgType { ArgTypeEnum::Path, "功能(.exe,.bat)", "" },
-        ArgType { ArgTypeEnum::Text, "参数列表", "" }
+        ArgType { ArgTypeEnum::Path, QT_TRANSLATE_NOOP("PreCess", "功能(.exe,.bat)"), "" },
+        ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "参数列表"), "" }
     };
 }

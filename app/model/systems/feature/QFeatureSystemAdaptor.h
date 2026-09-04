@@ -84,6 +84,15 @@ public:
      */
     void notifyScalarAttributeDisplayRequested(Index component_id, const std::string& attribute_name);
 
+    /**
+     * @brief 通知界面语言切换：重发 featuresInfoChanged，QML 按新语言重新读取功能信息
+     *
+     * 功能注册的字符串（display_name/description/menu_path/参数名）以源语言（中文）
+     * 存储，读取时经 QTranslator 翻译（见 DisplayTranslate.h），语言切换后由
+     * QModelManager::setLanguage 调本方法驱动刷新。
+     */
+    void notifyLanguageChanged() { emit featuresInfoChanged(); }
+
 signals:
     void featuresInfoChanged();
     //! @brief 功能请求在指定 Component 上渲染标量属性
