@@ -6,6 +6,9 @@
 #include <QTranslator>
 #include <QVariantList>
 
+#include <memory>
+#include <vector>
+
 class QQmlEngine;
 
 /**
@@ -56,9 +59,10 @@ signals:
     void translatorLoadedChanged();
 
 private:
-    /// @brief 卸载旧翻译并按需装载目标语言的 .qm
-    /// @return 装载成功返回 true；源语言恒为 true；失败时已卸载并告警，由调用方回退源语言
-    bool loadTranslator(const QString& code);
+    /// @brief 卸载旧翻译并按需装载目标语言的全部 .qm（核心翻译文件 + 各插件翻译文件）
+    /// @return 核心翻译文件装载成功返回 true；源语言恒为 true；核心装载失败时已卸载并告警，
+    ///         由调用方回退源语言。插件翻译文件缺失/损坏仅告警跳过，不阻断切换
+    bool loadTranslators(const QString& code);
 
     /// @brief 按系统语言检测默认语言：中文环境用 zh_CN，其余用 en_US
     static QString detectSystemLanguage();
@@ -67,7 +71,9 @@ private:
     static void persistLanguage(const QString& code);
 
     QPointer<QQmlEngine> engine_;
-    QTranslator translator_;
+    /// @brief 当前语言的翻译器链（核心翻译文件为首，其后为各插件翻译文件；
+    /// 与 app/CMakeLists.txt 中逐插件 qt_add_translations 的 ts 命名保持同步）
+    std::vector<std::unique_ptr<QTranslator>> translators_;
     QString current_language_;
     bool translator_loaded_ = false;
 };

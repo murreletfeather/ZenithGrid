@@ -5,11 +5,11 @@
     <name>TestContext</name>
     <message>
         <source>你好</source>
-        <translation type="vanished">Hello</translation>
+        <translation>Hello</translation>
     </message>
     <message>
         <source>再见</source>
-        <translation type="vanished">Bye</translation>
+        <translation>Bye</translation>
     </message>
 </context>
 </TS>
