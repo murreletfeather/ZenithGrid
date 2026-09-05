@@ -43,6 +43,6 @@ precess_add_test(TestDisplayTranslate
     TestDisplayTranslate.cpp
 )
 precess_test_link_libraries(TestDisplayTranslate
-    Qt${VTK_QT_VERSION}::Core Core
+    Qt${VTK_QT_VERSION}::Core Qt${VTK_QT_VERSION}::Qml Core modelQml
 )
 target_include_directories(TestDisplayTranslate PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../model)

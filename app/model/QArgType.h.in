@@ -48,6 +48,8 @@ public:
     QString desc() const { return QString::fromStdString(type_.desc); }
 
 private:
-    const core::ArgType& type_;
+    // 值持有而非引用：构造可能来自显示层临时副本（如 displayTranslatedArg 返回值），
+    // 引用成员会随临时析构立即悬垂（UAF），QML 读取 type()/name() 时崩溃或面板空白
+    core::ArgType type_;
 };
 #endif // !Q_ARG_TYPE_H

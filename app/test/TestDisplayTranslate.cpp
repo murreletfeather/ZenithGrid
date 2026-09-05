@@ -1,8 +1,12 @@
 #include "DisplayTranslate.h"
+#include "QArgType.h"
 
 #include <catch2/catch_test_macros.hpp>
 
+#include <memory>
+
 using systems::displayTranslateTreeNodeName;
+using systems::displayTranslatedArg;
 using systems::setDisplayLanguage;
 
 /**
@@ -63,4 +67,21 @@ TEST_CASE("tree node names translate in Chinese and stay original in English", "
         REQUIRE(displayTranslateTreeNodeName(QStringLiteral("Extrude")) == QStringLiteral("Extrude"));
         REQUIRE(displayTranslateTreeNodeName(QStringLiteral("我的模型")) == QStringLiteral("我的模型"));
     }
+}
+
+TEST_CASE("QArgType holds ArgType by value (no dangling reference)", "[app][language]")
+{
+    // 回归：QArgType 曾以 const 引用保存类型，构造自显示层临时副本
+    //（displayTranslatedArg 返回值）后立即悬垂，QML 读取 type()/name() 时崩溃。
+    std::unique_ptr<QArgType> arg_type;
+    {
+        core::ArgType local { ArgTypeEnum::Float, "尺寸", "1.5", "网格尺寸" };
+        arg_type = std::make_unique<QArgType>(displayTranslatedArg(local));
+        // local 在同一作用域块析构；值持有语义下 QArgType 不受影响
+    }
+
+    REQUIRE(arg_type->type() == QArgType::ArgTypeEnum::Float);
+    REQUIRE(arg_type->name() == "尺寸");
+    REQUIRE(arg_type->content() == "1.5");
+    REQUIRE(arg_type->desc() == "网格尺寸");
 }
