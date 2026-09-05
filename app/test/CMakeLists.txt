@@ -5,7 +5,7 @@ precess_add_test(TestLanguageManager
     ../QLanguageManager.cpp
 )
 precess_test_link_libraries(TestLanguageManager
-    Qt${VTK_QT_VERSION}::Qml Core
+    Qt${VTK_QT_VERSION}::Qml Core spdlog::spdlog
 )
 target_include_directories(TestLanguageManager PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/..

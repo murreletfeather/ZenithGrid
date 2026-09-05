@@ -8,6 +8,8 @@
 #include <QSettings>
 #include <QVariantMap>
 
+#include <spdlog/spdlog.h>
+
 namespace {
 const QString kSourceLanguage = QStringLiteral("zh_CN"); //> 源语言：界面字符串本身的语言，无需翻译文件
 const QStringList kSupportedLanguages = { QStringLiteral("zh_CN"), QStringLiteral("en_US") };
@@ -96,6 +98,12 @@ QString QLanguageManager::displayName(const QString& code) const
 
 bool QLanguageManager::loadTranslator(const QString& code)
 {
+    // 纵深防御：语言码必须落在白名单内（正常调用链已在上层过滤，这里兜底拦截非法路径输入）
+    if (!kSupportedLanguages.contains(code)) {
+        spdlog::warn("[i18n] QLanguageManager::loadTranslator: 非法语言码，已忽略: {}", code.toStdString());
+        return false;
+    }
+
     QCoreApplication* app = QCoreApplication::instance();
     if (translator_loaded_ && app)
         app->removeTranslator(&translator_);
@@ -112,7 +120,7 @@ bool QLanguageManager::loadTranslator(const QString& code)
             app->installTranslator(&translator_);
         return true;
     }
-    qWarning() << "QLanguageManager: 翻译文件装载失败，回退源语言：" << path;
+    spdlog::warn("[i18n] 翻译文件装载失败，回退源语言: {}", path.toStdString());
     return false;
 }
 

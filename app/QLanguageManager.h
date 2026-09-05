@@ -16,6 +16,9 @@ class QQmlEngine;
  * QQmlEngine::retranslate() 触发全部翻译绑定重求值，界面即时刷新。
  * 用户选择经 QSettings 持久化，启动时经 applySavedLanguage() 恢复，
  * 无记录时按系统语言检测默认语言。
+ *
+ * 非单例：由 main() 独占创建并经 context property 注入 QML；
+ * 继承 QObject（基类已删除拷贝/赋值）使本类不可复制，无副本实例风险。
  */
 class QLanguageManager : public QObject {
     Q_OBJECT
