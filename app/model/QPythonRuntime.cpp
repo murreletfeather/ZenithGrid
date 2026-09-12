@@ -66,6 +66,12 @@ QString QPythonRuntime::lastError() const
     return QString::fromStdString(runtime_->lastError());
 }
 
+void QPythonRuntime::setConsoleTexts(const QString& guide, const QString& exitHint)
+{
+    Q_ASSERT(QThread::currentThread() == thread()); // Python ≡ GUI 线程
+    runtime_->setConsoleTexts(guide.toStdString(), exitHint.toStdString());
+}
+
 void QPythonRuntime::initialize()
 {
     Q_ASSERT(QThread::currentThread() == thread()); // Python ≡ GUI 线程

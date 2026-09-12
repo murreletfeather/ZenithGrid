@@ -12,6 +12,16 @@
 #include <TopoDS_Shape.hxx>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "删除几何");
+}
+}
 namespace systems::feature {
 void DeleteGeometryHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
@@ -19,12 +29,12 @@ void DeleteGeometryHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/
     // 菜单与图标复用原"几何"页"删除几何"按钮的声明
     // content 声明可选的拾取类型，首个为开始选择时的默认模式（与原几何界面默认一致）；
     // 删除目标组件由所选形状反查，无需在对象树中选中组件
-    reg.addParameter({ ArgTypeEnum::Selector, "目标几何",
+    reg.addParameter({ ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "目标几何"),
         "GeometryFace,GeometryVertex,GeometryEdge,GeometrySolid",
-        "请选择一个顶层几何点、边、面或体" });
-    reg.addParameter({ ArgTypeEnum::Bool, "同时删除下级拓扑", "false",
-        "关闭时保留直接下级拓扑，开启时不影响其他形状共享的拓扑" });
-    reg.addMenuItem({ "几何", "删除几何", "qrc:/images/toolbar/Geometry/delete_geometry.svg" });
+        QT_TRANSLATE_NOOP("PreCess", "请选择一个顶层几何点、边、面或体") });
+    reg.addParameter({ ArgTypeEnum::Bool, QT_TRANSLATE_NOOP("PreCess", "同时删除下级拓扑"), "false",
+        QT_TRANSLATE_NOOP("PreCess", "关闭时保留直接下级拓扑，开启时不影响其他形状共享的拓扑") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "删除几何"), "qrc:/images/toolbar/Geometry/delete_geometry.svg" });
 }
 
 std::any DeleteGeometryHandler::execute(FeatureContext& ctx)

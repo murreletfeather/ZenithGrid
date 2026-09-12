@@ -15,13 +15,23 @@
 #include <spdlog/spdlog.h>
 #include <vector>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "选择闭合边创建面");
+}
+}
 namespace systems::feature {
 void CreateFaceFromEdgesHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createFaceFromEdgesInfo 保持一致；
     // 菜单与图标复用原"几何"页"闭合边成面"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Selector, "轮廓边", "GeometryEdge", "请选择一条或多条闭合轮廓边" });
-    reg.addMenuItem({ "几何", "选择闭合边创建面", "qrc:/images/toolbar/Geometry/close_edges_to_form_surface.svg" });
+    reg.addParameter({ ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "轮廓边"), "GeometryEdge", QT_TRANSLATE_NOOP("PreCess", "请选择一条或多条闭合轮廓边") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "选择闭合边创建面"), "qrc:/images/toolbar/Geometry/close_edges_to_form_surface.svg" });
 }
 
 std::any CreateFaceFromEdgesHandler::execute(FeatureContext& ctx)

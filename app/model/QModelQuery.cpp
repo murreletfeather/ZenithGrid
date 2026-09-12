@@ -60,50 +60,9 @@ bool QModelQuery::hasComponent(Index component_id) const
 
 QString QModelQuery::getComponentName(Index component_id) const
 {
-    ComponentData* component = m_manager->findComponent(component_id);
-    if (!component) {
-        return QString();
-    }
+    const auto name = m_query->componentName(component_id);
     // 与对象树一致的显示翻译（自动命名英文存储，仅已知模式翻译；自定义名称透传）
-    return systems::displayTranslateTreeNodeName(QString::fromLocal8Bit(component->name));
-}
-
-Q_INVOKABLE QStringList QModelQuery::getModelAttriName(Index model_id) const
-{
-    QStringList attri_list;
-    ModelData* model = m_manager->modelById(model_id);
-    if (!model) {
-        spdlog::error("模型不存在，无法获取属性名，id:{}", model_id);
-        return {};
-    }
-    auto ids = getComponentIds(model_id);
-    ComponentData* comp = nullptr;
-    for (Index cid : ids) {
-        ComponentData* c = m_manager->findComponent(cid);
-        if (c && c->mesh) {
-            comp = c;
-            break;
-        }
-    }
-    if (!comp)
-        return {};
-    MeshData* mesh = comp->asMeshData();
-    if (mesh) {
-        for (const auto& [name, data] : mesh->vertex_attributes_) {
-            attri_list.append(QString::fromStdString(name));
-        }
-        for (const auto& [name, data] : mesh->edge_attributes_) {
-            attri_list.append(QString::fromStdString(name));
-        }
-        for (const auto& [name, data] : mesh->face_attributes_) {
-            attri_list.append(QString::fromStdString(name));
-        }
-        for (const auto& [name, data] : mesh->solid_attributes_) {
-            attri_list.append(QString::fromStdString(name));
-        }
-        spdlog::info("attri_list.size(): {}", attri_list.size());
-    }
-    return attri_list;
+    return name ? systems::displayTranslateTreeNodeName(QString::fromStdString(*name)) : QString();
 }
 
 QVariantList QModelQuery::getComponentAttriInfo(Index component_id) const

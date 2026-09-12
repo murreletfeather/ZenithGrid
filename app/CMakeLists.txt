@@ -71,6 +71,20 @@ set(_PRECESS_I18N_PLUGINS
     algo/TetGenLibPlugin/TetGenLibPluginlib
     algo/GmshPlugin/GmshPluginlib
     algo/CmdExecutePlugin/CmdExecutePluginlib
+    feature/CreateBoxPlugin/CreateBoxPluginlib
+    feature/CreateConePlugin/CreateConePluginlib
+    feature/CreateCylinderPlugin/CreateCylinderPluginlib
+    feature/CreateDiskFacePlugin/CreateDiskFacePluginlib
+    feature/CreateFaceFromEdgesPlugin/CreateFaceFromEdgesPluginlib
+    feature/CreateLineByCoordinatesPlugin/CreateLineByCoordinatesPluginlib
+    feature/CreateLineFromVerticesPlugin/CreateLineFromVerticesPluginlib
+    feature/CreatePointPlugin/CreatePointPluginlib
+    feature/CreateRectangleFacePlugin/CreateRectangleFacePluginlib
+    feature/CreateSpherePlugin/CreateSpherePluginlib
+    feature/DeleteGeometryPlugin/DeleteGeometryPluginlib
+    feature/ExtrudeFacePlugin/ExtrudeFacePluginlib
+    feature/MeshBooleanPlugin/MeshBooleanPluginlib
+    feature/ScalePreviewPlugin/ScalePreviewPluginlib
 )
 foreach(_plugin_entry IN LISTS _PRECESS_I18N_PLUGINS)
     string(REGEX MATCH "^([^/]+)/([^/]+)/([^/]+)$" _m "${_plugin_entry}")

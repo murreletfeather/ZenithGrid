@@ -27,8 +27,36 @@ Item {
     property int historyIndex: -1
     property bool booted: false
 
+    // 语言切换时刷新运行时的 help()/exit() 文案（未初始化时仅暂存，随首启注入）。
+    // 必须延迟到 setLanguage 返回之后：QLanguageManager 先 emit 本信号、后 retranslate，
+    // 同步推送会取到旧的翻译缓存值（Qt.callLater 在本轮事件循环末执行）
+    Connections {
+        target: QLanguageManager
+        function onCurrentLanguageChanged() {
+            Qt.callLater(pyConsole.applyConsoleTexts)
+        }
+    }
+
     function prompt() {
         return buffer.length > 0 ? "..." : ">"
+    }
+
+    // help() 指南全文：逐行 qsTr 以便 lupdate 提取（JavaScript/Python 等词不译）
+    function consoleGuide() {
+        return qsTr("PreCess Python 控制台:\n") +
+               qsTr("- 输入即 Python，回车执行；def/for/if 未完时提示 ... 续行，Esc 放弃\n") +
+               qsTr("- import precess 后 precess.current 即当前 GUI 会话\n") +
+               qsTr("- 查询: precess.current.query.list_models()\n") +
+               qsTr("- 功能: precess.current.call('CreateBox', 0, 0, 0, 5, 5, 5, 2)\n") +
+               qsTr("- 自省: precess.current.feature_params('CreateBox')\n") +
+               qsTr("- 撤销/重做: precess.current.undo_stack.undo() / redo()\n") +
+               qsTr("- clear() 清空窗口；help(对象) 查看文档（如 help(str)）\n") +
+               qsTr("- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出")
+    }
+
+    // 把当前语言的控制台文案推给运行时（随首次初始化注入或立即重设）
+    function applyConsoleTexts() {
+        QModelManager.pythonRuntime.setConsoleTexts(consoleGuide(), qsTr("PreCess 是 GUI 程序，请直接关闭窗口退出"))
     }
 
     ColumnLayout {
@@ -65,7 +93,7 @@ Item {
             spacing: 4
 
             Button {
-                text: "帮助"
+                text: qsTr("帮助")
                 flat: true
                 onClicked: {
                     // 与输入 help() 等价：以命令形式执行，展示交互方式
@@ -76,7 +104,7 @@ Item {
             }
 
             Button {
-                text: "清空窗口"
+                text: qsTr("清空窗口")
                 flat: true
                 onClicked: {
                     outputText.text = ""
@@ -105,7 +133,7 @@ Item {
             TextField {
                 id: inputField
                 Layout.fillWidth: true
-                placeholderText: "输入 Python 代码..."
+                placeholderText: qsTr("输入 Python 代码...")
                 color: "#333333"
                 font.family: "Courier New"
                 font.pixelSize: 12
@@ -133,13 +161,13 @@ Item {
                     if (pyConsole.buffer.length > 0) {
                         pyConsole.buffer = ""
                         promptText.text = ">"
-                        appendOutput("（已放弃续行）\n\n")
+                        appendOutput(qsTr("（已放弃续行）\n\n"))
                     }
                 }
             }
 
             Button {
-                text: "执行"
+                text: qsTr("执行")
                 highlighted: true
                 onClicked: {
                     if (inputField.text.trim() !== "" || pyConsole.buffer.length > 0) {
@@ -164,15 +192,16 @@ Item {
     // 首次显示时初始化运行环境并输出欢迎信息（解释器懒启动，启动耗时只发生一次）
     function boot() {
         booted = true
+        applyConsoleTexts() // 先推送当前语言文案，随首次初始化注入
         const runtime = QModelManager.pythonRuntime
         runtime.initialize()
-        appendOutput("=== PreCess Python 控制台 ===\n")
-        appendOutput("按 F11 切换控制台显示\n")
+        appendOutput(qsTr("=== PreCess Python 控制台 ===\n"))
+        appendOutput(qsTr("按 F11 切换控制台显示\n"))
         if (runtime.available) {
-            appendOutput("解释器: " + runtime.version() + "\n")
+            appendOutput(qsTr("解释器: ") + runtime.version() + "\n")
             appendOutput("----------------------------\n")
-            appendOutput("import precess 后经 precess.current 操作当前会话\n")
-            appendOutput("输入 help() 查看控制台指南（help(对象) 查看文档）\n\n")
+            appendOutput(qsTr("import precess 后经 precess.current 操作当前会话\n"))
+            appendOutput(qsTr("输入 help() 查看控制台指南（help(对象) 查看文档）\n\n"))
         } else {
             appendOutput("----------------------------\n")
             appendOutput("✗ " + runtime.lastError() + "\n\n")
@@ -186,6 +215,8 @@ Item {
     }
 
     function submitInput() {
+        // 执行前按当前语言推送一次文案：与 JS 控制台"用时取新语言"语义对齐
+        applyConsoleTexts()
         const line = inputField.text
         appendOutput(prompt() + " " + line + "\n")
         inputField.text = ""

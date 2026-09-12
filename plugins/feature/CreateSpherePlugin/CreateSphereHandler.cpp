@@ -13,6 +13,16 @@
 #include <cmath>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建球体/部分球体");
+}
+}
 namespace systems::feature {
 namespace {
     /**
@@ -36,19 +46,19 @@ void CreateSphereHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createSphereInfo 保持一致；
     // 菜单与图标复用原"几何"页"球体/部分球体"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Float, "球心 X", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "球心 Y", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "球心 Z", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "半径", "10", "必须大于几何容差" });
-    reg.addParameter({ ArgTypeEnum::Float, "极轴 X", "0", "极轴不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "极轴 Y", "0", "极轴不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "极轴 Z", "1", "极轴不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "最小纬度（度）", "-90", "范围为 [-90, 90)，且小于最大纬度" });
-    reg.addParameter({ ArgTypeEnum::Float, "最大纬度（度）", "90", "范围为 (-90, 90]，且大于最小纬度" });
-    reg.addParameter({ ArgTypeEnum::Float, "经度扫掠角（度）", "360", "范围为 (0, 360]" });
-    reg.addParameter({ ArgTypeEnum::Combo, "写入目标",
-        "添加到当前 Component,新建 Component,新建 Model|0", "选择几何创建结果的组织位置" });
-    reg.addMenuItem({ "几何", "创建球体/部分球体", "qrc:/images/toolbar/Geometry/sphere.svg" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "球心 X"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "球心 Y"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "球心 Z"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "半径"), "10", QT_TRANSLATE_NOOP("PreCess", "必须大于几何容差") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "极轴 X"), "0", QT_TRANSLATE_NOOP("PreCess", "极轴不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "极轴 Y"), "0", QT_TRANSLATE_NOOP("PreCess", "极轴不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "极轴 Z"), "1", QT_TRANSLATE_NOOP("PreCess", "极轴不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "最小纬度（度）"), "-90", QT_TRANSLATE_NOOP("PreCess", "范围为 [-90, 90)，且小于最大纬度") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "最大纬度（度）"), "90", QT_TRANSLATE_NOOP("PreCess", "范围为 (-90, 90]，且大于最小纬度") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "经度扫掠角（度）"), "360", QT_TRANSLATE_NOOP("PreCess", "范围为 (0, 360]") });
+    reg.addParameter({ ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "写入目标"),
+        QT_TRANSLATE_NOOP("PreCess", "添加到当前 Component,新建 Component,新建 Model|0"), QT_TRANSLATE_NOOP("PreCess", "选择几何创建结果的组织位置") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "创建球体/部分球体"), "qrc:/images/toolbar/Geometry/sphere.svg" });
 }
 
 std::any CreateSphereHandler::execute(FeatureContext& ctx)

@@ -78,6 +78,15 @@ public:
      * @brief 解释器版本串（sys.version，UTF-8），不可用时返回空串
      */
     std::string version() const;
+    /**
+     * @brief 设置控制台辅助文案（help() 指南与 exit() 提示；供宿主本地化）
+     *
+     * 未设置时使用内置中文默认值；未初始化时暂存、随初始化注入，已初始化时
+     * 立即重设模块级文本（help()/exit() 随新文案输出）。
+     * @param guide help() 无参输出的指南全文（UTF-8，可多行）
+     * @param exit_hint exit()/quit() 的提示语（UTF-8）
+     */
+    void setConsoleTexts(std::string guide, std::string exit_hint);
 
 private:
     void ensureInitialized(); //> execute 的懒初始化入口，仅未初始化且无失败记录时才真正初始化

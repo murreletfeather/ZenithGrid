@@ -95,7 +95,7 @@ endfunction()
 #     [STATIC]
 # )
 function(precess_add_algo_plugin TARGET)
-    _add_plugin(${TARGET} ${ARGN} LIBS AlgorithmSystem $<COMPILE_ONLY:IOSystem>)
+    _add_plugin(${TARGET} ${ARGN} LIBS AlgorithmSystem $<COMPILE_ONLY:IOSystem> $<COMPILE_ONLY:Qt${VTK_QT_VERSION}::Core>)
 endfunction()
 
 # precess_add_edit_plugin(<target>
@@ -104,7 +104,7 @@ endfunction()
 #     [STATIC]
 # )
 function(precess_add_edit_plugin TARGET)
-    _add_plugin(${TARGET} ${ARGN} LIBS EditSystem)
+    _add_plugin(${TARGET} ${ARGN} LIBS EditSystem $<COMPILE_ONLY:Qt${VTK_QT_VERSION}::Core>)
 endfunction()
 
 # precess_add_feature_plugin(<target>
@@ -113,7 +113,7 @@ endfunction()
 #     [STATIC]
 # )
 function(precess_add_feature_plugin TARGET)
-    _add_plugin(${TARGET} ${ARGN} LIBS FeatureSystem)
+    _add_plugin(${TARGET} ${ARGN} LIBS FeatureSystem $<COMPILE_ONLY:Qt${VTK_QT_VERSION}::Core>)
 endfunction()
 
 # precess_plugin_link_libraries(<target> <lib1> <lib2> ...)

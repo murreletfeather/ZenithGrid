@@ -39,6 +39,16 @@
 #include <sstream>
 #include <string>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "网格布尔");
+}
+}
 namespace systems::feature {
 
 namespace {
@@ -383,23 +393,23 @@ void MeshBooleanHandler::setup(FeatureRegistrar& reg, FeatureContext&)
 {
     reg.addParameter({
         ArgTypeEnum::Selector,
-        "对象 A",
+        QT_TRANSLATE_NOOP("PreCess", "对象 A"),
         "Component",
-        "选择第一个操作对象：布尔结果会作为新模型生成，不会修改该对象",
+        QT_TRANSLATE_NOOP("PreCess", "选择第一个操作对象：布尔结果会作为新模型生成，不会修改该对象"),
     });
     reg.addParameter({
         ArgTypeEnum::Selector,
-        "对象 B",
+        QT_TRANSLATE_NOOP("PreCess", "对象 B"),
         "Component",
-        "选择第二个操作对象",
+        QT_TRANSLATE_NOOP("PreCess", "选择第二个操作对象"),
     });
     reg.addParameter({
         ArgTypeEnum::Combo,
-        "布尔运算",
-        "并集,交集,差集(A−B),差集(B−A)|0",
-        "选择布尔运算类型：并集 / 交集 / 差集(A−B) / 差集(B−A)",
+        QT_TRANSLATE_NOOP("PreCess", "布尔运算"),
+        QT_TRANSLATE_NOOP("PreCess", "并集,交集,差集(A−B),差集(B−A)|0"),
+        QT_TRANSLATE_NOOP("PreCess", "选择布尔运算类型：并集 / 交集 / 差集(A−B) / 差集(B−A)"),
     });
-    reg.addMenuItem({ "功能/网格", "网格布尔" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "功能/网格"), QT_TRANSLATE_NOOP("PreCess", "网格布尔") });
 }
 
 std::any MeshBooleanHandler::execute(FeatureContext& ctx)

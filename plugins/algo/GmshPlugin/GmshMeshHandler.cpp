@@ -383,7 +383,7 @@ std::vector<ArgType> systems::algo::GmshMeshHandler::args_type() const
 {
     return {
         ArgType { ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "选择几何面"), "GeometryFace" },
-        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "操作模式"), QT_TRANSLATE_NOOP("PreCess", "划分,删除,重划分") },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "操作模式"), QT_TRANSLATE_NOOP("PreCess", "划分,删除") },
         ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "目标网格尺寸(留空自动)"), "" },
         ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "最小网格尺寸(留空默认)"), "" },
         ArgType { ArgTypeEnum::Text, QT_TRANSLATE_NOOP("PreCess", "最大网格尺寸(留空默认)"), "" },

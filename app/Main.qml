@@ -160,7 +160,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: consoleDock
             uniqueName: "console"
-            title: qsTr("控制台")
+            title: qsTr("JavaScript 控制台")
 
             JavaScriptConsole {
                 anchors.fill: parent
@@ -170,7 +170,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: pythonConsoleDock
             uniqueName: "pythonConsole"
-            title: "Python 控制台"
+            title: qsTr("Python 控制台")
 
             PythonConsole {
                 anchors.fill: parent

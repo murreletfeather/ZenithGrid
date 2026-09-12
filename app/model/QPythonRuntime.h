@@ -57,6 +57,15 @@ public:
      * @brief 最近一次初始化失败的描述（界面提示用），空串表示无失败记录
      */
     Q_INVOKABLE QString lastError() const;
+    /**
+     * @brief 设置控制台辅助文案（help() 指南与 exit() 提示），支持随界面语言刷新
+     *
+     * 未初始化时暂存、随首次初始化注入；已初始化时立即生效。调用不触发
+     * 解释器初始化（语言切换早于控制台首启时无副作用）。
+     * @param guide help() 无参输出的指南全文
+     * @param exitHint exit()/quit() 的提示语
+     */
+    Q_INVOKABLE void setConsoleTexts(const QString& guide, const QString& exitHint);
 
 public slots:
     /**

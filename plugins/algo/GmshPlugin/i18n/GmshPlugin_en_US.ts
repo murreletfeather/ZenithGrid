@@ -4,12 +4,12 @@
 <context>
     <name>PreCess</name>
     <message>
-        <location filename="../GmshMeshHandler.cpp" line="+31"/>
+        <location filename="../GmshMeshHandler.cpp" line="+34"/>
         <source>Gmsh渐进式划分网格</source>
         <translation>Gmsh Progressive Meshing</translation>
     </message>
     <message>
-        <location line="+294"/>
+        <location line="+351"/>
         <source>选择几何面</source>
         <translation>Select Geometry Face</translation>
     </message>
@@ -20,8 +20,8 @@
     </message>
     <message>
         <location line="+0"/>
-        <source>划分,删除,重划分</source>
-        <translation>Mesh,Delete,Remesh</translation>
+        <source>划分,删除</source>
+        <translation>Mesh,Delete</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -74,9 +74,9 @@
         <translation>Export Mesh</translation>
     </message>
     <message>
-        <location filename="../GmshMeshOptions.h" line="+54"/>
-        <source>三角形,四边形主导,结构化四边形</source>
-        <translation>Triangles,Quad-Dominant,Structured Quad</translation>
+        <location filename="../GmshMeshOptions.h" line="+56"/>
+        <source>三角形,四边形主导,纯四边形,结构化四边形</source>
+        <translation>Triangles,Quad-Dominant,Pure Quad,Structured Quad</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -85,8 +85,8 @@
     </message>
     <message>
         <location line="+15"/>
-        <source>默认(Blossom),Simple,Blossom,Simple full-quad,Blossom full-quad</source>
-        <translation>Default (Blossom),Simple,Blossom,Simple full-quad,Blossom full-quad</translation>
+        <source>Simple,Blossom|1</source>
+        <translation>Simple,Blossom|1</translation>
     </message>
 </context>
 </TS>

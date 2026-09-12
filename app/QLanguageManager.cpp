@@ -31,6 +31,20 @@ const std::vector<QString> kPluginTranslationBases = {
     QStringLiteral("TetGenLibPlugin"),
     QStringLiteral("GmshPlugin"),
     QStringLiteral("CmdExecutePlugin"),
+    QStringLiteral("CreateBoxPlugin"),
+    QStringLiteral("CreateConePlugin"),
+    QStringLiteral("CreateCylinderPlugin"),
+    QStringLiteral("CreateDiskFacePlugin"),
+    QStringLiteral("CreateFaceFromEdgesPlugin"),
+    QStringLiteral("CreateLineByCoordinatesPlugin"),
+    QStringLiteral("CreateLineFromVerticesPlugin"),
+    QStringLiteral("CreatePointPlugin"),
+    QStringLiteral("CreateRectangleFacePlugin"),
+    QStringLiteral("CreateSpherePlugin"),
+    QStringLiteral("DeleteGeometryPlugin"),
+    QStringLiteral("ExtrudeFacePlugin"),
+    QStringLiteral("MeshBooleanPlugin"),
+    QStringLiteral("ScalePreviewPlugin"),
 };
 }
 

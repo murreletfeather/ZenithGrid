@@ -374,13 +374,13 @@ ColumnLayout {
                         onToggled: attributeRenderToggled()
                     }
                     Action {
-                        text: qsTr("控制台")
+                        text: qsTr("JavaScript 控制台")
                         checkable: true
                         checked: consoleOpen
                         onToggled: consoleToggled()
                     }
                     Action {
-                        text: "Python 控制台"
+                        text: qsTr("Python 控制台")
                         checkable: true
                         checked: pythonConsoleOpen
                         onToggled: pythonConsoleToggled()

@@ -14,6 +14,16 @@
 #include <algorithm>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "拉伸面为实体");
+}
+}
 namespace systems::feature {
 namespace {
     /**
@@ -31,12 +41,12 @@ void ExtrudeFaceHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
     // 参数声明与原 GeometryOperationActions.qml 中 extrudeFaceInfo 保持一致；
     // 菜单与图标复用原"几何"页"拉伸面"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Selector, "截面", "GeometryFace", "请选择一个几何面" });
-    reg.addParameter({ ArgTypeEnum::Float, "方向 X", "0", "方向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "方向 Y", "0", "方向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "方向 Z", "1", "方向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "长度", "10", "必须大于几何容差" });
-    reg.addMenuItem({ "几何", "拉伸面为实体", "qrc:/images/toolbar/Geometry/stretched_surface.svg" });
+    reg.addParameter({ ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "截面"), "GeometryFace", QT_TRANSLATE_NOOP("PreCess", "请选择一个几何面") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "方向 X"), "0", QT_TRANSLATE_NOOP("PreCess", "方向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "方向 Y"), "0", QT_TRANSLATE_NOOP("PreCess", "方向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "方向 Z"), "1", QT_TRANSLATE_NOOP("PreCess", "方向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "长度"), "10", QT_TRANSLATE_NOOP("PreCess", "必须大于几何容差") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "拉伸面为实体"), "qrc:/images/toolbar/Geometry/stretched_surface.svg" });
 }
 
 std::any ExtrudeFaceHandler::execute(FeatureContext& ctx)

@@ -20,12 +20,32 @@ namespace py = pybind11;
 
 namespace python {
 
+namespace {
+
+//> 控制台辅助文案默认值（中文）：宿主未经 setConsoleTexts 本地化时使用，
+//> headless 等无翻译宿主即取此默认
+const char* const kDefaultConsoleGuide
+    = "PreCess Python 控制台:\n"
+      "- 输入即 Python，回车执行；def/for/if 未完时提示 ... 续行，Esc 放弃\n"
+      "- import precess 后 precess.current 即当前 GUI 会话\n"
+      "- 查询: precess.current.query.list_models()\n"
+      "- 功能: precess.current.call('CreateBox', 0, 0, 0, 5, 5, 5, 2)\n"
+      "- 自省: precess.current.feature_params('CreateBox')\n"
+      "- 撤销/重做: precess.current.undo_stack.undo() / redo()\n"
+      "- clear() 清空窗口；help(对象) 查看文档（如 help(str)）\n"
+      "- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出";
+const char* const kDefaultConsoleExitHint = "PreCess 是 GUI 程序，请直接关闭窗口退出";
+
+} // namespace
+
 struct Runtime::State {
     session::Session* session = nullptr; //> 活会话（不持有所有权，宿主保证生命周期）
     Config config;                       //> 解释器配置（标准库根与模块目录候选）
     bool initialized = false;            //> 解释器就绪且 precess 已导入
     bool executing = false;              //> 重入守卫：Python 执行期间拒绝再次进入
     std::string last_error;              //> 初始化失败描述；非空时不再重试
+    std::string console_guide;           //> help() 指南全文（宿主可经 setConsoleTexts 本地化）
+    std::string console_exit_hint;       //> exit()/quit() 提示语（同上）
     py::object precess_module;           //> 已导入的 precess 绑定模块（current 挂活会话）
 };
 
@@ -34,6 +54,8 @@ Runtime::Runtime(session::Session* session, Config config)
 {
     state_->session = session;
     state_->config = std::move(config);
+    state_->console_guide = kDefaultConsoleGuide;
+    state_->console_exit_hint = kDefaultConsoleExitHint;
 }
 
 Runtime::~Runtime()
@@ -108,20 +130,15 @@ void Runtime::initialize()
     //    纯 Python、无界面级命令，help/clear/exit 以 Python 函数覆盖 site 默认——
     //    pydoc 的交互模式依赖 stdin，嵌入环境没有可交互 stdin（help() 会以
     //    "lost sys.stdin" 崩出），裸 help 的 "Type help()..." 提示语也会误导用户；
-    //    clear() 经输出换页符 \f、由界面识别清屏
+    //    clear() 经输出换页符 \f、由界面识别清屏。指南与提示语取自模块级文本
+    //    （_console_guide_text / _console_exit_text），供 setConsoleTexts 本地化
     try {
+        py::object main_dict = py::module_::import("__main__").attr("__dict__");
+        main_dict["_console_guide_text"] = state_->console_guide;
+        main_dict["_console_exit_text"] = state_->console_exit_hint;
         py::exec(R"PY(
 def _console_guide():
-    return (
-        "PreCess Python 控制台:\n"
-        "- 输入即 Python，回车执行；def/for/if 未完时提示 ... 续行，Esc 放弃\n"
-        "- import precess 后 precess.current 即当前 GUI 会话\n"
-        "- 查询: precess.current.query.list_models()\n"
-        "- 功能: precess.current.call('CreateBox', 0, 0, 0, 5, 5, 5, 2)\n"
-        "- 自省: precess.current.feature_params('CreateBox')\n"
-        "- 撤销/重做: precess.current.undo_stack.undo() / redo()\n"
-        "- clear() 清空窗口；help(对象) 查看文档（如 help(str)）\n"
-        "- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出")
+    return _console_guide_text
 
 class _ConsoleHelp:
     def __call__(self, *args):
@@ -136,10 +153,10 @@ class _ConsoleHelp:
 
 class _ConsoleExit:
     def __call__(self):
-        print("PreCess 是 GUI 程序，请直接关闭窗口退出")
+        print(_console_exit_text)
 
     def __repr__(self):
-        return "PreCess 是 GUI 程序，请直接关闭窗口退出"
+        return _console_exit_text
 
 def _console_clear():
     import sys
@@ -150,9 +167,26 @@ exit = quit = _ConsoleExit()
 clear = _console_clear
 del _ConsoleHelp, _ConsoleExit, _console_clear
 )PY",
-            py::module_::import("__main__").attr("__dict__"));
+            main_dict);
     } catch (const py::error_already_set& e) {
         spdlog::error("python::Runtime: 控制台辅助注入失败: {}", e.what());
+    }
+}
+
+void Runtime::setConsoleTexts(std::string guide, std::string exit_hint)
+{
+    state_->console_guide = std::move(guide);
+    state_->console_exit_hint = std::move(exit_hint);
+    if (!state_->initialized)
+        return;
+    // 已初始化：直接重设模块级文本，help()/exit() 立即按新文案输出
+    py::gil_scoped_acquire gil;
+    try {
+        py::object main_dict = py::module_::import("__main__").attr("__dict__");
+        main_dict["_console_guide_text"] = state_->console_guide;
+        main_dict["_console_exit_text"] = state_->console_exit_hint;
+    } catch (const py::error_already_set& e) {
+        spdlog::error("python::Runtime: 控制台文案更新失败: {}", e.what());
     }
 }
 
