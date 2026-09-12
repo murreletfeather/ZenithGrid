@@ -27,16 +27,6 @@ Item {
     property int historyIndex: -1
     property bool booted: false
 
-    // 语言切换时刷新运行时的 help()/exit() 文案（未初始化时仅暂存，随首启注入）。
-    // 必须延迟到 setLanguage 返回之后：QLanguageManager 先 emit 本信号、后 retranslate，
-    // 同步推送会取到旧的翻译缓存值（Qt.callLater 在本轮事件循环末执行）
-    Connections {
-        target: QLanguageManager
-        function onCurrentLanguageChanged() {
-            Qt.callLater(pyConsole.applyConsoleTexts)
-        }
-    }
-
     function prompt() {
         return buffer.length > 0 ? "..." : ">"
     }
@@ -54,7 +44,8 @@ Item {
                qsTr("- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出")
     }
 
-    // 把当前语言的控制台文案推给运行时（随首次初始化注入或立即重设）
+    // 把当前语言的控制台文案推给运行时：boot() 首启注入前、submitInput() 每次执行前调用
+    // （与 JS 控制台"用时取当前语言"语义一致，不依赖语言切换信号）
     function applyConsoleTexts() {
         QModelManager.pythonRuntime.setConsoleTexts(consoleGuide(), qsTr("PreCess 是 GUI 程序，请直接关闭窗口退出"))
     }

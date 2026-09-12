@@ -513,6 +513,8 @@ ColumnLayout {
                                 App.selection.selectionInvalidated()
                             }
                         }
+                        // 与 activatePlugin 路径一致：语言切换后按名重建信息
+                        root.attachLanguageRefresh(App.activeOperation)
                     }
                 }
             }

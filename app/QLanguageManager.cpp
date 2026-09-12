@@ -3,6 +3,7 @@
 #include "DisplayTranslate.h"
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QLocale>
 #include <QQmlEngine>
 #include <QSettings>
@@ -15,37 +16,8 @@ const QString kSourceLanguage = QStringLiteral("zh_CN"); //> 源语言：界面�
 const QStringList kSupportedLanguages = { QStringLiteral("zh_CN"), QStringLiteral("en_US") };
 const QString kSettingsKey = QStringLiteral("language");
 const QString kTranslationPrefix = QStringLiteral(":/i18n/"); //> qm 资源目录（qt_add_translations RESOURCE_PREFIX /i18n）
-//> 核心翻译文件基名（app/i18n/app_en_US.ts → app_en_US.qm）
+//> 核心翻译文件基名（app/i18n/app_en_US.ts → app_en_US.qm）：先装载，失败则整体回退源语言
 const QString kCoreTranslationBase = QStringLiteral("app");
-//> 插件翻译文件基名清单：与 app/CMakeLists.txt 中逐插件 qt_add_translations 的
-//> <插件名>_en_US.ts 命名一一对应（新增含翻译插件的 ts 时同步维护两处）
-const std::vector<QString> kPluginTranslationBases = {
-    QStringLiteral("FeatureDemoPlugin"),
-    QStringLiteral("MeasurePlugin"),
-    QStringLiteral("DimensionPlugin"),
-    QStringLiteral("MeshQualityPlugin"),
-    QStringLiteral("MeshRepairPlugin"),
-    QStringLiteral("CreateFacePlugin"),
-    QStringLiteral("DeleteFacePlugin"),
-    QStringLiteral("TetGenPlugin"),
-    QStringLiteral("TetGenLibPlugin"),
-    QStringLiteral("GmshPlugin"),
-    QStringLiteral("CmdExecutePlugin"),
-    QStringLiteral("CreateBoxPlugin"),
-    QStringLiteral("CreateConePlugin"),
-    QStringLiteral("CreateCylinderPlugin"),
-    QStringLiteral("CreateDiskFacePlugin"),
-    QStringLiteral("CreateFaceFromEdgesPlugin"),
-    QStringLiteral("CreateLineByCoordinatesPlugin"),
-    QStringLiteral("CreateLineFromVerticesPlugin"),
-    QStringLiteral("CreatePointPlugin"),
-    QStringLiteral("CreateRectangleFacePlugin"),
-    QStringLiteral("CreateSpherePlugin"),
-    QStringLiteral("DeleteGeometryPlugin"),
-    QStringLiteral("ExtrudeFacePlugin"),
-    QStringLiteral("MeshBooleanPlugin"),
-    QStringLiteral("ScalePreviewPlugin"),
-};
 }
 
 QLanguageManager::QLanguageManager(QQmlEngine* engine, QObject* parent)
@@ -169,8 +141,19 @@ bool QLanguageManager::loadTranslators(const QString& code)
     }
     translator_loaded_ = true;
 
-    // 插件翻译文件缺失/损坏仅告警跳过：单个插件翻译缺失不阻断全局语言切换
-    for (const QString& base : kPluginTranslationBases) {
+    // 插件翻译：枚举资源目录内同语言的 qm（由 app/CMakeLists.txt 逐插件 qt_add_translations
+    // 生成并统一嵌入），无需 C++ 侧维护清单；缺失/损坏仅告警跳过，不阻断全局语言切换
+    const QString suffix = QLatin1Char('_') + code + QStringLiteral(".qm");
+    QStringList plugin_bases;
+    const QDir i18n_dir(kTranslationPrefix);
+    const QStringList qm_files = i18n_dir.entryList(QStringList { QStringLiteral("*") + suffix }, QDir::Files);
+    for (const QString& qm_file : qm_files) {
+        const QString base = qm_file.left(qm_file.size() - suffix.size());
+        if (base != kCoreTranslationBase)
+            plugin_bases << base;
+    }
+    plugin_bases.sort();
+    for (const QString& base : plugin_bases) {
         load_one(base, code);
     }
     return true;

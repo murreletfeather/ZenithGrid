@@ -164,9 +164,7 @@ Item {
                         }
                     }
                     Label {
-                        text: modelData.renderable
-                            ? (modelData.componentCount > 0 ? modelData.componentCount + qsTr("分量") : "")
-                            : qsTr("暂不支持")
+                        text: modelData.componentCount > 0 ? modelData.componentCount + qsTr("分量") : ""
                         elide: Text.ElideRight
                     }
                 }

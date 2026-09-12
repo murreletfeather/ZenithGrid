@@ -190,9 +190,18 @@ Item{
 
             Component.onCompleted: {
                 if(model && model.content){
-                    // 先整串翻译再拆分：词表条目为整串（是,否 / 补洞,自交检测,退化清理|0），
-                    // 逐项查找会落空；几何 QML 源串已 qsTr 翻译，二次翻译未命中时原样透传
-                    const translated = qsTranslate("PreCess", model.content)
+                    // 先整串翻译再拆分：词表条目为整串（是,否 / 补洞,自交检测,退化清理|0）。
+                    // 整串未命中时逐项翻译兜底：注册表运行时拼接的 Combo 内容（如尺寸标注
+                    // 的测量类型）无整串条目，ts 中只有单项；逐项查 PreCess 上下文即可命中
+                    let translated = qsTranslate("PreCess", model.content)
+                    if (translated === model.content) {
+                        const barIndex = model.content.indexOf("|")
+                        const itemsPart = barIndex >= 0 ? model.content.substring(0, barIndex) : model.content
+                        const defaultPart = barIndex >= 0 ? model.content.substring(barIndex) : ""
+                        translated = itemsPart.split(",").map(function(item) {
+                            return qsTranslate("PreCess", item)
+                        }).join(",") + defaultPart
+                    }
                     let parts = translated.split("|")
                     let items = parts[0].split(",")
                     comboModel.clear()

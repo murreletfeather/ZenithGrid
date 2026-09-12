@@ -39,8 +39,10 @@ qt_add_qml_module(${MYNAME}
 # 互不冲突），主 ts 只含主程序 QML/适配器上下文。各 ts 独立生成 <基名>_en_US.qm；
 # 注意：qt_add_translations 多次调用 + RESOURCE_PREFIX 会共用内部 qrc 名互相覆盖，
 # 故一律用 QM_FILES_OUTPUT_VARIABLE 收集产物，最后统一一次 qt_add_resources 嵌入主程序。
-# 插件 ts 基名清单与 app/QLanguageManager.cpp 的 kPluginTranslationBases 一一对应。
+# QLanguageManager 运行期枚举 :/i18n 下的 *_<语言>.qm，无 C++ 侧插件清单需要同步。
+# 无 LinguistTools（wasm 等）时整段跳过：不生成/不嵌入 qm，QLanguageManager 找不到资源即回退源语言
 
+if(Qt${VTK_QT_VERSION}LinguistTools_FOUND)
 set(_PRECESS_I18N_QM_FILES "")
 
 # 1) 主程序翻译：QML 文件（经 ${MYNAME}）与系统适配器源码
@@ -91,6 +93,10 @@ foreach(_plugin_entry IN LISTS _PRECESS_I18N_PLUGINS)
     set(_plugin_cat "${CMAKE_MATCH_1}")
     set(_plugin_name "${CMAKE_MATCH_2}")
     set(_plugin_lib "${CMAKE_MATCH_3}")
+    # 平台裁剪（如 wasm 不建 CmdExecutePlugin/TetGenPlugin）：目标不存在则跳过其翻译构建
+    if(NOT TARGET ${_plugin_lib})
+        continue()
+    endif()
     set(_plugin_ts "${CMAKE_SOURCE_DIR}/plugins/${_plugin_cat}/${_plugin_name}/i18n/${_plugin_name}_en_US.ts")
     qt_add_translations(${MYNAME}
         TS_FILES ${_plugin_ts}
@@ -129,6 +135,7 @@ add_custom_target(check_translations
     VERBATIM
 )
 add_dependencies(${MYNAME} check_translations)
+endif() # Qt${VTK_QT_VERSION}LinguistTools_FOUND
 
 add_subdirectory(test)
 target_link_libraries(${MYNAME}

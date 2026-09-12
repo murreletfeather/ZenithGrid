@@ -110,14 +110,9 @@
         <translation>Not selected</translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+50"/>
         <source>分量</source>
         <translation>components</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>暂不支持</source>
-        <translation>Not supported yet</translation>
     </message>
     <message>
         <location line="+38"/>
@@ -771,7 +766,7 @@ Press F10 to toggle the console
 <context>
     <name>PythonConsole</name>
     <message>
-        <location filename="../PythonConsole.qml" line="+44"/>
+        <location filename="../PythonConsole.qml" line="+36"/>
         <source>PreCess Python 控制台:
 </source>
         <translation>PreCess Python Console:
@@ -832,7 +827,7 @@ Press F10 to toggle the console
         <translation>- exit()/quit() only print a hint; close the window to exit the GUI app</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>PreCess 是 GUI 程序，请直接关闭窗口退出</source>
         <translation>PreCess is a GUI app; close the window to exit</translation>
     </message>
@@ -987,7 +982,7 @@ Press F10 to toggle the console
         <translation>Confirm</translation>
     </message>
     <message>
-        <location line="+281"/>
+        <location line="+290"/>
         <source>无</source>
         <translation>None</translation>
     </message>

@@ -10,7 +10,7 @@
 namespace {
 // json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
 // 注册串一律存源语言，运行时翻译由显示层按当前语言完成
-void registerDisplayNameTranslationSources()
+[[maybe_unused]] void registerDisplayNameTranslationSources()
 {
     QT_TRANSLATE_NOOP("PreCess", "执行cmd命令");
 }

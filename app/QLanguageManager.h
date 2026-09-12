@@ -71,8 +71,8 @@ private:
     static void persistLanguage(const QString& code);
 
     QPointer<QQmlEngine> engine_;
-    /// @brief 当前语言的翻译器链（核心翻译文件为首，其后为各插件翻译文件；
-    /// 与 app/CMakeLists.txt 中逐插件 qt_add_translations 的 ts 命名保持同步）
+    /// @brief 当前语言的翻译器链（核心翻译文件为首，其后为按名排序的插件翻译文件；
+    /// 插件清单运行期枚举自 :/i18n 资源目录，与 app/CMakeLists.txt 的 qt_add_translations 产物自动一致）
     std::vector<std::unique_ptr<QTranslator>> translators_;
     QString current_language_;
     bool translator_loaded_ = false;
