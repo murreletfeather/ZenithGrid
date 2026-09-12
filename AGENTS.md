@@ -28,7 +28,7 @@
 - **技术栈**：C++17、CMake、Qt Quick 6（QML）、VTK、OpenCASCADE、spdlog、Catch2。
 - **目标平台**：跨平台（Windows / Linux / macOS），当前主力为 Windows + MSVC。
 - **错误处理机制**：使用 **异常**（不要用错误码裸返回风格替代）。
-- **迭代计划**：`README.md` 的「🗺️路线图」节是迭代计划与进度的记录；**完成或计划任务时须及时同步更新**（勾选已完成项、为进行中任务拆分小点或新增计划项），避免路线图陈旧。
+- **迭代计划**：`README.md` 的「🗺️路线图」节是迭代计划与进度的记录，**只记计划与进行中的事项**：路线图已有条目可勾选进度或为进行中任务拆分小点；除非是计划中的大型特性，**不要为已完成的新特性向路线图新增条目**，避免路线图沦为变更日志。新完成的功能特性可考虑改以**功能特性描述**的形式补充到 README 的功能介绍处。
 - **版本与接口稳定性**：项目处于**预览阶段**（0.x），接口随时可能发生二进制级/源代码级的不兼容变更，不提供稳定性承诺；插件须与主程序**同编译器、同配置、同依赖版本**构建（ABI 混用危害见第 8 节）。
 
 ---
@@ -43,12 +43,14 @@
   - `model/ops/`：基于数据结构的操作，依赖 `model/data`。
   - `model/systems/`：系统层（算法系统、模型 IO 系统、编辑系统、功能系统），负责插件注册与按字符串分发调用，依赖 `model/data`、`core`。
     - `model/systems/feature/`：功能系统 `FeatureSystem`，事件驱动的功能注册与调用：功能可注册参数/菜单/按键绑定，经 `EventBus` 订阅按键、参数变更、模型事件，通过 `FeatureContext` 访问模型层；声明 `interactive` 的功能另经 `InteractionContext` 订阅渲染线程驱动的视口交互（见第 10 节线程约定）。
+  - `model/session/`：会话层，无 Qt 的组合根 `Session`（装配模型层 / undo 栈 / `EventBus` / 四系统并有序拆解，内部转发观察者把模型通知桥接为 `ModelEvent`）与原生查询 `SessionQuery`（返回类型化结构体），供 QML 适配层与脚本宿主共用，依赖 `model/data`、`model/ops`、`model/systems`、`core`。
 - `app/`：程序与界面实现，依赖 `model`、`core`。
   - `app/core/` → `core`
-  - `app/model/` → `model`、`core`、`app/core`（model 的 Qt 接口、数据绑定）
+  - `app/model/` → `model`、`core`、`app/core`（model 的 Qt 接口、数据绑定；可选内嵌 Python 运行时 `QPythonRuntime`，见第 10 节 Python 嵌入约定）
   - `app/render/` → `app/model`（VTK 渲染窗口控件）
   - `app/*.qml` → `app/model`、`app/render`、`app/core`（界面布局与更新，仅做轻量数据处理，不承载主业务逻辑）
 - `plugins/`：插件示例与二次开发，依赖 `model/systems`、`model/data`、`core`，与 `app` 独立构建。
+- `python/`：precess Python 绑定模块（pyd）与内嵌解释器宿主 `python::Runtime`（LGPLv3，无 Qt；依赖 `model/session`）。
   - `plugins/algo/`：算法插件；`plugins/io/`：模型 IO 插件；`plugins/edit/`：编辑插件；`plugins/feature/`：功能插件（`FeatureHandler`，json 的 `system` 字段为 `FeatureSystem`）。
 
 **依赖速记**：`app → model → core`；`plugins → model + core`；QML 只调依赖包功能、不写主业务逻辑。
@@ -162,7 +164,7 @@
   - 算法系统：覆盖 `AlgorithmHandler::resolveComponentId` 按参数解析目标组件，不依赖对象树传入的 `fallback_component_id`；`HandlerContext::cur_component` 同样只视作提示。
   - 功能系统：`FeatureContext::activeModel` / `activeComponent` 是对象树选中态的动态查询，只作提示；优先注册 `Selector` 类型参数（`FeatureParams`）让用户显式选择目标。
 - 每个插件目录含 `*.json` 描述文件（见 `plugins/*/.../*.json`）与 `CMakeLists.txt`；新增插件参照同目录既有示例结构。
-- 功能插件（`plugins/feature/`，json 的 `system` 字段为 `FeatureSystem`）实现 `FeatureHandler` 接口：注册时 `setup(FeatureRegistrar&, FeatureContext&)` 一次（声明参数/菜单/按键绑定 + 经 `ctx.events` 订阅事件 `KeyEvent`、`ParameterChangedEvent`、`ModelEvent`），注销时 `teardown()` 一次；功能随活动操作切换被反复 进入 `activate(FeatureContext&)` / 退出 `deactivate()`（GUI 线程，所有功能可感知，由 `FeatureSystem::setFeatureActive` 驱动）；菜单触发 `execute()`。功能可修改的范围限模型层对象（经 `FeatureContext` 的 `ModelLayer` / `ComponentOperator`）与自身视口交互状态（经 `ctx.interaction`）；示例见 `plugins/feature/FeatureDemoPlugin/`，交互功能示例见 `plugins/feature/MeasurePlugin/`。
+- 功能插件（`plugins/feature/`，json 的 `system` 字段为 `FeatureSystem`）实现 `FeatureHandler` 接口：注册时 `setup(FeatureRegistrar&, FeatureContext&)` 一次（声明参数/菜单/按键绑定 + 经 `ctx.events` 订阅事件 `KeyEvent`、`ParameterChangedEvent`、`ModelEvent`），注销时 `teardown()` 一次；功能随活动操作切换被反复 进入 `activate(FeatureContext&)` / 退出 `deactivate()`（GUI 线程，所有功能可感知，由 `FeatureSystem::setFeatureActive` 驱动）；菜单触发 `execute()`。功能可修改的范围限模型层对象（经 `FeatureContext` 的 `ModelLayer` / `ComponentOperator`）与自身视口交互状态（经 `ctx.interaction`）；示例见 `plugins/feature/FeatureDemoPlugin/`，交互功能示例见 `plugins/feature/MeasurePlugin/`，staged 预览范式（`"undo": "manual"` + `ctx.undo` staged 会话）示例见 `plugins/feature/ScalePreviewPlugin/`。
   - 订阅 `ParameterChangedEvent` **必须按 `e.feature` 过滤**本功能注册名（与 json 一致，参照 FeatureDemoPlugin 的 `kFeatureName` 常量），否则将响应其他功能的参数变更。
   - `Button` 类型参数为无值触发器：计数器载荷，功能约定忽略值、只读参数下标；点击经 `ParameterChangedEvent` 回到功能（GUI 线程）。
 - **视口交互线程约定**（声明 `interactive` 的功能，改动前先读 `InteractionState.h` 注释）：交互回调（`onPick`/`onHover`）由 **渲染线程** 调用，`annotations` 为拉取契约（功能在回调中直写、渲染层拉取绘制）；**GUI 线程不得直接修改交互状态与标注**，变更经 `requestRefresh()`（纯刷新通知，重复置位自动合并）或 `deferRefresh(op)`（操作延迟到渲染线程执行后再刷新）通知，渲染线程 `InteractionService::syncPending()` 统一消费；`setActive` 启停均自动 notify，单激活约定由 FeatureSystem 装配。会话边界的现场清理走 feature 级 `deactivate()` + `deferRefresh`：框架定序保证 `deactivate()` 先于交互下线（`setActive(false)`），下线迁移（`syncState`）先消费 `deferred_op` 再 `clearSession`，清理必执行并触发重绘。
@@ -174,7 +176,15 @@
 - **写路径收口（写必脏 + 操作边界 flush）**：写模型数据必须经 `ComponentOperator` 语义接口（`appendPoint`/`appendFace`/`replaceMesh`/`materializeEdge` 等）或可写入口 `editableMesh(kind)`；**获取可写入口即标脏**（Topology 类立即失效邻接懒表并记入待通知集合（去重），NonTopology 仅记集合不失效懒表），**通知由操作边界 `ModelLayer::flushNotifications()` 统一发出，插件不得手调通知**（`ComponentOperator::notifyChanged` 已删除）；`component()`/`mesh()` 只读（返回 const），只读访问不标脏。结构操作（`addGeometryComponent`/`addModel`/`removeModel`/`removeComponent`）保持即时通知，不进待通知集合。
 - **操作边界清单**：`EditSystem::call`、`AlgorithmSystem::call`、`FeatureSystem::invoke`（含 `dispatchKeyEvent` 按键路由）、`FeatureSystem` 生命周期回调（`activate`/`deactivate`/`teardown`，功能退出清理现场等模型写经此 flush；只 flush 不成 undo 记录——退出清理若可撤销，撤销后会留下功能已停止跟踪的游离状态）、`FeatureEventGateway` 包装的事件回调（功能经 `ctx.events` 订阅的回调返回后自动 flush，异常时先 flush 再重抛）、app 层 QML 入口（`QModelManager::removeMesh/removeGeometry`、`QGeometryOperations::addGeometryShape` 组件分支）；Edit/Algo/QML 入口的 flush 为过渡 shim（随系统迁移消亡），FeatureSystem 的 invoke/生命周期回调 flush 与 `FeatureEventGateway` 为长期设施。**新增插件代码执行路径须纳入边界**，否则标脏的通知不会发出。
 - **网格数据与点 id 约定**（详见 `MeshData.h` / `ComponentData.h` 注释）：`MeshData` 自包含（坐标常驻 `vertex_positions_`，连通性数组存组件内局部点索引）；局部点索引只增不改号、不重排（`MeshAdjacency` 持久边身份与快照恢复依赖）；`Selection` / `PickInfo` 携带全局点 id（gid），写连通性前经 `ModelLayer::pointIdMap()` 换算；整网格替换经 `ComponentOperator::replaceMesh`（gid 纪律内建），运行期加点经 `ComponentOperator::appendPoint`（原子四连），其余 gid 伴生表受控点经 `ComponentData::ensurePointGlobalIds` 补缺。
-- **快照原语约定**：组件级 `ComponentOperator::takeSnapshot/restoreSnapshot`、模型级 `ModelLayer::takeModelSnapshot/restoreModel/restoreComponent` 为快照/恢复统一入口；快照只装源数据与身份数据（派生缓存——邻接边表、几何子形状索引——不进快照、恢复后重建），恢复含 gid 对账（`reclaim` 按原值拿回点/边 gid、组件/模型按原 id 插回）；`restoreSnapshot` 恢复后标脏（Topology），通知延迟到操作边界 flush 统一发出；几何 gid 跨 undo 不保持，undo 后选择集清空（Selection 持有的 gid/稳定 id 不作跨 undo 保证）。
+- **快照原语约定**：组件级 `ComponentOperator::takeSnapshot/restoreSnapshot`、模型级 `ModelLayer::takeModelSnapshot/restoreModel/restoreComponent` 为快照/恢复统一入口；快照只装源数据与身份数据（派生缓存——邻接边表、几何子形状 type_maps——不进快照、恢复后重建；几何 gid 向量是身份数据随快照保留），恢复含 gid 对账（点/边 gid 经 `MeshIDMap::reclaim`、几何 gid 经 `GeometryRegistry::reclaim*` 均按原值拿回、组件/模型按原 id 插回）；`restoreSnapshot` 恢复后标脏（Topology），通知延迟到操作边界 flush 统一发出；undo 后选择集清空（Selection 持有的 gid/稳定 id 不作跨 undo 保证，尽管 gid 实际按原值恢复）。
+- **undo/redo 系统（混合记录模式）**：`model/data/UndoStack` 实现 `UndoRecorder` 钩子挂接 `ModelLayer::setUndoRecorder`；app 层 `QModelManager` 构造栈并注入 Edit/Algo/Feature 系统，QML 经 `QModelManager.undoStack`（`QUndoStackAdaptor`）访问。
+  - **默认边界自动记录**：操作边界（`beginOperation/commitOperation`，挂点同第 10 节"操作边界清单"）内组件**首次标脏**经写前钩子克隆 before-image，commit 补 after-image 成一条记录；空操作丢弃，栈深上限 `kMaxDepth=32` 溢出丢最旧。简单操作零插件代码。
+  - **Manual 插件自控**：功能 json 声明 `"undo": "manual"`（→ `HandlerMetaData::undo_manual`）后，`invoke`/按键路由/事件网关边界不再自动捕获/提交（只 flush），插件经 `ctx.undo`（`UndoContext`）的 **staged 会话**显式控制，before-image 由栈持有（非插件自持）。
+  - **staged 会话（v1 单组件、无快照链）**：`beginStaged`（栈捕获 before₀）→ `editableMesh` 预览写，重试经 `revertStaged` 回滚再改 → 确认 `commitStaged`（before₀+当前状态成一条记录）/ 取消 `cancelStaged`（恢复 before₀ 不成记录）。逐步回退需求由 Auto 模式"每次执行一条记录"覆盖。
+  - **执行路径规则**：staged 打开时 undo=`cancelStaged`（恢复 before₀ 并关闭会话，不动全局栈）、redo 空转；隐式 `cancelStaged` 兜底挂在**真实写入点**（边界内首次标脏、结构操作）而非 `beginOperation`——纯旁观回调（只读事件订阅同样走操作边界）不得误杀进行中的预览，旧功能后续 staged 调用空转容忍；导出为只读所见即所得（含预览态），`stagedActive` 已暴露 QML 供界面禁用入口；功能 `deactivate` 时须自行关闭 staged 会话。
+  - **undo 后选择集清空已机制化**：`QUndoStackAdaptor::applied` 信号 → QML 统一 `clearSelection`（CentralRenderArea）。
+  - **结构操作即时成记录**：`addModel`/`removeModel`/`removeComponent`/`addGeometryComponent` 由钩子即时成记录；边界内发生的结构操作并入当前操作（一次用户动作一条记录）。
+- **Python 嵌入约定**（宿主为 `python/` 的 `python::Runtime` 无 Qt 静态库，GUI 的 `QPythonRuntime` 仅 QObject/QML 薄壳、无头 CLI 将复用同一宿主；`precess_runtime` 目标恒存在，Python3 + pybind11 缺失、`PRECESS_BUILD_PYTHON=OFF` 或 wasm 时自动降级为桩实现——"不可用"是运行时状态（available 恒 false），宿主侧不写条件编译）：**Python 与 GUI 线程绑定**，所有 Python 入口须在 GUI 线程调用，渲染线程不得触碰 Python；解释器懒初始化（控制台首次使用时启动），标准库根（python_home）由宿主运行期探测：随包分发的可移植标准库 `<exe_dir>/Lib` → 构建期导出的 `PRECESS_PYTHON_HOME_DIR`（存在才用）；安装规则把 pyd 装到 `<exe_dir>/python`、`Lib/`/`DLLs/` 随包分发到 exe 目录，构建树由 `precess_bindings` 构建后把解释器运行库（Windows 的 python3xx.dll，经 FindPython 导入目标求值、不硬编码版本）拷至构建根目录——Qt 工程运行时产物统一在此，运行/调试不依赖 PATH（类 Unix 的 libpython 由 rpath 解析，无需拷贝），解释器选择经可选缓存变量 `PRECESS_PYTHON_PATH`（解释器所在目录，经 `Python3_ROOT_DIR` 转交 FindPython、平台命名差异由模块处理，仅构建期生效，留空用系统 PATH 发现），`sys.path` 注入 precess 扩展模块目录（候选 `<exe_dir>/python` 与构建树输出目录）；**活会话以引用策略注入 `precess.current`**（Python 不持有所有权），故宿主析构必须先终结解释器、再析构会话；同时含 Qt 头与 Python/pybind11 头的编译单元，须取消并随后还原 Qt 的 `slots/signals/emit` 宏（否则破坏 CPython `PyType_Spec::slots`）；precess pyd 与插件同理，须与主程序同编译器、同配置、同依赖版本构建。
 
 ---
 
@@ -188,5 +198,5 @@
 - [ ] 通用界面无插件名 / 功能名特判；插件静态能力、动态状态、环境状态分别经声明链、事件回调、上下文访问（第 10 节三原则）。
 - [ ] 视口交互状态仅由渲染线程修改；GUI 线程变更经 `requestRefresh` / `deferRefresh` 通知（第 10 节线程约定）。
 - [ ] 能通过构建；涉及逻辑改动已（或建议）跑测试，新特性带测试。
-- [ ] 完成或计划任务时已同步更新 `README.md` 路线图（勾选已完成项、为进行中任务拆分小点或新增计划项）。
+- [ ] 路线图同步合规：仅为路线图中已有（计划/进行中）条目勾选进度或拆分小点；未为已完成的新特性新增路线图条目（新功能按需补充功能特性描述，见第 1 节）。
 - [ ] Commit 类型正确、单一职责、信息清晰。

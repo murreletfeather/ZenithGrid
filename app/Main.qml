@@ -25,24 +25,20 @@ import app.model.systems.io
 import app.render
 
 ApplicationWindow {
-    id: root 
+    id: root
     width: 800
     height: 600
     visibility: Window.Maximized
     title: qsTr("PreCess")
-
-    GeometryOperationActions {
-        id: geometryActions
-        onOperationActivated: sideBarDock.show()
-    }
+    flags: Qt.platform.os === "wasm" ? (Qt.Window | Qt.FramelessWindowHint) : Qt.Window
 
     header: AppToolbar {
-        geometryOperationActions: geometryActions
         windowHeight: root.height
         objectTreeOpen: objectTreeDock.isOpen
         propertyListOpen: sideBarDock.isOpen
         attributeRenderOpen: attributeRenderDock.isOpen
         consoleOpen: consoleDock.isOpen
+        pythonConsoleOpen: pythonConsoleDock.isOpen
         outputLogOpen: outputLogDock.isOpen
         preferencesOpen: preferencesDock.isOpen
         onObjectTreeToggled: {
@@ -60,6 +56,10 @@ ApplicationWindow {
         onConsoleToggled: {
             if (consoleDock.isOpen) consoleDock.close()
             else consoleDock.show()
+        }
+        onPythonConsoleToggled: {
+            if (pythonConsoleDock.isOpen) pythonConsoleDock.close()
+            else pythonConsoleDock.show()
         }
         onOutputLogToggled: {
             if (outputLogDock.isOpen) outputLogDock.close()
@@ -79,6 +79,26 @@ ApplicationWindow {
             else
                 consoleDock.show()
         }
+    }
+
+    Shortcut {
+        sequence: "F11"
+        onActivated: {
+            if (pythonConsoleDock.isOpen)
+                pythonConsoleDock.close()
+            else
+                pythonConsoleDock.show()
+        }
+    }
+
+    // 撤销/重做快捷键（栈空时适配器内部空转）
+    Shortcut {
+        sequence: "Ctrl+Z"
+        onActivated: QModelManager.undoStack.undo()
+    }
+    Shortcut {
+        sequence: "Ctrl+Y"
+        onActivated: QModelManager.undoStack.redo()
     }
 
     Connections {
@@ -148,6 +168,16 @@ ApplicationWindow {
         }
 
         KDDW.DockWidget {
+            id: pythonConsoleDock
+            uniqueName: "pythonConsole"
+            title: "Python 控制台"
+
+            PythonConsole {
+                anchors.fill: parent
+            }
+        }
+
+        KDDW.DockWidget {
             id: outputLogDock
             uniqueName: "outputLog"
             title: qsTr("日志")
@@ -172,6 +202,7 @@ ApplicationWindow {
             addDockWidget(sideBarDock, KDDW.KDDockWidgets.Location_OnBottom, objectTreeDock, Qt.size(0, 400))
             addDockWidget(attributeRenderDock, KDDW.KDDockWidgets.Location_OnBottom, objectTreeDock, Qt.size(0, 300), KDDW.KDDockWidgets.StartHidden)
             addDockWidget(consoleDock, KDDW.KDDockWidgets.Location_OnBottom, null, Qt.size(0, 300), KDDW.KDDockWidgets.StartHidden)
+            addDockWidget(pythonConsoleDock, KDDW.KDDockWidgets.Location_OnRight, null, Qt.size(450, 0), KDDW.KDDockWidgets.StartHidden)
             addDockWidget(outputLogDock, KDDW.KDDockWidgets.Location_OnBottom, null, Qt.size(0, 300), KDDW.KDDockWidgets.StartHidden)
             addDockWidget(preferencesDock, KDDW.KDDockWidgets.Location_OnTop, objectTreeDock, Qt.size(0, 320), KDDW.KDDockWidgets.StartHidden)
         }

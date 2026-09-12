@@ -1,6 +1,7 @@
 add_library(vtkPart STATIC 
     MeshActor.cpp
     MeshActorSelectOp.cpp
+    MeshAreaPick.cpp
     GeometryActorSelectOp.cpp
     GeometrySelectorHighlight.cpp
     QRenderWindowStyle.cpp
@@ -56,4 +57,6 @@ target_link_libraries(renderQml PRIVATE
 vtk_module_autoinit(TARGETS renderQml MODULES 
     VTK::GUISupportQtQuick VTK::CommonColor VTK::RenderingAnnotation
 )
+if(BUILD_TESTING)
 add_subdirectory(test)
+endif()

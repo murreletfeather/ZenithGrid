@@ -13,6 +13,8 @@ ColumnLayout {
     id: root
     spacing: 0
 
+    readonly property bool isWasm: Qt.platform.os === "wasm"
+
     property int activeCategory: -1
     property real windowHeight: 600
 
@@ -20,13 +22,11 @@ ColumnLayout {
     // 会与布局隐式尺寸形成反馈环（图标异步加载后触发 recursive rearrange 警告）。
     readonly property real ribbonIconSize: windowHeight / 12 * 0.65
 
-    // 基础几何创建入口，由 Main.qml 中的 GeometryOperationActions 提供。
-    property var geometryOperationActions
-
     signal objectTreeToggled()
     signal propertyListToggled()
     signal attributeRenderToggled()
     signal consoleToggled()
+    signal pythonConsoleToggled()
     signal outputLogToggled()
     signal preferencesToggled()
 
@@ -34,6 +34,7 @@ ColumnLayout {
     property bool propertyListOpen: false
     property bool attributeRenderOpen: false
     property bool consoleOpen: false
+    property bool pythonConsoleOpen: false
     property bool outputLogOpen: false
     property bool preferencesOpen: false
 
@@ -49,34 +50,6 @@ ColumnLayout {
         "DimensionPlugin": "qrc:/images/toolbar/Tools/size_marking.svg",
         "MeshQuality": "qrc:/images/toolbar/Function/grid_quality.svg"
     })
-    // 几何页按钮定义：当前使用默认插件图标。
-    readonly property var geometryOperationButtons: [
-        { text: qsTr("点"), operation: "startCreatePoint",
-          icon: "qrc:/images/toolbar/Geometry/point.svg" },
-        { text: qsTr("直线边（坐标）"), operation: "startCreateLineByCoordinates",
-          icon: "qrc:/images/toolbar/Geometry/line_coord.svg" },
-        { text: qsTr("直线边（选点）"), operation: "startCreateLineFromVertices",
-          icon: "qrc:/images/toolbar/Geometry/line_points.svg" },
-        { text: qsTr("矩形面"), operation: "startCreateRectangleFace",
-          icon: "qrc:/images/toolbar/Geometry/rectangle.svg" },
-        { text: qsTr("圆盘/扇形面"), operation: "startCreateDiskFace",
-          icon: "qrc:/images/toolbar/Geometry/sector_or_circle.svg" },
-        { text: qsTr("闭合边成面"), operation: "startCreateFaceFromEdges",
-          icon: "qrc:/images/toolbar/Geometry/close_edges_to_form_surface.svg" },
-        { text: qsTr("长方体"), operation: "startCreateBox",
-          icon: "qrc:/images/toolbar/Geometry/cuboid.svg" },
-        { text: qsTr("圆柱体"), operation: "startCreateCylinder",
-          icon: "qrc:/images/toolbar/Geometry/cylinder.svg" },
-        { text: qsTr("圆锥/圆台"), operation: "startCreateCone",
-          icon: "qrc:/images/toolbar/Geometry/cone_or_conical_stage.svg" },
-        { text: qsTr("球体/部分球体"), operation: "startCreateSphere",
-          icon: "qrc:/images/toolbar/Geometry/sphere.svg" },
-        { text: qsTr("拉伸面"), operation: "startExtrudeFace",
-          icon: "qrc:/images/toolbar/Geometry/stretched_surface.svg" },
-        { text: qsTr("删除几何"), operation: "startDeleteGeometry",
-          icon: "qrc:/images/toolbar/Geometry/delete_geometry.svg" }
-    ]
-
     function getIconForPlugin(pluginName) {
         return pluginIconMap[pluginName] || "qrc:/images/toolbar/precess_extra_plugin.svg"
     }
@@ -97,6 +70,13 @@ ColumnLayout {
                 break;
             }
         }
+    }
+
+    // 导出默认文件名：活动模型名（导入模型即为导入文件名，自带扩展名）。
+    // 扩展名交给对话框按所选文件类型适配（Windows IFileDialog 会随类型切换改写），此处不推导
+    function suggestedExportFileName() {
+        const model_id = App.selection.activeModelId
+        return model_id < 0 ? "" : QModelManager.query.getModelName(model_id)
     }
 
     // 功能触发入口：ribbon 功能按钮共用
@@ -185,6 +165,17 @@ ColumnLayout {
 
     Component.onCompleted: rebuildFeatureMenus()
 
+    // 网页端导入模型
+    Connections {
+        target: root.isWasm ? QWasmBridge : null
+        function onFilesImported(paths) {
+            for (var i = 0; i < paths.length; ++i) {
+                QModelManager.ioSystem.read("All files", "file://" + paths[i], [])
+            }
+            App.registry.renderWindow.resetCamera()
+        }
+    }
+
     // 导入模型对话框（支持多选，逐个导入所选文件）
     FileDialog {
         id: importModelDialog
@@ -207,11 +198,101 @@ ColumnLayout {
         id: exportModelDialog
         nameFilters: QModelManager.ioSystem.dialogNameFilters
         fileMode: FileDialog.SaveFile
+
+        // 以活动模型名预填文件名，避免用户从空白输入框开始；扩展名由对话框按所选类型适配
+        function openExport() {
+            const name = root.suggestedExportFileName()
+            if (name !== "")
+                selectedFile = currentFolder + "/" + name
+            open()
+        }
+
         onAccepted: {
             if (selectedNameFilter.index >= 0) {
                 QModelManager.ioSystem.write(selectedNameFilter.name, App.selection.activeModelId, selectedFile, [])
             } else {
                 console.exception("No valid file type selected.")
+            }
+        }
+    }
+
+    // 网页端导出模型
+    Popup {
+        id: wasmExportDialog
+        modal: true
+        anchors.centerIn: Overlay.overlay
+        width: 380
+        padding: 12
+        background: Rectangle { color: "#f0f0f0"; border.color: "#ccc" }
+
+        function openDialog() {
+            typeCombo.model = QModelManager.ioSystem.getModelIOInfo()
+            typeCombo.currentIndex = 0
+            // 按活动模型名预填（无活动模型时保留既有默认值）；扩展名由类型下拉的联动逻辑适配
+            const suggested = root.suggestedExportFileName()
+            if (suggested !== "")
+                nameField.text = suggested
+            open()
+        }
+
+        function confirmExport() {
+            var info = typeCombo.model[typeCombo.currentIndex]
+            if (!info) return
+            var file_name = nameField.text.trim()
+            if (file_name.length === 0) return
+            if (file_name.indexOf(".") < 0 && info.extensions.length > 0)
+                file_name += "." + info.extensions[0]
+            var path = "/tmp/" + file_name
+            QModelManager.ioSystem.write(info.name, App.selection.activeModelId, "file://" + path, [])
+            QWasmBridge.downloadFile(file_name, path)
+            close()
+        }
+
+        ColumnLayout {
+            width: parent.width
+            spacing: 8
+
+            Label { text: "导出模型" }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Label { text: "类型:" }
+                ComboBox {
+                    id: typeCombo
+                    Layout.fillWidth: true
+                    textRole: "name"
+                    onCurrentIndexChanged: {
+                        var info = typeCombo.model ? typeCombo.model[typeCombo.currentIndex] : null
+                        if (!info || !nameField) return
+                        var ext = info.extensions.length > 0 ? "." + info.extensions[0] : ""
+                        var base = nameField.text.split(".")[0]
+                        if (base.length > 0) nameField.text = base + ext
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Label { text: "文件名:" }
+                TextField {
+                    id: nameField
+                    Layout.fillWidth: true
+                    text: "model.obj"
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Item { Layout.fillWidth: true }
+                Button {
+                    text: "取消"
+                    onClicked: wasmExportDialog.close()
+                }
+                Button {
+                    text: "下载"
+                    highlighted: true
+                    onClicked: wasmExportDialog.confirmExport()
+                }
             }
         }
     }
@@ -243,14 +324,7 @@ ColumnLayout {
                 onClicked: activeCategory = (activeCategory === 2) ? -1 : 2
             }
 
-            ToolButton {
-                text: qsTr("几何")
-                checkable: true
-                checked: activeCategory === 3
-                onClicked: activeCategory = (activeCategory === 3) ? -1 : 3
-            }
-
-            // 功能菜单分页：按 menu_path 第一段（菜单）动态生成分页按钮，页序对应 StackLayout 索引 4 起
+            // 功能菜单分页：按 menu_path 第一段（菜单）动态生成分页按钮，页序对应 StackLayout 索引 3 起
             Repeater {
                 model: root.featureMenus
                 ToolButton {
@@ -258,8 +332,8 @@ ColumnLayout {
                     required property int index
                     text: modelData.name
                     checkable: true
-                    checked: activeCategory === 4 + index
-                    onClicked: activeCategory = (activeCategory === 4 + index) ? -1 : 4 + index
+                    checked: activeCategory === 3 + index
+                    onClicked: activeCategory = (activeCategory === 3 + index) ? -1 : 3 + index
                 }
             }
 
@@ -306,6 +380,12 @@ ColumnLayout {
                         onToggled: consoleToggled()
                     }
                     Action {
+                        text: "Python 控制台"
+                        checkable: true
+                        checked: pythonConsoleOpen
+                        onToggled: pythonConsoleToggled()
+                    }
+                    Action {
                         text: qsTr("日志")
                         checkable: true
                         checked: outputLogOpen
@@ -343,7 +423,12 @@ ColumnLayout {
                 Layout.fillHeight: true
                 display: ToolButton.TextUnderIcon
                 text: qsTr("导入")
-                onClicked: importModelDialog.open()
+                onClicked: {
+                    if (root.isWasm)
+                        QWasmBridge.pickFile(QModelManager.ioSystem.getDialogExtFilters(), true)
+                    else
+                        importModelDialog.open()
+                }
             }
 
             ToolButton {
@@ -354,7 +439,12 @@ ColumnLayout {
                 Layout.fillHeight: true
                 display: ToolButton.TextUnderIcon
                 text: qsTr("导出")
-                onClicked: exportModelDialog.open()
+                onClicked: {
+                    if (root.isWasm)
+                        wasmExportDialog.openDialog()
+                    else
+                        exportModelDialog.openExport()
+                }
             }
 
             ToolButton {
@@ -371,10 +461,37 @@ ColumnLayout {
             Item { Layout.fillWidth: true }
         }
 
-        // 1: 编辑 → 数据驱动，图标按名映射
+        // 1: 编辑 → 撤销/重做 + 数据驱动，图标按名映射
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            ToolButton {
+                text: qsTr("撤销")
+                enabled: QModelManager.undoStack.canUndo
+                Layout.fillHeight: true
+                ToolTip.visible: hovered
+                ToolTip.text: QModelManager.undoStack.undoLabel.length > 0
+                              ? qsTr("撤销 ") + QModelManager.undoStack.undoLabel
+                              : qsTr("撤销")
+                onClicked: QModelManager.undoStack.undo()
+            }
+
+            ToolButton {
+                text: qsTr("重做")
+                enabled: QModelManager.undoStack.canRedo
+                Layout.fillHeight: true
+                ToolTip.visible: hovered
+                ToolTip.text: QModelManager.undoStack.redoLabel.length > 0
+                              ? qsTr("重做 ") + QModelManager.undoStack.redoLabel
+                              : qsTr("重做")
+                onClicked: QModelManager.undoStack.redo()
+            }
+
+            ToolSeparator {
+                orientation: Qt.Vertical
+                Layout.fillHeight: true
+            }
 
             Repeater {
                 model: QModelManager.editSystem.editsInfo
@@ -426,30 +543,7 @@ ColumnLayout {
             Item { Layout.fillWidth: true }
         }
 
-        // 3: 几何 → 创建几何。
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Repeater {
-                model: root.geometryOperationButtons
-                ToolButton {
-                    required property var modelData
-                    icon.source: root.getIconForFeature(modelData)
-                    icon.width: root.ribbonIconSize
-                    icon.height: root.ribbonIconSize
-                    icon.color: "transparent"
-                    Layout.fillHeight: true
-                    display: ToolButton.TextUnderIcon
-                    text: modelData.text
-                    onClicked: root.geometryOperationActions[modelData.operation]()
-                }
-            }
-
-            Item { Layout.fillWidth: true }
-        }
-
-        // 功能菜单页（索引 4 起）：页内按 menu_path 第二段（分组）排列功能按钮，同组排在一起，组间以竖线分隔
+        // 功能菜单页（索引 3 起）：页内按 menu_path 第二段（分组）排列功能按钮，同组排在一起，组间以竖线分隔
         Repeater {
             model: root.featureMenus
             RowLayout {

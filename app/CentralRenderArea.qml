@@ -533,6 +533,15 @@ Page {
                     myItem.setGeometryVisibility(componentId, geometryVisible)
                 }
             }
+
+            Connections {
+                target: QModelManager.undoStack
+                // undo/redo 应用后统一清空选择集（Selection 持有的 gid/稳定 id 不作跨 undo 保证）
+                function onApplied() {
+                    myItem.clearSelection()
+                    selector.selection = null
+                }
+            }
         }
 
         Selector {
@@ -556,6 +565,11 @@ Page {
 
             onConfirmButtonClicked: {
                 selector.selection = myItem.selectedIDs
+            }
+
+            // 确认后复位选择集：确认即本轮选择结束，避免残留高亮被下一次确认带走
+            onSelectionConfirmed: {
+                myItem.clearSelection()
             }
         }
 

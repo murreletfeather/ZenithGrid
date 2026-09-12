@@ -8,7 +8,9 @@
 #include "MeshIDMap.h"
 #include "ModelLayer.h"
 
+#include <BRepAdaptor_Surface.hxx>
 #include <BRepGProp.hxx>
+#include <BRep_Tool.hxx>
 #include <GProp_GProps.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
@@ -21,6 +23,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -95,6 +98,65 @@ private:
     std::unordered_map<QuantizedCoord, Index, CoordHash> _map;
 };
 
+/**
+ * @brief 按网格合并节点时的相同量化规则查找组件内局部点 id
+ */
+class MeshPointLookup {
+public:
+    explicit MeshPointLookup(const MeshData& mesh)
+    {
+        for (Index point_id = 0;
+             point_id < static_cast<Index>(mesh.vertex_positions_.size()); ++point_id) {
+            const auto& position = mesh.vertex_positions_[static_cast<std::size_t>(point_id)];
+            points_[quantize(position)] = point_id;
+        }
+    }
+
+    std::optional<Index> find(const std::array<double, 3>& position) const
+    {
+        const auto it = points_.find(quantize(position));
+        return it == points_.end() ? std::nullopt : std::optional<Index>(it->second);
+    }
+
+private:
+    struct QuantizedCoord {
+        std::int64_t x;
+        std::int64_t y;
+        std::int64_t z;
+
+        bool operator==(const QuantizedCoord& other) const
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+    };
+
+    struct CoordHash {
+        std::size_t operator()(const QuantizedCoord& coord) const
+        {
+            std::size_t hash = 0;
+            hash ^= std::hash<std::int64_t>()(coord.x)
+                + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            hash ^= std::hash<std::int64_t>()(coord.y)
+                + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            hash ^= std::hash<std::int64_t>()(coord.z)
+                + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            return hash;
+        }
+    };
+
+    static QuantizedCoord quantize(const std::array<double, 3>& position)
+    {
+        constexpr double tolerance = 1e-7;
+        return {
+            static_cast<std::int64_t>(std::round(position[0] / tolerance)),
+            static_cast<std::int64_t>(std::round(position[1] / tolerance)),
+            static_cast<std::int64_t>(std::round(position[2] / tolerance))
+        };
+    }
+
+    std::unordered_map<QuantizedCoord, Index, CoordHash> points_;
+};
+
 // 通过全局几何面 ID 从 GeometryRegistry 取得 CAD 面。
 TopoDS_Face getFaceById(
     const GeometryRegistry& registry,
@@ -129,6 +191,8 @@ GmshSurfaceMeshType parseSurfaceMeshType(int meshTypeIndex)
 {
     if (meshTypeIndex == static_cast<int>(GmshSurfaceMeshType::QuadDominant))
         return GmshSurfaceMeshType::QuadDominant;
+    if (meshTypeIndex == static_cast<int>(GmshSurfaceMeshType::PureQuadrilateral))
+        return GmshSurfaceMeshType::PureQuadrilateral;
     if (meshTypeIndex == static_cast<int>(GmshSurfaceMeshType::StructuredQuadrilateral))
         return GmshSurfaceMeshType::StructuredQuadrilateral;
     if (meshTypeIndex != static_cast<int>(GmshSurfaceMeshType::Triangle))
@@ -141,9 +205,67 @@ const char* surfaceMeshTypeName(GmshSurfaceMeshType meshType)
 {
     if (meshType == GmshSurfaceMeshType::QuadDominant)
         return "quad-dominant";
+    if (meshType == GmshSurfaceMeshType::PureQuadrilateral)
+        return "pure-quad";
     if (meshType == GmshSurfaceMeshType::StructuredQuadrilateral)
         return "structured-quad";
     return "triangle";
+}
+
+/**
+ * @brief 统计 Gmsh 面上的二维单元类型，用于严格验证纯四边形结果
+ */
+struct SurfaceElementSummary {
+    std::size_t triangleCount {};
+    std::size_t quadrangleCount {};
+    std::size_t unsupportedCount {};
+
+    bool hasSupportedElements() const
+    {
+        return triangleCount > 0 || quadrangleCount > 0;
+    }
+
+    bool isPureQuadrilateral() const
+    {
+        return quadrangleCount > 0
+            && triangleCount == 0
+            && unsupportedCount == 0;
+    }
+};
+
+// 统计一阶三角形、四边形和当前插件不支持的其他二维单元。
+SurfaceElementSummary summarizeSurfaceElements(int faceTag)
+{
+    std::vector<int> elementTypes;
+    std::vector<std::vector<std::size_t>> elementTags;
+    std::vector<std::vector<std::size_t>> elementNodes;
+    gmsh::model::mesh::getElements(
+        elementTypes, elementTags, elementNodes, 2, faceTag);
+
+    SurfaceElementSummary summary;
+    for (std::size_t i = 0; i < elementTypes.size(); ++i) {
+        if (elementTypes[i] == 2)
+            summary.triangleCount += elementTags[i].size();
+        else if (elementTypes[i] == 3)
+            summary.quadrangleCount += elementTags[i].size();
+        else
+            summary.unsupportedCount += elementTags[i].size();
+    }
+    return summary;
+}
+
+// Full-quad 不支持 OCC 周期参数面或包含接缝边的面；普通重组仍可先行尝试。
+bool isPeriodicOrSeamFace(const TopoDS_Face& face)
+{
+    BRepAdaptor_Surface surface(face);
+    if (surface.IsUPeriodic() || surface.IsVPeriodic())
+        return true;
+
+    for (TopExp_Explorer explorer(face, TopAbs_EDGE); explorer.More(); explorer.Next()) {
+        if (BRep_Tool::IsClosed(TopoDS::Edge(explorer.Current()), face))
+            return true;
+    }
+    return false;
 }
 
 // 逐条导入当前面的 OCC 边，并直接使用公开 API 返回的 tag 建立 CAD 边映射。
@@ -195,6 +317,7 @@ std::map<int, GeomEdgeId> importGmshEdges(const TopoDS_Face& face,
 // 保存结构化划分中一条边的节点数，以及该数量是否由共享边缓存固定。
 struct EdgeTransfiniteInfo {
     int gmshTag {};
+    GeomEdgeId geometryEdgeId { kInvalidGeomEdgeId };
     int pointCount {};
     bool fixedByExistingMesh {};
 };
@@ -260,9 +383,42 @@ void configureMeshingOptions(const IncrementalMeshTools::GmshMeshParameters& par
         setGmshNumberOption("Mesh.RecombineMinimumQuality", parameters.quadMinQuality);
 }
 
-// 根据曲线长度和目标网格尺寸估算结构化曲线节点数；或者指定的划分段数
-int estimateEdgePointCount(int gmshTag, double meshSize, int structuredEdgeDivisions)
+// 判断当前重组算法是否会先把一维边界网格减半；这类算法要求每条边包含偶数个线单元。
+bool isFullQuadRecombination(int recombineAlgorithm)
 {
+    return recombineAlgorithm == static_cast<int>(GmshRecombinationAlgorithm::SimpleFullQuad)
+        || recombineAlgorithm == static_cast<int>(GmshRecombinationAlgorithm::BlossomFullQuad);
+}
+
+// 把节点数调整为奇数，从而保证对应的线单元数为偶数且至少为 2。
+int ensureFullQuadPointCount(int pointCount)
+{
+    pointCount = std::max(3, pointCount);
+    if (pointCount % 2 == 0)
+        ++pointCount;
+    return pointCount;
+}
+
+// 根据曲线长度和目标网格尺寸估算结构化曲线节点数；full-quad 时保证线单元数为偶数。
+int estimateEdgePointCount(
+    int gmshTag,
+    double meshSize,
+    int structuredEdgeDivisions,
+    bool requireEvenSegments)
+{
+    if (requireEvenSegments) {
+        int segmentCount = structuredEdgeDivisions;
+        if (segmentCount <= 0) {
+            double length = 0.0;
+            gmsh::model::occ::getMass(1, gmshTag, length);
+            segmentCount = static_cast<int>(std::ceil(length / meshSize));
+        }
+        segmentCount = std::max(2, segmentCount);
+        if (segmentCount % 2 == 1)
+            ++segmentCount;
+        return segmentCount + 1;
+    }
+
     if (structuredEdgeDivisions > 0)
         return std::max(2, structuredEdgeDivisions + 1);
 
@@ -283,13 +439,15 @@ EdgeTransfiniteInfo makeEdgeTransfiniteInfo(
     const std::map<int, GeomEdgeId>& gmshToOcc,
     const GmshIncrementalMeshState& state,
     double meshSize,
-    int structuredEdgeDivisions)
+    int structuredEdgeDivisions,
+    bool requireEvenSegments)
 {
     EdgeTransfiniteInfo info;
     info.gmshTag = gmshTag;
 
     auto occIt = gmshToOcc.find(gmshTag);
     if (occIt != gmshToOcc.end()) {
+        info.geometryEdgeId = occIt->second;
         auto cacheIt = state.meshedEdgesCache.find(occIt->second);
         if (cacheIt != state.meshedEdgesCache.end() && !cacheIt->second.coords.empty()) {
             info.pointCount = static_cast<int>(cacheIt->second.coords.size() / 3);
@@ -298,19 +456,38 @@ EdgeTransfiniteInfo makeEdgeTransfiniteInfo(
         }
     }
 
-    info.pointCount = estimateEdgePointCount(gmshTag, meshSize, structuredEdgeDivisions);
+    info.pointCount = estimateEdgePointCount(
+        gmshTag, meshSize, structuredEdgeDivisions, requireEvenSegments);
     return info;
+}
+
+// 已有共享边不能在单面划分时改变；full-quad 遇到奇数段时提前给出可操作的诊断。
+bool validateFullQuadCachedEdge(const EdgeTransfiniteInfo& edge)
+{
+    if (!edge.fixedByExistingMesh)
+        return true;
+
+    const int segmentCount = edge.pointCount - 1;
+    if (segmentCount >= 2 && segmentCount % 2 == 0)
+        return true;
+
+    spdlog::error(
+        "GmshMesh: full-quad rejected, cached geometry edge {} (Gmsh edge {}) has {} points / {} segments; "
+        "delete all meshed faces sharing this edge before remeshing",
+        edge.geometryEdgeId, edge.gmshTag, edge.pointCount, std::max(0, segmentCount));
+    return false;
 }
 
 // 协调一对相对边的节点数；两条共享边节点数不一致时拒绝结构化划分。
 bool resolveOppositeEdgePointCount(
     const EdgeTransfiniteInfo& first,
     const EdgeTransfiniteInfo& opposite,
-    int& pointCount)
+    int& pointCount,
+    bool requireEvenSegments)
 {
     if (first.fixedByExistingMesh && opposite.fixedByExistingMesh) {
         if (first.pointCount != opposite.pointCount) {
-            spdlog::warn("GmshMesh: structured quad rejected, opposite edges {} and {} have {} / {} points",
+            spdlog::error("GmshMesh: structured quad rejected, opposite edges {} and {} have {} / {} points",
                 first.gmshTag, opposite.gmshTag,
                 first.pointCount, opposite.pointCount);
             return false;
@@ -329,10 +506,12 @@ bool resolveOppositeEdgePointCount(
     }
 
     pointCount = static_cast<int>((first.pointCount + opposite.pointCount) * 0.5 + 0.5);
-    if (pointCount < 2)
-        pointCount = 2;
-    if (pointCount % 2 == 1)
-        ++pointCount;
+    if (requireEvenSegments) {
+        pointCount = ensureFullQuadPointCount(pointCount);
+        return true;
+    }
+
+    pointCount = std::max(2, pointCount);
     return true;
 }
 
@@ -348,7 +527,39 @@ bool configureSurfaceMeshType(
     if (meshType == GmshSurfaceMeshType::Triangle)
         return true;
 
+    const bool requireEvenSegments = isFullQuadRecombination(parameters.recombineAlgorithm);
+    const double boundaryMeshSize = parameters.maxMeshSize > 0.0
+        ? parameters.maxMeshSize
+        : meshSize;
+
     if (meshType == GmshSurfaceMeshType::QuadDominant) {
+        if (requireEvenSegments) {
+            gmsh::vectorpair boundary;
+            gmsh::model::getBoundary({ { 2, faceTag } }, boundary, false, false, false);
+
+            gmsh::vectorpair temporaryConstraints;
+            for (const auto& [dim, tag] : boundary) {
+                if (dim != 1)
+                    continue;
+
+                EdgeTransfiniteInfo edge = makeEdgeTransfiniteInfo(
+                    std::abs(tag), gmshToOcc, state, boundaryMeshSize, 0, true);
+                if (!validateFullQuadCachedEdge(edge))
+                    return false;
+                if (edge.fixedByExistingMesh)
+                    continue;
+
+                gmsh::model::mesh::setTransfiniteCurve(edge.gmshTag, edge.pointCount);
+                temporaryConstraints.emplace_back(1, edge.gmshTag);
+            }
+
+            if (!temporaryConstraints.empty()) {
+                // 先生成满足偶数段约束的一维网格，再移除临时约束，避免 full-quad 输出 Transfinite 警告。
+                gmsh::model::mesh::generate(1);
+                gmsh::model::mesh::removeConstraints(temporaryConstraints);
+            }
+        }
+
         gmsh::model::mesh::setRecombine(2, faceTag, 45.0);
         return true;
     }
@@ -362,7 +573,7 @@ bool configureSurfaceMeshType(
             edgeTags.push_back(std::abs(tag));
     }
     if (edgeTags.size() != 4) {
-        spdlog::warn("GmshMesh: structured quad requires 4 boundary edges, surface {} has {}",
+        spdlog::error("GmshMesh: structured quad requires 4 boundary edges, surface {} has {}",
             faceTag, edgeTags.size());
         return false;
     }
@@ -370,13 +581,23 @@ bool configureSurfaceMeshType(
     std::array<EdgeTransfiniteInfo, 4> edges {};
     for (std::size_t i = 0; i < edges.size(); ++i)
         edges[i] = makeEdgeTransfiniteInfo(
-            edgeTags[i], gmshToOcc, state, meshSize, parameters.structuredEdgeDivisions);
+            edgeTags[i], gmshToOcc, state, boundaryMeshSize,
+            parameters.structuredEdgeDivisions, requireEvenSegments);
+
+    if (requireEvenSegments) {
+        for (const auto& edge : edges) {
+            if (!validateFullQuadCachedEdge(edge))
+                return false;
+        }
+    }
 
     int firstPairPointCount = 0;
     int secondPairPointCount = 0;
-    if (!resolveOppositeEdgePointCount(edges[0], edges[2], firstPairPointCount))
+    if (!resolveOppositeEdgePointCount(
+            edges[0], edges[2], firstPairPointCount, requireEvenSegments))
         return false;
-    if (!resolveOppositeEdgePointCount(edges[1], edges[3], secondPairPointCount))
+    if (!resolveOppositeEdgePointCount(
+            edges[1], edges[3], secondPairPointCount, requireEvenSegments))
         return false;
 
     gmsh::model::mesh::setTransfiniteCurve(edges[0].gmshTag, firstPairPointCount);
@@ -432,18 +653,8 @@ bool injectConstrainedEdge(int gmshTag,
             rev[i * 3 + 2] = orderedCoords[ri * 3 + 2];
         }
         orderedCoords = rev;
+        // 方向改变后原参数顺序不再可用，统一在内部节点收集完成后批量重新参数化。
         orderedParams.clear();
-        for (std::size_t i = 1; i + 1 < nc; ++i) {
-            try {
-                std::vector<double> cc, cp;
-                gmsh::model::getClosestPoint(1, gmshTag,
-                    { orderedCoords[i * 3], orderedCoords[i * 3 + 1], orderedCoords[i * 3 + 2] }, cc, cp);
-                if (!cp.empty())
-                    orderedParams.push_back(cp[0]);
-            } catch (...) {
-                orderedParams.push_back(double(i) / double(nc - 1));
-            }
-        }
     }
 
     // 起点
@@ -485,17 +696,31 @@ bool injectConstrainedEdge(int gmshTag,
     if (orderedParams.size() == innerTags.size()) {
         innerParams = orderedParams;
     } else {
-        innerParams.clear();
-        for (std::size_t i = 0; i < innerTags.size(); ++i) {
-            std::size_t ci = i + 1;
-            try {
-                std::vector<double> cc, cp;
-                gmsh::model::getClosestPoint(1, gmshTag,
-                    { orderedCoords[ci * 3], orderedCoords[ci * 3 + 1], orderedCoords[ci * 3 + 2] }, cc, cp);
-                if (!cp.empty())
-                    innerParams.push_back(cp[0]);
-            } catch (...) {
-                innerParams.push_back(double(i + 1) / double(nc - 1));
+        // 从通用 Geometry↔Mesh 映射恢复时没有 Gmsh 私有参数坐标，
+        // 由当前导入的 OCC 曲线一次性重新计算，避免逐点投影产生重复参数。
+        try {
+            gmsh::model::getParametrization(1, gmshTag, innerCoords, innerParams);
+        } catch (...) {
+            innerParams.clear();
+        }
+
+        // 个别曲线无法批量参数化时逐点回退，并保证每个内部节点都有参数值。
+        if (innerParams.size() != innerTags.size()) {
+            innerParams.clear();
+            for (std::size_t i = 0; i < innerTags.size(); ++i) {
+                const std::size_t ci = i + 1;
+                double parameter = double(i + 1) / double(nc - 1);
+                try {
+                    std::vector<double> closest_coords;
+                    std::vector<double> closest_params;
+                    gmsh::model::getClosestPoint(1, gmshTag,
+                        { orderedCoords[ci * 3], orderedCoords[ci * 3 + 1], orderedCoords[ci * 3 + 2] },
+                        closest_coords, closest_params);
+                    if (!closest_params.empty())
+                        parameter = closest_params[0];
+                } catch (...) {
+                }
+                innerParams.push_back(parameter);
             }
         }
     }
@@ -504,7 +729,7 @@ bool injectConstrainedEdge(int gmshTag,
         gmsh::model::mesh::addNodes(1, gmshTag, innerTags, innerCoords, innerParams);
 
     // 线单元
-std::vector<std::size_t> allN;
+    std::vector<std::size_t> allN;
     allN.push_back(tagV0);
     for (auto t : innerTags)
         allN.push_back(t);
@@ -601,19 +826,20 @@ void storeNewEdges(GmshIncrementalMeshState& state, const std::map<int, GeomEdge
     int nNew = 0;
     int nShared = 0;
     for (auto& [gt, oid] : g2o) {
-        if (state.meshedEdgeRefCounts.find(oid) == state.meshedEdgeRefCounts.end()) {
+        if (state.meshedEdgesCache.find(oid) == state.meshedEdgesCache.end()) {
             auto ed = extractEdgeNodes(gt);
             if (!ed.coords.empty()) {
                 state.meshedEdgesCache[oid] = std::move(ed);
-                state.meshedEdgeRefCounts[oid] = 1; // 首次创建
+                state.meshedEdgeRefCounts[oid] = 1;
                 nNew++;
             }
         } else {
-            state.meshedEdgeRefCounts[oid]++; // 被另一个面复用
+            ++state.meshedEdgeRefCounts[oid];
             nShared++;
         }
     }
-    spdlog::info("GmshMesh:  {} new edges stored, {} edges reused (total cached: {})", nNew, nShared, state.meshedEdgeRefCounts.size());
+    spdlog::info("GmshMesh:  {} new edges stored, {} edges reused (total cached: {})",
+        nNew, nShared, state.meshedEdgesCache.size());
 }
 
 void mergeMeshResult(
@@ -659,28 +885,31 @@ void mergeMeshResult(
         mesh_data.face_vertices_offset_.size() - 1);
 }
 
-// 从 MeshData 中移除指定 Gmsh 面结果的单元，保留其他算法已写入的单元。
-bool removeCachedFaceCells(ComponentOperator& component_op, const SingleFaceMeshResult& result)
+// 从 MeshData 中移除指定几何面映射的单元，保留其他算法已写入的单元。
+bool removeMappedFaceCells(
+    ComponentOperator& component_op,
+    const GeometryFaceMeshTopology& topology)
 {
     const MeshData* mesh = component_op.mesh();
     if (!mesh) {
         spdlog::error("GmshMesh: component has no mesh");
         return false;
     }
-    if (result.global_face_vertices.size() != result.face_vertices.size()
-        || result.face_vertices_offset.size() < 2) {
-        spdlog::error("GmshMesh: cached face topology is incomplete");
+    if (topology.face_vertices_offset.size() < 2) {
+        spdlog::error("GmshMesh: mapped face topology is incomplete");
         return false;
     }
 
     std::set<std::vector<Index>> targetCells;
-    for (std::size_t i = 0; i + 1 < result.face_vertices_offset.size(); ++i) {
-        const std::size_t begin = result.face_vertices_offset[i];
-        const std::size_t end = result.face_vertices_offset[i + 1];
-        if (begin > end || end > result.global_face_vertices.size())
+    for (std::size_t i = 0; i + 1 < topology.face_vertices_offset.size(); ++i) {
+        const Index begin = topology.face_vertices_offset[i];
+        const Index end = topology.face_vertices_offset[i + 1];
+        if (begin < 0 || begin > end
+            || end > static_cast<Index>(topology.face_vertices.size())) {
             return false;
-        targetCells.emplace(result.global_face_vertices.begin() + begin,
-            result.global_face_vertices.begin() + end);
+        }
+        targetCells.emplace(topology.face_vertices.begin() + begin,
+            topology.face_vertices.begin() + end);
     }
 
     std::vector<Index> keptVertices;
@@ -696,9 +925,10 @@ bool removeCachedFaceCells(ComponentOperator& component_op, const SingleFaceMesh
 
         std::vector<Index> cell(mesh->face_vertices_.begin() + begin,
             mesh->face_vertices_.begin() + end);
-        if (targetCells.erase(cell) == 0)
+        if (targetCells.erase(cell) == 0) {
             keptVertices.insert(keptVertices.end(), cell.begin(), cell.end());
-        keptOffsets.push_back(static_cast<Index>(keptVertices.size()));
+            keptOffsets.push_back(static_cast<Index>(keptVertices.size()));
+        }
     }
 
     if (!targetCells.empty()) {
@@ -713,40 +943,96 @@ bool removeCachedFaceCells(ComponentOperator& component_op, const SingleFaceMesh
     return true;
 }
 
-// 释放一个 CAD 面占用的边缓存和面缓存，不修改 MeshData。
-bool releaseFaceCache(
-    GeometryData& geometry,
-    GmshIncrementalMeshState& state,
-    ModelLayer& model_layer,
-    GeomFaceId faceId)
-{
-    auto faceIt = state.meshedFacesCache.find(faceId);
-    if (faceIt == state.meshedFacesCache.end())
-        return false;
-
-    TopoDS_Face face = getFaceById(model_layer.geomRegistry(), faceId);
-    for (GeomEdgeId globalEdgeId : getFaceEdgeIds(face, geometry)) {
-        auto refIt = state.meshedEdgeRefCounts.find(globalEdgeId);
-        if (refIt == state.meshedEdgeRefCounts.end())
-            continue;
-
-        if (--refIt->second <= 0) {
-            state.meshedEdgeRefCounts.erase(refIt);
-            state.meshedEdgesCache.erase(globalEdgeId);
-        }
-    }
-    state.meshedFacesCache.erase(faceIt);
-    return true;
-}
-
 // 复制本次划分会修改的网格数组，用于重划分的候选结果。
 // 提交候选划分产生的网格数组，不影响 MeshData 的属性、边和体数据。
 } // anonymous namespace
 
 // 公开接口
+std::optional<GmshIncrementalMeshState> IncrementalMeshTools::buildStateFromGeometryMeshMap(
+    const GeometryMeshMap* mapping,
+    const MeshData& mesh,
+    const GeometryData& geometry,
+    const GeometryRegistry& registry)
+{
+    GmshIncrementalMeshState state;
+    if (!mapping)
+        return state;
+
+    for (const auto& [edge_id, point_ids] : mapping->geometry_edge_to_mesh_point_ids) {
+        MeshedEdgeData edge_data;
+        edge_data.coords.reserve(point_ids.size() * 3);
+        for (Index point_id : point_ids) {
+            if (point_id < 0
+                || point_id >= static_cast<Index>(mesh.vertex_positions_.size())) {
+                spdlog::error(
+                    "GmshMesh: geometry edge {} references invalid mesh point {}",
+                    edge_id, point_id);
+                return std::nullopt;
+            }
+            const auto& position = mesh.vertex_positions_[static_cast<std::size_t>(point_id)];
+            edge_data.coords.insert(
+                edge_data.coords.end(), position.begin(), position.end());
+        }
+        state.meshedEdgesCache.emplace(edge_id, std::move(edge_data));
+    }
+
+    // 引用计数只作为本次操作的派生缓存，由已映射面与 CAD 边关系一次性重建。
+    for (const auto& [face_id, unused] : mapping->geometry_face_to_mesh_topology) {
+        (void)unused;
+        const TopoDS_Shape* shape = registry.getFace(face_id);
+        if (!shape)
+            continue;
+        for (GeomEdgeId edge_id : getFaceEdgeIds(TopoDS::Face(*shape), geometry)) {
+            if (state.meshedEdgesCache.find(edge_id) != state.meshedEdgesCache.end())
+                ++state.meshedEdgeRefCounts[edge_id];
+        }
+    }
+
+    return state;
+}
+
+bool IncrementalMeshTools::storeStateToGeometryMeshMap(
+    const GmshIncrementalMeshState& state,
+    const GeometryMeshMap& working_mapping,
+    ComponentOperator& component_op)
+{
+    const MeshData* mesh = component_op.mesh();
+    if (!mesh)
+        return false;
+
+    GeometryMeshMap candidate = working_mapping;
+    candidate.geometry_edge_to_mesh_point_ids.clear();
+    const MeshPointLookup point_lookup(*mesh);
+    for (const auto& [edge_id, edge_data] : state.meshedEdgesCache) {
+        if (edge_data.coords.size() % 3 != 0) {
+            spdlog::error("GmshMesh: geometry edge {} has invalid coordinate cache", edge_id);
+            return false;
+        }
+
+        auto& point_ids = candidate.geometry_edge_to_mesh_point_ids[edge_id];
+        point_ids.reserve(edge_data.coords.size() / 3);
+        for (std::size_t i = 0; i < edge_data.coords.size(); i += 3) {
+            const std::array<double, 3> position {
+                edge_data.coords[i], edge_data.coords[i + 1], edge_data.coords[i + 2]
+            };
+            const auto point_id = point_lookup.find(position);
+            if (!point_id) {
+                spdlog::error(
+                    "GmshMesh: geometry edge {} node is missing from MeshData", edge_id);
+                return false;
+            }
+            point_ids.push_back(*point_id);
+        }
+    }
+
+    component_op.editableGeometryMeshMap() = std::move(candidate);
+    return true;
+}
+
 SingleFaceMeshResult IncrementalMeshTools::meshSingleFace(
     GeometryData& geometry,
     GmshIncrementalMeshState& state,
+    GeometryMeshMap& working_mapping,
     ComponentOperator& component_op,
     GeomFaceId faceId,
     double meshSize,
@@ -764,80 +1050,150 @@ SingleFaceMeshResult IncrementalMeshTools::meshSingleFace(
         spdlog::error("Face {} is null or invalid", faceId);
         return result;
     }
+
+    const bool requirePureQuadrilateral =
+        meshType == GmshSurfaceMeshType::PureQuadrilateral;
+    const bool periodicOrSeam =
+        requirePureQuadrilateral && isPeriodicOrSeamFace(face);
+
     GmshSession session;
     setGmshNumberOption("General.Terminal", 1);
-    gmsh::model::add("face_model");
-    // 先逐边导入并记录返回 tag，再导入整个面；面导入会复用相同 OCC 边的 tag。
-    auto gmshToOcc = importGmshEdges(face, geometry);
 
-    gmsh::vectorpair outDimTags;
-    gmsh::model::occ::importShapesNativePointer(
-        static_cast<const void*>(&face), outDimTags);
-    gmsh::model::occ::synchronize();
-
-    std::vector<std::pair<int, int>> faceDimTags;
-    gmsh::model::getEntities(faceDimTags, 2);
-    if (faceDimTags.empty()) {
-        spdlog::error("  No face after import");
-        return result;
-    }
-    int faceTag = faceDimTags[0].second;
-
-    std::size_t nodeCounter = 1, elemCounter = 1;
-    int shared = 0, free = 0;
-    std::map<int, std::size_t> vtxNodeMap;
-
-    for (const auto& [gt, oid] : gmshToOcc) {
-        auto cacheIt = state.meshedEdgesCache.find(oid);
-        if (state.meshedEdgeRefCounts.count(oid) > 0 && cacheIt != state.meshedEdgesCache.end()) {
-            if (!injectConstrainedEdge(gt, cacheIt->second,
-                    nodeCounter, elemCounter, vtxNodeMap)) {
-                spdlog::error("GmshMesh: failed to inject constrained edge {}", oid);
+    // 纯四边形先保留自然边界做普通重组；非周期面存在残余三角形时才重建模型并尝试 full-quad。
+    const int attemptCount = requirePureQuadrilateral && !periodicOrSeam ? 2 : 1;
+    for (int attempt = 0; attempt < attemptCount; ++attempt) {
+        if (attempt > 0) {
+            try {
+                gmsh::clear();
+            } catch (const std::exception& e) {
+                spdlog::error("GmshMesh: failed to clear model before full-quad retry: {}", e.what());
                 return result;
             }
-            shared++;
-        } else {
-            free++;
         }
-    }
-    spdlog::info("  {} shared, {} free", shared, free);
+        gmsh::model::add("face_model");
 
-    configureMeshingOptions(parameters, meshSize);
+        // 先逐边导入并记录返回 tag，再导入整个面；面导入会复用相同 OCC 边的 tag。
+        auto gmshToOcc = importGmshEdges(face, geometry);
 
-    try {
-        if (!configureSurfaceMeshType(faceTag, meshType, gmshToOcc, state, meshSize, parameters)) {
-            spdlog::warn("  Cannot configure {} mesh", surfaceMeshTypeName(meshType));
+        gmsh::vectorpair outDimTags;
+        gmsh::model::occ::importShapesNativePointer(
+            static_cast<const void*>(&face), outDimTags);
+        gmsh::model::occ::synchronize();
+
+        std::vector<std::pair<int, int>> faceDimTags;
+        gmsh::model::getEntities(faceDimTags, 2);
+        if (faceDimTags.empty()) {
+            spdlog::error("  No face after import");
             return result;
         }
-        gmsh::model::mesh::generate(2);
-    } catch (const std::exception& e) {
-        spdlog::error("  Mesh failed: {}", e.what());
+        const int faceTag = faceDimTags[0].second;
+
+        std::size_t nodeCounter = 1;
+        std::size_t elemCounter = 1;
+        int shared = 0;
+        int free = 0;
+        std::map<int, std::size_t> vtxNodeMap;
+
+        for (const auto& [gt, oid] : gmshToOcc) {
+            auto cacheIt = state.meshedEdgesCache.find(oid);
+            if (cacheIt != state.meshedEdgesCache.end()) {
+                if (!injectConstrainedEdge(gt, cacheIt->second,
+                        nodeCounter, elemCounter, vtxNodeMap)) {
+                    spdlog::error("GmshMesh: failed to inject constrained edge {}", oid);
+                    return result;
+                }
+                shared++;
+            } else {
+                free++;
+            }
+        }
+        spdlog::info("  {} shared, {} free", shared, free);
+
+        IncrementalMeshTools::GmshMeshParameters attemptParameters = parameters;
+        GmshSurfaceMeshType attemptMeshType = meshType;
+        if (requirePureQuadrilateral) {
+            attemptMeshType = GmshSurfaceMeshType::QuadDominant;
+            if (attempt > 0) {
+                attemptParameters.recombineAlgorithm =
+                    parameters.recombineAlgorithm
+                        == static_cast<int>(GmshRecombinationAlgorithm::Simple)
+                    ? static_cast<int>(GmshRecombinationAlgorithm::SimpleFullQuad)
+                    : static_cast<int>(GmshRecombinationAlgorithm::BlossomFullQuad);
+            }
+        }
+
+        configureMeshingOptions(attemptParameters, meshSize);
+
+        try {
+            if (!configureSurfaceMeshType(
+                    faceTag, attemptMeshType, gmshToOcc, state,
+                    meshSize, attemptParameters)) {
+                spdlog::error("  Cannot configure {} mesh",
+                    surfaceMeshTypeName(meshType));
+                return result;
+            }
+            gmsh::model::mesh::generate(2);
+        } catch (const std::exception& e) {
+            spdlog::error("  Mesh failed: {}", e.what());
+            return result;
+        }
+
+        const SurfaceElementSummary summary = summarizeSurfaceElements(faceTag);
+        if (!summary.hasSupportedElements()) {
+            spdlog::error("  No supported surface elements");
+            return result;
+        }
+        if (summary.unsupportedCount > 0) {
+            spdlog::error("  Surface contains {} unsupported elements",
+                summary.unsupportedCount);
+            return result;
+        }
+
+        if (requirePureQuadrilateral && !summary.isPureQuadrilateral()) {
+            if (attempt == 0 && periodicOrSeam) {
+                spdlog::error(
+                    "GmshMesh: pure-quad rejected on periodic/seam face {}; "
+                    "ordinary recombination left {} triangles and full-quad is unavailable",
+                    faceId, summary.triangleCount);
+                return result;
+            }
+            if (attempt == 0) {
+                spdlog::info(
+                    "GmshMesh: ordinary recombination left {} triangles on face {}; retrying full-quad",
+                    summary.triangleCount, faceId);
+                continue;
+            }
+
+            spdlog::error(
+                "GmshMesh: pure-quad failed on face {}; full-quad left {} triangles",
+                faceId, summary.triangleCount);
+            return result;
+        }
+
+        result = extractFaceMesh(faceTag);
+        if (result.success) {
+            result.triangle_count = summary.triangleCount;
+            result.quadrangle_count = summary.quadrangleCount;
+            storeNewEdges(state, gmshToOcc);
+            mergeMeshResult(component_op, result);
+
+            GeometryFaceMeshTopology topology;
+            topology.face_vertices = result.global_face_vertices;
+            topology.face_vertices_offset.reserve(result.face_vertices_offset.size());
+            for (std::size_t offset : result.face_vertices_offset)
+                topology.face_vertices_offset.push_back(static_cast<Index>(offset));
+            working_mapping.geometry_face_to_mesh_topology[faceId] = std::move(topology);
+
+            spdlog::info(
+                "GmshMesh: face {} meshed: {} elements ({} triangles, {} quadrangles)",
+                faceId,
+                result.triangle_count + result.quadrangle_count,
+                result.triangle_count,
+                result.quadrangle_count);
+        }
         return result;
     }
 
-    // 检查面单元
-    {
-        std::vector<int> ct;
-        std::vector<std::vector<std::size_t>> cta, cno;
-        gmsh::model::mesh::getElements(ct, cta, cno, 2, faceTag);
-        bool has = false;
-        for (size_t t = 0; t < ct.size(); ++t)
-            if ((ct[t] == 2 || ct[t] == 3) && !cta[t].empty()) {
-                has = true;
-                break;
-            }
-        if (!has) {
-            spdlog::warn("  No surface elements");
-            return result;
-        }
-    }
-
-    result = extractFaceMesh(faceTag);
-    if (result.success) {
-        storeNewEdges(state, gmshToOcc);
-        mergeMeshResult(component_op, result);
-        state.meshedFacesCache[faceId] = result;
-    }
     return result;
 }
 
@@ -871,19 +1227,31 @@ std::size_t IncrementalMeshTools::faceCount(const GeometryData& geometry)
 bool IncrementalMeshTools::deleteFaceMesh(
     GeometryData& geometry,
     GmshIncrementalMeshState& state,
+    GeometryMeshMap& working_mapping,
     ComponentOperator& component_op,
     GeomFaceId faceId)
 {
-    auto it = state.meshedFacesCache.find(faceId);
-    if (it == state.meshedFacesCache.end()) {
-        spdlog::warn("Face {} is not meshed or not cached.", faceId);
+    auto face_it = working_mapping.geometry_face_to_mesh_topology.find(faceId);
+    if (face_it == working_mapping.geometry_face_to_mesh_topology.end()) {
+        spdlog::warn("Face {} is not present in geometry-mesh mapping.", faceId);
         return false;
     }
 
-    if (!removeCachedFaceCells(component_op, it->second))
+    if (!removeMappedFaceCells(component_op, face_it->second))
         return false;
-    if (!releaseFaceCache(geometry, state, component_op.manager(), faceId))
-        return false;
+
+    // 面删除后递减临时引用计数，仅清理不再被其他已映射面使用的边缓存。
+    const TopoDS_Face face = getFaceById(component_op.manager().geomRegistry(), faceId);
+    for (GeomEdgeId edge_id : getFaceEdgeIds(face, geometry)) {
+        auto ref_it = state.meshedEdgeRefCounts.find(edge_id);
+        if (ref_it == state.meshedEdgeRefCounts.end())
+            continue;
+        if (--ref_it->second <= 0) {
+            state.meshedEdgeRefCounts.erase(ref_it);
+            state.meshedEdgesCache.erase(edge_id);
+        }
+    }
+    working_mapping.geometry_face_to_mesh_topology.erase(face_it);
 
     const MeshData* mesh = component_op.mesh();
     spdlog::info("Deleted Gmsh mesh for face {}. Remaining cells: {}",
@@ -894,14 +1262,45 @@ bool IncrementalMeshTools::deleteFaceMesh(
 SingleFaceMeshResult IncrementalMeshTools::remeshSingleFace(
     GeometryData& geometry,
     GmshIncrementalMeshState& state,
+    GeometryMeshMap& working_mapping,
     ComponentOperator& component_op,
     GeomFaceId faceId,
     double meshSize,
     const GmshMeshParameters& parameters)
 {
-    if (state.meshedFacesCache.find(faceId) != state.meshedFacesCache.end())
-        deleteFaceMesh(geometry, state, component_op, faceId);
+    const auto faceIt =
+        working_mapping.geometry_face_to_mesh_topology.find(faceId);
+    if (faceIt == working_mapping.geometry_face_to_mesh_topology.end()) {
+        return meshSingleFace(
+            geometry, state, working_mapping, component_op,
+            faceId, meshSize, parameters);
+    }
 
-    return meshSingleFace(
-        geometry, state, component_op, faceId, meshSize, parameters);
+    const MeshData* mesh = component_op.mesh();
+    if (!mesh)
+        return {};
+
+    // 重划分按单面事务处理：新网格失败时恢复旧单元、共享边缓存和工作映射。
+    const std::vector<Index> previousFaceVertices = mesh->face_vertices_;
+    const std::vector<Index> previousFaceOffsets = mesh->face_vertices_offset_;
+    const GmshIncrementalMeshState previousState = state;
+    const GeometryMeshMap previousMapping = working_mapping;
+
+    if (!deleteFaceMesh(
+            geometry, state, working_mapping, component_op, faceId)) {
+        return {};
+    }
+
+    SingleFaceMeshResult result = meshSingleFace(
+        geometry, state, working_mapping, component_op, faceId, meshSize, parameters);
+    if (result.success)
+        return result;
+
+    MeshData& editableMesh = component_op.editableMesh();
+    editableMesh.face_vertices_ = previousFaceVertices;
+    editableMesh.face_vertices_offset_ = previousFaceOffsets;
+    state = previousState;
+    working_mapping = previousMapping;
+    spdlog::info("GmshMesh: face {} remeshing failed; previous mesh restored", faceId);
+    return result;
 }

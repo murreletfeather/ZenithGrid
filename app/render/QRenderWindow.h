@@ -45,7 +45,7 @@ struct QRenderWindow : QQuickVTKItem { // 结构体继承QQuickVTKItem
     Q_PROPERTY(int meshStyle READ getMeshStyle WRITE setMeshStyle NOTIFY meshStyleChanged)
     QML_ELEMENT
 public:
-    QRenderWindow(); // 槽函数，改变边框重置相机
+    QRenderWindow();
     ~QRenderWindow() override;
 
     struct Data : vtkObject { // 结构体继承vtkObject
@@ -155,7 +155,7 @@ public:
      * @brief 设置属性渲染方式
      *
      * 在控制台中调用示例：
-     * QModelManager.query.getModelAttriName(0)
+     * QModelManager.query.getComponentAttriInfo(0)
      * App.registry.renderWindow.setAttriMode(0, "f_pressure_1", 1, {})
      * App.registry.renderWindow.setAttriMode(0, "f_color_3", 0, {})
      * App.registry.renderWindow.setAttriMode(0, "f_vectors_3", 3, {})

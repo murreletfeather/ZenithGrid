@@ -47,7 +47,12 @@ public:
      * @brief 供文件对话框使用，获取所有支持的文件类型过滤器
      * @return 文件类型过滤器列表，如 ["Wavefront .obj file (*.obj)", "All files (*)"]
      */
-    QStringList getDialogNameFilters() const;
+    Q_INVOKABLE QStringList getDialogNameFilters() const;
+    /**
+     * @brief 供特定平台的文件选择器使用（如浏览器），获取所有支持的文件扩展名过滤器
+     * @return 文件扩展名过滤器，如 ".obj,.mesh"
+     */
+    Q_INVOKABLE QString getDialogExtFilters() const;
 
     /**
      * @brief 通知界面语言切换：重发 dialogNameFiltersChanged，QML 按新语言重新读取文件过滤器
@@ -58,6 +63,17 @@ signals:
     void dialogNameFiltersChanged();
 
 private:
+    /**
+     * @brief 解析出实际使用的文件类型注册名：注册名优先，未指定或未知时按文件扩展名回退
+     *
+     * 界面文件对话框传入的是过滤器名，它未必等于注册名：用户选中默认项时是 "All files"，
+     * 名字本身也可能与注册名不一致。读写两侧共用本函数，保证解析规则一致。
+     * @param unique_name 界面传入的文件类型名，允许未注册
+     * @param url 目标文件 URL，回退时按其扩展名匹配（导出时不要求文件已存在）
+     * @return 已注册的文件类型唯一名称，无法解析时返回空串
+     */
+    QString resolveFileType(const QString& unique_name, const QUrl& url) const;
+
     /**
      * @brief 按文件扩展名解析出支持该文件类型的注册名
      * @param suffix 小写的、不含点的文件扩展名

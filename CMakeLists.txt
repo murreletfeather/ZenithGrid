@@ -18,9 +18,48 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-finput-charset=UTF-8>)
 endif()
 
-list(INSERT CMAKE_MODULE_PATH 0 "${PROJECT_SOURCE_DIR}/cmake")
+if(UNIX)
+    # 链接到动态库的静态库必须启用 PIC
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    add_link_options($<$<PLATFORM_ID:Linux>:-Wl,--disable-new-dtags>)
+endif()
+
+if(APPLE)
+    # Apple libc++ 的 std::execution 并行算法属实验特性，须显式开启
+    add_compile_options(-fexperimental-library)
+    # 构建时注入 rpath 用于调试和测试，安装时的 rpath 由 fixup_bundle 处理
+    foreach(_prefix IN LISTS CMAKE_PREFIX_PATH)
+        if(EXISTS "${_prefix}/lib")
+            list(APPEND CMAKE_BUILD_RPATH "${_prefix}/lib")
+        endif()
+    endforeach()
+endif()
+
+if(EMSCRIPTEN)
+    # for std::execution
+    add_compile_options(-fexperimental-library)
+    # VTK 9.6 use wasm exceptions
+    add_compile_options(-fwasm-exceptions)
+    # libMeshb depends on setjmp/longjmp
+    add_link_options(-sSUPPORT_LONGJMP=wasm)
+    option(WASM_THREADS "启用 WebAssembly 多线程支持" OFF)
+    if(WASM_THREADS)
+        add_compile_options(-pthread)
+        add_link_options(-pthread)
+    endif()
+    # 让 VTK 使用 Qt 内置的 freetype/tiff，避免静态链接报符号重定义的错误
+    get_filename_component(WASM_QT_DIR "${CMAKE_TOOLCHAIN_FILE}/../../../.." ABSOLUTE)
+    get_filename_component(WASM_SOURCE_DIR "${WASM_QT_DIR}/../../_source" ABSOLUTE)
+    set(TIFF_LIBRARY "${WASM_QT_DIR}/plugins/imageformats/libqtiff.a" CACHE FILEPATH "" FORCE)
+    set(TIFF_INCLUDE_DIR "${WASM_SOURCE_DIR}/qt5/qtimageformats/src/3rdparty/libtiff/libtiff" CACHE PATH "" FORCE)
+    set(FREETYPE_INCLUDE_DIR_ft2build "${WASM_QT_DIR}/include/QtFreetype" CACHE PATH "" FORCE)
+    set(FREETYPE_INCLUDE_DIR_freetype2 "${WASM_QT_DIR}/include/QtFreetype" CACHE PATH "" FORCE)
+    set(FREETYPE_LIBRARY "${WASM_QT_DIR}/lib/libQt6BundledFreetype.a" CACHE FILEPATH "" FORCE)
+endif()
 
 option(BUILD_TESTING "是否启用并构建测试用例" OFF)
+
+list(INSERT CMAKE_MODULE_PATH 0 "${PROJECT_SOURCE_DIR}/cmake")
 
 find_package(spdlog REQUIRED)
 
@@ -45,7 +84,7 @@ if(NOT freetype_FOUND)
     endif()
 endif()
 
-find_package("Qt${VTK_QT_VERSION}" REQUIRED COMPONENTS Gui Quick QuickControls2 LinguistTools)
+find_package("Qt${VTK_QT_VERSION}" REQUIRED COMPONENTS Gui Quick QuickControls2 Svg LinguistTools)
 message(STATUS "QT_VERSION: Qt${VTK_QT_VERSION}")
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()
@@ -54,6 +93,7 @@ include(test)
 
 add_subdirectory(core)
 add_subdirectory(model)
+add_subdirectory(python)
 add_subdirectory(plugins)
 
 add_subdirectory(app)

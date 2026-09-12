@@ -42,6 +42,8 @@
     <a href="https://gitee.com/precess/PreCess/wikis/Home"><strong>项目文档 »</strong></a>
     <br />
     <br />
+    <a href="https://precess.dawncraft.cc/">在线体验</a>
+    &middot;
     <a href="https://gitee.com/precess/PreCess/releases">发行版</a>
     &middot;
     <a href="https://gitee.com/precess/PreCess/issues/new?template=1-bug%E6%8A%A5%E5%91%8A.yml">Bug 报告</a>
@@ -116,7 +118,7 @@
 * [![Catch2][Catch2]][Catch2-url]
 * [![KDDockWidgets][KDDockWidgets]][KDDockWidgets-url]
 
-**插件层功能依赖**（由 `PreCess-deps.bat` 获取，随对应插件按需构建）：
+**插件层功能依赖**（由 `PreCess-deps.bat` 或 `PreCess-deps.sh` 获取，随对应插件按需构建）：
 
 * [![CGAL][CGAL]][CGAL-url]：插件共用网格转换层 `plugins/shared/cgal_support` 与网格修复插件（CGAL PMP）
 * [![Gmsh][Gmsh]][Gmsh-url]：Gmsh 渐进式网格划分插件（`gmsh::shared`）
@@ -145,9 +147,9 @@ cmake --build ./build --target install
 <!-- USAGE EXAMPLES -->
 ## ⚙️功能用法
 
-- **模型导入与展示**：支持 IGES、STEP、OBJ、PLY、`.m`、Medit `.mesh`、Abaqus `.inp`、VTK `.vtk` 等格式导入与展示，支持多文件同时导入；几何与网格分层组织、网格/几何渲染风格切换（如「网格·面·带网格线」「网格·线·带内部线」等）、体网格切面裁剪。
+- **模型导入与展示**：支持 IGES、STEP、OBJ、PLY、`.m`、Medit `.mesh`、Abaqus `.inp`、VTK `.vtk`、`.off` 等格式导入与展示，支持多文件同时导入；几何与网格分层组织、网格/几何渲染风格切换（如「网格·面·带网格线」「网格·线·带内部线」等）、体网格切面裁剪。
 - **交互式选择与算法调用**：组件/点/边/面/体/几何点线面体选择器，网格面支持按角度扩散多选；对选择结果调用网格算法插件（Gmsh 渐进式划分、TetGen/TetGenLib 体网格剖分、CCGMeshToNURBS、执行 cmd 命令等）。
-- **几何处理**：几何基本形状创建、几何删除。
+- **几何处理**：基础图元创建——点、直线边（坐标/选点）、矩形面、圆盘/扇形面、长方体、圆柱、圆锥/圆台、球体/部分球体；几何编辑——闭合边成面、面拉伸为实体、删除几何。以功能系统插件提供，菜单点选后经参数侧栏执行。
 - **网格编辑**：创建面、删除面等编辑插件。
 - **测量与尺寸标注**：视口交互测量与参数化尺寸标注（距离/角度/半径/长度/面积/体积/包围盒/重心）。
 - **网格质量分析**：计算所选组件的网格质量并生成标量属性，支持属性渲染与颜色表。
@@ -170,6 +172,14 @@ _For more examples, please refer to the [Documentation](https://gitee.com/preces
   * [ ] 配置远程托管平台的自动测试与检查
     * [x] Doxygen 文档自动生成、自动构建与单元测试 CI
     * [ ] 代码静态检查 CI
+* [ ] **跨平台构建**：
+  * [x] 依赖下载脚本迁移到 Python，并提供 bat/sh 入口和 fetch/build 分段
+  * [x] 依赖及主程序的交叉编译（依赖产物按平台分目录存放）
+    * [ ] linux/mac 交叉编译
+    * [x] WebAssembly 交叉编译
+  * [x] Qt 插件支持静态链接，以便 WebAssembly 等仅支持静态链接的平台使用
+  * [x] WebAssembly 适配，包括壳网页、捆绑字体、浏览器文件导入导出等
+    * [x] PWA 应用（manifest + Service Worker 离线缓存，可安装、可离线启动）
 * [x] **网格类型支持**：做到能导入并可视化三角形网格、四边形网格、更广义的多边形网格、体网格
 * [x] **渲染窗口的基础交互支持**：支持各种网格元素的拾取：点、边、面、体及几何元素，网格面支持按角度扩散多选
   * [x] 体网格的切面支持，实现切平面裁剪网格的可视化效果
@@ -196,21 +206,25 @@ _For more examples, please refer to the [Documentation](https://gitee.com/preces
   * [ ] 菜单栏视图或窗口header按钮或窗口header右键菜单可以管理窗口状态：开关、选项页等。参考HyperMesh、Ansys，激进点的参考Visual Studio与Blender
   * [ ] 类Blender的自定义窗口布局预设
 * [ ] 任务执行  
-  * [ ] 任务的失败恢复与撤销重做
+  * [x] 任务的失败恢复与撤销重做
     * [x] 模型层快照/恢复原语（组件/模型级 takeSnapshot/restoreSnapshot）
-    * [ ] 撤销重做
+    * [x] 撤销重做：边界自动记录（Auto）+ Manual staged 预览会话（beginStaged/commitStaged/cancelStaged/revertStaged），线性历史；设计约定见 AGENTS.md 第 10 节
   * [ ] 任务暂停或断点：算法执行过程中的调试。一般都是每次执行输出一个结果到文件再打开模型查看情况，也许可以做到更精细的算法控制
   * [ ] UI的更新机制：数据更新还挺困难。比如数据更新可能会导致当前操作不合法，需要考虑避免
 * [ ] 从软件中剥离业务逻辑：这服务于以下几点
   * [x] C++类库：模型层已抽象为 `core/`、`model/` 静态库
   * [ ] 对模型层做Python Wrapper接口层，可以像Blender将模型层打包成wheel与UI解释器调用接口
+    * [x] Qt-free 会话层 `model/session`：Session 组合根 + SessionQuery 原生查询（QML 适配器瘦身为纯包装，签名不变）
+    * [x] pybind11 绑定模块 `precess`（顶层 `python/` 目录，LGPLv3；顺序传参调用 `call(feature, *args)` + `feature_params` 自省，Combo 按选项下标；wheel 打包待后续）
+    * [x] app 内嵌 Python 运行环境：QPythonRuntime + Python 控制台（F11；活会话注入 `precess.current`，Python ≡ GUI 线程执行约定）
+    * [ ] 无头 CLI 与 wheel 打包（含插件加载的 Qt 解耦）
   * [ ] 无头软件：软件不是必须得要一个UI吧！命令行也是一种调用接口方法
   * [ ] C/S架构：模型层打包成服务器上的服务，类ParaView
 * [ ] 插件管理
   * [x] 插件管理界面：偏好设置中提供插件注册/注销管理
   * [ ] 完善动态插件机制：ABI稳定过于抽象，在用户的插件使用过程中逐渐完善
   * [ ] 插件化的还不够彻底，目前只是实现了业务逻辑的插件化，没有考虑渲染或者UI的插件化
-  * [ ] 静态插件机制设计：使用constexpr静态注册，元数据在插件编译时嵌入。尽量兼容动态插件接口
+  * [x] 静态插件机制设计：使用constexpr静态注册，元数据在插件编译时嵌入。尽量兼容动态插件接口
 * [ ] 多任务管理
   * [ ] 算法不阻塞UI，区分工作线程与界面线程
   * [ ] 任务资源占用识别与任务的多线程调度：模型A正在运行某个拓扑操作，此时不能同时对A进行另一个拓扑操作。并行的资源占用、任务暂停。考虑使用std::execution实现UE5的任务图的可行性。

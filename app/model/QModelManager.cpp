@@ -1,17 +1,15 @@
 #include "QModelManager.h"
 #include "AlgorithmSystem.h"
-#include "AlgorithmSystemRegister.h"
 #include "EditSystem.h"
-#include "EditSystemRegister.h"
-#include "EventBus.h"
 #include "FeatureEvents.h"
 #include "FeatureSystem.h"
-#include "FeatureSystemRegister.h"
 #include "ModelIOSystem.h"
-#include "ModelIOSystemRegister.h"
 #include "ModelLayer.h"
 #include "QModelObserver.h"
+#include "QPythonRuntime.h"
+#include "Session.h"
 #include "SystemPluginManager.h"
+#include "UndoStack.h"
 
 #include <QUrl>
 #include <filesystem>
@@ -20,76 +18,46 @@
 QModelManager::QModelManager(std::string_view argv0, QObject* parent)
     : QObject(parent)
 {
-    // 1) 初始化
+    // 1) 会话组合根：模型层 + undo 栈 + 事件总线 + 四系统（内部经转发观察者桥接 ModelEvent）
     observer_ = std::make_unique<QModelObserver>();
-    core_ = std::make_unique<ModelLayer>(
-        /*observer=*/observer_.get());
+    session_ = std::make_unique<session::Session>(observer_.get());
 
-    query_ = std::make_unique<QModelQuery>(core_.get(), this);
-    geometry_operations_ = std::make_unique<QGeometryOperations>(*core_);
+    query_ = std::make_unique<QModelQuery>(&session_->query(), this);
 
-    io_system_ = std::make_unique<systems::io::ModelIOSystem>(*core_);
-    algo_system_ = std::make_unique<systems::algo::AlgorithmSystem>(*io_system_, *core_);
-    edit_system_ = std::make_unique<systems::edit::EditSystem>(*core_);
+    // 2) Qt 适配器包装会话内子系统
+    algo_adaptor_ = std::make_unique<systems::algo::QAlgorithmSystemAdaptor>(session_->algorithmSystem());
+    io_adaptor_ = std::make_unique<systems::io::QModelIOSystemAdaptor>(session_->ioSystem());
+    edit_adaptor_ = std::make_unique<systems::edit::QEditSystemAdaptor>(session_->editSystem());
+    feature_adaptor_ = std::make_unique<systems::feature::QFeatureSystemAdaptor>(session_->featureSystem());
+    undo_adaptor_ = std::make_unique<QUndoStackAdaptor>(session_->undoStack());
 
-    // 功能系统：事件总线 + 系统本体 + 动态上下文 provider 注入
-    event_bus_ = std::make_unique<core::EventBus>();
-    feature_system_ = std::make_unique<systems::feature::FeatureSystem>(*core_, *event_bus_);
-
-    algo_adaptor_ = std::make_unique<systems::algo::QAlgorithmSystemAdaptor>(*algo_system_);
-    io_adaptor_ = std::make_unique<systems::io::QModelIOSystemAdaptor>(*io_system_);
-    edit_adaptor_ = std::make_unique<systems::edit::QEditSystemAdaptor>(*edit_system_);
-    feature_adaptor_ = std::make_unique<systems::feature::QFeatureSystemAdaptor>(*feature_system_);
     // 功能上下文的活动模型/组件由 UI 同步到适配器，功能经 provider 动态获取
-    feature_system_->setActiveModelProvider([this]() { return feature_adaptor_->activeModel(); });
-    feature_system_->setActiveComponentProvider([this]() { return feature_adaptor_->activeComponent(); });
+    session_->featureSystem().setActiveModelProvider([this]() { return feature_adaptor_->activeModel(); });
+    session_->featureSystem().setActiveComponentProvider([this]() { return feature_adaptor_->activeComponent(); });
 
+    // 3) UI 桥接订阅（显示层关注点，保留在 app 层）
     // 参数变更桥接：功能回写参数值（如交互结果）经事件总线转发到 QML 同步显示
-    param_bridge_sub_ = event_bus_->subscribe<systems::feature::ParameterChangedEvent>(
+    param_bridge_sub_ = session_->events().subscribe<systems::feature::ParameterChangedEvent>(
         [this](const systems::feature::ParameterChangedEvent& e) {
             feature_adaptor_->notifyParameterChanged(e.feature, e.param_index, e.value);
         });
 
     // 标量属性显示桥接：功能请求经 Qt 排队信号转发，保证模型操作边界 flush 后再设置渲染属性。
     scalar_attribute_display_bridge_sub_
-        = event_bus_->subscribe<systems::feature::ScalarAttributeDisplayRequestedEvent>(
+        = session_->events().subscribe<systems::feature::ScalarAttributeDisplayRequestedEvent>(
             [this](const systems::feature::ScalarAttributeDisplayRequestedEvent& event) {
                 feature_adaptor_->notifyScalarAttributeDisplayRequested(
                     event.component_id, event.attribute_name);
             });
 
-    // 模型事件桥接到事件总线：功能可订阅 ModelEvent 实时响应模型增删改
-    using systems::feature::ModelEvent;
-    connect(observer_.get(), &QModelObserver::modelAdded, this, [this](Index id) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ModelAdded, id, -1 });
-    });
-    connect(observer_.get(), &QModelObserver::modelRemoved, this, [this](Index id) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ModelRemoved, id, -1 });
-    });
-    connect(observer_.get(), &QModelObserver::modelChanged, this, [this](Index id) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ModelChanged, id, -1 });
-    });
-    connect(observer_.get(), &QModelObserver::modelNameChanged, this, [this](Index id, const QString&) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ModelNameChanged, id, -1 });
-    });
-    connect(observer_.get(), &QModelObserver::componentChanged, this, [this](Index id) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ComponentChanged, -1, id });
-    });
-    connect(observer_.get(), &QModelObserver::componentRemoved, this, [this](Index id) {
-        event_bus_->publish(ModelEvent { ModelEvent::Kind::ComponentRemoved, -1, id });
-    });
+    q_plugin_manager_ = std::make_unique<systems::QSystemPluginManager>(&session_->pluginManager());
 
-    plugin_manager_ = std::make_unique<systems::SystemPluginManager>();
+    // 4) 内嵌 Python 运行时：懒初始化（控制台首次使用时启动解释器），持有活会话引用
+    python_runtime_ = std::make_unique<QPythonRuntime>(session_.get(), this);
 
-    // 2) 注册系统
-    plugin_manager_->addSystemRegister(systems::io::ModelIOSystem::name, std::make_unique<systems::io::ModelIOSystemRegister>(*io_system_));
-    plugin_manager_->addSystemRegister(systems::algo::AlgorithmSystem::name, std::make_unique<systems::algo::AlgorithmSystemRegister>(*algo_system_));
-    plugin_manager_->addSystemRegister(systems::edit::EditSystem::name, std::make_unique<systems::edit::EditSystemRegister>(*edit_system_));
-    plugin_manager_->addSystemRegister(systems::feature::FeatureSystem::name, std::make_unique<systems::feature::FeatureSystemRegister>(*feature_system_));
-
-    q_plugin_manager_ = std::make_unique<systems::QSystemPluginManager>(plugin_manager_.get());
-
-    // 3) 注册插件
+    // 5) 注册插件：静态插件经适配器注册以同步 QML 插件名列表
+    q_plugin_manager_->registerStaticPlugins();
+#ifndef __EMSCRIPTEN__
     using std::filesystem::path;
     path exe_dir = std::filesystem::absolute(argv0).parent_path();
     path plugin_dir = exe_dir / "plugins"; // 对应 开发调试 时的目录结构，相对严格
@@ -97,47 +65,54 @@ QModelManager::QModelManager(std::string_view argv0, QObject* parent)
         plugin_dir = exe_dir / "../plugins"; // 对应 install 后的目录结构，相对宽松
     }
     if (!std::filesystem::is_directory(plugin_dir)) {
-        spdlog::error("QModelManager::QModelManager: 插件目录 {} 不存在", plugin_dir.string());
+        spdlog::info("QModelManager::QModelManager: 插件目录 {} 不存在，跳过动态插件加载", plugin_dir.string());
         return;
     }
-    // 遍历插件目录，加载所有插件
+    // 遍历插件目录，加载所有插件（经适配器注册以同步 QML 插件名列表）
     for (const auto& entry : std::filesystem::directory_iterator(plugin_dir)) {
-        if (entry.is_regular_file()) {
-            QUrl plugin_url = QUrl::fromLocalFile(QString::fromLocal8Bit(entry.path().string()));
-            getSystemPluginManager()->registerPlugin(plugin_url);
+        if (!entry.is_regular_file()) {
+            continue;
         }
+        const path& entry_path = entry.path();
+        const path extension = entry_path.extension();
+        if (extension != ".dll" && extension != ".so" && extension != ".dylib") {
+            continue;
+        }
+        QUrl plugin_url = QUrl::fromLocalFile(QString::fromLocal8Bit(entry_path.string()));
+        q_plugin_manager_->registerPlugin(plugin_url);
     }
+#endif
 }
 
-QModelManager::~QModelManager() = default;
+QModelManager::~QModelManager()
+{
+    // 先关 Python 运行时（丢弃 precess.current 活会话引用并终结解释器）：
+    // Python 侧以引用策略持有活会话，会话先析构会在终结前留下悬垂
+    python_runtime_.reset();
+    // 显式再拆会话（停功能系统、断 undo 钩子）：此刻 Qt 适配器均存活，
+    // staged 清理路径经 on_changed_ 回调 undo_adaptor_ 发信号安全；其余成员按声明逆序析构
+    session_.reset();
+}
 
 void QModelManager::removeModel(int id)
 {
-    core_->removeModel(id);
+    session_->removeModel(id);
     emit modelRemoved(id);
 }
 
 void QModelManager::removeComponent(int id)
 {
-    core_->removeComponent(id);
+    session_->removeComponent(id);
 }
 
 void QModelManager::removeMesh(int componentId)
 {
-    auto op = core_->getComponentOperator(componentId);
-    if (op)
-        op->removeMesh();
-    // 过渡 shim（随系统迁移消亡）：QML 入口作为操作边界统一 flush 组件变更通知
-    core_->flushNotifications();
+    session_->removeMesh(componentId);
 }
 
 void QModelManager::removeGeometry(int componentId)
 {
-    auto op = core_->getComponentOperator(componentId);
-    if (op)
-        op->removeGeometry();
-    // 过渡 shim（随系统迁移消亡）：QML 入口作为操作边界统一 flush 组件变更通知
-    core_->flushNotifications();
+    session_->removeGeometry(componentId);
 }
 
 void QModelManager::setLanguage(const QString&)
@@ -152,7 +127,7 @@ void QModelManager::setLanguage(const QString&)
 
 ModelLayer* QModelManager::getModelManager()
 {
-    return core_.get();
+    return &session_->model();
 }
 
 QModelObserver* QModelManager::getModelObserver() const
@@ -190,12 +165,21 @@ systems::QSystemPluginManager* QModelManager::getSystemPluginManager() const
     return q_plugin_manager_.get();
 }
 
-QGeometryOperations* QModelManager::getGeometryOperations() const
+QUndoStackAdaptor* QModelManager::getUndoStackAdaptor() const
 {
-    return geometry_operations_.get();
+    return undo_adaptor_.get();
 }
 
+QPythonRuntime* QModelManager::getPythonRuntime() const
+{
+    return python_runtime_.get();
+}
+
+#ifdef _WIN32
 std::string_view QModelManager::argv0 = "./PreCess.exe";
+#else
+std::string_view QModelManager::argv0 = "./PreCess";
+#endif
 
 QModelManager* QModelManager::create(QQmlEngine*, QJSEngine*)
 {
