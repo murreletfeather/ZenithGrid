@@ -1,23 +1,25 @@
 set(CMAKE_AUTOMOC ON)
 
-precess_add_test(TestLanguageManager
-    TestLanguageManager.cpp
-    ../QLanguageManager.cpp
-)
-precess_test_link_libraries(TestLanguageManager
-    Qt${VTK_QT_VERSION}::Qml Core spdlog::spdlog
-)
-target_include_directories(TestLanguageManager PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
-    ${CMAKE_CURRENT_SOURCE_DIR}/../model
-)
-
-# 测试用翻译资源：微小 qm（/i18n/app_en_US.qm）经手工 lrelease 构建后内嵌进测试 exe，
-# 使 QLanguageManager 在测试中可走真实的"装载→卸载"路径（覆盖 zh→en→zh 回归）。
-# 注意：不走 qt_add_translations（避免被全局 update_translations 以无源码来源为由清除词条）。
-# 守卫：BUILD_TESTING=OFF 时 precess_add_test 不建目标，引用会配置失败；无 LinguistTools
-# 的平台（如 wasm）无 lrelease，整段跳过
+# TestLanguageManager 依赖测试用翻译资源（微小 qm 经 lrelease 生成后内嵌），整体受
+# BUILD_TESTING 与 LinguistTools 双重守卫：
+# - BUILD_TESTING=OFF 时 precess_add_test 不建目标，任何引用都会配置失败；
+# - 无 LinguistTools（如 wasm）时无 lrelease，qm 生成不了、测试断言无法成立。
 if(BUILD_TESTING AND Qt${VTK_QT_VERSION}LinguistTools_FOUND)
+    precess_add_test(TestLanguageManager
+        TestLanguageManager.cpp
+        ../QLanguageManager.cpp
+    )
+    precess_test_link_libraries(TestLanguageManager
+        Qt${VTK_QT_VERSION}::Qml Core spdlog::spdlog
+    )
+    target_include_directories(TestLanguageManager PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}/../model
+    )
+
+    # 测试用翻译资源：微小 qm（/i18n/app_en_US.qm）经手工 lrelease 构建后内嵌进测试 exe，
+    # 使 QLanguageManager 在测试中可走真实的"装载→卸载"路径（覆盖 zh→en→zh 回归）。
+    # 注意：不走 qt_add_translations（避免被全局 update_translations 以无源码来源为由清除词条）。
     set(_test_i18n_ts ${CMAKE_CURRENT_SOURCE_DIR}/app_en_US.ts)
     set(_test_i18n_qm ${CMAKE_CURRENT_BINARY_DIR}/app_en_US.qm)
     add_custom_command(

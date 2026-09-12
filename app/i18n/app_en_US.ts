@@ -713,7 +713,12 @@ Press F10 to toggle the console
         <translation>Language</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+28"/>
+        <source>该语言暂无翻译资源</source>
+        <translation>No translation resources for this language</translation>
+    </message>
+    <message>
+        <location line="+12"/>
         <source>主题设置 - 待开发</source>
         <translation>Theme settings - under development</translation>
     </message>

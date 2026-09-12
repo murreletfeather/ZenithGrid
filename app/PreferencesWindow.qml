@@ -87,6 +87,22 @@ Item {
                             Component.onCompleted: currentIndex = indexOfValue(sourceLanguage)
 
                             onActivated: QLanguageManager.setLanguage(currentValue)
+
+                            // 无翻译资源的语言置灰并提示（如无 LinguistTools 的构建），
+                            // 避免选择后静默回退源语言
+                            delegate: ItemDelegate {
+                                id: languageItem
+                                required property var modelData
+                                required property int index
+                                width: languageComboBox.width
+                                enabled: modelData.available
+                                highlighted: languageComboBox.highlightedIndex === index
+                                text: modelData.name
+
+                                ToolTip.visible: languageItem.hovered && !modelData.available
+                                ToolTip.text: qsTr("该语言暂无翻译资源")
+                                ToolTip.delay: 300
+                            }
                         }
                     }
 

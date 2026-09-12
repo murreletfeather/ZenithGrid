@@ -4,6 +4,7 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
 #include <QLocale>
 #include <QQmlEngine>
 #include <QSettings>
@@ -36,6 +37,7 @@ QVariantList QLanguageManager::languageOptions() const
         QVariantMap option;
         option.insert(QStringLiteral("code"), code);
         option.insert(QStringLiteral("name"), displayName(code));
+        option.insert(QStringLiteral("available"), isLanguageAvailable(code));
         options << option;
     }
     return options;
@@ -96,6 +98,17 @@ QString QLanguageManager::displayName(const QString& code) const
     if (code == QStringLiteral("en_US"))
         return QStringLiteral("English");
     return code;
+}
+
+bool QLanguageManager::isLanguageAvailable(const QString& code) const
+{
+    // 源语言无翻译文件需求，恒可用
+    if (code == kSourceLanguage)
+        return true;
+    if (!kSupportedLanguages.contains(code))
+        return false;
+    return QFile::exists(kTranslationPrefix + kCoreTranslationBase + QLatin1Char('_') + code
+        + QStringLiteral(".qm"));
 }
 
 bool QLanguageManager::loadTranslators(const QString& code)

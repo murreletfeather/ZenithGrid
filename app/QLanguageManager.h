@@ -36,7 +36,9 @@ public:
      */
     explicit QLanguageManager(QQmlEngine* engine = nullptr, QObject* parent = nullptr);
 
-    /// @brief 可供切换的语言列表，元素形如 {code, name}，name 使用该语言自身的名称（不翻译）
+    /// @brief 可供切换的语言列表，元素形如 {code, name, available}，name 使用该语言
+    /// 自身的名称（不翻译）；available 表示该语言是否有可用翻译资源（源语言恒为 true，
+    /// 其余语言探测核心 qm 是否存在，供界面置灰无翻译的选项）
     QVariantList languageOptions() const;
 
     /// @brief 当前生效的语言代码（如 zh_CN / en_US）
@@ -53,6 +55,10 @@ public:
 
     /// @brief 语言选项的显示名称，使用该语言自身的名称（不翻译）
     Q_INVOKABLE QString displayName(const QString& code) const;
+
+    /// @brief 该语言是否有可用翻译资源：源语言恒为 true，其余语言探测核心 qm
+    ///（:/i18n/app_<code>.qm）是否存在；无 LinguistTools 的构建此值为 false
+    Q_INVOKABLE bool isLanguageAvailable(const QString& code) const;
 
 signals:
     void currentLanguageChanged(const QString& code);
