@@ -133,7 +133,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: objectTreeDock
             uniqueName: "objectTree"
-            title: "对象树"
+            title: qsTr("对象树")
             ObjectTree {
                 anchors.fill: parent
             }
@@ -142,7 +142,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: sideBarDock
             uniqueName: "sideBar"
-            title: "属性列表"
+            title: qsTr("属性列表")
             SideBar {
                 anchors.fill: parent
             }
@@ -151,7 +151,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: attributeRenderDock
             uniqueName: "attributeRender"
-            title: "属性渲染"
+            title: qsTr("属性渲染")
             AttributeRenderPanel {
                 anchors.fill: parent
             }
@@ -160,7 +160,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: consoleDock
             uniqueName: "console"
-            title: "JavaScript 控制台"
+            title: qsTr("JavaScript 控制台")
 
             JavaScriptConsole {
                 anchors.fill: parent
@@ -170,7 +170,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: pythonConsoleDock
             uniqueName: "pythonConsole"
-            title: "Python 控制台"
+            title: qsTr("Python 控制台")
 
             PythonConsole {
                 anchors.fill: parent
@@ -180,7 +180,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: outputLogDock
             uniqueName: "outputLog"
-            title: "日志"
+            title: qsTr("日志")
 
             OutputLog {
                 anchors.fill: parent
@@ -190,7 +190,7 @@ ApplicationWindow {
         KDDW.DockWidget {
             id: preferencesDock
             uniqueName: "preferences"
-            title: "偏好设置"
+            title: qsTr("偏好设置")
 
             PreferencesWindow {
                 anchors.fill: parent
@@ -204,7 +204,7 @@ ApplicationWindow {
             addDockWidget(consoleDock, KDDW.KDDockWidgets.Location_OnBottom, null, Qt.size(0, 300), KDDW.KDDockWidgets.StartHidden)
             addDockWidget(pythonConsoleDock, KDDW.KDDockWidgets.Location_OnRight, null, Qt.size(450, 0), KDDW.KDDockWidgets.StartHidden)
             addDockWidget(outputLogDock, KDDW.KDDockWidgets.Location_OnBottom, null, Qt.size(0, 300), KDDW.KDDockWidgets.StartHidden)
-            addDockWidget(preferencesDock, KDDW.KDDockWidgets.Location_OnTop, objectTreeDock, Qt.size(0, 200), KDDW.KDDockWidgets.StartHidden)
+            addDockWidget(preferencesDock, KDDW.KDDockWidgets.Location_OnTop, objectTreeDock, Qt.size(0, 320), KDDW.KDDockWidgets.StartHidden)
         }
     }
 

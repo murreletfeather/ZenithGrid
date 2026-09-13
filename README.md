@@ -199,6 +199,7 @@ _For more examples, please refer to the [Documentation](https://gitee.com/preces
   * [ ] 软件选项设置管理
     * [x] 插件注册/注销管理
     * [ ] 偏好设置窗口：主题设置
+  * [x] 国际化（i18n）：基于 qsTr/tr + Qt Linguist 工具链的动态语言切换
   * [ ] Python解释器对软件的控制：参考HyperMesh等，激进点参考Blender
   * [ ] 菜单栏视图或窗口header按钮或窗口header右键菜单可以管理窗口状态：开关、选项页等。参考HyperMesh、Ansys，激进点的参考Visual Studio与Blender
   * [ ] 类Blender的自定义窗口布局预设

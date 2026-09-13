@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include "CreateFaceHandler.h"
 #include "ArgObject.h"
 #include "ArgType.h"
@@ -11,6 +12,15 @@
 #include <filesystem>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建面");
+}
+}
 
 namespace systems::edit {
 using namespace core;
@@ -67,7 +77,7 @@ std::any CreateFaceHandler::execute(ModelLayer& model, Index /*fallback_componen
 std::vector<ArgType> CreateFaceHandler::args_type() const
 {
     return {
-        ArgType { ArgTypeEnum::Selector, "选择点", "Vertex" }
+        ArgType { ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "选择点"), "Vertex" }
     };
 }
 }

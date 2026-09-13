@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include "TetGenHandler.h"
 #include "ArgObject.h"
 #include "ModelIOSystemBase.h"
@@ -8,6 +9,15 @@
 
 #include <filesystem>
 #include <spdlog/spdlog.h>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "TetGen体网格剖分");
+}
+}
 
 using namespace std;
 using namespace core;
@@ -68,8 +78,8 @@ std::vector<ArgType> systems::algo::TetGenHandler::args_type() const
 {
     // 复用TetGenCommand参数模型
     return {
-        ArgType { ArgTypeEnum::Path, "TetGen路径", "tetgen" },
-        ArgType { ArgTypeEnum::Combo, "是否仅保留最外层腔体", "是,否" },
-        ArgType { ArgTypeEnum::Float, "尺度参数（比1越大越稀疏）", "1.2" },
+        ArgType { ArgTypeEnum::Path, QT_TRANSLATE_NOOP("PreCess", "TetGen路径"), "tetgen" },
+        ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "是否仅保留最外层腔体"), QT_TRANSLATE_NOOP("PreCess", "是,否") },
+        ArgType { ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "尺度参数（比1越大越稀疏）"), "1.2" },
     };
 }

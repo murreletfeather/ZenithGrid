@@ -39,6 +39,12 @@ public:
     Q_INVOKABLE void removeComponent(int id);
     Q_INVOKABLE void removeMesh(int componentId);
     Q_INVOKABLE void removeGeometry(int componentId);
+    /**
+     * @brief 通知界面语言切换：各系统重发信息变更回调，QML 按新语言重建信息列表
+     *
+     * 翻译在 UI 读取层（各 Adaptor）经 QTranslator 完成，本方法仅驱动刷新。
+     */
+    Q_INVOKABLE void setLanguage(const QString& code);
     ModelLayer* getModelManager();
     QModelObserver* getModelObserver() const;
     QModelQuery* getModelQuery() const;

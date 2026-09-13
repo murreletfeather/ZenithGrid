@@ -4,6 +4,7 @@
  * @author 范成通 email 1941804585@qq.com
  */
 
+#include <QCoreApplication>
 #include "DimensionHandler.h"
 #include "ArgObject.h"
 #include "ComponentData.h"
@@ -41,6 +42,15 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "尺寸标注");
+}
+}
 
 namespace systems::feature {
 
@@ -910,14 +920,14 @@ std::string meshCentroid(const MeshData& mesh, ModelLayer& manager, const Select
 
 //! @brief 测量操作注册表：新增测量类型只需在此加一行，args_type/校验/分发全部由表生成
 const MeasureOp kMeasureOps[] = {
-    { MeasureType::Distance, "距离", "Vertex", "GeometryVertex", meshDistance, geomDistance },
-    { MeasureType::Angle, "角度", "Vertex,Edge", "GeometryVertex,GeometryEdge", meshAngle, geomAngle },
-    { MeasureType::Radius, "半径", "Vertex", "GeometryVertex,GeometryEdge", meshRadius, geomRadius },
-    { MeasureType::Length, "长度", "Edge", "GeometryEdge", meshLength, geomLength },
-    { MeasureType::Area, "面积", "Face", "GeometryFace", meshArea, geomArea },
-    { MeasureType::Volume, "体积", "Solid", "GeometrySolid", meshVolume, geomVolume },
-    { MeasureType::BoundingBox, "包围盒", "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshBoundingBox, geomBoundingBox },
-    { MeasureType::Centroid, "重心", "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshCentroid, geomCentroid },
+    { MeasureType::Distance, QT_TRANSLATE_NOOP("PreCess", "距离"), "Vertex", "GeometryVertex", meshDistance, geomDistance },
+    { MeasureType::Angle, QT_TRANSLATE_NOOP("PreCess", "角度"), "Vertex,Edge", "GeometryVertex,GeometryEdge", meshAngle, geomAngle },
+    { MeasureType::Radius, QT_TRANSLATE_NOOP("PreCess", "半径"), "Vertex", "GeometryVertex,GeometryEdge", meshRadius, geomRadius },
+    { MeasureType::Length, QT_TRANSLATE_NOOP("PreCess", "长度"), "Edge", "GeometryEdge", meshLength, geomLength },
+    { MeasureType::Area, QT_TRANSLATE_NOOP("PreCess", "面积"), "Face", "GeometryFace", meshArea, geomArea },
+    { MeasureType::Volume, QT_TRANSLATE_NOOP("PreCess", "体积"), "Solid", "GeometrySolid", meshVolume, geomVolume },
+    { MeasureType::BoundingBox, QT_TRANSLATE_NOOP("PreCess", "包围盒"), "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshBoundingBox, geomBoundingBox },
+    { MeasureType::Centroid, QT_TRANSLATE_NOOP("PreCess", "重心"), "Vertex,Edge,Face,Solid", "GeometryVertex,GeometryEdge,GeometryFace,GeometrySolid", meshCentroid, geomCentroid },
 };
 
 //! @brief 按下标查注册表，越界返回 nullptr
@@ -966,9 +976,9 @@ std::string selectorContent()
 void DimensionHandler::setup(FeatureRegistrar& reg, FeatureContext&)
 {
     // Combo 内容全部由测量操作注册表生成，名称与下标天然一致
-    reg.addParameter({ ArgTypeEnum::Combo, "测量类型", comboContent() + "|0" });
-    reg.addParameter({ ArgTypeEnum::Selector, "选择对象", selectorContent() });
-    reg.addMenuItem({ "工具", "尺寸标注" });
+    reg.addParameter({ ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "测量类型"), comboContent() + "|0" });
+    reg.addParameter({ ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "选择对象"), selectorContent() });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "工具"), "尺寸标注" });
 }
 
 std::any DimensionHandler::execute(FeatureContext& ctx)

@@ -66,6 +66,7 @@ ColumnLayout {
                     info: systemList[i],
                     execute: function(model, args) { system.call(pluginName, model, args) }
                 };
+                attachLanguageRefresh(App.activeOperation)
                 break;
             }
         }
@@ -85,6 +86,41 @@ ColumnLayout {
             isFeature: true,
             execute: function() { return QModelManager.featureSystem.invoke(info.name) }
         }
+        attachLanguageRefresh(App.activeOperation)
+    }
+
+    // 语言切换后的操作信息重建：按名从系统当前信息列表重新查找（Adaptor 已按新语言重建），
+    // 返回带当前参数的新操作对象；找不到时返回 null（由调用方保留原对象）
+    function attachLanguageRefresh(op) {
+        op.refresh = function(params) {
+            let fresh = null
+            if (op.isFeature) {
+                for (const i of QModelManager.featureSystem.featuresInfo) {
+                    if (i.name === op.info.name) {
+                        fresh = { info: i, isFeature: true, execute: op.execute }
+                        break
+                    }
+                }
+            } else {
+                for (const i of QModelManager.editSystem.editsInfo) {
+                    if (i.name === op.info.name) {
+                        fresh = { info: i, execute: op.execute }
+                        break
+                    }
+                }
+                if (!fresh) {
+                    for (const i of QModelManager.algorithmSystem.algorithmsInfo) {
+                        if (i.name === op.info.name) {
+                            fresh = { info: i, execute: op.execute }
+                            break
+                        }
+                    }
+                }
+            }
+            if (fresh)
+                fresh.defaultParameters = params.slice()
+            return fresh
+        }
     }
 
     // 功能 ribbon 结构：[{ name: 菜单名, groups: [{ name: 分组名, items: [QFeatureInfo] }] }]，由 rebuildFeatureMenus 维护
@@ -95,7 +131,7 @@ ColumnLayout {
         let menu_order = []
         let menus = {} // 菜单名 -> { group_order, groups: 分组名 -> [QFeatureInfo] }
         for (let info of QModelManager.featureSystem.featuresInfo) {
-            let segs = (info.menu_path || "功能").split('/')
+            let segs = (info.menu_path || qsTr("功能")).split('/')
             let menu_name = segs[0]
             let group_name = segs.length > 1 ? segs[1] : ""
             if (!menus[menu_name]) {
@@ -268,7 +304,7 @@ ColumnLayout {
             spacing: 0
 
             ToolButton {
-                text: "文件"
+                text: qsTr("文件")
                 checkable: true
                 checked: activeCategory === 0
                 onClicked: activeCategory = (activeCategory === 0) ? -1 : 0
@@ -303,7 +339,7 @@ ColumnLayout {
 
             ToolButton {
                 id: viewBtn
-                text: "视图"
+                text: qsTr("视图")
                 onClicked: viewMenu.popup(viewBtn, 0, viewBtn.height)
                 Menu {
                     id: viewMenu
@@ -320,43 +356,43 @@ ColumnLayout {
                     }
 
                     Action {
-                        text: "对象树"
+                        text: qsTr("对象树")
                         checkable: true
                         checked: objectTreeOpen
                         onToggled: objectTreeToggled()
                     }
                     Action {
-                        text: "属性列表"
+                        text: qsTr("属性列表")
                         checkable: true
                         checked: propertyListOpen
                         onToggled: propertyListToggled()
                     }
                     Action {
-                        text: "属性渲染"
+                        text: qsTr("属性渲染")
                         checkable: true
                         checked: attributeRenderOpen
                         onToggled: attributeRenderToggled()
                     }
                     Action {
-                        text: "JavaScript 控制台"
+                        text: qsTr("JavaScript 控制台")
                         checkable: true
                         checked: consoleOpen
                         onToggled: consoleToggled()
                     }
                     Action {
-                        text: "Python 控制台"
+                        text: qsTr("Python 控制台")
                         checkable: true
                         checked: pythonConsoleOpen
                         onToggled: pythonConsoleToggled()
                     }
                     Action {
-                        text: "日志"
+                        text: qsTr("日志")
                         checkable: true
                         checked: outputLogOpen
                         onToggled: outputLogToggled()
                     }
                     Action {
-                        text: "偏好设置"
+                        text: qsTr("偏好设置")
                         checkable: true
                         checked: preferencesOpen
                         onToggled: preferencesToggled()
@@ -386,7 +422,7 @@ ColumnLayout {
                 icon.color: "transparent"
                 Layout.fillHeight: true
                 display: ToolButton.TextUnderIcon
-                text: "导入"
+                text: qsTr("导入")
                 onClicked: {
                     if (root.isWasm)
                         QWasmBridge.pickFile(QModelManager.ioSystem.getDialogExtFilters(), true)
@@ -402,7 +438,7 @@ ColumnLayout {
                 icon.color: "transparent"
                 Layout.fillHeight: true
                 display: ToolButton.TextUnderIcon
-                text: "导出"
+                text: qsTr("导出")
                 onClicked: {
                     if (root.isWasm)
                         wasmExportDialog.openDialog()
@@ -418,7 +454,7 @@ ColumnLayout {
                 icon.color: "transparent"
                 Layout.fillHeight: true
                 display: ToolButton.TextUnderIcon
-                text: "偏好设置"
+                text: qsTr("偏好设置")
                 onClicked: preferencesToggled()
             }
 
@@ -477,6 +513,8 @@ ColumnLayout {
                                 App.selection.selectionInvalidated()
                             }
                         }
+                        // 与 activatePlugin 路径一致：语言切换后按名重建信息
+                        root.attachLanguageRefresh(App.activeOperation)
                     }
                 }
             }

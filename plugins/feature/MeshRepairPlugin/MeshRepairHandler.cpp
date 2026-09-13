@@ -6,7 +6,8 @@
 // CGAL 头文件必须置于所有 OCC 相关头文件之前：
 // OCC 的 Standard_Handle.hxx 将 Handle 定义为宏（Handle(X) -> opencascade::handle<X>），
 // 若先引入 OCC，宏会污染后续解析的 CGAL/Handle.h 类声明，造成大片级联语法错误
-#include <CGAL/boost/graph/border.h>
+#include <QCoreApplication>
+#include <CGAL/Polygon_mesh_processing/border.h>
 #include <CGAL/Polygon_mesh_processing/repair_degeneracies.h>
 #include <CGAL/Polygon_mesh_processing/self_intersections.h>
 #include <CGAL/Polygon_mesh_processing/triangulate_hole.h>
@@ -30,6 +31,15 @@
 #include <optional>
 #include <sstream>
 #include <string>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "网格修复");
+}
+}
 
 namespace systems::feature {
 
@@ -182,17 +192,17 @@ void MeshRepairHandler::setup(FeatureRegistrar& reg, FeatureContext&)
 {
     reg.addParameter({
         ArgTypeEnum::Selector,
-        "目标 Component",
+        QT_TRANSLATE_NOOP("PreCess", "目标 Component"),
         "Component",
-        "选择要执行修复操作的 Component",
+        QT_TRANSLATE_NOOP("PreCess", "选择要执行修复操作的 Component"),
     });
     reg.addParameter({
         ArgTypeEnum::Combo,
-        "操作类型",
-        "补洞,自交检测,退化清理|0",
-        "选择要执行的网格修复操作",
+        QT_TRANSLATE_NOOP("PreCess", "操作类型"),
+        QT_TRANSLATE_NOOP("PreCess", "补洞,自交检测,退化清理|0"),
+        QT_TRANSLATE_NOOP("PreCess", "选择要执行的网格修复操作"),
     });
-    reg.addMenuItem({ "功能/网格", "网格修复" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "功能/网格"), "网格修复" });
 }
 
 std::any MeshRepairHandler::execute(FeatureContext& ctx)

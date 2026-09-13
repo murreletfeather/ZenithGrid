@@ -47,6 +47,19 @@ Item{
         }
     }
 
+    // 语言切换后重建当前操作：信息对象（参数名/描述/选项）按新语言重新取得，参数值保留。
+    // 直接以新操作对象替换（不经"置空"过渡）：避免触发 deactivate/取消功能渲染，
+    // 面板仍会重建（新 info 引用的 arg_types 与旧引用不同）
+    Connections {
+        target: QLanguageManager
+        function onCurrentLanguageChanged() {
+            const op = App.activeOperation
+            if (!op)
+                return
+            App.activeOperation = (op.refresh && op.refresh(root.parameters)) || op
+        }
+    }
+
     RowLayout{
         id: buttonRow
         anchors.top: parent.top
@@ -55,7 +68,7 @@ Item{
         height: 30
         Button{
             id: commitButton
-            text: "执行"
+            text: qsTr("执行")
             enabled: !!(root.activeOp && root.activeOp.info)
             Layout.fillWidth: true
             onClicked:{
@@ -74,7 +87,7 @@ Item{
         }
         Button{
             id: confirmButton
-            text: "确认"
+            text: qsTr("确认")
             enabled: !!(root.activeOp && root.activeOp.info)
             Layout.fillWidth: true
             // 确认 = 结束当前操作，取消操作选中；再次执行需重新点选算法
@@ -177,11 +190,23 @@ Item{
 
             Component.onCompleted: {
                 if(model && model.content){
-                    let parts = model.content.split("|")
+                    // 先整串翻译再拆分：词表条目为整串（是,否 / 补洞,自交检测,退化清理|0）。
+                    // 整串未命中时逐项翻译兜底：注册表运行时拼接的 Combo 内容（如尺寸标注
+                    // 的测量类型）无整串条目，ts 中只有单项；逐项查 PreCess 上下文即可命中
+                    let translated = qsTranslate("PreCess", model.content)
+                    if (translated === model.content) {
+                        const barIndex = model.content.indexOf("|")
+                        const itemsPart = barIndex >= 0 ? model.content.substring(0, barIndex) : model.content
+                        const defaultPart = barIndex >= 0 ? model.content.substring(barIndex) : ""
+                        translated = itemsPart.split(",").map(function(item) {
+                            return qsTranslate("PreCess", item)
+                        }).join(",") + defaultPart
+                    }
+                    let parts = translated.split("|")
                     let items = parts[0].split(",")
                     comboModel.clear()
                     for(let i=0; i<items.length; i++){
-                        comboModel.append({"text":items[i]})
+                        comboModel.append({"text": items[i]})
                     }
                     const parameterValue = root.parameters[index]
                     let defaultIndex = parameterValue !== undefined
@@ -352,12 +377,12 @@ Item{
             }
             Text{
                 id:selectedItems
-                text: value ? value.size():"无"
+                text: value ? value.size() : qsTr("无")
             }
 
             Button{
                 id: selectStartButton
-                text: "开始选择"
+                text: qsTr("开始选择")
                 checked: App.selection.listeningSelectorIndex === index
                 onClicked: {
                     if (!checked) {

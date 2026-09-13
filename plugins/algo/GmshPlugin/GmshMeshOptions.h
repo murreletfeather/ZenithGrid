@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QCoreApplication>
+
 #include <array>
 #include <cstddef>
 
@@ -50,13 +52,12 @@ enum class GmshRecombinationAlgorithm {
 };
 
 // 前端 Combo 文案和下面的取值数组必须保持同一顺序。
-inline constexpr const char* kGmshSurfaceMeshTypeComboText =
-    "三角形,四边形主导,纯四边形,结构化四边形";
+// QT_TRANSLATE_NOOP 仅用于 lupdate 提取，编译期展开为源串，显示层按当前语言翻译。
+inline constexpr const char* kGmshSurfaceMeshTypeComboText = QT_TRANSLATE_NOOP("PreCess", "三角形,四边形主导,纯四边形,结构化四边形");
 
-inline constexpr const char* kGmshMeshAlgorithmComboText =
-    "默认(Frontal-Delaunay),MeshAdapt,Automatic,Delaunay,"
-    "Frontal-Delaunay,BAMG,Frontal-Delaunay for Quads,"
-    "Packing Parallelograms";
+inline constexpr const char* kGmshMeshAlgorithmComboText = QT_TRANSLATE_NOOP("PreCess", "默认(Frontal-Delaunay),MeshAdapt,Automatic,Delaunay,"
+                                                                                        "Frontal-Delaunay,BAMG,Frontal-Delaunay for Quads,"
+                                                                                        "Packing Parallelograms");
 
 inline constexpr std::array<int, 8> kGmshMeshAlgorithmComboValues {
     static_cast<int>(GmshMeshAlgorithm::FrontalDelaunay),
@@ -69,8 +70,7 @@ inline constexpr std::array<int, 8> kGmshMeshAlgorithmComboValues {
     static_cast<int>(GmshMeshAlgorithm::PackingParallelograms)
 };
 
-inline constexpr const char* kGmshRecombinationAlgorithmComboText =
-    "Simple,Blossom|1";
+inline constexpr const char* kGmshRecombinationAlgorithmComboText = QT_TRANSLATE_NOOP("PreCess", "Simple,Blossom|1");
 
 inline constexpr std::array<int, 2> kGmshRecombinationAlgorithmComboValues {
     static_cast<int>(GmshRecombinationAlgorithm::Simple),

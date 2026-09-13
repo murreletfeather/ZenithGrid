@@ -65,7 +65,7 @@ Item {
             spacing: 4
 
             Button {
-                text: "帮助"
+                text: qsTr("帮助")
                 flat: true
                 onClicked: {
                     // 与输入 help() 等价：以命令形式执行，展示交互方式
@@ -76,7 +76,7 @@ Item {
             }
 
             Button {
-                text: "清空窗口"
+                text: qsTr("清空窗口")
                 flat: true
                 onClicked: {
                     outputText.text = ""
@@ -105,7 +105,7 @@ Item {
             TextField {
                 id: inputField
                 Layout.fillWidth: true
-                placeholderText: "输入 Python 代码..."
+                placeholderText: qsTr("输入 Python 代码...")
                 color: "#333333"
                 font.family: "Courier New"
                 font.pixelSize: 12
@@ -133,13 +133,13 @@ Item {
                     if (pyConsole.buffer.length > 0) {
                         pyConsole.buffer = ""
                         promptText.text = ">"
-                        appendOutput("（已放弃续行）\n\n")
+                        appendOutput(qsTr("（已放弃续行）\n\n"))
                     }
                 }
             }
 
             Button {
-                text: "执行"
+                text: qsTr("执行")
                 highlighted: true
                 onClicked: {
                     if (inputField.text.trim() !== "" || pyConsole.buffer.length > 0) {
@@ -166,13 +166,13 @@ Item {
         booted = true
         const runtime = QModelManager.pythonRuntime
         runtime.initialize()
-        appendOutput("=== PreCess Python 控制台 ===\n")
-        appendOutput("按 F11 切换控制台显示\n")
+        appendOutput(qsTr("=== PreCess Python 控制台 ===\n"))
+        appendOutput(qsTr("按 F11 切换控制台显示\n"))
         if (runtime.available) {
-            appendOutput("解释器: " + runtime.version() + "\n")
+            appendOutput(qsTr("解释器: ") + runtime.version() + "\n")
             appendOutput("----------------------------\n")
-            appendOutput("import precess 后经 precess.current 操作当前会话\n")
-            appendOutput("输入 help() 查看控制台指南（help(对象) 查看文档）\n\n")
+            appendOutput(qsTr("import precess 后经 precess.current 操作当前会话\n"))
+            appendOutput(qsTr("输入 help() 查看控制台指南（help(对象) 查看文档）\n\n"))
         } else {
             appendOutput("----------------------------\n")
             appendOutput("✗ " + runtime.lastError() + "\n\n")

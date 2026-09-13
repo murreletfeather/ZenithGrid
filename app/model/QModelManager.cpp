@@ -115,6 +115,16 @@ void QModelManager::removeGeometry(int componentId)
     session_->removeGeometry(componentId);
 }
 
+void QModelManager::setLanguage(const QString&)
+{
+    // 通知各 Adaptor 重发信息变更信号：QML 重建 ribbon/编辑页/算法页并重新读取信息，
+    // 各 Adaptor 在读取时经 QTranslator（"PreCess" 上下文）返回新语言文本
+    feature_adaptor_->notifyLanguageChanged();
+    edit_adaptor_->notifyLanguageChanged();
+    algo_adaptor_->notifyLanguageChanged();
+    io_adaptor_->notifyLanguageChanged();
+}
+
 ModelLayer* QModelManager::getModelManager()
 {
     return &session_->model();

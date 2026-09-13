@@ -1,4 +1,5 @@
 #include "TreeModel.h"
+#include "DisplayTranslate.h"
 #include "QModelQuery.h"
 
 #include <QVariantList>
@@ -67,7 +68,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     switch (role) {
     case Qt::DisplayRole:
     case NameRole:
-        return node->name;
+        // 模型名与组件名（含自动命名 Point_1/component_3 等）一律透传；
+        // 仅“几何/网格”与“2D/3D/点/边/面/体”层级标签按界面语言翻译
+        if (node->nodeType == TreeNode::NodeType::Model || node->nodeType == TreeNode::NodeType::Component)
+            return node->name;
+        return systems::displayTranslateHierarchyLabel(node->name);
 
     case NumberRole:
         return node->number;
@@ -345,6 +350,15 @@ void TreeModel::setAllVisibility(bool visible)
         emitDescendantDataChanged(index(r, 0, QModelIndex()));
 }
 
+void TreeModel::notifyNamesChanged()
+{
+    for (int row = 0; row < rowCount(); ++row) {
+        QModelIndex top = index(row, 0);
+        emit dataChanged(top, top, { NameRole });
+        emitDescendantDataChanged(top, { NameRole });
+    }
+}
+
 void TreeModel::syncSubNodes(TreeNode* node)
 {
     for (TreeNode* child : node->children) {
@@ -374,13 +388,13 @@ void TreeModel::propagateUp(TreeNode* node) {
     }
 }
 
-void TreeModel::emitDescendantDataChanged(const QModelIndex& parentIndex)
+void TreeModel::emitDescendantDataChanged(const QModelIndex& parentIndex, const QVector<int>& roles)
 {
     int count = rowCount(parentIndex);
     for (int i = 0; i < count; ++i) {
         QModelIndex child = index(i, 0, parentIndex);
-        emit dataChanged(child, child, { IsVisibleRole });
-        emitDescendantDataChanged(child);
+        emit dataChanged(child, child, roles);
+        emitDescendantDataChanged(child, roles);
     }
 }
 

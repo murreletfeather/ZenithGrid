@@ -54,6 +54,11 @@ public:
      */
     Q_INVOKABLE QString getDialogExtFilters() const;
 
+    /**
+     * @brief 通知界面语言切换：重发 dialogNameFiltersChanged，QML 按新语言重新读取文件过滤器
+     */
+    void notifyLanguageChanged() { emit dialogNameFiltersChanged(); }
+
 signals:
     void dialogNameFiltersChanged();
 

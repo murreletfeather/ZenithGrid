@@ -12,6 +12,16 @@
 #include <TopoDS_Shape.hxx>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建点");
+}
+}
 namespace systems::feature {
 namespace {
     /**
@@ -29,12 +39,12 @@ void CreatePointHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createPointInfo 保持一致；
     // 菜单与图标复用原"几何"页"点"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Float, "X 坐标", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "Y 坐标", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "Z 坐标", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Combo, "写入目标",
-        "添加到当前 Component,新建 Component,新建 Model|0", "选择几何创建结果的组织位置" });
-    reg.addMenuItem({ "几何", "创建点", "qrc:/images/toolbar/Geometry/point.svg" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "X 坐标"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "Y 坐标"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "Z 坐标"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "写入目标"),
+        QT_TRANSLATE_NOOP("PreCess", "添加到当前 Component,新建 Component,新建 Model|0"), QT_TRANSLATE_NOOP("PreCess", "选择几何创建结果的组织位置") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "创建点"), "qrc:/images/toolbar/Geometry/point.svg" });
 }
 
 std::any CreatePointHandler::execute(FeatureContext& ctx)

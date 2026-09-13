@@ -1,5 +1,6 @@
 #include "QEditSystemAdaptor.h"
 #include "ArgObject.h"
+#include "DisplayTranslate.h"
 #include "EditSystem.h"
 #include "QArgObject.h"
 #include "QEditInfo.h"
@@ -55,12 +56,12 @@ QList<QEditInfo*> QEditSystemAdaptor::getEditsInfo() const
     for (const auto& edit_info : edit_system_->getEditInfos()) {
         QList<QArgType*> args;
         for (const auto& arg_type : edit_info->arg_types) {
-            args.append(new QArgType(arg_type));
+            args.append(new QArgType(displayTranslatedArg(arg_type)));
         }
         infos.append(new QEditInfo(
             QString::fromStdString(edit_info->name),
-            QString::fromStdString(edit_info->display_name),
-            QString::fromStdString(edit_info->description),
+            displayTranslate(edit_info->display_name),
+            displayTranslate(edit_info->description),
             std::move(args)));
     }
     return infos;

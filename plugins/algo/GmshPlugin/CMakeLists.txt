@@ -9,6 +9,7 @@ endif()
 precess_add_algo_plugin(GmshPlugin
     SOURCES
         "GmshMeshHandler.cpp"
+        "GmshMeshOptions.h"
         "IncrementalMeshTools.cpp"
     PLUGIN_H "GmshMeshPlugin.h"
 )

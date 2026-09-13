@@ -56,6 +56,15 @@ Pane {
         function onComponentChanged(componentId) { refreshTimer.restart() }
     }
 
+    // 语言切换：轻量重发 NameRole 变更（保留展开/选中状态），仅层级标签
+    //（几何/网格、2D/3D/点/边/面/体）按新语言重新取值；模型/组件名不翻译
+    Connections {
+        target: QLanguageManager
+        function onCurrentLanguageChanged() {
+            treeModel.notifyNamesChanged()
+        }
+    }
+
     Rectangle {
         id: headerBar
         anchors { left: parent.left; right: parent.right; top: parent.top }
@@ -307,7 +316,7 @@ Pane {
 
                 MenuItem {
                     id: hideItem
-                    text: "隐藏"
+                    text: qsTr("隐藏")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -330,7 +339,7 @@ Pane {
 
                 MenuItem {
                     id: isolateItem
-                    text: "隔离"
+                    text: qsTr("隔离")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -361,7 +370,7 @@ Pane {
 
                 MenuItem {
                     id: showItem
-                    text: "显示"
+                    text: qsTr("显示")
                     implicitHeight: 30
 
                     background: Rectangle {
@@ -386,7 +395,7 @@ Pane {
 
                 MenuItem {
                     id: deleteItem
-                    text: "删除"
+                    text: qsTr("删除")
                     implicitHeight: 30
 
                     background: Rectangle {

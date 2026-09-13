@@ -85,6 +85,12 @@ if(NOT freetype_FOUND)
 endif()
 
 find_package("Qt${VTK_QT_VERSION}" REQUIRED COMPONENTS Gui Quick QuickControls2 Svg)
+# 翻译工具链（lupdate/lrelease）为可选宿主组件：wasm 等交叉/精简 Qt 无 LinguistTools 时
+# 跳过 app 侧 qt_add_translations 与 check_translations（界面回退源语言），不阻断构建
+find_package("Qt${VTK_QT_VERSION}" QUIET COMPONENTS LinguistTools)
+if(NOT Qt${VTK_QT_VERSION}LinguistTools_FOUND)
+    message(STATUS "未找到 Qt LinguistTools，跳过翻译构建（界面保持源语言）")
+endif()
 message(STATUS "QT_VERSION: Qt${VTK_QT_VERSION}")
 qt_policy(SET QTP0001 NEW)
 qt_standard_project_setup()

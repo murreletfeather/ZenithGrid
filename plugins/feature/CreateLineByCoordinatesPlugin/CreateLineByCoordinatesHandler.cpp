@@ -12,6 +12,16 @@
 #include <TopoDS_Shape.hxx>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建直线边（坐标）");
+}
+}
 namespace systems::feature {
 namespace {
     /**
@@ -29,15 +39,15 @@ void CreateLineByCoordinatesHandler::setup(FeatureRegistrar& reg, FeatureContext
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createLineByCoordinatesInfo 保持一致；
     // 菜单与图标复用原"几何"页"直线边（坐标）"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Float, "起点 X", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "起点 Y", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "起点 Z", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "终点 X", "10", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "终点 Y", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "终点 Z", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Combo, "写入目标",
-        "添加到当前 Component,新建 Component,新建 Model|0", "选择几何创建结果的组织位置" });
-    reg.addMenuItem({ "几何", "创建直线边（坐标）", "qrc:/images/toolbar/Geometry/line_coord.svg" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "起点 X"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "起点 Y"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "起点 Z"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "终点 X"), "10", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "终点 Y"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "终点 Z"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "写入目标"),
+        QT_TRANSLATE_NOOP("PreCess", "添加到当前 Component,新建 Component,新建 Model|0"), QT_TRANSLATE_NOOP("PreCess", "选择几何创建结果的组织位置") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "创建直线边（坐标）"), "qrc:/images/toolbar/Geometry/line_coord.svg" });
 }
 
 std::any CreateLineByCoordinatesHandler::execute(FeatureContext& ctx)

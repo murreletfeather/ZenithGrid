@@ -7,6 +7,7 @@ import app.model
 
 Item {
     id: root
+    clip: true
 
     ColumnLayout {
         anchors.fill: parent
@@ -32,7 +33,7 @@ Item {
                     }
 
                     ToolButton {
-                        text: "主题"
+                        text: qsTr("主题")
                         Layout.fillWidth: true
                         checkable: true
                         checked: true
@@ -41,7 +42,7 @@ Item {
                     }
 
                     ToolButton {
-                        text: "插件"
+                        text: qsTr("插件")
                         Layout.fillWidth: true
                         checkable: true
                         ButtonGroup.group: categoryGroup
@@ -63,11 +64,57 @@ Item {
                 Layout.margins: 8
                 currentIndex: 0
 
-                Item {
-                    Label {
-                        anchors.centerIn: parent
-                        text: "主题设置 - 待开发"
-                        color: "#888"
+                // 主题面板：语言选择器置顶左上锚定，主题其余设置待开发
+                ColumnLayout {
+                    RowLayout {
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                        Layout.margins: 8
+                        spacing: 6
+
+                        Label {
+                            text: qsTr("语言")
+                        }
+
+                        ComboBox {
+                            id: languageComboBox
+                            model: QLanguageManager.languageOptions
+                            textRole: "name"
+                            valueRole: "code"
+
+                            // 绑定建立在自己的属性上，外部语言变化（启动恢复等）时同步选择框
+                            property string sourceLanguage: QLanguageManager.currentLanguage
+                            onSourceLanguageChanged: currentIndex = indexOfValue(sourceLanguage)
+                            Component.onCompleted: currentIndex = indexOfValue(sourceLanguage)
+
+                            onActivated: QLanguageManager.setLanguage(currentValue)
+
+                            // 无翻译资源的语言置灰并提示（如无 LinguistTools 的构建），
+                            // 避免选择后静默回退源语言
+                            delegate: ItemDelegate {
+                                id: languageItem
+                                required property var modelData
+                                required property int index
+                                width: languageComboBox.width
+                                enabled: modelData.available
+                                highlighted: languageComboBox.highlightedIndex === index
+                                text: modelData.name
+
+                                ToolTip.visible: languageItem.hovered && !modelData.available
+                                ToolTip.text: qsTr("该语言暂无翻译资源")
+                                ToolTip.delay: 300
+                            }
+                        }
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        Label {
+                            anchors.centerIn: parent
+                            text: qsTr("主题设置 - 待开发")
+                            color: "#888"
+                        }
                     }
                 }
 
@@ -129,14 +176,14 @@ Item {
             Item { Layout.fillWidth: true }
 
             Button {
-                text: "注册"
+                text: qsTr("注册")
                 implicitWidth: 70
                 implicitHeight: 26
                 onClicked: pluginFileDialog.open()
             }
 
             Button {
-                text: "注销"
+                text: qsTr("注销")
                 implicitWidth: 70
                 implicitHeight: 26
                 enabled: pluginListView.currentIndex !== -1
@@ -156,13 +203,15 @@ Item {
             Item { Layout.fillWidth: true }
 
             Button {
-                text: "恢复默认"
+                text: qsTr("恢复默认")
                 implicitWidth: 70
                 implicitHeight: 26
+                // 默认语言为简体中文：恢复默认即切回源语言（卸载翻译器，界面文案回中文）
+                onClicked: QLanguageManager.setLanguage("zh_CN")
             }
 
             Button {
-                text: "应用"
+                text: qsTr("应用")
                 implicitWidth: 70
                 implicitHeight: 26
             }
@@ -171,9 +220,9 @@ Item {
 
     FileDialog {
         id: pluginFileDialog
-        title: "请选择插件文件"
+        title: qsTr("请选择插件文件")
         fileMode: FileDialog.OpenFile
-        nameFilters: ["Plugin files (*.dll *.so)", "All files (*)"]
+        nameFilters: [qsTr("Plugin files (*.dll *.so)"), qsTr("All files (*)")]
 
         onAccepted: {
             var result = QModelManager.systemPluginManager.registerPlugin(selectedFile)
@@ -185,13 +234,13 @@ Item {
 
     Dialog {
         id: registerFailureDialog
-        title: "注册失败"
+        title: qsTr("注册失败")
         standardButtons: Dialog.Ok
         modal: true
         anchors.centerIn: parent
 
         Label {
-            text: "插件注册失败"
+            text: qsTr("插件注册失败")
         }
     }
 }

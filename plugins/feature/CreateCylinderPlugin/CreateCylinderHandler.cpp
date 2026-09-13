@@ -13,6 +13,16 @@
 #include <cmath>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建圆柱体");
+}
+}
 namespace systems::feature {
 namespace {
     /**
@@ -36,18 +46,18 @@ void CreateCylinderHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createCylinderInfo 保持一致；
     // 菜单与图标复用原"几何"页"圆柱体"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Float, "底面圆心 X", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "底面圆心 Y", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "底面圆心 Z", "0", "" });
-    reg.addParameter({ ArgTypeEnum::Float, "半径", "10", "必须大于几何容差" });
-    reg.addParameter({ ArgTypeEnum::Float, "高度", "20", "必须大于几何容差" });
-    reg.addParameter({ ArgTypeEnum::Float, "轴向 X", "0", "轴向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "轴向 Y", "0", "轴向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "轴向 Z", "1", "轴向不能为零向量" });
-    reg.addParameter({ ArgTypeEnum::Float, "扫掠角（度）", "360", "范围为 (0, 360]" });
-    reg.addParameter({ ArgTypeEnum::Combo, "写入目标",
-        "添加到当前 Component,新建 Component,新建 Model|0", "选择几何创建结果的组织位置" });
-    reg.addMenuItem({ "几何", "创建圆柱体", "qrc:/images/toolbar/Geometry/cylinder.svg" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "底面圆心 X"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "底面圆心 Y"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "底面圆心 Z"), "0", "" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "半径"), "10", QT_TRANSLATE_NOOP("PreCess", "必须大于几何容差") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "高度"), "20", QT_TRANSLATE_NOOP("PreCess", "必须大于几何容差") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "轴向 X"), "0", QT_TRANSLATE_NOOP("PreCess", "轴向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "轴向 Y"), "0", QT_TRANSLATE_NOOP("PreCess", "轴向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "轴向 Z"), "1", QT_TRANSLATE_NOOP("PreCess", "轴向不能为零向量") });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "扫掠角（度）"), "360", QT_TRANSLATE_NOOP("PreCess", "范围为 (0, 360]") });
+    reg.addParameter({ ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "写入目标"),
+        QT_TRANSLATE_NOOP("PreCess", "添加到当前 Component,新建 Component,新建 Model|0"), QT_TRANSLATE_NOOP("PreCess", "选择几何创建结果的组织位置") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "创建圆柱体"), "qrc:/images/toolbar/Geometry/cylinder.svg" });
 }
 
 std::any CreateCylinderHandler::execute(FeatureContext& ctx)

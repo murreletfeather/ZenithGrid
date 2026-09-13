@@ -18,6 +18,8 @@ qt_add_qml_module(${MYNAME}
             TreeModel.cpp
             QLogManager.h
             QLogManager.cpp
+            QLanguageManager.h
+            QLanguageManager.cpp
         QML_FILES
             Main.qml
             AppToolbar.qml
@@ -31,6 +33,111 @@ qt_add_qml_module(${MYNAME}
             PreferencesWindow.qml
             OutputLog.qml
 )
+
+# ===== 国际化（拆分协作式）=====
+# 中文为源语言，仅打包英文翻译；每插件一份独立 .ts（归属各插件目录，团队成员各自维护，
+# 互不冲突），主 ts 只含主程序 QML/适配器上下文。各 ts 独立生成 <基名>_en_US.qm；
+# 注意：qt_add_translations 多次调用 + RESOURCE_PREFIX 会共用内部 qrc 名互相覆盖，
+# 故一律用 QM_FILES_OUTPUT_VARIABLE 收集产物，最后统一一次 qt_add_resources 嵌入主程序。
+# QLanguageManager 运行期枚举 :/i18n 下的 *_<语言>.qm，无 C++ 侧插件清单需要同步。
+# 无 LinguistTools（wasm 等）时整段跳过：不生成/不嵌入 qm，QLanguageManager 找不到资源即回退源语言
+
+if(Qt${VTK_QT_VERSION}LinguistTools_FOUND)
+set(_PRECESS_I18N_QM_FILES "")
+
+# 1) 主程序翻译：QML 文件（经 ${MYNAME}）与系统适配器源码
+qt_add_translations(${MYNAME}
+    TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/i18n/app_en_US.ts
+    LUPDATE_OPTIONS -locations relative
+    LUPDATE_TARGET PreCess_lupdate
+    LRELEASE_TARGET PreCess_lrelease
+    SOURCE_TARGETS
+        # 必须包含 app 目标本体：显式传 SOURCE_TARGETS 时 lupdate 只扫描列表内目标，
+        # 遗漏主目标会把 QML 源串标 vanished、被 lrelease 丢弃（qm 缺 QML 上下文）
+        ${MYNAME}
+        FeatureSystemQml EditSystemQml AlgorithmSystemQml IOSystemQml
+    QM_FILES_OUTPUT_VARIABLE _PRECESS_MAIN_QM
+)
+list(APPEND _PRECESS_I18N_QM_FILES ${_PRECESS_MAIN_QM})
+
+# 2) 插件翻译：每插件一份 ts（插件负责人各自维护），源集为该插件静态库
+set(_PRECESS_I18N_PLUGINS
+    feature/FeatureDemoPlugin/FeatureDemoPluginlib
+    feature/MeasurePlugin/MeasurePluginlib
+    feature/DimensionPlugin/DimensionPluginlib
+    feature/MeshQualityPlugin/MeshQualityPluginlib
+    feature/MeshRepairPlugin/MeshRepairPluginlib
+    edit/CreateFacePlugin/CreateFacePluginlib
+    edit/DeleteFacePlugin/DeleteFacePluginlib
+    algo/TetGenPlugin/TetGenPluginlib
+    algo/TetGenLibPlugin/TetGenLibPluginlib
+    algo/GmshPlugin/GmshPluginlib
+    algo/CmdExecutePlugin/CmdExecutePluginlib
+    feature/CreateBoxPlugin/CreateBoxPluginlib
+    feature/CreateConePlugin/CreateConePluginlib
+    feature/CreateCylinderPlugin/CreateCylinderPluginlib
+    feature/CreateDiskFacePlugin/CreateDiskFacePluginlib
+    feature/CreateFaceFromEdgesPlugin/CreateFaceFromEdgesPluginlib
+    feature/CreateLineByCoordinatesPlugin/CreateLineByCoordinatesPluginlib
+    feature/CreateLineFromVerticesPlugin/CreateLineFromVerticesPluginlib
+    feature/CreatePointPlugin/CreatePointPluginlib
+    feature/CreateRectangleFacePlugin/CreateRectangleFacePluginlib
+    feature/CreateSpherePlugin/CreateSpherePluginlib
+    feature/DeleteGeometryPlugin/DeleteGeometryPluginlib
+    feature/ExtrudeFacePlugin/ExtrudeFacePluginlib
+    feature/MeshBooleanPlugin/MeshBooleanPluginlib
+    feature/ScalePreviewPlugin/ScalePreviewPluginlib
+)
+foreach(_plugin_entry IN LISTS _PRECESS_I18N_PLUGINS)
+    string(REGEX MATCH "^([^/]+)/([^/]+)/([^/]+)$" _m "${_plugin_entry}")
+    set(_plugin_cat "${CMAKE_MATCH_1}")
+    set(_plugin_name "${CMAKE_MATCH_2}")
+    set(_plugin_lib "${CMAKE_MATCH_3}")
+    # 平台裁剪（如 wasm 不建 CmdExecutePlugin/TetGenPlugin）：目标不存在则跳过其翻译构建
+    if(NOT TARGET ${_plugin_lib})
+        continue()
+    endif()
+    set(_plugin_ts "${CMAKE_SOURCE_DIR}/plugins/${_plugin_cat}/${_plugin_name}/i18n/${_plugin_name}_en_US.ts")
+    qt_add_translations(${MYNAME}
+        TS_FILES ${_plugin_ts}
+        LUPDATE_OPTIONS -locations relative
+        LUPDATE_TARGET ${_plugin_name}_lupdate
+        LRELEASE_TARGET ${_plugin_name}_lrelease
+        SOURCE_TARGETS ${_plugin_lib}
+        QM_FILES_OUTPUT_VARIABLE _plugin_qm
+    )
+    list(APPEND _PRECESS_I18N_QM_FILES ${_plugin_qm})
+endforeach()
+
+# 3) 统一嵌入：全部 qm 以 /i18n 前缀进入主程序资源（rcc 在 qm 生成之后运行）
+set(_PRECESS_I18N_TS_FILES ${CMAKE_CURRENT_SOURCE_DIR}/i18n/app_en_US.ts)
+add_custom_target(PreCess_i18n_qms DEPENDS ${_PRECESS_I18N_QM_FILES})
+add_dependencies(${MYNAME} PreCess_i18n_qms)
+foreach(_qm_file IN LISTS _PRECESS_I18N_QM_FILES)
+    get_filename_component(_qm_name "${_qm_file}" NAME)
+    set_source_files_properties(${_qm_file} PROPERTIES
+        GENERATED TRUE
+        QT_RESOURCE_ALIAS "${_qm_name}"
+    )
+endforeach()
+qt_add_resources(${MYNAME} PreCess_translations PREFIX "/i18n" FILES ${_PRECESS_I18N_QM_FILES})
+
+# 翻译检查：构建时校验全部 ts 无 vanished 条目（lupdate 扫描范围缩水的回归防护）
+foreach(_plugin_entry IN LISTS _PRECESS_I18N_PLUGINS)
+    string(REGEX MATCH "^([^/]+)/([^/]+)/([^/]+)$" _m "${_plugin_entry}")
+    list(APPEND _PRECESS_I18N_TS_FILES
+        "${CMAKE_SOURCE_DIR}/plugins/${CMAKE_MATCH_1}/${CMAKE_MATCH_2}/i18n/${CMAKE_MATCH_2}_en_US.ts")
+endforeach()
+add_custom_target(check_translations
+    COMMAND ${CMAKE_COMMAND} "-DTS_FILES=${_PRECESS_I18N_TS_FILES}"
+            -P ${CMAKE_SOURCE_DIR}/cmake/CheckTranslations.cmake
+    COMMENT "检查全部翻译源文件（app + 各插件）中是否存在 vanished 条目"
+    VERBATIM
+)
+add_dependencies(${MYNAME} check_translations)
+endif() # Qt${VTK_QT_VERSION}LinguistTools_FOUND
+
+add_subdirectory(test)
 target_link_libraries(${MYNAME}
     PRIVATE
     renderQml renderQmlplugin modelQml modelQmlplugin

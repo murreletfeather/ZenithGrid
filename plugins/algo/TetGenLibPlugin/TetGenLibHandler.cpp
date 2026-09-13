@@ -4,6 +4,7 @@
  * @brief TetGen 库模式四面体剖分处理器实现，包含 MeshData↔tetgenio 双向转换与参数组装
  * @date 2026-06-24
  */
+#include <QCoreApplication>
 #include "TetGenLibHandler.h"
 
 #include "ArgObject.h"
@@ -30,6 +31,15 @@
 #include <vtkCellType.h>
 
 #include <tetgen.h>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "TetGen库体网格剖分");
+}
+}
 
 namespace {
 
@@ -557,19 +567,19 @@ std::any systems::algo::TetGenLibHandler::execute(HandlerContext& context, const
 std::vector<core::ArgType> systems::algo::TetGenLibHandler::args_type() const
 {
     return {
-        core::ArgType { ArgTypeEnum::Selector, "目标 Component", "Component", "选择需要执行四面体剖分的 Component" },
-        core::ArgType { ArgTypeEnum::Combo, "是否仅使用最大表面壳", "是,否" },
-        core::ArgType { ArgTypeEnum::Float, "质量参数 q（0表示关闭）", "1.2" },
-        core::ArgType { ArgTypeEnum::Float, "最大单元体积 a（0表示关闭）", "0" },
-        core::ArgType { ArgTypeEnum::Combo, "是否保留原始表面", "是,否" },
-        core::ArgType { ArgTypeEnum::Combo, "是否仅检测自交", "是,否|1" },
+        core::ArgType { ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "目标 Component"), "Component", QT_TRANSLATE_NOOP("PreCess", "选择需要执行四面体剖分的 Component") },
+        core::ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "是否仅使用最大表面壳"), QT_TRANSLATE_NOOP("PreCess", "是,否") },
+        core::ArgType { ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "质量参数 q（0表示关闭）"), "1.2" },
+        core::ArgType { ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "最大单元体积 a（0表示关闭）"), "0" },
+        core::ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "是否保留原始表面"), QT_TRANSLATE_NOOP("PreCess", "是,否") },
+        core::ArgType { ArgTypeEnum::Combo, QT_TRANSLATE_NOOP("PreCess", "是否仅检测自交"), QT_TRANSLATE_NOOP("PreCess", "是,否|1") },
         core::ArgType { ArgTypeEnum::Combo,
-            "输出方式",
-            "新建模型,替换当前模型",
-            "默认新建模型；选择替换时仅替换所选 component 的 mesh，保留 geometry 等其他数据。" },
+            QT_TRANSLATE_NOOP("PreCess", "输出方式"),
+            QT_TRANSLATE_NOOP("PreCess", "新建模型,替换当前模型"),
+            QT_TRANSLATE_NOOP("PreCess", "默认新建模型；选择替换时仅替换所选 component 的 mesh，保留 geometry 等其他数据。") },
         core::ArgType { ArgTypeEnum::Text,
-            "高级 TetGen 参数",
+            QT_TRANSLATE_NOOP("PreCess", "高级 TetGen 参数"),
             "",
-            "追加到自动参数后，例如 O2T1e-8M；holes、regions、background mesh 等需额外数据，不能仅靠 switches 生效。" },
+            QT_TRANSLATE_NOOP("PreCess", "追加到自动参数后，例如 O2T1e-8M；holes、regions、background mesh 等需额外数据，不能仅靠 switches 生效。") },
     };
 }

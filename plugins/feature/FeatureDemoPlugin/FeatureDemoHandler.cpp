@@ -6,7 +6,18 @@
 #include "FeatureRegistrar.h"
 #include "MeshData.h"
 
+#include <QCoreApplication>
+
 #include <spdlog/spdlog.h>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "功能示例");
+}
+}
 
 namespace systems::feature {
 namespace {
@@ -18,16 +29,17 @@ namespace {
 
 void FeatureDemoHandler::setup(FeatureRegistrar& reg, FeatureContext& ctx)
 {
-    // 功能参数注册
-    reg.addParameter({ ArgTypeEnum::Float, "缩放因子", "1.0", "网格顶点坐标的缩放倍数" });
-    reg.addParameter({ ArgTypeEnum::Bool, "自动应用", "false", "修改参数后立即对当前组件生效" });
-    // 菜单选项注册：演示两级菜单路径，"功能" 菜单分页内的 "批处理" 分组
-    reg.addMenuItem({ "功能/批处理", "功能示例" });
+    // 注册串一律存源语言（中文），运行时翻译由显示层按当前语言完成；
+    // QT_TRANSLATE_NOOP 仅让 lupdate 提取源串进 app_en_US.ts，编译期展开为原串
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "缩放因子"), "1.0", QT_TRANSLATE_NOOP("PreCess", "网格顶点坐标的缩放倍数") });
+    reg.addParameter({ ArgTypeEnum::Bool, QT_TRANSLATE_NOOP("PreCess", "自动应用"), "false", QT_TRANSLATE_NOOP("PreCess", "修改参数后立即对当前组件生效") });
+    // 菜单选项注册：演示两级菜单路径，"功能" 菜单分页内的 "批处理" 分组（menu text 当前未被 UI 展示，不译）
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "功能/批处理"), "功能示例" });
     // 演示页内分组竖线分隔："功能" 菜单分页内与 "批处理" 并列的 "测量" 分组
     // 同时演示自定义图标：指定 qrc 图标资源路径，未指定时按插件名映射默认图标
-    reg.addMenuItem({ "功能/测量", "功能示例", "qrc:/images/toolbar/Algorithm/gmsh.svg" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "功能/测量"), "功能示例", "qrc:/images/toolbar/Algorithm/gmsh.svg" });
     // 演示单级菜单路径，归入 "示例" 菜单分页的默认分组
-    reg.addMenuItem({ "示例", "功能示例" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "示例"), "功能示例" });
     // 按键事件注册：Ctrl+D
     reg.addKeyBinding({ kKeyD, kControlModifier });
 

@@ -1,4 +1,5 @@
 #include "QFeatureSystemAdaptor.h"
+#include "DisplayTranslate.h"
 #include "FeatureParams.h"
 #include "FeatureSystem.h"
 #include "QArgObject.h"
@@ -139,18 +140,18 @@ QList<QFeatureInfo*> QFeatureSystemAdaptor::getFeaturesInfo() const
         // 每个菜单贡献项生成一条功能信息（同一功能可挂到多个菜单），未声明时归入默认"功能"菜单
         std::vector<MenuContribution> menus = feature_info->menus;
         if (menus.empty()) {
-            menus.push_back({ "功能", "", "" });
+            menus.push_back({ QT_TRANSLATE_NOOP("PreCess", "功能"), "", "" });
         }
         for (const auto& menu : menus) {
             QList<QArgType*> args;
             for (const auto& arg_type : feature_info->arg_types) {
-                args << new QArgType(arg_type);
+                args << new QArgType(displayTranslatedArg(arg_type));
             }
             infos.append(new QFeatureInfo(
                 QString::fromStdString(feature_info->name),
-                QString::fromStdString(feature_info->display_name),
-                QString::fromStdString(feature_info->description),
-                QString::fromStdString(menu.menu_path.empty() ? "功能" : menu.menu_path),
+                displayTranslate(feature_info->display_name),
+                displayTranslate(feature_info->description),
+                displayTranslate(menu.menu_path.empty() ? "功能" : menu.menu_path),
                 QString::fromStdString(menu.icon),
                 std::move(args),
                 feature_info->interactive));

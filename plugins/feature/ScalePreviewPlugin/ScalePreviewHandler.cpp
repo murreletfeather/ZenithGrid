@@ -10,6 +10,16 @@
 
 #include <cstddef>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "缩放预览演示");
+}
+}
 namespace systems::feature {
 namespace {
     constexpr const char* kFeatureName = "ScalePreview";
@@ -22,12 +32,12 @@ namespace {
 void ScalePreviewHandler::setup(FeatureRegistrar& reg, FeatureContext& ctx)
 {
     // 功能参数注册
-    reg.addParameter({ ArgTypeEnum::Float, "缩放因子", "1.0", "网格顶点坐标的缩放倍数（预览按绝对因子应用，不累计）" });
+    reg.addParameter({ ArgTypeEnum::Float, QT_TRANSLATE_NOOP("PreCess", "缩放因子"), "1.0", QT_TRANSLATE_NOOP("PreCess", "网格顶点坐标的缩放倍数（预览按绝对因子应用，不累计）") });
     // Button 为无值触发器：计数器载荷，功能约定忽略值、只读参数下标
-    reg.addParameter({ ArgTypeEnum::Button, "预览", "", "开启预览：beginStaged 捕获 before₀ 并开始监听参数变化" });
-    reg.addParameter({ ArgTypeEnum::Button, "取消", "", "取消预览：回滚到 before₀，不成记录" });
+    reg.addParameter({ ArgTypeEnum::Button, QT_TRANSLATE_NOOP("PreCess", "预览"), "", QT_TRANSLATE_NOOP("PreCess", "开启预览：beginStaged 捕获 before₀ 并开始监听参数变化") });
+    reg.addParameter({ ArgTypeEnum::Button, QT_TRANSLATE_NOOP("PreCess", "取消"), "", QT_TRANSLATE_NOOP("PreCess", "取消预览：回滚到 before₀，不成记录") });
     // 菜单选项注册：归入 "示例" 菜单分页的默认分组（菜单触发 = 确认预览成一条 undo 记录）
-    reg.addMenuItem({ "示例", "缩放预览演示" });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "示例"), QT_TRANSLATE_NOOP("PreCess", "缩放预览演示") });
 
     ctx_ = &ctx;
 

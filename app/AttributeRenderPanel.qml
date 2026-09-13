@@ -106,13 +106,15 @@ Item {
             Layout.fillWidth: true
             spacing: 4
             Label {
-                text: "组件"
-                Layout.preferredWidth: 32
+                text: qsTr("组件")
+                // 宽度随当前语言自适应（隐式宽度），空间不足时省略而不是溢出重叠
+                Layout.minimumWidth: 0
+                elide: Text.ElideRight
             }
             Label {
                 Layout.fillWidth: true
                 Layout.minimumWidth: 0
-                text: root.componentName.length > 0 ? root.componentName : "未选择"
+                text: root.componentName.length > 0 ? root.componentName : qsTr("未选择")
                 elide: Text.ElideRight
             }
         }
@@ -162,7 +164,7 @@ Item {
                         }
                     }
                     Label {
-                        text: modelData.componentCount > 0 ? modelData.componentCount + "分量" : ""
+                        text: modelData.componentCount > 0 ? modelData.componentCount + qsTr("分量") : ""
                         elide: Text.ElideRight
                     }
                 }
@@ -200,18 +202,19 @@ Item {
             columnSpacing: 6
 
             Label {
-                text: "渲染策略"
+                text: qsTr("渲染策略")
             }
             ComboBox {
                 id: modeCombo
                 Layout.fillWidth: true
-                model: ["RGB", "标量", "UV", "向量"]
+                model: ["RGB", qsTr("标量"), "UV", qsTr("向量")]
             }
 
             Label {
-                text: "范围"
+                text: qsTr("范围")
                 visible: modeCombo.currentIndex === 1
-                Layout.preferredWidth: 32
+                // 列宽随当前语言自适应，省略兜底避免译文溢出
+                elide: Text.ElideRight
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -234,9 +237,10 @@ Item {
             }
 
             Label {
-                text: "贴图"
+                text: qsTr("贴图")
                 visible: modeCombo.currentIndex === 2
-                Layout.preferredWidth: 32
+                // 列宽随当前语言自适应，省略兜底避免译文溢出
+                elide: Text.ElideRight
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -255,9 +259,10 @@ Item {
             }
 
             Label {
-                text: "缩放"
+                text: qsTr("缩放")
                 visible: modeCombo.currentIndex === 3
-                Layout.preferredWidth: 32
+                // 列宽随当前语言自适应，省略兜底避免译文溢出
+                elide: Text.ElideRight
             }
             TextField {
                 id: glyphScaleField
@@ -274,7 +279,7 @@ Item {
             Layout.fillWidth: true
 
             Button {
-                text: "应用"
+                text: qsTr("应用")
                 enabled: root.canApply()
                 onClicked: {
                     let attr = root.selectedAttribute()
@@ -288,7 +293,7 @@ Item {
             }
 
             Button {
-                text: "取消属性渲染"
+                text: qsTr("取消属性渲染")
                 enabled: App.selection.activeComponentId >= 0 && App.registry.renderWindow
                 onClicked: App.registry.renderWindow.cancelComponentAttri(App.selection.activeComponentId)
             }
@@ -297,9 +302,9 @@ Item {
 
     FileDialog {
         id: textureFileDialog
-        title: "选择贴图"
+        title: qsTr("选择贴图")
         fileMode: FileDialog.OpenFile
-        nameFilters: ["Image files (*.png *.jpg *.jpeg *.bmp)", "All files (*)"]
+        nameFilters: [qsTr("Image files (*.png *.jpg *.jpeg *.bmp)"), qsTr("All files (*)")]
         onAccepted: texturePathField.text = root.urlToPath(selectedFile)
     }
 

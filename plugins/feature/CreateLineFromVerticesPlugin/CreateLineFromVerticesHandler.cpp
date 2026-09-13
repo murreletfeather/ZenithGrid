@@ -14,13 +14,23 @@
 #include <algorithm>
 #include <spdlog/spdlog.h>
 
+#include <QCoreApplication>
+
+namespace {
+// json 元数据中的 UI 字符串不会被 lupdate 扫描，此处以 NOOP 形式集中声明供提取；
+// 注册串一律存源语言，运行时翻译由显示层按当前语言完成
+[[maybe_unused]] void registerDisplayNameTranslationSources()
+{
+    QT_TRANSLATE_NOOP("PreCess", "创建直线边（选择两点）");
+}
+}
 namespace systems::feature {
 void CreateLineFromVerticesHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 {
     // 参数声明与原 GeometryOperationActions.qml 中 createLineFromVerticesInfo 保持一致；
     // 菜单与图标复用原"几何"页"直线边（选点）"按钮的声明
-    reg.addParameter({ ArgTypeEnum::Selector, "端点", "GeometryVertex", "请选择两个几何点" });
-    reg.addMenuItem({ "几何", "创建直线边（选择两点）", "qrc:/images/toolbar/Geometry/line_points.svg" });
+    reg.addParameter({ ArgTypeEnum::Selector, QT_TRANSLATE_NOOP("PreCess", "端点"), "GeometryVertex", QT_TRANSLATE_NOOP("PreCess", "请选择两个几何点") });
+    reg.addMenuItem({ QT_TRANSLATE_NOOP("PreCess", "几何"), QT_TRANSLATE_NOOP("PreCess", "创建直线边（选择两点）"), "qrc:/images/toolbar/Geometry/line_points.svg" });
 }
 
 std::any CreateLineFromVerticesHandler::execute(FeatureContext& ctx)

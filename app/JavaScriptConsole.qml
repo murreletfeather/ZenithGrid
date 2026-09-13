@@ -34,9 +34,9 @@ Item {
                 font.family: "Courier New"
                 font.pixelSize: 12
                 wrapMode: TextArea.Wrap
-                text: "=== PreCess JavaScript 控制台 ===\n" +
-                      "按 F10 切换控制台显示\n" +
-                      "----------------------------\n\n"
+                text: qsTr("=== PreCess JavaScript 控制台 ===\n" +
+                           "按 F10 切换控制台显示\n" +
+                           "----------------------------\n\n")
             }
         }
 
@@ -54,7 +54,7 @@ Item {
             TextField {
                 id: inputField
                 Layout.fillWidth: true
-                placeholderText: "输入 JavaScript 代码..."
+                placeholderText: qsTr("输入 JavaScript 代码...")
                 color: "#333333"
                 font.family: "Courier New"
                 font.pixelSize: 12
@@ -69,7 +69,7 @@ Item {
                         let parentComponent = findComponentById(parentId)
                         if (parentComponent) {
                                 var childrenList = getChildrenList(parentComponent)
-                                outputText.text += "子组件列表 (" + parentId + "):\n"
+                                outputText.text += qsTr("子组件列表 (%1):\n").arg(parentId)
                                 outputText.text += childrenList + "\n"
                                 outputText.cursorPosition = outputText.length
                             }
@@ -87,14 +87,14 @@ Item {
                                     let parentComponent = findComponentById(parentId)
                                     if (parentId) {
                                         let childrenList = getChildrenList(parentComponent)
-                                        outputText.text += "子组件列表 (" + parentId + "):\n"
+                                        outputText.text += qsTr("子组件列表 (%1):\n").arg(parentId)
                                         outputText.text += childrenList + "\n"
                                         outputText.cursorPosition = outputText.length
                                     } else {
-                                        outputText.text += "✗ 错误: 未找到组件 " + parentId + "\n"
+                                        outputText.text += qsTr("✗ 错误: 未找到组件 %1\n").arg(parentId)
                                     }
                                 } catch (e) {
-                                    outputText.text += "✗ 错误: " + e.toString() + "\n"
+                                    outputText.text += qsTr("✗ 错误: %1\n").arg(e.toString())
                                 }
                             }
                         }
@@ -126,7 +126,7 @@ Item {
             }
 
             Button {
-                text: "执行"
+                text: qsTr("执行")
                 highlighted: true
                 onClicked: {
                     if (inputField.text.trim() !== "") {
@@ -139,8 +139,8 @@ Item {
             }
 
             Button {
-                text: "清空窗口"
-                onClicked: outputText.text = "=== PreCess JavaScript 控制台 ===\n\n"
+                text: qsTr("清空窗口")
+                onClicked: outputText.text = qsTr("=== PreCess JavaScript 控制台 ===\n\n")
             }
         }
     }
@@ -154,12 +154,12 @@ Item {
             showQuickHelp()
             return
         } else if (cmd.trim() === "clear") {
-            outputText.text = "=== PreCess JavaScript 控制台 ===\n\n"
+            outputText.text = qsTr("=== PreCess JavaScript 控制台 ===\n\n")
             return
         } else if (cmd.trim() === "components") {
-            outputText.text += "← 全局对象: App (App.selection, App.registry, App.activeOperation)\n"
-            outputText.text += "← 系统对象: QModelManager (observer, query, algorithmSystem, ioSystem, editSystem)\n"
-            outputText.text += "← 注册控件: App.registry.renderWindow, App.registry.treeModel\n\n"
+            outputText.text += qsTr("← 全局对象: App (App.selection, App.registry, App.activeOperation)\n")
+            outputText.text += qsTr("← 系统对象: QModelManager (observer, query, algorithmSystem, ioSystem, editSystem)\n")
+            outputText.text += qsTr("← 注册控件: App.registry.renderWindow, App.registry.treeModel\n\n")
             return
         }
 
@@ -182,7 +182,7 @@ Item {
                 outputText.text += "← undefined\n"
             }
         } catch (e) {
-            outputText.text += "✗ 错误: " + e.toString() + "\n"
+            outputText.text += qsTr("✗ 错误: %1\n").arg(e.toString())
         }
 
         outputText.text += "\n"
@@ -195,7 +195,7 @@ Item {
         
         // 对于Item类型的组件，使用children属性
         if (parent.children && parent.children.length > 0) {
-            result += "  item类型组件:\n"
+            result += qsTr("  item类型组件:\n")
             for (let i = 0; i < parent.children.length; i++) {
                 let child = parent.children[i]
                 let childType = child.toString().split(" ")[0] || "Unknown"
@@ -205,12 +205,12 @@ Item {
                 // 递归获取更深层的子组件（可选，这里只显示一层）
             }
         } else {
-            result += "  (无子组件)\n"
+            result += qsTr("  (无子组件)\n")
         }
         
         // 对于非Item组件，检查contentChildren属性
         if (parent.contentChildren && parent.contentChildren.length > 0) {
-            result += "  控件类型组件:\n"
+            result += qsTr("  控件类型组件:\n")
             for (let j = 0; j < parent.contentChildren.length; j++) {
                 let contentChild = parent.contentChildren[j]
                 let contentChildType = contentChild.toString().split(" ")[0] || "Unknown"
@@ -221,7 +221,7 @@ Item {
         
         // 检查data属性（适用于Item的data属性）
         if (parent.data && parent.data.length > 0) {
-            result += "  数据类型组件:\n"
+            result += qsTr("  数据类型组件:\n")
             for (let k = 0; k < parent.data.length; k++) {
                 let dataChild = parent.data[k]
                 if (dataChild) {
@@ -237,15 +237,15 @@ Item {
 
     // 显示快速帮助信息
     function showQuickHelp() {
-        let helpText = "🚀 快速命令:\n" +
-                       "• help - 显示此帮助\n" +
-                       "• clear - 清空控制台\n" +
-                       "• components - 显示可用组件\n\n" +
-                       "🔧 组件探索:\n" +
-                       "• 通过 App.registry.xxx 访问注册控件\n" +
-                       "• 例如: App.registry.renderWindow.resetCamera()\n" +
-                       "• Tab 键查看对象子属性\n\n" +
-                       "💡 提示: 直接输入表达式执行 JavaScript\n"
+        let helpText = qsTr("🚀 快速命令:\n") +
+                       qsTr("• help - 显示此帮助\n") +
+                       qsTr("• clear - 清空控制台\n") +
+                       qsTr("• components - 显示可用组件\n\n") +
+                       qsTr("🔧 组件探索:\n") +
+                       qsTr("• 通过 App.registry.xxx 访问注册控件\n") +
+                       qsTr("• 例如: App.registry.renderWindow.resetCamera()\n") +
+                       qsTr("• Tab 键查看对象子属性\n\n") +
+                       qsTr("💡 提示: 直接输入表达式执行 JavaScript\n")
 
         outputText.text += helpText + "\n"
         outputText.cursorPosition = outputText.length
