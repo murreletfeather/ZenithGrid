@@ -291,13 +291,6 @@ GIT_REPOSITORIES = [
         "gmsh-occ8",
         "86596d7902a1b00e23641ac5c904b7c1f880ce9f",
     ),
-    # 翻译工具链（lupdate/lrelease/lconvert/linguist + Qt6LinguistTools CMake 包）；
-    # 版本须与内置 Qt（Qt6.8.3）对齐，仅原生内置 Qt 构建使用
-    GitRepository(
-        "qttools",
-        "https://code.qt.io/qt/qttools.git",
-        "v6.8.3",
-    ),
 ]
 
 class DependencyError(Exception):
@@ -333,10 +326,6 @@ def clone_repositories(settings: DependenciesSettings) -> None:
                 "v6.8.3",
             ),
         )
-    # qttools 仅服务内置 Qt 的原生构建（宿主翻译工具链）；外部 Qt 自带与否由使用者
-    # 保证，wasm 交叉构建不需要（且无法在宿主运行交叉产物），不克隆
-    if settings.qt_path is not None or settings.platform.is_wasm:
-        repositories = [r for r in repositories if r.name != "qttools"]
 
     for repository in repositories:
         destination_name = repository.destination or repository.name
@@ -631,13 +620,20 @@ def build_qt(settings: DependenciesSettings) -> None:
     )
     configure_script = source / configure_script_name
     qt_arguments = [
+        # qtdeclarative 与 qttools 同列：Linguist 工具链（lupdate/lrelease/lconvert/
+        # linguist + Qt6LinguistTools CMake 包）由 Qt 自身构建流程产出，随 Qt 一起
+        # install；designer/assistant/clang/qdoc 一并关闭，避免无谓的 Widgets/libclang 依赖
         "-submodules",
-        "qtdeclarative",
+        "qtdeclarative,qttools",
         qt_config,
         *toolchain_arguments(settings),
         "-prefix",
         settings.install_dir / "Qt6.8.3",
         "CMAKE_INSTALL_MESSAGE=LAZY",
+        "-no-feature-designer",
+        "-no-feature-assistant",
+        "-no-feature-clang",
+        "-no-feature-qdoc",
     ]
     if settings.platform.system == "macos":
         # Xcode clang 默认对部分 Qt 源码警告启用 -Werror，随 SDK 版本波动易误伤，关闭。
@@ -647,55 +643,6 @@ def build_qt(settings: DependenciesSettings) -> None:
     run([configure_script, *qt_arguments], build_directory)
     require_qt_configured(build_directory)
     run(["cmake", "--build", ".", "--parallel", "--target", "install"], build_directory)
-
-def build_qttools(settings: DependenciesSettings) -> None:
-    """构建 Qt LinguistTools 翻译工具链（lupdate/lrelease/lconvert/linguist + CMake 包）。
-
-    仅随内置 Qt 的原生构建进行：qttools 需经刚安装的 Qt 工具链文件配置，并装入同一
-    Qt 前缀，使 find_package(Qt6 COMPONENTS LinguistTools) 可命中；外部 Qt 由使用者
-    自行保证，交叉构建产物无法在宿主运行，均跳过。只构建 linguist 相关产物：
-    designer/assistant 等以 feature 开关关闭，qdoc/clangcpp 依赖 libclang 时自动关闭。
-    """
-    if settings.qt_path is not None:
-        print("[跳过] 使用外部 Qt，不构建 qttools（请确保其自带 LinguistTools）")
-        return
-    if settings.is_cross:
-        print("[跳过] 交叉构建不构建宿主翻译工具链（qttools）")
-        return
-
-    qt_prefix = settings.install_dir / "Qt6.8.3"
-    linguist_package = qt_prefix / "lib" / "cmake" / "Qt6LinguistTools"
-    if linguist_package.exists():
-        print(f"[跳过] qttools 已安装：{linguist_package}")
-        return
-
-    source = settings.source_dir / "qttools"
-    if not source.exists():
-        raise DependencyError(f"缺少 qttools 源码：{source}（请先执行拉取阶段）")
-    build_directory = settings.build_directory(source)
-    build_directory.mkdir(exist_ok=True)
-    definitions = [
-        ("CMAKE_TOOLCHAIN_FILE:FILEPATH", qt_prefix / "lib" / "cmake" / "Qt6" / "qt.toolchain.cmake"),
-        ("FEATURE_assistant", "OFF"),
-        ("FEATURE_designer", "OFF"),
-        ("FEATURE_distancefieldgenerator", "OFF"),
-        ("FEATURE_pixeltool", "OFF"),
-        ("FEATURE_qdbus", "OFF"),
-        ("FEATURE_qtattributionsscanner", "OFF"),
-        ("FEATURE_qtdiag", "OFF"),
-        ("FEATURE_qtplugininfo", "OFF"),
-        ("QT_BUILD_TESTS", "OFF"),
-        ("QT_BUILD_EXAMPLES", "OFF"),
-    ]
-    configure_cmake_project(
-        source,
-        build_directory,
-        qt_prefix,
-        definitions,
-        settings,
-        use_toolchain=False,
-    )
-    install_configs(settings.install_configs, build_directory)
 
 def build_spdlog(settings: DependenciesSettings) -> None:
     source = settings.source_dir / "spdlog"
@@ -1037,7 +984,6 @@ def build_native(settings: DependenciesSettings) -> None:
 
     print(f"[阶段] 构建原生依赖 -> {settings.install_dir}")
     build_qt(settings)
-    build_qttools(settings)
     build_spdlog(settings)
     build_kddockwidgets(settings)
     build_vtk(settings)

@@ -200,8 +200,6 @@ _For more examples, please refer to the [Documentation](https://gitee.com/preces
     * [x] 插件注册/注销管理
     * [ ] 偏好设置窗口：主题设置
   * [x] 国际化（i18n）：基于 qsTr/tr + Qt Linguist 工具链的动态语言切换
-    * [x] 精简 Qt 6.8.3 补充 qttools（lupdate/lrelease/linguist + Qt6LinguistTools CMake 包）
-    * [x] 应用侧集成 qt_add_translations 与 QTranslator / QQmlEngine::retranslate 动态切换（QLanguageManager，偏好设置-主题面板语言选择器，语言选择经 QSettings 持久化）
   * [ ] Python解释器对软件的控制：参考HyperMesh等，激进点参考Blender
   * [ ] 菜单栏视图或窗口header按钮或窗口header右键菜单可以管理窗口状态：开关、选项页等。参考HyperMesh、Ansys，激进点的参考Visual Studio与Blender
   * [ ] 类Blender的自定义窗口布局预设

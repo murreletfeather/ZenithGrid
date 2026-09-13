@@ -50,9 +50,4 @@ std::string Runtime::version() const
     return std::string();
 }
 
-void Runtime::setConsoleTexts(std::string /*guide*/, std::string /*exit_hint*/)
-{
-    // 桩实现无解释器，文案无落点
-}
-
 }

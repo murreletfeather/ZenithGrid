@@ -28,8 +28,6 @@ TEST_CASE("precess Runtime hosts embedded interpreter", "[python][runtime]")
 
     // —— 懒初始化：幂等，成功后 precess 模块可用 ——
     CHECK_FALSE(runtime.isAvailable());
-    // 控制台文案在初始化前设置：暂存并随首次注入生效（宿主本地化路径）
-    runtime.setConsoleTexts("GUIDE-A\n", "EXIT-A");
     runtime.initialize();
     REQUIRE(runtime.isAvailable());
     CHECK(runtime.lastError().empty());
@@ -70,20 +68,10 @@ TEST_CASE("precess Runtime hosts embedded interpreter", "[python][runtime]")
     //    stdin，嵌入环境会以 lost sys.stdin 崩出）。回归宿主下沉时丢失注入 ——
     result = runtime.execute("help");
     REQUIRE(result.ok);
-    CHECK(result.output.find("GUIDE-A") != std::string::npos);
+    CHECK(result.output.find("PreCess Python 控制台") != std::string::npos);
     result = runtime.execute("clear()");
     REQUIRE(result.ok);
     CHECK(result.output.find('\f') != std::string::npos);
-
-    // —— 控制台文案本地化：初始化后重设立即生效（语言切换刷新路径）——
-    runtime.setConsoleTexts("GUIDE-B\n", "EXIT-B");
-    result = runtime.execute("help");
-    REQUIRE(result.ok);
-    CHECK(result.output.find("GUIDE-B") != std::string::npos);
-    CHECK(result.output.find("GUIDE-A") == std::string::npos);
-    result = runtime.execute("exit()");
-    REQUIRE(result.ok);
-    CHECK(result.output.find("EXIT-B") != std::string::npos);
 
     // —— 活会话调用：precess.current 即构造时注入的 session ——
     const std::filesystem::path plugin_dir(PRECESS_PLUGIN_DIR);

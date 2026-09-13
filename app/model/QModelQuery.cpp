@@ -3,7 +3,6 @@
  * @brief 模型层查询的 QML 适配器实现（逻辑委托给 SessionQuery）
  */
 #include "QModelQuery.h"
-#include "DisplayTranslate.h"
 #include "SessionQuery.h"
 
 #include <QString>
@@ -61,8 +60,7 @@ bool QModelQuery::hasComponent(Index component_id) const
 QString QModelQuery::getComponentName(Index component_id) const
 {
     const auto name = m_query->componentName(component_id);
-    // 与对象树一致的显示翻译（自动命名英文存储，仅已知模式翻译；自定义名称透传）
-    return name ? systems::displayTranslateTreeNodeName(QString::fromStdString(*name)) : QString();
+    return name ? QString::fromStdString(*name) : QString();
 }
 
 QVariantList QModelQuery::getComponentAttriInfo(Index component_id) const

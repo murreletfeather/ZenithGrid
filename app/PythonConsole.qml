@@ -31,25 +31,6 @@ Item {
         return buffer.length > 0 ? "..." : ">"
     }
 
-    // help() 指南全文：逐行 qsTr 以便 lupdate 提取（JavaScript/Python 等词不译）
-    function consoleGuide() {
-        return qsTr("PreCess Python 控制台:\n") +
-               qsTr("- 输入即 Python，回车执行；def/for/if 未完时提示 ... 续行，Esc 放弃\n") +
-               qsTr("- import precess 后 precess.current 即当前 GUI 会话\n") +
-               qsTr("- 查询: precess.current.query.list_models()\n") +
-               qsTr("- 功能: precess.current.call('CreateBox', 0, 0, 0, 5, 5, 5, 2)\n") +
-               qsTr("- 自省: precess.current.feature_params('CreateBox')\n") +
-               qsTr("- 撤销/重做: precess.current.undo_stack.undo() / redo()\n") +
-               qsTr("- clear() 清空窗口；help(对象) 查看文档（如 help(str)）\n") +
-               qsTr("- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出")
-    }
-
-    // 把当前语言的控制台文案推给运行时：boot() 首启注入前、submitInput() 每次执行前调用
-    // （与 JS 控制台"用时取当前语言"语义一致，不依赖语言切换信号）
-    function applyConsoleTexts() {
-        QModelManager.pythonRuntime.setConsoleTexts(consoleGuide(), qsTr("PreCess 是 GUI 程序，请直接关闭窗口退出"))
-    }
-
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 6
@@ -183,7 +164,6 @@ Item {
     // 首次显示时初始化运行环境并输出欢迎信息（解释器懒启动，启动耗时只发生一次）
     function boot() {
         booted = true
-        applyConsoleTexts() // 先推送当前语言文案，随首次初始化注入
         const runtime = QModelManager.pythonRuntime
         runtime.initialize()
         appendOutput(qsTr("=== PreCess Python 控制台 ===\n"))
@@ -206,8 +186,6 @@ Item {
     }
 
     function submitInput() {
-        // 执行前按当前语言推送一次文案：与 JS 控制台"用时取新语言"语义对齐
-        applyConsoleTexts()
         const line = inputField.text
         appendOutput(prompt() + " " + line + "\n")
         inputField.text = ""

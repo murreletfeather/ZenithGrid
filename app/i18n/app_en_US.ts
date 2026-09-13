@@ -220,20 +220,20 @@
     <message>
         <location line="+18"/>
         <location line="+137"/>
-        <source>面 ▶</source>
-        <translation>Face ▶</translation>
+        <source>面</source>
+        <translation>Face</translation>
     </message>
     <message>
         <location line="-122"/>
         <location line="+137"/>
-        <source>透 ▶</source>
-        <translation>Transparent ▶</translation>
+        <source>透</source>
+        <translation>Transparent</translation>
     </message>
     <message>
         <location line="-122"/>
         <location line="+137"/>
-        <source>线 ▶</source>
-        <translation>Wire ▶</translation>
+        <source>线</source>
+        <translation>Wire</translation>
     </message>
     <message>
         <location line="-123"/>
@@ -655,7 +655,7 @@ Press F10 to toggle the console
 <context>
     <name>ObjectTree</name>
     <message>
-        <location filename="../ObjectTree.qml" line="+86"/>
+        <location filename="../ObjectTree.qml" line="+87"/>
         <source>显示全部</source>
         <translation>Show All</translation>
     </message>
@@ -771,73 +771,7 @@ Press F10 to toggle the console
 <context>
     <name>PythonConsole</name>
     <message>
-        <location filename="../PythonConsole.qml" line="+36"/>
-        <source>PreCess Python 控制台:
-</source>
-        <translation>PreCess Python Console:
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- 输入即 Python，回车执行；def/for/if 未完时提示 ... 续行，Esc 放弃
-</source>
-        <translation>- Type Python directly and press Enter; incomplete def/for/if shows ... for continuation, Esc aborts
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- import precess 后 precess.current 即当前 GUI 会话
-</source>
-        <translation>- After importing precess, precess.current is the current GUI session
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- 查询: precess.current.query.list_models()
-</source>
-        <translation>- Query: precess.current.query.list_models()
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- 功能: precess.current.call(&apos;CreateBox&apos;, 0, 0, 0, 5, 5, 5, 2)
-</source>
-        <translation>- Feature: precess.current.call(&apos;CreateBox&apos;, 0, 0, 0, 5, 5, 5, 2)
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- 自省: precess.current.feature_params(&apos;CreateBox&apos;)
-</source>
-        <translation>- Introspection: precess.current.feature_params(&apos;CreateBox&apos;)
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- 撤销/重做: precess.current.undo_stack.undo() / redo()
-</source>
-        <translation>- Undo/redo: precess.current.undo_stack.undo() / redo()
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- clear() 清空窗口；help(对象) 查看文档（如 help(str)）
-</source>
-        <translation>- clear() clears the window; help(object) shows docs (e.g. help(str))
-</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>- exit()/quit() 仅作提示，GUI 程序请直接关闭窗口退出</source>
-        <translation>- exit()/quit() only print a hint; close the window to exit the GUI app</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>PreCess 是 GUI 程序，请直接关闭窗口退出</source>
-        <translation>PreCess is a GUI app; close the window to exit</translation>
-    </message>
-    <message>
-        <location line="+37"/>
+        <location filename="../PythonConsole.qml" line="+68"/>
         <source>帮助</source>
         <translation>Help</translation>
     </message>
@@ -866,7 +800,7 @@ Press F10 to toggle the console
         <translation>Run</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>=== PreCess Python 控制台 ===
 </source>
         <translation>=== PreCess Python Console ===

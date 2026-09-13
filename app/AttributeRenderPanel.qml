@@ -315,14 +315,6 @@ Item {
         }
     }
 
-    // 语言切换：组件名按新语言重新读取（与对象树一致的显示翻译）
-    Connections {
-        target: QLanguageManager
-        function onCurrentLanguageChanged() {
-            root.refreshAttributes()
-        }
-    }
-
     Connections {
         target: QModelManager.observer
         function onComponentChanged(component_id) {

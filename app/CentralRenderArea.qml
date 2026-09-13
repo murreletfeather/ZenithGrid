@@ -78,7 +78,7 @@ Page {
 
                     MenuItem {
                         id: geoFaceCat
-                        text: qsTr("面 ▶")
+                        text: qsTr("面") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -93,7 +93,7 @@ Page {
                     }
                     MenuItem {
                         id: geoTransCat
-                        text: qsTr("透 ▶")
+                        text: qsTr("透") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -108,7 +108,7 @@ Page {
                     }
                     MenuItem {
                         id: geoWireCat
-                        text: qsTr("线 ▶")
+                        text: qsTr("线") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 geoSubCloseTimer.stop()
@@ -215,7 +215,7 @@ Page {
 
                     MenuItem {
                         id: meshFaceCat
-                        text: qsTr("面 ▶")
+                        text: qsTr("面") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
@@ -230,7 +230,7 @@ Page {
                     }
                     MenuItem {
                         id: meshTransCat
-                        text: qsTr("透 ▶")
+                        text: qsTr("透") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
@@ -245,7 +245,7 @@ Page {
                     }
                     MenuItem {
                         id: meshWireCat
-                        text: qsTr("线 ▶")
+                        text: qsTr("线") + " ▶"
                         onHoveredChanged: {
                             if (hovered) {
                                 meshSubCloseTimer.stop()
