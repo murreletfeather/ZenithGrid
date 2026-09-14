@@ -3,13 +3,16 @@
 
 from __future__ import annotations
 import argparse
+import ipaddress
 import os
 import platform
 import shlex
 import shutil
+import socket
 import subprocess
 import sys
 import tarfile
+import urllib.parse
 import urllib.request
 import zipfile
 from dataclasses import dataclass
@@ -357,7 +360,33 @@ def clone_repositories(settings: DependenciesSettings) -> None:
         if repository.detached_commit:
             run(["git", "checkout", "--detach", repository.detached_commit], destination)
 
+def validate_download_url(url: str) -> None:
+    """下载前校验 URL，防 SSRF：仅允许 http/https，host 不得解析到本机/私有/保留地址。"""
+
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise DependencyError(f"下载地址非法（仅允许 http/https）：{url}")
+    default_port = 443 if parsed.scheme == "https" else 80
+    try:
+        addr_infos = socket.getaddrinfo(
+            parsed.hostname, parsed.port or default_port, type=socket.SOCK_STREAM
+        )
+    except socket.gaierror as error:
+        raise DependencyError(f"下载地址主机无法解析：{url}（{error}）")
+    for addr_info in addr_infos:
+        address = ipaddress.ip_address(addr_info[4][0])
+        if (
+            address.is_unspecified
+            or address.is_loopback
+            or address.is_private
+            or address.is_link_local
+            or address.is_reserved
+            or address.is_multicast
+        ):
+            raise DependencyError(f"下载地址解析到禁止的网络地址（本机/私有/保留）：{url}")
+
 def download_file(url: str, destination: Path) -> None:
+    validate_download_url(url)
     if destination.exists() and destination.stat().st_size > 0:
         print(f"[跳过] 压缩包已存在：{destination}")
         return
@@ -407,6 +436,11 @@ def download_archives(settings: DependenciesSettings) -> None:
         (
             "https://github.com/boostorg/boost/releases/download/boost-1.91.0-1/boost-1.91.0-1-cmake.tar.xz",
             settings.source_dir / "boost-1.91.0-1-cmake.tar.xz",
+        ),
+        (
+            # Eigen 纯头文件库（MPL2），CGAL Jet_fitting_3（Monge_via_jet_fitting）所需。
+            "https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz",
+            settings.source_dir / "eigen-3.4.0.tar.gz",
         ),
     ]
     if settings.platform.system != "windows":
@@ -463,6 +497,30 @@ def extract_boost_archive(archive: Path, destination: Path) -> None:
             # Python 3.11 及更早版本没有 data 过滤器。
             archive_file.extractall(destination, members=stripped_members)
 
+def extract_eigen_archive(archive: Path, destination: Path) -> None:
+    """解压 Eigen 归档并去掉一层归档目录（Eigen 为纯头文件库）。"""
+
+    print(f"[解压] {archive} -> {destination}")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(archive, "r:gz") as archive_file:
+        members = archive_file.getmembers()
+        stripped_members = []
+        for member in members:
+            parts = Path(member.name).parts
+            if len(parts) <= 1:
+                continue
+            member.name = str(Path(*parts[1:]))
+            if member.linkname:
+                link_parts = Path(member.linkname).parts
+                if len(link_parts) > 1:
+                    member.linkname = str(Path(*link_parts[1:]))
+            stripped_members.append(member)
+        try:
+            archive_file.extractall(destination, members=stripped_members, filter="data")
+        except TypeError:
+            # Python 3.11 及更早版本没有 data 过滤器。
+            archive_file.extractall(destination, members=stripped_members)
+
 def prepare_archives(settings: DependenciesSettings) -> None:
     # OCCT 的 vc14 第三方包与解压仅 windows 原生构建需要；Linux 下 freetype
     # 由本项目 freetype2.14.1 安装提供，其余第三方组件默认关闭。
@@ -489,6 +547,17 @@ def prepare_archives(settings: DependenciesSettings) -> None:
             remove_path(cgal_destination / directory_name)
     else:
         print(f"[跳过] 已解压：{cgal_destination}")
+
+    # Eigen 为纯头文件库，按平台各解压一份；RidgesUmbilicsPlugin 经 find_path 按目录名发现。
+    eigen_destination = settings.install_dir / "eigen-3.4.0"
+    eigen_marker = eigen_destination / "Eigen" / "src" / "Core" / "util" / "Macros.h"
+    if not eigen_marker.exists():
+        extract_eigen_archive(settings.source_dir / "eigen-3.4.0.tar.gz", eigen_destination)
+        for directory_name in ("ci", "demos", "doc", "scripts", "test"):
+            remove_path(eigen_destination / directory_name)
+        remove_path(eigen_destination / "unsupported" / "doc")
+    else:
+        print(f"[跳过] 已解压：{eigen_destination}")
 
     boost_source = settings.source_dir / "boost-src"
     if not boost_source.exists():
