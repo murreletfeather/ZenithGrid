@@ -1,5 +1,5 @@
 # RidgesUmbilicsPlugin CMake 配置
-# CGAL Ridges_3 脊线与脐点近似算法插件；Monge jet 拟合（Jet_fitting_3）依赖 Eigen 头文件
+# CGAL Ridges_3 脊线与脐点近似分析功能插件；Monge jet 拟合（Jet_fitting_3）依赖 Eigen 头文件
 
 # Eigen 为纯头文件库（MPL2），随 PreCess-deps 分发到 <deps>/eigen-3.4.0；
 # 缺失时跳过本插件，不阻塞其余目标配置（libMeshb 先例）
@@ -13,7 +13,7 @@ if(NOT EIGEN3_INCLUDE_DIR)
     return()
 endif()
 
-precess_add_algo_plugin(RidgesUmbilicsPlugin
+precess_add_feature_plugin(RidgesUmbilicsPlugin
     SOURCES "RidgesUmbilicsHandler.cpp"
     PLUGIN_H "RidgesUmbilicsPlugin.h"
 )

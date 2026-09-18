@@ -1,7 +1,0 @@
-{
-  "system": "AlgorithmSystem",
-  "handler": {
-    "name": "RidgesUmbilicsPlugin",
-    "display_name": "脊线与脐点分析"
-  }
-}

@@ -1,22 +1,12 @@
 /**
  * @file RidgesUmbilicsHandler.cpp
- * @brief 基于 CGAL Ridges_3 的脊线与脐点近似分析处理器实现
+ * @brief 基于 CGAL Ridges_3 的脊线与脐点近似分析功能处理器实现
  * @date 2026-09-13
  */
-#include "RidgesUmbilicsHandler.h"
 
-#include "ArgObject.h"
-#include "CgalExceptionGuard.h"
-#include "CgalMeshAdapter.h"
-#include "ComponentData.h"
-#include "ComponentOperator.h"
-#include "GeometryBuilder.h"
-#include "GeometryData.h"
-#include "MeshData.h"
-#include "ModelLayer.h"
-#include "ModelOperator.h"
-#include "Selection.h"
-
+// CGAL 头文件必须置于所有 OCC 相关头文件之前：
+// OCC 的 Standard_Handle.hxx 将 Handle 定义为宏（Handle(X) -> opencascade::handle<X>），
+// 若先引入 OCC，宏会污染后续解析的 CGAL/Handle.h 类声明，造成大片级联语法错误
 #include <CGAL/Monge_via_jet_fitting.h>
 #include <CGAL/PolyhedralSurf_neighbors.h>
 #include <CGAL/Ridges.h>
@@ -25,6 +15,24 @@
 #include <CGAL/barycenter.h>
 #include <CGAL/boost/graph/graph_traits_Surface_mesh.h>
 #include <CGAL/boost/graph/properties_Surface_mesh.h>
+
+#include "RidgesUmbilicsHandler.h"
+
+#include "ArgObject.h"
+#include "ArgType.h"
+#include "CgalExceptionGuard.h"
+#include "CgalMeshAdapter.h"
+#include "ComponentData.h"
+#include "ComponentOperator.h"
+#include "FeatureContext.h"
+#include "FeatureParams.h"
+#include "FeatureRegistrar.h"
+#include "GeometryBuilder.h"
+#include "GeometryData.h"
+#include "MeshData.h"
+#include "ModelLayer.h"
+#include "ModelOperator.h"
+#include "Selection.h"
 
 #include <BRep_Builder.hxx>
 #include <TopoDS_Compound.hxx>
@@ -37,13 +45,16 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
+namespace systems::feature {
+
 namespace {
 
-// 参数下标（与 args_type() 注册顺序一一对应；同步见 README.md）
+// 参数下标（与 setup() 注册顺序一一对应；同步见 README.md）
 constexpr std::size_t kSelectorParam = 0; //> 目标 component 选择器（Component 类型选择）
 constexpr std::size_t kRidgeKindParam = 1; //> 脊线类型（最大/最小/crest/全部）
 constexpr std::size_t kRidgeOrderParam = 2; //> 脊线阶数（三阶/四阶）
@@ -118,7 +129,8 @@ const char* umbilicComponentName(CGAL::Umbilic_type type)
  * @brief 把结果形状包装成新几何组件并加入模型
  *
  * 结果按类型独立成组件，便于对象树按类显隐；调用方对空结果不建组件。
- * undo 随算法系统操作边界自动记录（结构操作即时成记录），无需快照回滚。
+ * addGeometryComponent 属结构操作，通知即时发出并随 FeatureSystem::invoke
+ * 边界即时成 undo 记录，无需快照回滚。
  * @return 新组件 id
  */
 Index addResultComponent(ModelOperator& model_operator, const std::string& name, TopoDS_Shape shape)
@@ -133,87 +145,79 @@ Index addResultComponent(ModelOperator& model_operator, const std::string& name,
 
 } // namespace
 
-std::optional<Index> systems::algo::RidgesUmbilicsHandler::resolveComponentId(
-    ModelLayer& model_layer,
-    Index fallback_component_id,
-    const std::vector<core::ArgObject>& args) const
+void RidgesUmbilicsHandler::setup(FeatureRegistrar& reg, FeatureContext&)
 {
-    (void)model_layer;
-
-    // 两路径解析目标 component，遵循 AGENTS.md 第 10 节"算法系统不依赖对象树选中态"：
-    //   路径 A（首选）：选择器直接选定 Component 类型（单选）
-    //   路径 B（兜底）：fallback_component_id（对象树选中态，仅供兼容保留）
-    if (args.size() > kSelectorParam) {
-        const auto* selection_ptr = args[kSelectorParam].get<ArgTypeEnum::Selector>();
-        if (selection_ptr && *selection_ptr) {
-            const auto& sel = **selection_ptr;
-
-            if (sel.type == ElementEnum::Component && !sel.ids.empty()) {
-                if (sel.ids.size() == 1) {
-                    return sel.ids.front();
-                }
-                spdlog::error(
-                    "RidgesUmbilicsHandler: 只能选择一个 component（当前选中 {} 个）",
-                    sel.ids.size());
-                return std::nullopt;
-            }
-
-            spdlog::warn(
-                "RidgesUmbilicsHandler: Selector 内容不匹配（type={}），期望 Component 类型选择",
-                static_cast<int>(sel.type));
-        }
-    }
-
-    if (fallback_component_id < 0) {
-        spdlog::error(
-            "RidgesUmbilicsHandler: 解析目标 component 失败：请通过选择器（组件模式）或在对象树中选中目标组件。");
-        return std::nullopt;
-    }
-    spdlog::info(
-        "RidgesUmbilicsHandler: 选择器未提供目标 component，回退到对象树选中态 component_id={}",
-        fallback_component_id);
-    return fallback_component_id;
+    reg.addParameter({
+        ArgTypeEnum::Selector,
+        "目标 Component",
+        "Component",
+        "选择需要分析脊线与脐点的三角网格 Component",
+    });
+    reg.addParameter({
+        ArgTypeEnum::Combo,
+        "脊线类型",
+        "最大,最小,crest,全部|3",
+        "最大/最小为沿最大/最小主曲率方向的曲率极值线（各分椭圆/双曲两类），"
+        "crest 为曲率沿主方向的极值线（需四阶）；默认全部。",
+    });
+    reg.addParameter({
+        ArgTypeEnum::Combo,
+        "脊线阶数",
+        "三阶,四阶",
+        "三阶用 b0/b3 标注椭圆/双曲脊线；四阶额外拟合 P1/P2 并支持 crest 脊线与 sharpness，耗时更高。",
+    });
+    reg.addParameter({
+        ArgTypeEnum::Int,
+        "拟合邻域环数（0=自动）",
+        "0",
+        "Monge 拟合的顶点邻域大小；自动模式按拟合阶数扩环至点数充足，网格稀疏或噪声较大时可手动增大。",
+    });
+    reg.addParameter({
+        ArgTypeEnum::Combo,
+        "是否计算脐点",
+        "是,否|0",
+        "脐点为两主曲率相等的点（如椭球面的 4 个椭圆脐点）。",
+    });
+    reg.addMenuItem({ "功能/网格", "脊线与脐点分析" });
 }
 
-std::any systems::algo::RidgesUmbilicsHandler::execute(
-    HandlerContext& context, const std::vector<core::ArgObject>& args)
+std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
 {
-    if (args.size() <= kUmbilicsParam) {
-        spdlog::error("RidgesUmbilicsHandler: 参数数量不足（{} 个）", args.size());
-        return {};
+    // 目标 Component 由 Selector 参数显式解析（AGENTS.md §10：不依赖对象树选中态）
+    const auto* selection_ptr = ctx.params.value(kSelectorParam).get<ArgTypeEnum::Selector>();
+    if (!selection_ptr || !*selection_ptr) {
+        return std::string("请选择一个 Component");
     }
-    const int* ridge_kind = args[kRidgeKindParam].get<ArgTypeEnum::Combo>();
-    const int* ridge_order_idx = args[kRidgeOrderParam].get<ArgTypeEnum::Combo>();
-    const long long* ring_count = args[kRingCountParam].get<ArgTypeEnum::Int>();
-    const int* umbilics_enabled = args[kUmbilicsParam].get<ArgTypeEnum::Combo>();
+    const Selection& selection = **selection_ptr;
+    if (selection.type != ElementEnum::Component || selection.ids.size() != 1) {
+        return std::string("请选择且仅选择一个 Component");
+    }
+    const Index component_id = selection.ids.front();
+
+    auto comp_op = ctx.componentOperator ? ctx.componentOperator(component_id) : std::nullopt;
+    if (!comp_op || !comp_op->mesh()) {
+        return std::string("当前 Component 没有表面网格，无法分析脊线与脐点");
+    }
+    const MeshData& input_mesh = *comp_op->mesh();
+
+    // 入口预检：曲率脊线只对纯三角表面有意义。含体单元/非三角面时先一步拦截给出
+    // 直白文案（MeshRepair 同款；toSurfaceMesh 对非三角面内部也会 throw）
+    if (hasSolids(input_mesh)) {
+        return std::string("脊线与脐点分析仅支持纯三角表面网格（当前 Component 含体单元，请改用其他工具）");
+    }
+    if (!isAllTriangular(input_mesh)) {
+        return std::string("脊线与脐点分析仅支持纯三角表面网格（当前 Component 含非三角面，请先转换为全三角网格）");
+    }
+
+    const int* ridge_kind = ctx.params.value(kRidgeKindParam).get<ArgTypeEnum::Combo>();
+    const int* ridge_order_idx = ctx.params.value(kRidgeOrderParam).get<ArgTypeEnum::Combo>();
+    const long long* ring_count = ctx.params.value(kRingCountParam).get<ArgTypeEnum::Int>();
+    const int* umbilics_enabled = ctx.params.value(kUmbilicsParam).get<ArgTypeEnum::Combo>();
     if (!ridge_kind || *ridge_kind < 0 || *ridge_kind > 3
         || !ridge_order_idx || *ridge_order_idx < 0 || *ridge_order_idx > 1
         || !ring_count || *ring_count < 0
         || !umbilics_enabled || *umbilics_enabled < 0) {
-        spdlog::error("RidgesUmbilicsHandler: 参数无效");
-        return {};
-    }
-
-    // AlgorithmSystem 已按选择器解析出的 component_id 组装 context.cur_component
-    const ComponentData& input_component = context.cur_component.component();
-    const MeshData* input_mesh = input_component.mesh.get();
-    if (!input_mesh || input_mesh->face_vertices_offset_.size() <= 1) {
-        spdlog::error("RidgesUmbilicsHandler: 当前 component {} 无表面网格，无法分析脊线与脐点。",
-            context.cur_component.componentId());
-        return {};
-    }
-
-    // 入口预检：曲率脊线只对纯三角表面有意义。含体单元/非三角面时先一步拦截给出
-    // 直白文案（MeshRepair 同款；toSurfaceMesh 对非三角面内部也会 throw）
-    if (hasSolids(*input_mesh)) {
-        spdlog::error("RidgesUmbilicsHandler: 当前 component {} 含体单元，仅支持纯三角表面网格。",
-            context.cur_component.componentId());
-        return {};
-    }
-    if (!isAllTriangular(*input_mesh)) {
-        spdlog::error("RidgesUmbilicsHandler: 当前 component {} 含非三角面，请先转换为全三角网格。",
-            context.cur_component.componentId());
-        return {};
+        return std::string("错误：脊线与脐点分析参数无效");
     }
 
     // 作用域内 CGAL 断言失败 → 抛 C++ 异常（详见 CgalExceptionGuard 注释）
@@ -221,7 +225,7 @@ std::any systems::algo::RidgesUmbilicsHandler::execute(
 
     try {
         // 只读转换到 CGAL Surface_mesh（顶点索引与 MeshData 局部点 id 一致），原网格不动
-        CgalMesh cgal_mesh = toSurfaceMesh(*input_mesh);
+        CgalMesh cgal_mesh = toSurfaceMesh(input_mesh);
         const auto vpm = get(CGAL::vertex_point, cgal_mesh);
 
         // ---- 1. 逐顶点 Monge jet 拟合主曲率/主方向与三、四阶系数 ----
@@ -307,8 +311,7 @@ std::any systems::algo::RidgesUmbilicsHandler::execute(
             }
         }
         if (degraded_count > 0) {
-            spdlog::warn("RidgesUmbilicsHandler: {} 个顶点邻域不足/退化，已按平坦量处理",
-                degraded_count);
+            spdlog::warn("[RidgesUmbilics] {} 个顶点邻域不足/退化，已按平坦量处理", degraded_count);
         }
 
         // ---- 2. 脊线提取（近似类持属性映射引用，包装对象须活过 compute 调用）----
@@ -369,12 +372,11 @@ std::any systems::algo::RidgesUmbilicsHandler::execute(
         }
 
         // ---- 4. 结果按类型落成新几何组件（空类别不建组件）----
-        ModelLayer& model_layer = context.cur_component.manager();
-        auto model_operator = model_layer.getModelOperator(context.cur_component.modelId());
+        auto model_operator = ctx.model.getModelOperator(comp_op->modelId());
         if (!model_operator) {
-            spdlog::error("RidgesUmbilicsHandler: 未找到 component {} 所属模型，无法写入结果组件。",
-                context.cur_component.componentId());
-            return {};
+            spdlog::error("[RidgesUmbilics] 未找到 component {} 所属模型，无法写入结果组件",
+                component_id);
+            return std::string("脊线与脐点分析失败：未找到目标组件所属模型，无法写入结果组件");
         }
 
         std::size_t total_lines = 0;
@@ -426,32 +428,21 @@ std::any systems::algo::RidgesUmbilicsHandler::execute(
         }
 
         if (added_components == 0) {
-            spdlog::warn("RidgesUmbilicsHandler: 组件 {} 未检测到脊线/脐点，未生成结果组件。",
-                context.cur_component.componentId());
-        } else {
-            spdlog::info("RidgesUmbilicsHandler: 组件 {} 分析完成：{} 条脊线、{} 个脐点，新增 {} 个结果组件。",
-                context.cur_component.componentId(), total_lines, total_umbilics, added_components);
+            return std::string("未检测到脊线/脐点，未生成结果组件");
         }
-    } catch (const std::exception& error) {
-        spdlog::error("RidgesUmbilicsHandler: 脊线与脐点分析失败: {}", error.what());
-        return {};
+        std::ostringstream oss;
+        oss << "脊线与脐点分析完成：脊线 " << total_lines << " 条、脐点 " << total_umbilics
+            << " 个，已生成 " << added_components << " 个结果组件（对象树 Ridge_* / Umbilic_*）";
+        return oss.str();
+    } catch (const CGAL::Failure_exception& e) {
+        // CGAL 内部几何不变量违反：细节留日志便于开发定位，UI 仅返回固定温和文案
+        spdlog::error("[RidgesUmbilics] CGAL 断言失败: expr={}, file={}:{}",
+            e.expression(), e.filename(), e.line_number());
+        return std::string("脊线与脐点分析失败：当前网格不满足曲率拟合前提");
+    } catch (const std::exception& e) {
+        spdlog::error("[RidgesUmbilics] CGAL 操作异常: {}", e.what());
+        return std::string("脊线与脐点分析失败：") + e.what();
     }
-    return {};
 }
 
-std::vector<core::ArgType> systems::algo::RidgesUmbilicsHandler::args_type() const
-{
-    return {
-        core::ArgType { ArgTypeEnum::Selector, "目标 Component", "Component",
-            "选择需要分析脊线与脐点的三角网格 Component" },
-        core::ArgType { ArgTypeEnum::Combo, "脊线类型", "最大,最小,crest,全部|3",
-            "最大/最小为沿最大/最小主曲率方向的曲率极值线（各分椭圆/双曲两类），"
-            "crest 为曲率沿主方向的极值线（需四阶）；默认全部。" },
-        core::ArgType { ArgTypeEnum::Combo, "脊线阶数", "三阶,四阶",
-            "三阶用 b0/b3 标注椭圆/双曲脊线；四阶额外拟合 P1/P2 并支持 crest 脊线与 sharpness，耗时更高。" },
-        core::ArgType { ArgTypeEnum::Int, "拟合邻域环数（0=自动）", "0",
-            "Monge 拟合的顶点邻域大小；自动模式按拟合阶数扩环至点数充足，网格稀疏或噪声较大时可手动增大。" },
-        core::ArgType { ArgTypeEnum::Combo, "是否计算脐点", "是,否",
-            "脐点为两主曲率相等的点（如椭球面的 4 个椭圆脐点）。" },
-    };
-}
+} // namespace systems::feature

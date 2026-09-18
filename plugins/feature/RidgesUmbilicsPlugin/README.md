@@ -1,6 +1,6 @@
 # RidgesUmbilicsPlugin
 
-基于 CGAL [Ridges_3](https://doc.cgal.org/latest/Ridges_3/index.html)（Cazals & Pouget 的脊线/脐点近似算法）的三角网格曲率特征分析插件。
+基于 CGAL [Ridges_3](https://doc.cgal.org/latest/Ridges_3/index.html)（Cazals & Pouget 的脊线/脐点近似算法）的三角网格曲率特征分析功能插件，菜单入口在「功能 → 网格」分组（与网格布尔、网格质量、网格修复同组）。
 
 ## 功能
 
@@ -9,13 +9,13 @@
 - **脊线（ridge lines）**：主曲率沿主方向取得极值的曲线，按类型分椭圆/双曲/crest 与最大/最小共 6 类；
 - **脐点（umbilics）**：两主曲率相等的点（k1=k2），分椭圆/双曲/非-generic 三类（如椭球面上有 4 个椭圆脐点）。
 
-结果按类型落成**新建几何组件**（折线边/点，命名 `Ridge_*` / `Umbilic_*`），不修改原网格；组件随算法系统操作边界自动进入 undo 记录。
+结果按类型落成**新建几何组件**（折线边/点，命名 `Ridge_*` / `Umbilic_*`），不修改原网格；`addGeometryComponent` 结构操作随 `FeatureSystem::invoke` 边界即时发出通知并进入 undo 记录。
 
-## 参数（下标与 `args_type()` 注册顺序一一对应）
+## 参数（下标与 `setup()` 注册顺序一一对应）
 
 | 下标 | 类型 | 名称 | 说明 |
 | ---- | ---- | ---- | ---- |
-| 0 | Selector | 目标 Component | Component 类型单选；未选择时回退对象树选中态 |
+| 0 | Selector | 目标 Component | Component 类型单选 |
 | 1 | Combo | 脊线类型 | 最大/最小/crest/全部（默认全部） |
 | 2 | Combo | 脊线阶数 | 三阶（b0/b3 标注）/四阶（额外拟合 P1/P2，支持 crest 与 sharpness） |
 | 3 | Int | 拟合邻域环数（0=自动） | 0 时按拟合阶数自动扩环至点数充足 |
