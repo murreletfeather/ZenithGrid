@@ -35,6 +35,7 @@
 #include "Selection.h"
 
 #include <BRep_Builder.hxx>
+#include <Precision.hxx>
 #include <TopoDS_Compound.hxx>
 
 #include <boost/property_map/property_map.hpp>
@@ -60,6 +61,12 @@ constexpr std::size_t kRidgeKindParam = 1; //> 脊线类型（最大/最小/cres
 constexpr std::size_t kRidgeOrderParam = 2; //> 脊线阶数（三阶/四阶）
 constexpr std::size_t kRingCountParam = 3; //> 拟合邻域环数（0=自动）
 constexpr std::size_t kUmbilicsParam = 4; //> 是否计算脐点
+
+//! @brief 全曲面近似脐点判定比例：曲面 |k1-k2| 中位数与最大曲率均值之比低于
+//! 该值时，视为处处脐点的退化曲面（完整球面最典型）。实测 32×24 UV 球面的
+//! 中位数约 0.4%（各向异性邻域的拟合误差远大于双精度噪声），椭球等真实脊线
+//! 曲面约 24%，阈值取二者中间
+constexpr double kUmbilicEverywhereRatio = 2e-2;
 
 //! @brief Monge jet 拟合的数据内核（取默认 Simple_cartesian<double>，SVD 由 Eigen 提供）
 using FitKernel = CGAL::Simple_cartesian<double>;
@@ -237,6 +244,10 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
 
         CGAL::T_PolyhedralSurf_neighbors<CgalMesh> neighbors(cgal_mesh);
         std::size_t degraded_count = 0;
+        // 曲率量级统计（仅拟合成功的顶点参与）：用于识别处处脐点的退化曲面。
+        // 个别顶点拟合噪声可能很大（如球面极区各向异性邻域），判据取全体中位数而非最大值
+        std::vector<double> curvature_diffs;
+        double max_curvature_scale = 0;
         for (const CgalMesh::Vertex_index vertex : vertices(cgal_mesh)) {
             std::vector<CgalMesh::Vertex_index> vertex_neigh;
             std::list<CgalMesh::Halfedge_index> contour;
@@ -280,8 +291,12 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
             try {
                 MongeFitting monge_fit;
                 const MongeFitting::Monge_form monge_form = monge_fit(fit_points.begin(), fit_points.end(), monge_degree, monge_degree);
-                k1_map[vertex] = monge_form.principal_curvatures(0);
-                k2_map[vertex] = monge_form.principal_curvatures(1);
+                const double k1 = monge_form.principal_curvatures(0);
+                const double k2 = monge_form.principal_curvatures(1);
+                k1_map[vertex] = k1;
+                k2_map[vertex] = k2;
+                curvature_diffs.push_back(std::abs(k1 - k2));
+                max_curvature_scale = std::max(max_curvature_scale, 0.5 * (std::abs(k1) + std::abs(k2)));
                 const auto& max_dir = monge_form.maximal_principal_direction();
                 const auto& min_dir = monge_form.minimal_principal_direction();
                 d1_map[vertex] = CgalKernel::Vector_3(max_dir.x(), max_dir.y(), max_dir.z());
@@ -312,6 +327,20 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
         }
         if (degraded_count > 0) {
             spdlog::warn("[RidgesUmbilics] {} 个顶点邻域不足/退化，已按平坦量处理", degraded_count);
+        }
+
+        // 处处脐点的退化曲面（完整球面最典型）：k1≈k2 仅剩拟合噪声，主方向无定义，
+        // 脊线在数学上不存在、脐点处处都是，继续提取只会得到噪声结果，且其中的
+        // 近重合退化线段会被 OCC 拒绝而中断整个分析，故直接给出明确结论
+        if (!curvature_diffs.empty() && max_curvature_scale > 0) {
+            const auto median_it = curvature_diffs.begin()
+                + static_cast<std::ptrdiff_t>(curvature_diffs.size() / 2);
+            std::nth_element(curvature_diffs.begin(), median_it, curvature_diffs.end());
+            spdlog::info("[RidgesUmbilics] 曲率统计：|k1-k2| 中位数={:.3e}，曲率量级={:.3e}",
+                *median_it, max_curvature_scale);
+            if (*median_it < kUmbilicEverywhereRatio * max_curvature_scale) {
+                return std::string("曲面所有顶点均近似为脐点（k1≈k2，如完整球面），不存在脊线，未生成结果组件");
+            }
         }
 
         // ---- 2. 脊线提取（近似类持属性映射引用，包装对象须活过 compute 调用）----
@@ -389,6 +418,7 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
             TopoDS_Compound compound;
             BRep_Builder builder;
             builder.MakeCompound(compound);
+            std::size_t edge_count = 0;
             for (const auto& polyline : polylines) {
                 for (std::size_t i = 1; i < polyline.size(); ++i) {
                     const CgalPoint3& start = polyline[i - 1];
@@ -396,12 +426,19 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
                     const double dx = end.x() - start.x();
                     const double dy = end.y() - start.y();
                     const double dz = end.z() - start.z();
-                    // 过滤零长段，避免 OCC 对重合端点抛错
-                    if (dx * dx + dy * dy + dz * dz < 1e-24) {
+                    // 按 OCC 容差过滤退化段：makeLine 对端点距离 ≤ Precision::Confusion
+                    // 的线段抛错，不过滤会让单个退化段中断整个分析
+                    if (dx * dx + dy * dy + dz * dz <= Precision::Confusion() * Precision::Confusion()) {
                         continue;
                     }
                     builder.Add(compound, GeometryBuilder::makeLine(start.x(), start.y(), start.z(), end.x(), end.y(), end.z()));
+                    ++edge_count;
                 }
+            }
+
+            // 全部线段被过滤时不建空组件
+            if (edge_count == 0) {
+                continue;
             }
 
             addResultComponent(*model_operator, ridgeComponentName(ridge_type), std::move(compound));

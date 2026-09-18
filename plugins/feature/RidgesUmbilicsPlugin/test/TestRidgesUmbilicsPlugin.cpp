@@ -7,9 +7,11 @@
  *   2) 未选 Component 时的兜底提示
  *   3) 椭球面脊线/脐点提取与结果组件生成
  *   4) 非三角面 / 体单元的入口预检拒绝
+ *   5) 处处脐点曲面（完整球面）的退化早退：明确结论且不生成组件
  *
  * 测试网格：参数化椭球面（半轴 a/b/c，经度 M 段、纬度 N 段），闭合且全三角，
- * 理论上有 4 个椭圆脐点，必有脊线，适合作为曲率特征分析的正例。
+ * 理论上有 4 个椭圆脐点，必有脊线，适合作为曲率特征分析的正例；
+ * a=b=c 时退化为完整球面，用于处处脐点的负例。
  */
 
 #include "ArgObject.h"
@@ -307,6 +309,28 @@ TEST_CASE("RidgesUmbilics extracts ridges and umbilics from ellipsoid", "[Ridges
         CHECK(countComponentsWithPrefix(model_layer, *model, "Ridge_Min") == 0);
         CHECK(countComponentsWithPrefix(model_layer, *model, "Ridge_Max") >= 1);
     }
+}
+
+TEST_CASE("RidgesUmbilics reports umbilic-everywhere sphere without failing", "[RidgesUmbilicsPlugin]")
+{
+    core::EventBus bus;
+    ModelLayer model_layer;
+    FeatureSystem feature_system(model_layer, bus);
+    // 完整球面（a=b=c）：所有顶点均为脐点，k1≈k2 仅剩拟合噪声，不存在脊线。
+    // 回归背景：噪声脊线曾产生近重合的退化线段，被 makeLine 按 OCC 容差拒绝，
+    // 以 "Line endpoints must be different" 中断整个分析
+    const auto setup = addMeshComponent(model_layer,
+        makeEllipsoidMesh(1.0, 1.0, 1.0, 32, 24), "sphere");
+    registerRidgesHandler(feature_system);
+
+    setAnalysisParams(feature_system, setup.component_id, 3, 0, 0, 0);
+    const std::string text = resultText(feature_system.invoke(kFeatureName));
+
+    // 不抛异常、给出明确退化结论、不生成任何结果组件
+    REQUIRE(text.find("近似为脐点") != std::string::npos);
+    const ModelData* model = model_layer.modelById(setup.model_id);
+    REQUIRE(model != nullptr);
+    CHECK(model->componentIds().size() == setup.initial_component_count);
 }
 
 TEST_CASE("RidgesUmbilics rejects non-triangular mesh", "[RidgesUmbilicsPlugin]")
