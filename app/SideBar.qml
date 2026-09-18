@@ -123,6 +123,9 @@ Item{
                             if(model.type === QArgType.Float){           //数字框
                                 return oneNumberBox
                             }
+                            if(model.type === QArgType.Int){            //整数框
+                                return intNumberBox
+                            }
                             if(model.type === QArgType.Selector){           //选择器
                                 return selectorComponent
                             }
@@ -219,6 +222,31 @@ Item{
                 text: model.content
                 onTextChanged:{
                     root.setParam(index, parseFloat(text))
+                }
+            }
+        }
+    }
+    Component{
+        id:intNumberBox
+        RowLayout{
+            spacing: 5
+            width: parameterList.width
+            Text{
+                id:nametext
+                text: model.name
+            }
+            Rectangle{
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+                color: "black"
+            }
+            TextField {
+                id:parameterIntInput
+                Layout.fillWidth: parent.width
+                text: model.content
+                validator: IntValidator{}
+                onTextChanged:{
+                    root.setParam(index, parseInt(text))
                 }
             }
         }
