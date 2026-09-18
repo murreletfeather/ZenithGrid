@@ -131,7 +131,9 @@ void GeometryActor::loadShape(const GeometryDataVtk& geometry_data)
     line_actor_->GetProperty()->SetLineWidth(2.0);
     line_actor_->GetProperty()->RenderLinesAsTubesOn();
     line_actor_->GetProperty()->SetPointSize(6.0);
-    line_actor_->GetProperty()->SetColor(0.0, 0.0, 0.0);
+    // 洋红与网格黑色线框、银灰面色形成强对比（黑色线条易与网格线框混淆），
+    // 并与选择高亮语义色（红/黄/绿）区分
+    line_actor_->GetProperty()->SetColor(1.0, 0.0, 1.0);
     renderer_->AddActor(line_actor_);
 }
 
