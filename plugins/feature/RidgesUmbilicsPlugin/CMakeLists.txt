@@ -1,11 +1,13 @@
 # RidgesUmbilicsPlugin CMake 配置
 # CGAL Ridges_3 脊线与脐点近似分析功能插件；Monge jet 拟合（Jet_fitting_3）依赖 Eigen 头文件
 
-# Eigen 为纯头文件库（MPL2），随 PreCess-deps 分发到 <deps>/eigen-3.4.0；
-# 缺失时跳过本插件，不阻塞其余目标配置（libMeshb 先例）
+# Eigen 为纯头文件库（MPL2）。两种依赖形态：PreCess-deps.py git 克隆安装布局
+# （<deps>/eigen-3.4.0/include/eigen3）与旧压缩包解压布局（<deps>/eigen-3.4.0 根
+# 下直接放 Eigen/，兼容既有依赖目录）；缺失时跳过本插件，不阻塞其余目标配置
+# （libMeshb 先例）
 find_path(EIGEN3_INCLUDE_DIR
     Eigen/src/Core/util/Macros.h
-    PATH_SUFFIXES eigen-3.4.0 eigen3
+    PATH_SUFFIXES eigen-3.4.0/include/eigen3 eigen-3.4.0 eigen3
     DOC "Eigen 头文件目录（PreCess-deps 下的 eigen-3.4.0）"
 )
 if(NOT EIGEN3_INCLUDE_DIR)
