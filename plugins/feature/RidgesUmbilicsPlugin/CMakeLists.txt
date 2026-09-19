@@ -22,4 +22,14 @@ precess_add_feature_plugin(RidgesUmbilicsPlugin
 precess_plugin_link_libraries(RidgesUmbilicsPlugin CgalSupport)
 target_include_directories(RidgesUmbilicsPluginlib PRIVATE ${EIGEN3_INCLUDE_DIR})
 
+# Monge 拟合逐顶点循环的并行加速：OpenMP 是编译器内置特性（无外部依赖），
+# 可用时启用并行；不可用时 #pragma omp 被编译器忽略，自动退化为顺序执行。
+# Emscripten 的 OpenMP 依赖 wasm 线程（实验性），直接跳过保持顺序执行
+if(NOT EMSCRIPTEN)
+    find_package(OpenMP COMPONENTS CXX)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(RidgesUmbilicsPluginlib PRIVATE OpenMP::OpenMP_CXX)
+    endif()
+endif()
+
 add_subdirectory(test)

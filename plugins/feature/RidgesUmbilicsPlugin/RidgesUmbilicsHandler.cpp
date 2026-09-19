@@ -43,6 +43,8 @@
 #include <spdlog/spdlog.h>
 
 #include <algorithm>
+#include <chrono>
+#include <exception>
 #include <list>
 #include <map>
 #include <memory>
@@ -150,6 +152,107 @@ Index addResultComponent(ModelOperator& model_operator, const std::string& name,
     return model_operator.addGeometryComponent(std::move(component));
 }
 
+//! @brief 单顶点 Monge jet 拟合结果（按顶点序写入槽位数组，并行完成后统一回填属性表）；
+//! 默认值即"平坦量"退化占位（k1≠k2 避免退化顶点被误判为脐点）
+struct VertexFitResult {
+    CgalKernel::FT k1 = 0;
+    CgalKernel::FT k2 = 1;
+    CgalKernel::FT b0 = 0;
+    CgalKernel::FT b3 = 0;
+    CgalKernel::FT p1 = 0;
+    CgalKernel::FT p2 = 0;
+    CgalKernel::Vector_3 d1{1, 0, 0};
+    CgalKernel::Vector_3 d2{0, 1, 0};
+    bool degraded = false; //> 邻域不足/拟合失败，占位值不参与曲率统计
+};
+
+/**
+ * @brief 单线程拟合工作器：持线程私有的邻域查询实例与复用缓冲
+ *
+ * T_PolyhedralSurf_neighbors 内部维护访问标记表（is_visited_map）且接口非 const，
+ * 多线程共享单实例会数据竞争，并行时每个工作线程须独立构造一个实例（构造为一次
+ * 全网格标记初始化）；compute_one_ring/compute_neighbors 对传入容器只追加不清空，
+ * 跨顶点复用缓冲前须手动 clear。
+ */
+struct FitWorker {
+    CGAL::T_PolyhedralSurf_neighbors<CgalMesh> neighbors;
+    std::vector<CgalMesh::Vertex_index> vertex_neigh;
+    std::list<CgalMesh::Halfedge_index> contour;
+    std::vector<FitKernel::Point_3> fit_points;
+
+    explicit FitWorker(const CgalMesh& mesh)
+        : neighbors(mesh)
+    {
+    }
+
+    //! @brief 对单顶点拟合主曲率/主方向与三、四阶系数；邻域不足或拟合失败按平坦量退化
+    //! @param mesh 源 CGAL 网格（只读，坐标经顶点属性映射读取）
+    //! @param monge_degree 拟合阶数（3 或 4）
+    //! @param required_points 拟合阶要求的最少邻域点数
+    //! @param ring_count 手动邻域环数；0 为自动扩环
+    VertexFitResult operator()(const CgalMesh& mesh, CgalMesh::Vertex_index vertex,
+        std::size_t monge_degree, std::size_t required_points, long long ring_count)
+    {
+        const auto vpm = get(CGAL::vertex_point, mesh);
+        VertexFitResult result;
+
+        vertex_neigh.clear();
+        contour.clear();
+        CgalKernel::FT one_ring_size = 0;
+        if (ring_count > 0) {
+            // compute_neighbors 内部先取一环，再按 size*OneRingSize 半径扩环
+            neighbors.compute_neighbors(vertex, vertex_neigh, contour,
+                static_cast<CgalKernel::FT>(ring_count));
+        } else {
+            // 自动模式：从一环起逐步扩环直至点数满足拟合阶要求
+            neighbors.compute_one_ring(vertex, vertex_neigh, contour, one_ring_size);
+            CgalKernel::FT rings = 1;
+            while (vertex_neigh.size() < required_points && rings < 10) {
+                ++rings;
+                neighbors.compute_neighbors(vertex, vertex_neigh, contour, rings);
+            }
+        }
+
+        fit_points.clear();
+        fit_points.reserve(vertex_neigh.size());
+        for (const CgalMesh::Vertex_index neighbor : vertex_neigh) {
+            const CgalPoint3& p = get(vpm, neighbor);
+            fit_points.emplace_back(p.x(), p.y(), p.z());
+        }
+
+        // 邻域点数不足拟合阶要求（网格过稀疏/边界退化）时按平坦量退化
+        if (fit_points.size() < required_points) {
+            result.degraded = true;
+            return result;
+        }
+
+        try {
+            MongeFitting monge_fit;
+            const MongeFitting::Monge_form monge_form = monge_fit(fit_points.begin(), fit_points.end(), monge_degree, monge_degree);
+            result.k1 = monge_form.principal_curvatures(0);
+            result.k2 = monge_form.principal_curvatures(1);
+            const auto& max_dir = monge_form.maximal_principal_direction();
+            const auto& min_dir = monge_form.minimal_principal_direction();
+            result.d1 = CgalKernel::Vector_3(max_dir.x(), max_dir.y(), max_dir.z());
+            result.d2 = CgalKernel::Vector_3(min_dir.x(), min_dir.y(), min_dir.z());
+            result.b0 = monge_form.third_order_coefficients(0);
+            result.b3 = monge_form.third_order_coefficients(3);
+            if (monge_degree >= 4) {
+                // P1/P2 为 Monge 形式四阶极值系数 c0/c4
+                result.p1 = monge_form.fourth_order_coefficients(0);
+                result.p2 = monge_form.fourth_order_coefficients(4);
+            }
+            // 三阶标注不用 P1/P2（sharpness 亦无效），保持置零占位
+            return result;
+        } catch (const std::exception&) {
+            // 个别退化邻域（共线/重合点等）拟合失败不影响整体分析，同平坦量退化处理
+            result = VertexFitResult {};
+            result.degraded = true;
+            return result;
+        }
+    }
+};
+
 } // namespace
 
 void RidgesUmbilicsHandler::setup(FeatureRegistrar& reg, FeatureContext&)
@@ -207,8 +310,13 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
     }
     const MeshData& input_mesh = *comp_op->mesh();
 
-    // 入口预检：曲率脊线只对纯三角表面有意义。含体单元/非三角面时先一步拦截给出
-    // 直白文案（MeshRepair 同款；toSurfaceMesh 对非三角面内部也会 throw）
+    // 入口预检：曲率脊线只对纯三角表面有意义。空网格/含体单元/非三角面时先一步
+    // 拦截给出直白文案（MeshRepair 同款；toSurfaceMesh 对非三角面内部也会 throw）。
+    // 空网格若不拦截，会经 toSurfaceMesh 得到空 CGAL 网格、被 CGAL 近似类静默
+    // 产出空结果，最终以"未检测到脊线/脐点"误导用户为分析过但无结果
+    if (input_mesh.vertex_count_ == 0 || input_mesh.face_vertices_offset_.size() <= 1) {
+        return std::string("当前 Component 的网格为空，无法分析脊线与脐点");
+    }
     if (hasSolids(input_mesh)) {
         return std::string("脊线与脐点分析仅支持纯三角表面网格（当前 Component 含体单元，请改用其他工具）");
     }
@@ -239,91 +347,70 @@ std::any RidgesUmbilicsHandler::execute(FeatureContext& ctx)
         const std::size_t monge_degree = *ridge_order_idx == 0 ? 3 : 4;
         const std::size_t required_points = (monge_degree + 1) * (monge_degree + 2) / 2;
 
-        VertexFTMap k1_map, k2_map, b0_map, b3_map, p1_map, p2_map;
-        VertexVectorMap d1_map, d2_map;
-
-        CGAL::T_PolyhedralSurf_neighbors<CgalMesh> neighbors(cgal_mesh);
-        std::size_t degraded_count = 0;
-        // 曲率量级统计（仅拟合成功的顶点参与）：用于识别处处脐点的退化曲面。
-        // 个别顶点拟合噪声可能很大（如球面极区各向异性邻域），判据取全体中位数而非最大值
-        std::vector<double> curvature_diffs;
-        double max_curvature_scale = 0;
+        // 收集顶点序列并按序分配结果槽位：并行区各写各的槽位，完成后单线程回填
+        std::vector<CgalMesh::Vertex_index> vertex_indices;
+        vertex_indices.reserve(cgal_mesh.number_of_vertices());
         for (const CgalMesh::Vertex_index vertex : vertices(cgal_mesh)) {
-            std::vector<CgalMesh::Vertex_index> vertex_neigh;
-            std::list<CgalMesh::Halfedge_index> contour;
-            CgalKernel::FT one_ring_size = 0;
-            if (*ring_count > 0) {
-                // compute_neighbors 内部先取一环，再按 size*OneRingSize 半径扩环
-                neighbors.compute_neighbors(vertex, vertex_neigh, contour,
-                    static_cast<CgalKernel::FT>(*ring_count));
-            } else {
-                // 自动模式：从一环起逐步扩环直至点数满足拟合阶要求
-                neighbors.compute_one_ring(vertex, vertex_neigh, contour, one_ring_size);
-                CgalKernel::FT rings = 1;
-                while (vertex_neigh.size() < required_points && rings < 10) {
-                    ++rings;
-                    neighbors.compute_neighbors(vertex, vertex_neigh, contour, rings);
+            vertex_indices.push_back(vertex);
+        }
+        std::vector<VertexFitResult> fit_results(vertex_indices.size());
+
+        // 逐顶点拟合是大网格上的主要耗时（每顶点一次邻域扩环 + 一次 SVD），OpenMP
+        // 并行；邻域查询实例非线程安全，每线程独立构造（见 FitWorker）。并行区不允许
+        // 异常逸出（MSVC 实现下直接 terminate），先收集、并行区外重抛，保持与串行
+        // 路径一致的中断语义（CGAL 断言异常由外层统一翻译成温和文案）
+        std::vector<std::exception_ptr> fit_errors;
+        const auto fit_started = std::chrono::steady_clock::now();
+#pragma omp parallel
+        {
+            FitWorker worker(cgal_mesh);
+            // 动态调度 + 中等 chunk：单顶点开销不均（扩环轮数不同），chunk 过小会让
+            // 调度锁成为瓶颈（MSVC OpenMP 的 dynamic 为全局锁）
+#pragma omp for schedule(dynamic, 64)
+            for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(vertex_indices.size()); ++i) {
+                try {
+                    fit_results[i] = worker(cgal_mesh, vertex_indices[i],
+                        monge_degree, required_points, *ring_count);
+                } catch (...) {
+#pragma omp critical
+                    fit_errors.push_back(std::current_exception());
                 }
             }
+        }
+        if (!fit_errors.empty()) {
+            std::rethrow_exception(fit_errors.front());
+        }
+        spdlog::info("[RidgesUmbilics] {} 顶点 Monge 拟合耗时 {:.2f}s",
+            vertex_indices.size(),
+            std::chrono::duration<double>(std::chrono::steady_clock::now() - fit_started).count());
 
-            std::vector<FitKernel::Point_3> fit_points;
-            fit_points.reserve(vertex_neigh.size());
-            for (const CgalMesh::Vertex_index neighbor : vertex_neigh) {
-                const CgalPoint3& p = get(vpm, neighbor);
-                fit_points.emplace_back(p.x(), p.y(), p.z());
-            }
-
-            // 邻域点数不足拟合阶要求（网格过稀疏/边界退化）时置平坦量跳过，
-            // k1≠k2 避免退化顶点被误判为脐点
-            if (fit_points.size() < required_points) {
-                k1_map[vertex] = 0;
-                k2_map[vertex] = 1;
-                b0_map[vertex] = 0;
-                b3_map[vertex] = 0;
-                p1_map[vertex] = 0;
-                p2_map[vertex] = 0;
-                d1_map[vertex] = CgalKernel::Vector_3(1, 0, 0);
-                d2_map[vertex] = CgalKernel::Vector_3(0, 1, 0);
+        // 拟合结果回填属性表（Ridge/Umbilic 近似类持关联容器映射）。曲率量级统计
+        // （仅拟合成功的顶点参与）用于识别处处脐点的退化曲面：个别顶点拟合噪声
+        // 可能很大（如球面极区各向异性邻域），判据取全体中位数而非最大值
+        std::size_t degraded_count = 0;
+        VertexFTMap k1_map, k2_map, b0_map, b3_map, p1_map, p2_map;
+        VertexVectorMap d1_map, d2_map;
+        std::vector<double> curvature_diffs;
+        curvature_diffs.reserve(fit_results.size());
+        double max_curvature_scale = 0;
+        for (std::size_t i = 0; i < vertex_indices.size(); ++i) {
+            const CgalMesh::Vertex_index vertex = vertex_indices[i];
+            const VertexFitResult& fit = fit_results[i];
+            k1_map[vertex] = fit.k1;
+            k2_map[vertex] = fit.k2;
+            b0_map[vertex] = fit.b0;
+            b3_map[vertex] = fit.b3;
+            p1_map[vertex] = fit.p1;
+            p2_map[vertex] = fit.p2;
+            d1_map[vertex] = fit.d1;
+            d2_map[vertex] = fit.d2;
+            if (fit.degraded) {
                 ++degraded_count;
                 continue;
             }
-
-            try {
-                MongeFitting monge_fit;
-                const MongeFitting::Monge_form monge_form = monge_fit(fit_points.begin(), fit_points.end(), monge_degree, monge_degree);
-                const double k1 = monge_form.principal_curvatures(0);
-                const double k2 = monge_form.principal_curvatures(1);
-                k1_map[vertex] = k1;
-                k2_map[vertex] = k2;
-                curvature_diffs.push_back(std::abs(k1 - k2));
-                max_curvature_scale = std::max(max_curvature_scale, 0.5 * (std::abs(k1) + std::abs(k2)));
-                const auto& max_dir = monge_form.maximal_principal_direction();
-                const auto& min_dir = monge_form.minimal_principal_direction();
-                d1_map[vertex] = CgalKernel::Vector_3(max_dir.x(), max_dir.y(), max_dir.z());
-                d2_map[vertex] = CgalKernel::Vector_3(min_dir.x(), min_dir.y(), min_dir.z());
-                b0_map[vertex] = monge_form.third_order_coefficients(0);
-                b3_map[vertex] = monge_form.third_order_coefficients(3);
-                if (monge_degree >= 4) {
-                    // P1/P2 为 Monge 形式四阶极值系数 c0/c4
-                    p1_map[vertex] = monge_form.fourth_order_coefficients(0);
-                    p2_map[vertex] = monge_form.fourth_order_coefficients(4);
-                } else {
-                    // 三阶标注不用 P1/P2（sharpness 亦无效），置零占位
-                    p1_map[vertex] = 0;
-                    p2_map[vertex] = 0;
-                }
-            } catch (const std::exception&) {
-                // 个别退化邻域（共线/重合点等）拟合失败不影响整体分析，同平坦量退化处理
-                k1_map[vertex] = 0;
-                k2_map[vertex] = 1;
-                b0_map[vertex] = 0;
-                b3_map[vertex] = 0;
-                p1_map[vertex] = 0;
-                p2_map[vertex] = 0;
-                d1_map[vertex] = CgalKernel::Vector_3(1, 0, 0);
-                d2_map[vertex] = CgalKernel::Vector_3(0, 1, 0);
-                ++degraded_count;
-            }
+            curvature_diffs.push_back(std::abs(fit.k1 - fit.k2));
+            max_curvature_scale = std::max(max_curvature_scale,
+                0.5 * (std::abs(fit.k1) + std::abs(fit.k2)));
         }
         if (degraded_count > 0) {
             spdlog::warn("[RidgesUmbilics] {} 个顶点邻域不足/退化，已按平坦量处理", degraded_count);

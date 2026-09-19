@@ -6,7 +6,7 @@
  *   1) 参数声明（Selector + Combo/Int）
  *   2) 未选 Component 时的兜底提示
  *   3) 椭球面脊线/脐点提取与结果组件生成
- *   4) 非三角面 / 体单元的入口预检拒绝
+ *   4) 非三角面 / 体单元 / 空网格的入口预检拒绝
  *   5) 处处脐点曲面（完整球面）的退化早退：明确结论且不生成组件
  *
  * 测试网格：参数化椭球面（半轴 a/b/c，经度 M 段、纬度 N 段），闭合且全三角，
@@ -110,6 +110,16 @@ std::unique_ptr<MeshData> makeQuadFaceMesh()
     mesh->vertex_count_ = 4;
     mesh->face_vertices_ = { 0, 1, 2, 3 };
     mesh->face_vertices_offset_ = { 0, 4 };
+    return mesh;
+}
+
+/**
+ * @brief 构造不含任何顶点/面的空网格（用于空网格拒绝路径）
+ */
+std::unique_ptr<MeshData> makeEmptyMesh()
+{
+    auto mesh = std::make_unique<MeshData>();
+    mesh->init();
     return mesh;
 }
 
@@ -346,6 +356,26 @@ TEST_CASE("RidgesUmbilics rejects non-triangular mesh", "[RidgesUmbilicsPlugin]"
 
     // 非三角面被预检拒绝：温和文案、不抛异常、不生成任何结果组件
     REQUIRE(text.find("仅支持纯三角表面网格") != std::string::npos);
+    const ModelData* model = model_layer.modelById(setup.model_id);
+    REQUIRE(model != nullptr);
+    CHECK(model->componentIds().size() == setup.initial_component_count);
+}
+
+TEST_CASE("RidgesUmbilics rejects empty mesh", "[RidgesUmbilicsPlugin]")
+{
+    core::EventBus bus;
+    ModelLayer model_layer;
+    FeatureSystem feature_system(model_layer, bus);
+    // 回归背景：空网格此前不被入口预检拦截，经 toSurfaceMesh 得到空 CGAL 网格后被
+    // 近似类静默产出空结果，以"未检测到脊线/脐点"误导为分析过但无结果
+    const auto setup = addMeshComponent(model_layer, makeEmptyMesh(), "empty");
+    registerRidgesHandler(feature_system);
+
+    setAnalysisParams(feature_system, setup.component_id, 3, 0, 0, 0);
+    const std::string text = resultText(feature_system.invoke(kFeatureName));
+
+    // 空网格被预检拒绝：温和文案、不抛异常、不生成任何结果组件
+    REQUIRE(text.find("网格为空") != std::string::npos);
     const ModelData* model = model_layer.modelById(setup.model_id);
     REQUIRE(model != nullptr);
     CHECK(model->componentIds().size() == setup.initial_component_count);
