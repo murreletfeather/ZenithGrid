@@ -3,13 +3,15 @@
 
 from __future__ import annotations
 import argparse
+import ipaddress
 import os
 import platform
 import shlex
 import shutil
+import socket
 import subprocess
 import sys
-import tarfile
+import urllib.parse
 import urllib.request
 import zipfile
 from dataclasses import dataclass
@@ -162,6 +164,8 @@ class GitRepository:
     ref: str
     destination: str = ""
     detached_commit: str = ""
+    # 克隆后需初始化的子模块路径（git pathspec；浅初始化深度 1）。
+    submodule_paths: tuple[str, ...] = ()
 
 @dataclass(frozen=True)
 class DependenciesSettings:
@@ -291,6 +295,26 @@ GIT_REPOSITORIES = [
         "gmsh-occ8",
         "86596d7902a1b00e23641ac5c904b7c1f880ce9f",
     ),
+    GitRepository(
+        # Boost 超级仓库：CMake 构建逻辑在 tools/cmake 子模块，库体在 libs/ 子模块，
+        # 只浅初始化这两处，tools/ 其余子模块（b2、quickbook 等）不参与 CMake 构建。
+        "boost",
+        "https://github.com/boostorg/boost.git",
+        "boost-1.91.0",
+        submodule_paths=("libs", "tools/cmake"),
+    ),
+    GitRepository(
+        # CGAL 纯头文件库：CMake 安装头文件与包配置（CGALConfig），无二进制产物。
+        "cgal",
+        "https://github.com/CGAL/cgal.git",
+        "v6.2",
+    ),
+    GitRepository(
+        # Eigen 纯头文件库：CMake 安装头文件（Monge_via_jet_fitting 所需）。
+        "eigen",
+        "https://gitlab.com/libeigen/eigen.git",
+        "3.4.0",
+    ),
 ]
 
 class DependencyError(Exception):
@@ -356,8 +380,41 @@ def clone_repositories(settings: DependenciesSettings) -> None:
         run(command)
         if repository.detached_commit:
             run(["git", "checkout", "--detach", repository.detached_commit], destination)
+        if repository.submodule_paths:
+            # 浅初始化子模块：pathspec 形式（如 libs）匹配该目录下全部子模块。
+            run(
+                ["git", "submodule", "update", "--init", "--depth", "1", "--",
+                 *repository.submodule_paths],
+                destination,
+            )
+
+def validate_download_url(url: str) -> None:
+    """下载前校验 URL，防 SSRF：仅允许 http/https，host 不得解析到本机/私有/保留地址。"""
+
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise DependencyError(f"下载地址非法（仅允许 http/https）：{url}")
+    default_port = 443 if parsed.scheme == "https" else 80
+    try:
+        addr_infos = socket.getaddrinfo(
+            parsed.hostname, parsed.port or default_port, type=socket.SOCK_STREAM
+        )
+    except socket.gaierror as error:
+        raise DependencyError(f"下载地址主机无法解析：{url}（{error}）")
+    for addr_info in addr_infos:
+        address = ipaddress.ip_address(addr_info[4][0])
+        if (
+            address.is_unspecified
+            or address.is_loopback
+            or address.is_private
+            or address.is_link_local
+            or address.is_reserved
+            or address.is_multicast
+        ):
+            raise DependencyError(f"下载地址解析到禁止的网络地址（本机/私有/保留）：{url}")
 
 def download_file(url: str, destination: Path) -> None:
+    validate_download_url(url)
     if destination.exists() and destination.stat().st_size > 0:
         print(f"[跳过] 压缩包已存在：{destination}")
         return
@@ -394,23 +451,16 @@ def download_file(url: str, destination: Path) -> None:
         raise
 
 def download_archives(settings: DependenciesSettings) -> None:
-    downloads = [
-        (
-            # OCCT 的 Windows 预编译第三方库（freetype 等），仅 windows 原生构建需要。
-            "https://github.com/Open-Cascade-SAS/OCCT/releases/download/V8_0_0/3rdparty-vc14-64.zip",
-            settings.source_dir / "OCCT" / "3rdparty-vc14-64-temp.zip",
-        ),
-        (
-            "https://github.com/CGAL/cgal/releases/download/v6.2/CGAL-6.2.zip",
-            settings.source_dir / "CGAL-6.2.zip",
-        ),
-        (
-            "https://github.com/boostorg/boost/releases/download/boost-1.91.0-1/boost-1.91.0-1-cmake.tar.xz",
-            settings.source_dir / "boost-1.91.0-1-cmake.tar.xz",
-        ),
-    ]
-    if settings.platform.system != "windows":
-        downloads = downloads[1:]
+    # CGAL/Boost/Eigen 已改走 git 仓库克隆->构建->安装主逻辑，此处仅剩
+    # OCCT 的 Windows 预编译第三方库（无源码仓库形态，仅 windows 原生构建需要）。
+    downloads = []
+    if settings.platform.system == "windows":
+        downloads.append(
+            (
+                "https://github.com/Open-Cascade-SAS/OCCT/releases/download/V8_0_0/3rdparty-vc14-64.zip",
+                settings.source_dir / "OCCT" / "3rdparty-vc14-64-temp.zip",
+            )
+        )
     for url, destination in downloads:
         download_file(url, destination)
 
@@ -436,33 +486,6 @@ def extract_zip(archive: Path, destination: Path) -> None:
     with zipfile.ZipFile(archive) as zip_file:
         zip_file.extractall(destination)
 
-def extract_boost_archive(archive: Path, destination: Path) -> None:
-    """解压 Boost 归档并去掉一层归档目录。"""
-
-    print(f"[解压] {archive} -> {destination}")
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    excluded_marker = "/libs/decimal/doc/modules/ROOT/examples"
-    with tarfile.open(archive, "r:xz") as archive_file:
-        members = archive_file.getmembers()
-        stripped_members = []
-        for member in members:
-            parts = Path(member.name).parts
-            if len(parts) <= 1:
-                continue
-            if excluded_marker in "/" + member.name:
-                continue
-            member.name = str(Path(*parts[1:]))
-            if member.linkname:
-                link_parts = Path(member.linkname).parts
-                if len(link_parts) > 1:
-                    member.linkname = str(Path(*link_parts[1:]))
-            stripped_members.append(member)
-        try:
-            archive_file.extractall(destination, members=stripped_members, filter="data")
-        except TypeError:
-            # Python 3.11 及更早版本没有 data 过滤器。
-            archive_file.extractall(destination, members=stripped_members)
-
 def prepare_archives(settings: DependenciesSettings) -> None:
     # OCCT 的 vc14 第三方包与解压仅 windows 原生构建需要；Linux 下 freetype
     # 由本项目 freetype2.14.1 安装提供，其余第三方组件默认关闭。
@@ -479,25 +502,6 @@ def prepare_archives(settings: DependenciesSettings) -> None:
             extract_zip(inner_archive, occt_source)
         else:
             print(f"[跳过] 已解压：{third_party_dir}")
-
-    # CGAL 为纯头文件库，按平台各解压一份，保证 CMAKE_PREFIX_PATH 指向平台目录即可发现。
-    cgal_destination = settings.install_dir / "CGAL-6.2"
-    cgal_marker = cgal_destination / "CMakeLists.txt"
-    if not cgal_marker.exists():
-        extract_zip(settings.source_dir / "CGAL-6.2.zip", settings.install_dir)
-        for directory_name in ("data", "demo", "examples", "doc_html"):
-            remove_path(cgal_destination / directory_name)
-    else:
-        print(f"[跳过] 已解压：{cgal_destination}")
-
-    boost_source = settings.source_dir / "boost-src"
-    if not boost_source.exists():
-        extract_boost_archive(
-            settings.source_dir / "boost-1.91.0-1-cmake.tar.xz",
-            boost_source,
-        )
-    else:
-        print(f"[跳过] 已解压：{boost_source}")
 
 def fetch_sources(settings: DependenciesSettings) -> None:
     settings.dependency_dir.mkdir(parents=True, exist_ok=True)
@@ -929,8 +933,75 @@ def fix_gmsh_occ_paths(settings: DependenciesSettings) -> None:
         return
     write_text_file(target_file, updated)
 
+def build_eigen(settings: DependenciesSettings) -> None:
+    """Eigen 为纯头文件库（MPL2），CMake 安装头文件，无二进制产物。
+
+    头文件落 <prefix>/include/eigen3（Eigen 默认布局，消费端 find_path 按该
+    后缀发现）。不能显式传相对 INCLUDE_INSTALL_DIR：CMake 会把命令行相对路径
+    相对工作目录绝对化，装到依赖目录之外。纯头文件安装与目标平台工具链无关，
+    wasm 交叉构建复用同一配方。
+    """
+
+    install_prefix = settings.install_dir / "eigen-3.4.0"
+    # include/eigen3 为本脚本安装布局；根目录直接放 Eigen 为旧压缩包布局，兼容跳过。
+    installed_markers = (
+        install_prefix / "include" / "eigen3" / "Eigen" / "src" / "Core" / "util" / "Macros.h",
+        install_prefix / "Eigen" / "src" / "Core" / "util" / "Macros.h",
+    )
+    if any(marker.exists() for marker in installed_markers):
+        print(f"[跳过] Eigen 已安装：{install_prefix}")
+        return
+    source = settings.source_dir / "eigen"
+    build_directory = settings.build_directory(source)
+    configure_cmake_project(
+        source,
+        build_directory,
+        install_prefix,
+        [
+            ("-DEIGEN_BUILD_DOC", "OFF"),
+            ("-DEIGEN_BUILD_PKGCONFIG", "OFF"),
+            ("-DBUILD_TESTING", "OFF"),
+            # blas/lapack 子目录无条件 check_language(Fortran)；PATH 中可能存在与
+            # 主工具链不兼容的 gfortran（如 MinGW），探测会以 fatal error 中断配置。
+            # 预置该缓存变量让 check_language 跳过、blas/lapack 走无 Fortran 分支
+            # （libMeshb 先例；头文件消费方不依赖 blas/lapack 产物）。
+            ("-DCMAKE_Fortran_COMPILER:STRING", "OFF"),
+        ],
+        settings,
+        use_toolchain=False,
+    )
+    install_configs(("Release",), build_directory)
+
+def build_cgal(settings: DependenciesSettings) -> None:
+    """CGAL 为纯头文件库，CMake 安装头文件与包配置（CGALConfig），无二进制产物。
+
+    CGAL_DISABLE_GMP 与消费端 CgalSupport 传播的编译宏保持同一语义，避免
+    配置产物记录 GMP 依赖。纯头文件安装与目标平台工具链无关，wasm 交叉
+    构建复用同一配方。
+    """
+
+    install_prefix = settings.install_dir / "CGAL-6.2"
+    installed_marker = install_prefix / "lib" / "cmake" / "CGAL" / "CGALConfig.cmake"
+    if installed_marker.exists():
+        print(f"[跳过] CGAL 已安装：{install_prefix}")
+        return
+    source = settings.source_dir / "cgal"
+    build_directory = settings.build_directory(source)
+    configure_cmake_project(
+        source,
+        build_directory,
+        install_prefix,
+        [
+            ("-DCGAL_DISABLE_GMP", "ON"),
+            ("-DCGAL_ENABLE_TESTING", "OFF"),
+        ],
+        settings,
+        use_toolchain=False,
+    )
+    install_configs(("Release",), build_directory)
+
 def build_boost(settings: DependenciesSettings) -> None:
-    source = settings.source_dir / "boost-src"
+    source = settings.source_dir / "boost"
     build_directory = settings.build_directory(source)
     configure_cmake_project(
         source,
@@ -987,6 +1058,8 @@ def build_native(settings: DependenciesSettings) -> None:
     build_tetgen(settings)
     build_gmsh(settings)
     build_boost(settings)
+    build_cgal(settings)
+    build_eigen(settings)
     build_pybind11(settings)
 
 REQUIRED_EMSDK_VERSION = "3.1.56"
@@ -1550,7 +1623,7 @@ def build_gmsh_wasm(
     inject_gmsh_occ_static_libraries(settings, occ_lib_dir)
 
 def build_boost_wasm(settings: DependenciesSettings, environment: dict[str, str]) -> None:
-    source = settings.source_dir / "boost-src"
+    source = settings.source_dir / "boost"
     build_directory = settings.build_directory(source)
     configure_cmake_project(
         source,
@@ -1603,6 +1676,9 @@ def build_wasm(settings: DependenciesSettings) -> None:
     build_tetgen_wasm(settings, environment)
     build_gmsh_wasm(settings, occ_prefix, environment)
     build_boost_wasm(settings, environment)
+    # 纯头文件库安装（配方与原生一致，不依赖 wasm 工具链与交叉环境变量）。
+    build_cgal(settings)
+    build_eigen(settings)
 
 def build_dependencies(settings: DependenciesSettings) -> None:
     if settings.platform.is_wasm:

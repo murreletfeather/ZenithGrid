@@ -1,0 +1,8 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "RidgesUmbilics",
+    "display_name": "脊线与脐点分析",
+    "description": "基于 CGAL Ridges_3 的曲率特征分析：提取脊线（椭圆/双曲/crest）与脐点（椭圆/双曲），结果生成为独立的新几何组件，不修改原网格"
+  }
+}
