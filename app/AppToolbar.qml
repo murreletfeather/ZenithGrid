@@ -38,8 +38,8 @@ ColumnLayout {
     property bool outputLogOpen: false
     property bool preferencesOpen: false
 
-    // 已知插件名 → 图标映射，未命中则使用 plugin.svg
-    // key 与 ZenithGrid catalog handlers 1:1 命中，路径按 PreCess 既有 toolbar/<group>/ 子目录布局
+    // 已知插件名 → 图标映射, 未命中回退到 Common/preferences.svg (通用图标)
+    // key 与 ZenithGrid catalog handlers 1:1 命中, 路径按 PreCess 既有 toolbar/<group>/ 子目录布局
     readonly property var pluginIconMap: ({
         "CreateFacePlugin": "qrc:/images/toolbar/Edit/create-face.svg",
         "DeleteFacePlugin": "qrc:/images/toolbar/Edit/delete-face.svg",
@@ -47,12 +47,16 @@ ColumnLayout {
         "TetGenLibPlugin": "qrc:/images/toolbar/Algorithm/tetgen.svg",
         "GmshPlugin": "qrc:/images/toolbar/Algorithm/gmsh.svg",
         "cmdExecutePlugin": "qrc:/images/toolbar/Algorithm/cmd.svg",
-        "MeasurePlugin": "qrc:/images/toolbar/Tools/measure.svg",
-        "DimensionPlugin": "qrc:/images/toolbar/Tools/size_marking.svg",
-        "MeshQuality": "qrc:/images/toolbar/Function/grid_quality.svg"
+        "MeasurePlugin": "qrc:/images/toolbar/Measure/measure.svg",
+        "DimensionPlugin": "qrc:/images/toolbar/Measure/dimension.svg",
+        "MeshQuality": "qrc:/images/toolbar/Function/grid_quality.svg",
+        "MeshBoolean": "qrc:/images/toolbar/Mesh/mesh-boolean.svg",
+        "MeshRepair": "qrc:/images/toolbar/Mesh/mesh-repair.svg",
+        "ScalePreview": "qrc:/images/toolbar/Panels/scale-preview.svg",
+        "FeatureDemo": "qrc:/images/toolbar/Panels/feature-demo.svg"
     })
     function getIconForPlugin(pluginName) {
-        return pluginIconMap[pluginName] || "qrc:/images/toolbar/plugin.svg"
+        return pluginIconMap[pluginName] || "qrc:/images/toolbar/Panels/plugin.svg"
     }
 
     // 功能图标：优先菜单声明的自定义 qrc 图标，未指定时按插件名映射默认图标
@@ -440,6 +444,10 @@ ColumnLayout {
             spacing: 2
 
             RibbonActionButton {
+                icon.source: "qrc:/images/toolbar/Common/undo.svg"
+                icon.width: root.ribbonIconSize
+                icon.height: root.ribbonIconSize
+                icon.color: "transparent"
                 text: qsTr("撤销")
                 enabled: QModelManager.undoStack.canUndo
                 Layout.fillHeight: true
@@ -451,6 +459,10 @@ ColumnLayout {
             }
 
             RibbonActionButton {
+                icon.source: "qrc:/images/toolbar/Common/redo.svg"
+                icon.width: root.ribbonIconSize
+                icon.height: root.ribbonIconSize
+                icon.color: "transparent"
                 text: qsTr("重做")
                 enabled: QModelManager.undoStack.canRedo
                 Layout.fillHeight: true

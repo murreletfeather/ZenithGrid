@@ -581,6 +581,9 @@ Page {
             }
 
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/clip.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "裁剪"
                 checkable: true
                 Layout.preferredWidth: 50
@@ -590,6 +593,9 @@ Page {
                 }
             }
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/scale-bar.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "比例尺"
                 checkable: true
                 Layout.preferredWidth: 50
@@ -599,6 +605,9 @@ Page {
                 }
             }
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/reset-view.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "重置视图"
                 Layout.preferredWidth: 70
                 Layout.fillHeight: true
