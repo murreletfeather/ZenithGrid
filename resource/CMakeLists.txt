@@ -11,17 +11,17 @@ qt_add_resources(${MYNAME} "images"
         toolbar/Algorithm/cmd.svg
         toolbar/Algorithm/gmsh.svg
         toolbar/precess_extra_plugin.svg
-        toolbar/Geometry/point.svg
-        toolbar/Geometry/line_coord.svg
-        toolbar/Geometry/line_points.svg
+        toolbar/Geometry/create-point.svg
+        toolbar/Geometry/line-coordinates.svg
+        toolbar/Geometry/line-vertices.svg
         toolbar/Geometry/rectangle.svg
-        toolbar/Geometry/sector_or_circle.svg
-        toolbar/Geometry/close_edges_to_form_surface.svg
+        toolbar/Geometry/disk.svg
+        toolbar/Geometry/face-from-edges.svg
         toolbar/Geometry/box.svg
         toolbar/Geometry/cylinder.svg
-        toolbar/Geometry/cone_or_conical_stage.svg
+        toolbar/Geometry/cone.svg
         toolbar/Geometry/sphere.svg
-        toolbar/Geometry/stretched_surface.svg
+        toolbar/Geometry/extrude.svg
         toolbar/Geometry/delete-geometry.svg
         toolbar/Function/grid_quality.svg
         toolbar/Tools/measure.svg
