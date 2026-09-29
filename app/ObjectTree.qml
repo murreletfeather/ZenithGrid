@@ -88,6 +88,7 @@ Pane {
                 implicitWidth: 26
                 implicitHeight: 26
                 display: ToolButton.IconOnly
+                flat: true
                 Accessible.name: qsTr("显示全部")
 
                 ToolTip.visible: hovered
@@ -104,6 +105,7 @@ Pane {
                 implicitWidth: 26
                 implicitHeight: 26
                 display: ToolButton.IconOnly
+                flat: true
                 Accessible.name: qsTr("隐藏全部")
 
                 ToolTip.visible: hovered
