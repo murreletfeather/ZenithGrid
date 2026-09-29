@@ -5,8 +5,8 @@ qt_add_resources(${MYNAME} "images"
         toolbar/File/import.svg
         toolbar/File/export.svg
         toolbar/File/preference.svg
-        toolbar/Edit/create_face.svg
-        toolbar/Edit/delete_face.svg
+        toolbar/Edit/create-face.svg
+        toolbar/Edit/delete-face.svg
         toolbar/Algorithm/tetgen.svg
         toolbar/Algorithm/cmd.svg
         toolbar/Algorithm/gmsh.svg
@@ -17,12 +17,12 @@ qt_add_resources(${MYNAME} "images"
         toolbar/Geometry/rectangle.svg
         toolbar/Geometry/sector_or_circle.svg
         toolbar/Geometry/close_edges_to_form_surface.svg
-        toolbar/Geometry/cuboid.svg
+        toolbar/Geometry/box.svg
         toolbar/Geometry/cylinder.svg
         toolbar/Geometry/cone_or_conical_stage.svg
         toolbar/Geometry/sphere.svg
         toolbar/Geometry/stretched_surface.svg
-        toolbar/Geometry/delete_geometry.svg
+        toolbar/Geometry/delete-geometry.svg
         toolbar/Function/grid_quality.svg
         toolbar/Tools/measure.svg
         toolbar/Tools/size_marking.svg

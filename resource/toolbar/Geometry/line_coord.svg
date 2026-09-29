@@ -1,9 +1,1 @@
-<!-- 2. 直线边（坐标） -->
-<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">
-  <rect width="60" height="60" fill="#ffffff"/>
-  <line x1="15" y1="45" x2="45" y2="15" stroke="#000000" stroke-width="2"/>
-  <circle cx="15" cy="45" r="3" fill="#ffffff" stroke="#0066cc" stroke-width="1.5"/>
-  <circle cx="45" cy="15" r="3" fill="#ffffff" stroke="#0066cc" stroke-width="1.5"/>
-  <text x="8" y="56" font-size="6" fill="#0066cc">(x,y)</text>
-  <text x="38" y="12" font-size="6" fill="#0066cc">(x,y)</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><title>坐标创建直线</title><defs><linearGradient id="line-coordinates-silver" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8CA7B0"/><stop offset="1" stop-color="#536F7C"/></linearGradient><linearGradient id="line-coordinates-teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3CBFC6"/><stop offset="1" stop-color="#087C8B"/></linearGradient></defs><g fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><g stroke="url(#line-coordinates-silver)"><path d="M4 4v16h16" /></g><g stroke="url(#line-coordinates-teal)"><path d="m7 15 11-9" /><circle cx="7" cy="15" r="1.5" fill="url(#line-coordinates-teal)" /><circle cx="18" cy="6" r="1.5" fill="url(#line-coordinates-teal)" /></g></g></svg>
