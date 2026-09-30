@@ -17,13 +17,13 @@
 #include <QtQml/QQmlContext>
 #include <QtQml/qqmlregistration.h>
 #include <vtkActor.h>
-#include <vtkCameraOrientationWidget.h>
 #include <vtkAxisActor2D.h>
+#include <vtkOrientationMarkerWidget.h>
+#include <vtkPoints.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
-#include <vtkPoints.h>
 
 class MeshActor;
 class SelectManager;
@@ -57,7 +57,7 @@ public:
 
         /*std::unordered_map<Index, std::unique_ptr<MeshActor>> models_;*/
         vtkNew<QRenderWindowStyle> style_;
-        vtkSmartPointer<vtkCameraOrientationWidget> orientationWidget = vtkSmartPointer<vtkCameraOrientationWidget>::New();
+        vtkNew<vtkOrientationMarkerWidget> orientation_widget_;
 
         std::unique_ptr<MeshActorManager> mesh_actor_manager_;
         std::unique_ptr<GeometryActorManager> geometry_actor_manager_;
