@@ -117,6 +117,18 @@ Pane {
             }
         }
 
+    // 空状态固定在视口中央；rows 带变更通知，导入/删除模型后会自动更新。
+    Label {
+        anchors.centerIn: treeView
+        visible: treeView.rows === 0
+        text: qsTr("拖入或打开\n模型文件以填充对象树")
+        color: Theme.textSecondary
+        font.pixelSize: Theme.fontSizeCaption
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.WordWrap
+        width: Math.max(0, Math.min(implicitWidth, treeView.width - Theme.spacingMd))
+    }
+
     TreeView {
         id: treeView
         anchors { left: parent.left; right: parent.right; top: headerBar.bottom; bottom: parent.bottom }
@@ -131,19 +143,6 @@ Pane {
         property int toggleExpandRow: -1
         onExpanded: (row, depth) => toggleExpandRow = row
         onCollapsed: (row, recursively) => toggleExpandRow = row
-
-        // 空模型占位：拖入或打开模型文件后会自动消失。
-        // 折行 + 居中 + 限制最大宽度，避免窄 Pane 下文字向左溢出被裁
-        Label {
-            anchors.centerIn: parent
-            visible: treeModel.rowCount() === 0
-            text: qsTr("拖入或打开\n模型文件以填充对象树")
-            color: Theme.textSecondary
-            font.pixelSize: Theme.fontSizeCaption
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
-            width: Math.min(implicitWidth, parent.width - Theme.spacingMd)
-        }
 
         delegate: TreeViewDelegate {
             id: viewDelegate
