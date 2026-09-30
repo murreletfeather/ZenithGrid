@@ -71,6 +71,14 @@ Page {
 
             ToolButton {
                 id: geoBtn
+                icon.source: "qrc:/images/toolbar/Viewport/geometry.svg"
+                icon.width: 20
+                icon.height: 20
+                icon.color: "transparent"
+                Accessible.name: qsTr("几何显示")
+                ToolTip.visible: hovered
+                ToolTip.text: text
+                ToolTip.delay: 500
                 display: ToolButton.IconOnly
                 flat: true
                 Layout.preferredWidth: 32
@@ -211,6 +219,14 @@ Page {
 
             ToolButton {
                 id: meshBtn
+                icon.source: "qrc:/images/toolbar/Viewport/mesh.svg"
+                icon.width: 20
+                icon.height: 20
+                icon.color: "transparent"
+                Accessible.name: qsTr("网格显示")
+                ToolTip.visible: hovered
+                ToolTip.text: text
+                ToolTip.delay: 500
                 display: ToolButton.IconOnly
                 flat: true
                 Layout.preferredWidth: 32
