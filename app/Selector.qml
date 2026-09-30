@@ -57,7 +57,11 @@ RowLayout {
     }
     Button{
         id: selectClearButton
+        icon.source: "qrc:/images/toolbar/Selection/clear-selection.svg"
+        icon.width: 16
+        icon.height: 16
         text: "清除选择"
+        flat: true
         onClicked: root.clearButtonClicked()
         opacity: enabled ? 1.0 : 0.6
     }
@@ -87,6 +91,9 @@ RowLayout {
         }
     }
     Button{
+        icon.source: "qrc:/images/toolbar/Common/confirm.svg"
+        icon.width: 16
+        icon.height: 16
         text: "确认"
         onClicked: {
             root.confirmButtonClicked()

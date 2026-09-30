@@ -22,6 +22,7 @@ ColumnLayout {
     // 会与布局隐式尺寸形成反馈环（图标异步加载后触发 recursive rearrange 警告）。
     readonly property real ribbonIconSize: windowHeight / 12 * 0.65
 
+    signal resetLayoutRequested()
     signal objectTreeToggled()
     signal propertyListToggled()
     signal attributeRenderToggled()
@@ -38,20 +39,55 @@ ColumnLayout {
     property bool outputLogOpen: false
     property bool preferencesOpen: false
 
-    // 已知插件名 → 图标映射，未命中则使用 PreCess_extra_plugin.svg
+    // 已知插件名 → 图标映射, 未命中回退到 Panels/plugin.svg (通用图标)
+    // key 与 ZenithGrid catalog handlers 1:1 命中, 路径按 PreCess 既有 toolbar/<group>/ 子目录布局
     readonly property var pluginIconMap: ({
-        "CreateFacePlugin": "qrc:/images/toolbar/Edit/create_face.svg",
-        "DeleteFacePlugin": "qrc:/images/toolbar/Edit/delete_face.svg",
+        // 编辑 (mesh)
+        "CreateFacePlugin": "qrc:/images/toolbar/Edit/create-face.svg",
+        "DeleteFacePlugin": "qrc:/images/toolbar/Edit/delete-face.svg",
+        // 算法 (algorithm)
         "TetGenPlugin": "qrc:/images/toolbar/Algorithm/tetgen.svg",
         "TetGenLibPlugin": "qrc:/images/toolbar/Algorithm/tetgen.svg",
         "GmshPlugin": "qrc:/images/toolbar/Algorithm/gmsh.svg",
         "cmdExecutePlugin": "qrc:/images/toolbar/Algorithm/cmd.svg",
-        "MeasurePlugin": "qrc:/images/toolbar/Tools/measure.svg",
-        "DimensionPlugin": "qrc:/images/toolbar/Tools/size_marking.svg",
-        "MeshQuality": "qrc:/images/toolbar/Function/grid_quality.svg"
+        // 测量 (measure)
+        "MeasurePlugin": "qrc:/images/toolbar/Measure/measure.svg",
+        "DimensionPlugin": "qrc:/images/toolbar/Measure/dimension.svg",
+        // 网格 (mesh)
+        "MeshQuality": "qrc:/images/toolbar/Function/grid_quality.svg",
+        "MeshBoolean": "qrc:/images/toolbar/Mesh/mesh-boolean.svg",
+        "MeshRepair": "qrc:/images/toolbar/Mesh/mesh-repair.svg",
+        // 演示 (panels)
+        "ScalePreview": "qrc:/images/toolbar/Panels/scale-preview.svg",
+        "FeatureDemo": "qrc:/images/toolbar/Panels/feature-demo.svg",
+        // 几何创建 (geometry) — handler 名带不带 Plugin 后缀两种都映射
+        "CreatePoint": "qrc:/images/toolbar/Geometry/create-point.svg",
+        "CreatePointPlugin": "qrc:/images/toolbar/Geometry/create-point.svg",
+        "CreateLineByCoordinates": "qrc:/images/toolbar/Geometry/line-coordinates.svg",
+        "CreateLineByCoordinatesPlugin": "qrc:/images/toolbar/Geometry/line-coordinates.svg",
+        "CreateLineFromVertices": "qrc:/images/toolbar/Geometry/line-vertices.svg",
+        "CreateLineFromVerticesPlugin": "qrc:/images/toolbar/Geometry/line-vertices.svg",
+        "CreateRectangleFace": "qrc:/images/toolbar/Geometry/rectangle.svg",
+        "CreateRectangleFacePlugin": "qrc:/images/toolbar/Geometry/rectangle.svg",
+        "CreateDiskFace": "qrc:/images/toolbar/Geometry/disk.svg",
+        "CreateDiskFacePlugin": "qrc:/images/toolbar/Geometry/disk.svg",
+        "CreateBox": "qrc:/images/toolbar/Geometry/box.svg",
+        "CreateBoxPlugin": "qrc:/images/toolbar/Geometry/box.svg",
+        "CreateSphere": "qrc:/images/toolbar/Geometry/sphere.svg",
+        "CreateSpherePlugin": "qrc:/images/toolbar/Geometry/sphere.svg",
+        "CreateCylinder": "qrc:/images/toolbar/Geometry/cylinder.svg",
+        "CreateCylinderPlugin": "qrc:/images/toolbar/Geometry/cylinder.svg",
+        "CreateCone": "qrc:/images/toolbar/Geometry/cone.svg",
+        "CreateConePlugin": "qrc:/images/toolbar/Geometry/cone.svg",
+        "CreateFaceFromEdges": "qrc:/images/toolbar/Geometry/face-from-edges.svg",
+        "CreateFaceFromEdgesPlugin": "qrc:/images/toolbar/Geometry/face-from-edges.svg",
+        "ExtrudeFace": "qrc:/images/toolbar/Geometry/extrude.svg",
+        "ExtrudeFacePlugin": "qrc:/images/toolbar/Geometry/extrude.svg",
+        "DeleteGeometry": "qrc:/images/toolbar/Geometry/delete-geometry.svg",
+        "DeleteGeometryPlugin": "qrc:/images/toolbar/Geometry/delete-geometry.svg"
     })
     function getIconForPlugin(pluginName) {
-        return pluginIconMap[pluginName] || "qrc:/images/toolbar/precess_extra_plugin.svg"
+        return pluginIconMap[pluginName] || "qrc:/images/toolbar/Panels/plugin.svg"
     }
 
     // 功能图标：优先菜单声明的自定义 qrc 图标，未指定时按插件名映射默认图标
@@ -186,8 +222,12 @@ ColumnLayout {
         modal: true
         anchors.centerIn: Overlay.overlay
         width: 380
-        padding: 12
-        background: Rectangle { color: "#f0f0f0"; border.color: "#ccc" }
+        padding: Theme.spacingMd
+        background: Rectangle {
+            color: Theme.surface
+            border.color: Theme.border
+            radius: Theme.radiusMenu
+        }
 
         function openDialog() {
             typeCombo.model = QModelManager.ioSystem.getModelIOInfo()
@@ -262,26 +302,41 @@ ColumnLayout {
     }
 
     ToolBar {
+        background: Rectangle {
+            color: Theme.surfaceAlt
+
+            // 底部细线分隔页签行与页面内容
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
+                }
+                height: 1
+                color: Theme.border
+            }
+        }
+
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 0
+            spacing: 2
 
-            ToolButton {
+            RibbonTabButton {
                 text: "文件"
                 checkable: true
                 checked: activeCategory === 0
                 onClicked: activeCategory = (activeCategory === 0) ? -1 : 0
             }
 
-            ToolButton {
+            RibbonTabButton {
                 text: qsTr("编辑")
                 checkable: true
                 checked: activeCategory === 1
                 onClicked: activeCategory = (activeCategory === 1) ? -1 : 1
             }
 
-            ToolButton {
+            RibbonTabButton {
                 text: qsTr("算法")
                 checkable: true
                 checked: activeCategory === 2
@@ -291,7 +346,7 @@ ColumnLayout {
             // 功能菜单分页：按 menu_path 第一段（菜单）动态生成分页按钮，页序对应 StackLayout 索引 3 起
             Repeater {
                 model: root.featureMenus
-                ToolButton {
+                RibbonTabButton {
                     required property var modelData
                     required property int index
                     text: modelData.name
@@ -301,23 +356,13 @@ ColumnLayout {
                 }
             }
 
-            ToolButton {
+            RibbonTabButton {
                 id: viewBtn
                 text: "视图"
                 onClicked: viewMenu.popup(viewBtn, 0, viewBtn.height)
                 Menu {
                     id: viewMenu
                     closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-                    topPadding: 2
-                    bottomPadding: 2
-
-                    delegate: MenuItem {
-                        implicitHeight: 22
-                        padding: 0
-                        leftPadding: 6
-                        rightPadding: 6
-                        spacing: 0
-                    }
 
                     Action {
                         text: "对象树"
@@ -361,6 +406,11 @@ ColumnLayout {
                         checked: preferencesOpen
                         onToggled: preferencesToggled()
                     }
+                    MenuSeparator {}
+                    Action {
+                        text: qsTr("恢复默认布局")
+                        onTriggered: root.resetLayoutRequested()
+                    }
                 }
             }
 
@@ -378,14 +428,14 @@ ColumnLayout {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 2
 
-            ToolButton {
+            RibbonActionButton {
                 icon.source: "qrc:/images/toolbar/File/import.svg"
                 icon.width: root.ribbonIconSize
                 icon.height: root.ribbonIconSize
                 icon.color: "transparent"
                 Layout.fillHeight: true
-                display: ToolButton.TextUnderIcon
                 text: "导入"
                 onClicked: {
                     if (root.isWasm)
@@ -395,13 +445,12 @@ ColumnLayout {
                 }
             }
 
-            ToolButton {
+            RibbonActionButton {
                 icon.source: "qrc:/images/toolbar/File/export.svg"
                 icon.width: root.ribbonIconSize
                 icon.height: root.ribbonIconSize
                 icon.color: "transparent"
                 Layout.fillHeight: true
-                display: ToolButton.TextUnderIcon
                 text: "导出"
                 onClicked: {
                     if (root.isWasm)
@@ -411,13 +460,12 @@ ColumnLayout {
                 }
             }
 
-            ToolButton {
+            RibbonActionButton {
                 icon.source: "qrc:/images/toolbar/File/preference.svg"
                 icon.width: root.ribbonIconSize
                 icon.height: root.ribbonIconSize
                 icon.color: "transparent"
                 Layout.fillHeight: true
-                display: ToolButton.TextUnderIcon
                 text: "偏好设置"
                 onClicked: preferencesToggled()
             }
@@ -429,8 +477,13 @@ ColumnLayout {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 2
 
-            ToolButton {
+            RibbonActionButton {
+                icon.source: "qrc:/images/toolbar/Common/undo.svg"
+                icon.width: root.ribbonIconSize
+                icon.height: root.ribbonIconSize
+                icon.color: "transparent"
                 text: qsTr("撤销")
                 enabled: QModelManager.undoStack.canUndo
                 Layout.fillHeight: true
@@ -441,7 +494,11 @@ ColumnLayout {
                 onClicked: QModelManager.undoStack.undo()
             }
 
-            ToolButton {
+            RibbonActionButton {
+                icon.source: "qrc:/images/toolbar/Common/redo.svg"
+                icon.width: root.ribbonIconSize
+                icon.height: root.ribbonIconSize
+                icon.color: "transparent"
                 text: qsTr("重做")
                 enabled: QModelManager.undoStack.canRedo
                 Layout.fillHeight: true
@@ -459,14 +516,13 @@ ColumnLayout {
 
             Repeater {
                 model: QModelManager.editSystem.editsInfo
-                ToolButton {
+                RibbonActionButton {
                     required property var modelData
                     icon.source: root.getIconForPlugin(modelData.name)
                     icon.width: root.ribbonIconSize
                     icon.height: root.ribbonIconSize
                     icon.color: "transparent"
                     Layout.fillHeight: true
-                    display: ToolButton.TextUnderIcon
                     text: modelData.display_name
                     onClicked: {
                         App.activeOperation = {
@@ -488,17 +544,17 @@ ColumnLayout {
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            spacing: 2
 
             Repeater {
                 model: QModelManager.algorithmSystem.algorithmsInfo
-                ToolButton {
+                RibbonActionButton {
                     required property var modelData
                     icon.source: root.getIconForPlugin(modelData.name)
                     icon.width: root.ribbonIconSize
                     icon.height: root.ribbonIconSize
                     icon.color: "transparent"
                     Layout.fillHeight: true
-                    display: ToolButton.TextUnderIcon
                     text: modelData.display_name
                     onClicked: root.activatePlugin(QModelManager.algorithmSystem.algorithmsInfo, modelData.name, QModelManager.algorithmSystem)
                 }
@@ -515,6 +571,7 @@ ColumnLayout {
                 required property var modelData
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                spacing: 2
 
                 Repeater {
                     model: featureMenuPage.modelData.groups
@@ -523,18 +580,17 @@ ColumnLayout {
                         required property var modelData
                         required property int index
                         Layout.fillHeight: true
-                        spacing: 0
+                        spacing: 2
 
                         Repeater {
                             model: featureGroupRow.modelData.items
-                            ToolButton {
+                            RibbonActionButton {
                                 required property var modelData
                                 icon.source: root.getIconForFeature(modelData)
                                 icon.width: root.ribbonIconSize
                                 icon.height: root.ribbonIconSize
                                 icon.color: "transparent"
                                 Layout.fillHeight: true
-                                display: ToolButton.TextUnderIcon
                                 text: modelData.display_name
                                 onClicked: root.activateFeature(modelData)
                             }

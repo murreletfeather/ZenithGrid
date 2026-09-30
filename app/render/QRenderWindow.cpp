@@ -15,15 +15,19 @@
 #include "MeshIdQuery.h"
 
 #include <spdlog/spdlog.h>
-#include <vtkCamera.h>
-#include <vtkDoubleArray.h>
+#include <vtkAxesActor.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
+#include <vtkCaptionActor2D.h>
 #include <vtkDisplaySizedImplicitPlaneRepresentation.h>
 #include <vtkDisplaySizedImplicitPlaneWidget.h>
+#include <vtkDoubleArray.h>
 #include <vtkMapper.h>
 #include <vtkMath.h>
 #include <vtkObjectFactory.h>
 #include <vtkPlane.h>
+#include <vtkProperty.h>
+#include <vtkTextProperty.h>
 
 #include <cmath>
 #include <memory>
@@ -244,10 +248,32 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     // 注入渲染刷新回调（与 setFeatureAdaptor 互补，确保两者先后顺序均能生效）
     injectRenderRefreshCallback();
 
-    vtk->orientationWidget->AnimateOff();
-    vtk->orientationWidget->SetParentRenderer(vtk->renderer_);
-    vtk->orientationWidget->SetInteractor(renderWindow->GetInteractor()); // 设置坐标系控件大小（占屏幕比例）
-    vtk->orientationWidget->On();
+    // ParaView 风格方向标：细轴线、锥形箭头与白色标签，随主相机旋转。
+    vtkNew<vtkAxesActor> axes;
+    axes->SetShaftTypeToLine();
+    axes->SetTipTypeToCone();
+    axes->SetNormalizedShaftLength(0.8, 0.8, 0.8);
+    axes->SetNormalizedTipLength(0.2, 0.2, 0.2);
+    axes->SetConeRadius(0.08);
+    axes->GetXAxisShaftProperty()->SetColor(1.0, 0.0, 0.0);
+    axes->GetXAxisTipProperty()->SetColor(1.0, 0.0, 0.0);
+    axes->GetYAxisShaftProperty()->SetColor(1.0, 1.0, 0.0);
+    axes->GetYAxisTipProperty()->SetColor(1.0, 1.0, 0.0);
+    axes->GetZAxisShaftProperty()->SetColor(0.0, 1.0, 0.0);
+    axes->GetZAxisTipProperty()->SetColor(0.0, 1.0, 0.0);
+    for (auto* caption : { axes->GetXAxisCaptionActor2D(), axes->GetYAxisCaptionActor2D(),
+             axes->GetZAxisCaptionActor2D() }) {
+        caption->GetCaptionTextProperty()->SetColor(1.0, 1.0, 1.0);
+        caption->GetCaptionTextProperty()->BoldOff();
+        caption->GetCaptionTextProperty()->ItalicOff();
+        caption->GetCaptionTextProperty()->ShadowOff();
+    }
+    vtk->orientation_widget_->SetOrientationMarker(axes);
+    vtk->orientation_widget_->SetDefaultRenderer(vtk->renderer_);
+    vtk->orientation_widget_->SetInteractor(renderWindow->GetInteractor());
+    vtk->orientation_widget_->SetViewport(0.0, 0.0, 0.18, 0.18);
+    vtk->orientation_widget_->On();
+    vtk->orientation_widget_->InteractiveOff();
 
     vtkNew<vtkDisplaySizedImplicitPlaneRepresentation> rep;
     // 连接回调函数到平面控件，更新裁剪平面
@@ -282,6 +308,8 @@ void QRenderWindow::destroyingVTK(vtkRenderWindow* renderWindow, vtkUserData use
     vtk->style_->SetSelectManager(nullptr);
     interaction_service_.reset();
     select_manager_.reset();
+    vtk->orientation_widget_->Off();
+    vtk->orientation_widget_->SetInteractor(nullptr);
     data_ = nullptr;
     if (vtk->renderer_) {
         vtk->renderer_->RemoveAllViewProps();

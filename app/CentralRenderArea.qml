@@ -48,12 +48,40 @@ Page {
 
     footer: ToolBar {
         id: toolbar
-        height: 25
+        // 容纳图标 + 文字: 让 footer 高度随内容自适应, 不固定 28 (加图标后被 elide 截断)
+        implicitHeight: 36
+        leftPadding: 4
+        rightPadding: 4
+        background: Rectangle {
+            color: Theme.surfaceAlt
+
+            // 与渲染区的细线分隔
+            Rectangle {
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                }
+                height: 1
+                color: Theme.border
+            }
+        }
         RowLayout {
             anchors.fill: parent
 
             ToolButton {
                 id: geoBtn
+                icon.source: "qrc:/images/toolbar/Viewport/geometry.svg"
+                icon.width: 20
+                icon.height: 20
+                icon.color: "transparent"
+                Accessible.name: qsTr("几何显示")
+                ToolTip.visible: hovered
+                ToolTip.text: text
+                ToolTip.delay: 500
+                display: ToolButton.IconOnly
+                flat: true
+                Layout.preferredWidth: 32
                 readonly property var geoLabels: [
                     "几何·面·有边", "几何·面·无边", "几何·透·75%", "几何·透·50%",
                     "几何·透·25%", "几何·线·带曲面线", "几何·线·无曲面线", "几何·隐"
@@ -191,6 +219,17 @@ Page {
 
             ToolButton {
                 id: meshBtn
+                icon.source: "qrc:/images/toolbar/Viewport/mesh.svg"
+                icon.width: 20
+                icon.height: 20
+                icon.color: "transparent"
+                Accessible.name: qsTr("网格显示")
+                ToolTip.visible: hovered
+                ToolTip.text: text
+                ToolTip.delay: 500
+                display: ToolButton.IconOnly
+                flat: true
+                Layout.preferredWidth: 32
                 readonly property var meshLabels: [
                     "网格·面·带网格线", "网格·面·无线", "网格·透·75%", "网格·透·50%",
                     "网格·透·25%", "网格·线·带内部线", "网格·线·仅表面线", "网格·隐"
@@ -329,6 +368,7 @@ Page {
             ToolButton {
                 id: topologyDiagnosticBtn
                 text: "网格诊断"
+                flat: true
                 Layout.preferredWidth: 70
                 Layout.fillHeight: true
                 onClicked: topologyDiagnosticMenu.visible ? topologyDiagnosticMenu.close() : topologyDiagnosticMenu.open()
@@ -440,6 +480,7 @@ Page {
             ToolButton {
                 id: geometryTopologyDiagnosticBtn
                 text: "几何诊断"
+                flat: true
                 Layout.preferredWidth: 70
                 Layout.fillHeight: true
                 onClicked: geometryTopologyDiagnosticMenu.visible ? geometryTopologyDiagnosticMenu.close() : geometryTopologyDiagnosticMenu.open()
@@ -567,26 +608,35 @@ Page {
             }
 
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/clip.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "裁剪"
+                flat: true
                 checkable: true
-                Layout.preferredWidth: 50
                 Layout.fillHeight: true
                 onClicked: {
                     myItem.setMeshClip(checked)
                 }
             }
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/scale-bar.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "比例尺"
+                flat: true
                 checkable: true
-                Layout.preferredWidth: 50
                 Layout.fillHeight: true
                 onClicked: {
                     myItem.setScaleBarVisible(checked)
                 }
             }
             ToolButton {
+                icon.source: "qrc:/images/toolbar/Viewport/reset-view.svg"
+                icon.width: 16
+                icon.height: 16
                 text: "重置视图"
-                Layout.preferredWidth: 70
+                flat: true
                 Layout.fillHeight: true
                 onClicked: myItem.resetCamera()
             }
@@ -604,8 +654,8 @@ Page {
         Rectangle {
             id: borderRectangle
             anchors.fill: parent
-            border.color: "black"
-            border.width: 3
+            border.color: Theme.borderStrong
+            border.width: 1
             color: "transparent"
             z: 1
         }
@@ -613,7 +663,7 @@ Page {
         QRenderWindow {
             id: myItem
             anchors.fill: parent
-            anchors.margins: 3
+            anchors.margins: 1
             query: QModelManager.query
 
             Component.onCompleted: {
@@ -714,66 +764,16 @@ Page {
                 pickedIds = sel ? sel.getAsComponentIds() : []
             }
 
-            implicitWidth: 140
-            width: implicitWidth
-            height: implicitHeight
-
-            padding: 0
-            topPadding: 0
-            bottomPadding: 0
-            leftPadding: 0
-            rightPadding: 0
-
-            property int textLeftInset: 18
-            property int textRightInset: 12
-
-            background: Rectangle {
-                anchors.fill: parent
-                color: "#ffffff"
-                border.color: "#d0d0d0"
-                border.width: 1
-                radius: 4
-            }
-
+            // 视口菜单项：shown 控制显隐（无拾取时显示整组操作，有拾取时显示对象操作）
             component StyledMenuItem: MenuItem {
                 id: control
                 property bool shown: true
 
                 visible: shown
                 enabled: shown
-
-                implicitHeight: shown ? 30 : 0
-                height: implicitHeight
-
-                width: viewportMenu.width
-                implicitWidth: viewportMenu.width
-
-                background: Rectangle {
-                    anchors.fill: parent
-                    color: control.hovered ? "#f0f0f0" : "transparent"
-                }
-
-                contentItem: Text {
-                    anchors.fill: parent
-                    anchors.leftMargin: viewportMenu.textLeftInset
-                    anchors.rightMargin: viewportMenu.textRightInset
-
-                    text: control.text
-                    color: control.hovered ? "#1976d2" : "#333333"
-                    font.pixelSize: 12
-                    font.family: "Microsoft YaHei"
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignLeft
-                    elide: Text.ElideRight
-                }
             }
 
-            component StyledSeparator: MenuSeparator {
-                width: viewportMenu.width
-                implicitWidth: viewportMenu.width
-                implicitHeight: 6
-                height: visible ? implicitHeight : 0
-            }
+            component StyledSeparator: MenuSeparator {}
 
             StyledMenuItem {
                 text: "隐藏"

@@ -8,6 +8,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <vtkActor.h>
 #include <vtkActorCollection.h>
+#include <vtkAxesActor.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkWeakPointer.h>
 
@@ -29,6 +30,13 @@ TEST_CASE("QRenderWindow releases interaction actors before recreating VTK resou
         auto user_data = item.initializeVTK(window);
         auto* data = QRenderWindow::Data::SafeDownCast(user_data);
         REQUIRE(data != nullptr);
+        // 方向标独立叠加并随资源重建，不能截获视口拖拽。
+        auto* axes = vtkAxesActor::SafeDownCast(data->orientation_widget_->GetOrientationMarker());
+        REQUIRE(axes != nullptr);
+        CHECK(axes->GetShaftType() == vtkAxesActor::LINE_SHAFT);
+        CHECK(axes->GetTipType() == vtkAxesActor::CONE_TIP);
+        CHECK(data->orientation_widget_->GetEnabled());
+        CHECK_FALSE(data->orientation_widget_->GetInteractive());
         auto* actors = data->renderer_->GetActors();
         // InteractionService 添加点、实线、虚线三个标注 actor；renderer 还可包含选择高亮等 actor。
         REQUIRE(actors->GetNumberOfItems() >= 3);
@@ -36,6 +44,8 @@ TEST_CASE("QRenderWindow releases interaction actors before recreating VTK resou
         REQUIRE(interaction_actor.GetPointer() != nullptr);
 
         item.destroyingVTK(window, user_data);
+        CHECK_FALSE(data->orientation_widget_->GetEnabled());
+        CHECK(data->orientation_widget_->GetInteractor() == nullptr);
         // RemoveAllViewProps 只能释放 renderer 持有的引用，服务本身也必须及时析构。
         CHECK(interaction_actor.GetPointer() == nullptr);
         window->RemoveRenderer(data->overlay_renderer_);
