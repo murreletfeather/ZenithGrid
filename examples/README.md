@@ -44,3 +44,36 @@ cmake --install build --prefix "<安装前缀>" --component AllPlugins
 - PRECESS_PLUGIN_IN_TREE 由构建入口管理，不手动设置。示例保留独立入口；项目内插件不需要这套 SDK 入口。以上命令的产物均放在独立 build 目录。
 
 模型写入、任务和线程契约以接口头文件为准。示例使用活动组件是教学简化，正式功能优先通过 Selector 选择目标。
+
+## 算法插件的导航声明
+
+算法导航统一通过 `AlgorithmHandler::setup(AlgorithmRegistrar&)` 声明。JSON 只保留 `system`、`handler.name`、`handler.display_name` 等身份信息；不再解析 `handler.navigation` 或 DLL 旁置导航文件。
+
+```cpp
+#include "AlgorithmHandler.h"
+#include "AlgorithmRegistrar.h"
+
+class ExampleQuadMesher : public systems::algo::AlgorithmHandler {
+public:
+    void setup(systems::algo::AlgorithmRegistrar& registrar) override
+    {
+        registrar.addCategory({ "quadrilateral", "四边形网格生成", "", 20 });
+        registrar.setLabel("四边形网格生成（示例方法）");
+        registrar.setGroup("生成");
+        registrar.setOrder(10);
+        registrar.setCategoryDefault("quadrilateral", "网格类型", "1");
+    }
+    // 实现 args_type()、execute()，必要时覆盖 resolveComponentId()。
+};
+```
+
+- `setup` 每次注册调用一次，查询、分类切换和算法执行不重复调用。默认空实现将算法归入“其他算法”。注册器仅收集声明，不持有模型或界面，不能保存其引用。
+- 声明及参数准备成功后整体登记；setup 抛异常时不新增条目，替换失败保留原算法；模型忙碌时在调用 setup 前拒绝注册。
+- `addCategory` 接收完整分类描述：稳定 `id`、必填 `title`、可选资源 `icon` 和排序 `order`。`other` 为保留身份。一个算法可以声明多个分类，同一 id 自动合并为同一个按钮和页面，算法身份仍使用各自的 `handler.name`。
+- 同类描述应保持一致；冲突时记录警告，选择算法唯一名按字典序最小的完整声明，结果与加载顺序无关。分类按 order、id 排序。
+- 三角形、四边形、四面体、六面体四个基础分类始终显示；无算法时显示“暂无可用算法”并禁用执行。扩展分类由当前注册表派生，最后一个提供者卸载后消失。
+- `setLabel` 使用业务名称，空时沿用 display_name。`setIcon` 的资源由插件注册；group 为空时使用默认分组，order 越小越靠前，同值按算法身份排序。
+- `setCategoryDefault` 按分类设置参数默认值，参数名与 args_type() 一致，Combo 使用选项索引的字符串；进入分类时应用，用户随后可修改。参数控件仍由宿主生成，插件不依赖 app 层。
+- 直接 C++ 注册与动态、静态插件统一走 Handler 的 setup；HandlerMetaData 仅保存身份，没有第二套导航声明入口。
+
+此改动更新 AlgorithmHandler 的虚函数接口，旧算法 DLL 不能混用。更新 SDK 后必须重建主程序、项目内插件、示例及独立 Addons 插件，并使用匹配的工具链和依赖。旧 JSON 导航配置和旁置文件应删除；分类需迁移至 setup，不提供兼容解析。
