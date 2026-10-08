@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/render/test/MakeMeshDataVtk.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_364370753f3c0e27b80c476caf69e0e2.html">render</a></li><li class="navelem"><a href="dir_ea7bf32d4afef5a01f2beaa3de806056.html">test</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">MakeMeshDataVtk.h</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="MakeMeshDataVtk_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef MAKE_MESH_DATA_VTK_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define MAKE_MESH_DATA_VTK_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="MeshActor_8h.html">MeshActor.h</a>&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="MeshData_8h.html">MeshData.h</a>&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;string_view&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;vector&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="comment">// 生成内置演示用数据</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><a class="code hl_struct" href="structMeshDataVtk.html">MeshDataVtk</a> <a class="code hl_function" href="MakeMeshDataVtk_8h.html#a73ae695c9635bc2b34e9fc47f2ab5c41">MakeMeshDataVtk</a>(<a class="code hl_struct" href="structMeshData.html">MeshData</a>&amp; data);</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// 从外部 vtk/vtu/vtp 文件导入，并尽可能填充 MeshDataVtk</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// 当前实现：</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">//  - 读取 UnstructuredGrid 或 PolyData</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">//  - 直接按 cell 维度分类：3D-&gt;solid, 2D-&gt;face, 1D-&gt;edge</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">//  - polyhedral 相关数组留空</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">//  - face block 生成单一 block，包含全部面；若需要更复杂 block 划分，可在此函数外再修改 block_datas</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><a class="code hl_struct" href="structMeshDataVtk.html">MeshDataVtk</a> <a class="code hl_function" href="MakeMeshDataVtk_8h.html#a86ea92f96f1c8978335749e494c11898">MakeMeshDataVtkFromFile</a>(</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    std::string_view file_path,</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <a class="code hl_struct" href="structMeshData.html">MeshData</a>&amp; data</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>);</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="aMakeMeshDataVtk_8h_html_a73ae695c9635bc2b34e9fc47f2ab5c41"><div class="ttname"><a href="MakeMeshDataVtk_8h.html#a73ae695c9635bc2b34e9fc47f2ab5c41">MakeMeshDataVtk</a></div><div class="ttdeci">MeshDataVtk MakeMeshDataVtk(MeshData &amp;data)</div><div class="ttdef"><b>定义</b> MakeMeshDataVtk.cpp:19</div></div>
+<div class="ttc" id="aMakeMeshDataVtk_8h_html_a86ea92f96f1c8978335749e494c11898"><div class="ttname"><a href="MakeMeshDataVtk_8h.html#a86ea92f96f1c8978335749e494c11898">MakeMeshDataVtkFromFile</a></div><div class="ttdeci">MeshDataVtk MakeMeshDataVtkFromFile(std::string_view file_path, MeshData &amp;data)</div><div class="ttdef"><b>定义</b> MakeMeshDataVtk.cpp:109</div></div>
+<div class="ttc" id="aMeshActor_8h_html"><div class="ttname"><a href="MeshActor_8h.html">MeshActor.h</a></div></div>
+<div class="ttc" id="aMeshData_8h_html"><div class="ttname"><a href="MeshData_8h.html">MeshData.h</a></div></div>
+<div class="ttc" id="astructMeshDataVtk_html"><div class="ttname"><a href="structMeshDataVtk.html">MeshDataVtk</a></div><div class="ttdoc">用于存储网格数据以供 VTK 渲染使用的结构体</div><div class="ttdef"><b>定义</b> Core.h:84</div></div>
+<div class="ttc" id="astructMeshData_html"><div class="ttname"><a href="structMeshData.html">MeshData</a></div><div class="ttdef"><b>定义</b> MeshData.h:39</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

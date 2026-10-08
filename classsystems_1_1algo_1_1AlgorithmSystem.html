@@ -1,0 +1,854 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: systems::algo::AlgorithmSystem类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesystems.html">systems</a></li><li class="navelem"><a href="namespacesystems_1_1algo.html">algo</a></li><li class="navelem"><a href="classsystems_1_1algo_1_1AlgorithmSystem.html">AlgorithmSystem</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-attribs">静态 Public 属性</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classsystems_1_1algo_1_1AlgorithmSystem-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">systems::algo::AlgorithmSystem类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="AlgorithmSystem_8h_source.html">AlgorithmSystem.h</a>&gt;</code></p>
+<div class="dynheader">
+systems::algo::AlgorithmSystem 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsystems_1_1algo_1_1AlgorithmSystem__coll__graph.png" border="0" usemap="#asystems_1_1algo_1_1AlgorithmSystem_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="asystems_1_1algo_1_1AlgorithmSystem_coll__map" id="asystems_1_1algo_1_1AlgorithmSystem_coll__map">
+<area shape="rect" title=" " alt="" coords="2872,883,3057,923"/>
+<area shape="rect" title=" " alt="" coords="265,977,352,1002"/>
+<area shape="poly" title=" " alt="" coords="366,987,697,987,1721,987,1831,983,1916,973,2001,961,2110,949,2536,922,2872,904,2872,909,2537,927,2111,955,2001,966,1917,978,1831,988,1721,992,697,992,366,992"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="652,317,745,342"/>
+<area shape="poly" title=" " alt="" coords="323,963,422,795,431,768,436,756,446,745,463,735,480,732,511,734,541,735,554,731,567,720,579,695,585,661,584,574,580,484,583,446,591,418,608,392,629,371,672,340,675,344,632,375,612,396,596,420,588,447,586,484,589,573,590,661,584,697,571,723,557,735,542,741,511,739,480,737,465,740,450,749,440,759,436,770,426,797,328,966"/>
+<area shape="rect" href="structComponentData.html" title="模型的组成单元：一个 ComponentData 表示模型中的一个物体部件" alt="" coords="635,811,763,837"/>
+<area shape="poly" title=" " alt="" coords="324,963,374,905,408,875,447,851,481,841,529,833,634,824,635,829,530,838,482,846,449,856,411,879,378,909,329,967"/>
+<area shape="rect" href="classUndoStack.html" title=" " alt="" coords="2190,859,2282,885"/>
+<area shape="poly" title=" " alt="" coords="365,978,583,952,723,941,864,936,1913,936,1994,930,2072,916,2143,899,2197,882,2199,887,2144,904,2074,922,1994,936,1913,941,864,941,723,946,584,957,366,984"/>
+<area shape="rect" href="structUndoRecord.html" title="一次操作 = 一条记录" alt="" coords="648,867,749,893"/>
+<area shape="poly" title=" " alt="" coords="345,968,393,945,447,924,554,898,647,883,648,888,555,903,449,929,395,950,347,973"/>
+<area shape="rect" href="classsystems_1_1job_1_1Job.html" title="任务单元：持有执行体、提交体、取消令牌与状态" alt="" coords="1845,138,1979,163"/>
+<area shape="poly" title=" " alt="" coords="327,964,377,891,402,845,421,795,428,762,430,720,430,619,431,519,436,477,446,444,471,404,499,380,531,358,567,327,578,313,592,302,622,290,669,279,801,256,972,234,1167,213,1560,176,1845,153,1845,158,1560,181,1168,218,973,239,802,262,670,284,624,296,595,306,582,317,571,331,534,362,502,384,475,408,450,446,441,478,436,520,435,619,436,720,433,763,427,797,407,847,381,894,331,967"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystem.html" title="模型IO系统，每种文件格式只能注册一个处理器" alt="" coords="2531,1025,2739,1050"/>
+<area shape="poly" title=" " alt="" coords="329,1012,378,1068,412,1097,449,1120,514,1146,569,1154,697,1152,2237,1152,2292,1149,2348,1140,2454,1111,2544,1077,2607,1048,2610,1053,2546,1082,2456,1116,2349,1145,2293,1154,2237,1157,697,1157,568,1159,513,1151,447,1125,409,1101,375,1072,325,1015"/>
+<area shape="rect" title=" " alt="" coords="1393,1027,1617,1082"/>
+<area shape="poly" title=" " alt="" coords="366,995,448,1005,714,1026,977,1040,1393,1051,1393,1056,977,1045,713,1032,448,1011,365,1000"/>
+<area shape="rect" href="structsystems_1_1io_1_1ModelIOInfo.html" title="模型层文件读写支持的文件类型信息" alt="" coords="607,1090,791,1115"/>
+<area shape="poly" title=" " alt="" coords="331,1011,381,1058,413,1082,449,1099,491,1110,535,1115,619,1113,619,1118,535,1120,490,1115,447,1104,411,1086,378,1063,327,1014"/>
+<area shape="rect" title=" " alt="" coords="1416,1231,1595,1300"/>
+<area shape="poly" title=" " alt="" coords="323,1013,341,1050,369,1094,405,1137,426,1156,449,1171,487,1188,532,1201,640,1220,765,1230,900,1234,1165,1234,1279,1235,1370,1241,1416,1248,1415,1253,1369,1247,1278,1241,1165,1239,900,1239,765,1235,639,1225,530,1206,485,1193,447,1176,423,1160,401,1141,365,1098,337,1053,318,1016"/>
+<area shape="rect" href="structsystems_1_1algo_1_1AlgorithmInfo.html" title=" " alt="" coords="593,1339,804,1365"/>
+<area shape="poly" title=" " alt="" coords="315,1015,326,1077,349,1158,367,1200,389,1241,417,1278,450,1310,482,1330,518,1343,556,1351,593,1355,593,1360,555,1356,517,1348,480,1334,446,1314,413,1282,385,1244,362,1202,344,1160,321,1078,310,1016"/>
+<area shape="rect" title=" " alt="" coords="5,969,144,1009"/>
+<area shape="poly" title=" " alt="" coords="158,987,265,987,265,992,158,992"/>
+<area shape="rect" href="classsystems_1_1job_1_1JobRunner.html" title="所属线程管理一个在飞任务；worker 不等待 GUI。 发布、准备、查询、清理、终态与 stop 均在构造线程。 异步运行须向该线程投递；计算结束后保持槽与模型占用直到 GUI 收尾。" alt="" coords="2545,354,2724,379"/>
+<area shape="poly" title=" " alt="" coords="2656,389,2743,508,2798,588,2850,672,2913,790,2957,881,2952,884,2909,792,2846,675,2793,591,2739,511,2652,392"/>
+<area shape="rect" title=" " alt="" coords="2153,323,2319,349"/>
+<area shape="poly" title=" " alt="" coords="2333,341,2545,357,2545,363,2333,346"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="1863,554,1961,579"/>
+<area shape="poly" title=" " alt="" coords="1967,581,2901,880,2900,885,1965,586"/>
+<area shape="poly" title=" " alt="" coords="1935,543,2009,485,2058,454,2110,429,2193,409,2309,392,2545,370,2545,375,2309,398,2194,414,2112,435,2060,459,2012,489,1939,547"/>
+<area shape="poly" title=" " alt="" coords="1928,590,1968,658,1996,696,2027,731,2074,772,2124,807,2210,857,2208,862,2121,812,2071,776,2023,735,1992,699,1964,661,1924,593"/>
+<area shape="poly" title=" " alt="" coords="1922,592,1943,659,1980,749,2006,796,2036,841,2071,883,2112,918,2161,948,2214,973,2269,993,2326,1008,2435,1027,2531,1035,2530,1040,2434,1032,2325,1013,2268,998,2212,978,2159,953,2109,922,2068,886,2032,844,2001,798,1975,751,1938,661,1917,593"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="1435,607,1576,633"/>
+<area shape="poly" title=" " alt="" coords="1590,615,1690,608,1798,595,1871,577,1872,582,1799,600,1690,614,1590,620"/>
+<area shape="rect" title=" " alt="" coords="943,574,1130,629"/>
+<area shape="poly" title=" " alt="" coords="1144,603,1435,615,1434,620,1143,608"/>
+<area shape="rect" title=" " alt="" coords="949,653,1125,707"/>
+<area shape="poly" title=" " alt="" coords="1138,667,1369,639,1434,629,1435,634,1370,644,1139,672"/>
+<area shape="rect" title=" " alt="" coords="950,731,1123,786"/>
+<area shape="poly" title=" " alt="" coords="1137,756,1193,751,1253,739,1313,720,1368,691,1376,683,1379,674,1383,664,1392,654,1414,640,1439,630,1441,635,1417,645,1395,658,1388,667,1384,676,1380,686,1371,695,1315,725,1255,745,1194,756,1138,762"/>
+<area shape="rect" title=" " alt="" coords="949,495,1125,550"/>
+<area shape="poly" title=" " alt="" coords="1139,533,1250,552,1370,576,1468,605,1466,610,1369,581,1249,557,1138,539"/>
+<area shape="rect" title=" " alt="" coords="1424,337,1587,391"/>
+<area shape="poly" title=" " alt="" coords="1600,358,1649,361,1701,369,1752,384,1800,407,1840,441,1871,482,1894,522,1908,553,1903,555,1889,525,1867,485,1836,445,1797,412,1750,389,1699,374,1648,366,1600,363"/>
+<area shape="rect" title=" " alt="" coords="927,317,1147,342"/>
+<area shape="poly" title=" " alt="" coords="1161,336,1424,355,1424,361,1160,341"/>
+<area shape="poly" title=" " alt="" coords="759,327,927,327,927,332,759,332"/>
+<area shape="rect" title=" " alt="" coords="230,298,387,323"/>
+<area shape="poly" title=" " alt="" coords="397,293,448,288,509,286,569,288,803,285,1193,283,1396,286,1578,294,1719,310,1768,320,1800,334,1828,357,1850,385,1869,416,1883,449,1903,510,1912,553,1906,554,1898,511,1878,451,1864,419,1846,388,1824,361,1797,338,1767,325,1718,315,1578,300,1396,291,1193,288,803,290,569,293,509,292,448,293,397,299"/>
+<area shape="poly" title=" " alt="" coords="401,312,652,324,651,330,401,318"/>
+<area shape="poly" title=" " alt="" coords="333,332,439,452,506,533,572,618,644,728,692,810,688,813,639,731,567,622,502,537,435,455,329,336"/>
+<area shape="rect" title=" " alt="" coords="1406,667,1605,722"/>
+<area shape="poly" title=" " alt="" coords="1618,682,1707,666,1753,654,1798,639,1852,609,1894,577,1897,582,1855,613,1800,644,1755,659,1709,672,1619,688"/>
+<area shape="rect" title=" " alt="" coords="932,811,1141,851"/>
+<area shape="poly" title=" " alt="" coords="1155,834,1280,830,1332,822,1368,809,1377,797,1380,784,1382,769,1391,753,1412,735,1435,720,1438,724,1415,739,1395,756,1388,771,1385,785,1382,799,1371,813,1334,827,1280,836,1155,839"/>
+<area shape="poly" title=" " alt="" coords="777,823,931,826,931,831,776,828"/>
+<area shape="rect" title=" " alt="" coords="1429,416,1581,456"/>
+<area shape="poly" title=" " alt="" coords="1596,431,1696,440,1749,452,1800,470,1832,488,1861,510,1902,552,1898,556,1857,514,1829,492,1798,474,1747,457,1695,446,1595,437"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="1456,530,1555,555"/>
+<area shape="poly" title=" " alt="" coords="1569,553,1642,563,1761,568,1862,566,1862,571,1760,573,1641,568,1568,558"/>
+<area shape="rect" title=" " alt="" coords="931,431,1143,471"/>
+<area shape="poly" title=" " alt="" coords="1157,445,1208,449,1263,458,1318,472,1371,492,1383,505,1395,516,1425,529,1456,536,1455,541,1423,534,1392,521,1380,508,1368,497,1317,477,1262,463,1208,455,1156,451"/>
+<area shape="rect" title=" " alt="" coords="607,431,790,471"/>
+<area shape="poly" title=" " alt="" coords="804,448,931,448,931,453,804,453"/>
+<area shape="rect" title=" " alt="" coords="965,367,1108,407"/>
+<area shape="poly" title=" " alt="" coords="1121,383,1191,384,1264,390,1328,401,1353,410,1371,421,1381,433,1385,445,1385,470,1384,494,1387,506,1395,517,1423,534,1456,541,1455,546,1422,539,1392,521,1382,508,1378,495,1379,470,1380,446,1376,435,1368,425,1351,415,1327,406,1264,395,1191,389,1121,388"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="1445,481,1566,506"/>
+<area shape="poly" title=" " alt="" coords="1580,492,1684,501,1799,520,1845,535,1885,551,1883,556,1843,540,1798,525,1684,506,1579,498"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="1448,766,1563,791"/>
+<area shape="poly" title=" " alt="" coords="1576,772,1628,766,1685,753,1743,734,1797,707,1834,677,1864,641,1902,578,1907,581,1868,644,1837,681,1800,712,1745,739,1687,759,1629,771,1577,778"/>
+<area shape="poly" title=" " alt="" coords="1576,782,1799,805,2019,836,2190,862,2189,867,2018,841,1798,811,1576,787"/>
+<area shape="rect" title=" " alt="" coords="593,56,804,96"/>
+<area shape="poly" title=" " alt="" coords="818,84,975,101,1147,127,1480,189,1684,236,1758,259,1800,279,1830,311,1854,348,1873,387,1888,428,1905,502,1912,553,1907,554,1900,503,1883,429,1868,390,1850,350,1826,314,1797,283,1757,264,1683,241,1478,195,1146,132,974,107,818,89"/>
+<area shape="rect" href="classModelLayer_1_1WriteOperation.html" title="模型操作占用：身份绑定，只有本操作能够释放；取消不释放。" alt="" coords="934,23,1139,49"/>
+<area shape="poly" title=" " alt="" coords="818,59,933,46,934,51,818,65"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="208,63,409,89"/>
+<area shape="poly" title=" " alt="" coords="423,73,593,73,593,79,423,79"/>
+<area shape="poly" title=" " alt="" coords="2296,872,2872,896,2872,901,2296,877"/>
+<area shape="poly" title=" " alt="" coords="2251,846,2309,764,2383,662,2521,493,2620,378,2624,381,2525,496,2387,666,2313,767,2256,849"/>
+<area shape="poly" title=" " alt="" coords="2281,887,2604,1022,2602,1027,2279,892"/>
+<area shape="rect" title=" " alt="" coords="1171,843,1369,869"/>
+<area shape="poly" title=" " alt="" coords="1383,855,2190,869,2189,874,1383,861"/>
+<area shape="poly" title=" " alt="" coords="763,875,1147,860,1170,859,1170,864,1147,865,763,881"/>
+<area shape="rect" title=" " alt="" coords="193,651,424,677"/>
+<area shape="poly" title=" " alt="" coords="390,647,435,645,484,650,531,664,552,676,571,691,585,711,591,731,586,770,580,809,584,828,595,848,619,865,649,874,647,879,617,870,591,851,579,830,575,810,580,769,585,731,581,713,567,695,549,681,529,669,483,655,435,651,390,653"/>
+<area shape="rect" title=" " alt="" coords="199,758,418,783"/>
+<area shape="poly" title=" " alt="" coords="432,771,514,779,547,787,571,798,581,810,584,823,587,836,595,847,620,862,649,871,647,877,618,867,592,851,582,838,579,825,576,813,568,802,545,792,513,785,431,776"/>
+<area shape="rect" title=" " alt="" coords="2111,45,2361,85"/>
+<area shape="poly" title=" " alt="" coords="2376,78,2445,100,2478,116,2508,137,2535,161,2558,190,2595,252,2619,311,2632,353,2627,354,2614,313,2590,255,2554,193,2531,165,2505,141,2475,121,2443,105,2374,84"/>
+<area shape="rect" href="structsystems_1_1job_1_1JobRunner_1_1ModelOperation.html" title=" " alt="" coords="1823,19,2001,59"/>
+<area shape="poly" title=" " alt="" coords="2015,44,2111,52,2110,58,2015,50"/>
+<area shape="rect" title=" " alt="" coords="1400,5,1611,45"/>
+<area shape="poly" title=" " alt="" coords="1624,27,1822,33,1822,38,1624,32"/>
+<area shape="poly" title=" " alt="" coords="1153,31,1400,25,1400,30,1153,36"/>
+<area shape="rect" title=" " alt="" coords="2141,139,2331,179"/>
+<area shape="poly" title=" " alt="" coords="2344,174,2446,194,2508,211,2550,244,2585,284,2612,323,2629,353,2624,355,2607,326,2581,287,2547,248,2505,216,2445,199,2343,179"/>
+<area shape="poly" title=" " alt="" coords="1992,150,2141,154,2141,159,1992,155"/>
+<area shape="rect" title=" " alt="" coords="1412,69,1599,109"/>
+<area shape="poly" title=" " alt="" coords="1613,95,1704,104,1799,119,1869,135,1867,140,1798,124,1703,110,1612,100"/>
+<area shape="rect" title=" " alt="" coords="1459,134,1551,159"/>
+<area shape="poly" title=" " alt="" coords="1565,150,1728,171,1963,205,2234,254,2372,284,2507,317,2605,351,2603,356,2506,323,2371,289,2233,259,1962,210,1728,176,1565,156"/>
+<area shape="poly" title=" " alt="" coords="1565,145,1845,147,1845,153,1565,150"/>
+<area shape="rect" title=" " alt="" coords="2190,445,2282,470"/>
+<area shape="poly" title=" " alt="" coords="2296,458,2395,454,2451,447,2506,435,2537,423,2567,408,2615,377,2617,382,2570,412,2539,428,2507,440,2452,453,2396,460,2296,463"/>
+<area shape="poly" title=" " alt="" coords="2707,1019,2776,999,2847,972,2894,947,2934,921,2937,925,2897,952,2849,977,2777,1004,2708,1024"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystemBase.html" title="ModelIOSystem接口基类，出于插件开发而设计的接口基类。" alt="" coords="2116,1193,2356,1218"/>
+<area shape="poly" title=" " alt="" coords="2369,1205,2439,1195,2473,1185,2505,1171,2545,1144,2579,1110,2624,1049,2628,1052,2583,1113,2549,1148,2508,1176,2475,1190,2440,1200,2370,1210"/>
+<area shape="poly" title=" " alt="" coords="1631,1050,2530,1036,2530,1042,1631,1055"/>
+<area shape="rect" href="structsystems_1_1io_1_1ModelIOSystem_1_1IOEntry.html" title="文件格式处理器与信息共同持有，占用期注册表保持只读。" alt="" coords="933,1077,1141,1117"/>
+<area shape="poly" title=" " alt="" coords="1154,1093,1259,1089,1369,1079,1393,1075,1394,1081,1370,1084,1259,1094,1154,1099"/>
+<area shape="poly" title=" " alt="" coords="804,1098,932,1096,932,1102,804,1104"/>
+<area shape="rect" title=" " alt="" coords="237,1312,380,1352"/>
+<area shape="poly" title=" " alt="" coords="354,1303,674,1113,677,1118,357,1307"/>
+<area shape="poly" title=" " alt="" coords="351,1357,397,1382,449,1401,482,1408,508,1410,569,1401,625,1384,673,1362,675,1367,627,1389,570,1407,509,1415,481,1414,447,1407,395,1387,349,1362"/>
+<area shape="poly" title=" " alt="" coords="1609,1263,1911,1263,2636,1263,2670,1260,2701,1251,2731,1238,2759,1220,2810,1175,2854,1121,2890,1063,2919,1007,2954,922,2959,924,2924,1009,2895,1066,2858,1124,2814,1179,2762,1225,2734,1243,2703,1256,2670,1265,2636,1268,1911,1268,1609,1268"/>
+<area shape="rect" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html" title="同一注册的 handler 与信息共同持有，节点扩容不改变信息地址。" alt="" coords="944,1268,1129,1308"/>
+<area shape="poly" title=" " alt="" coords="1143,1280,1416,1267,1416,1272,1143,1286"/>
+<area shape="poly" title=" " alt="" coords="780,1334,943,1303,944,1308,781,1339"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:AlgorithmEntry" id="r_AlgorithmEntry"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html">AlgorithmEntry</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">同一注册的 handler 与信息共同持有，节点扩容不改变信息地址。  <a href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:aae6db223bd7e8ed813e7e2a1a2b60f09" id="r_aae6db223bd7e8ed813e7e2a1a2b60f09"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae6db223bd7e8ed813e7e2a1a2b60f09">SystemHandler</a> = <a class="el" href="classsystems_1_1algo_1_1AlgorithmHandler.html">AlgorithmHandler</a></td></tr>
+<tr class="memitem:a0d8434a13e322022619cd021ead7dd13" id="r_a0d8434a13e322022619cd021ead7dd13"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0d8434a13e322022619cd021ead7dd13">SystemHandlerPtr</a> = <a class="el" href="namespacesystems.html#a9cec77b8a54a3e8546f9c1cc01542eac">::systems::SystemHandlerPtr</a>&lt;<a class="el" href="#aae6db223bd7e8ed813e7e2a1a2b60f09">SystemHandler</a>&gt;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a012217db0cce209e143f3e65de176274" id="r_a012217db0cce209e143f3e65de176274"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a012217db0cce209e143f3e65de176274">AlgorithmSystem</a> (<a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">io::ModelIOSystem</a> &amp;io_system, <a class="el" href="classModelLayer.html">ModelLayer</a> &amp;model_manager, <a class="el" href="classUndoStack.html">UndoStack</a> *undo_stack=nullptr)</td></tr>
+<tr class="memitem:ad8e2e052d697c51da2f298382814bf94" id="r_ad8e2e052d697c51da2f298382814bf94"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8e2e052d697c51da2f298382814bf94">~AlgorithmSystem</a> ()</td></tr>
+<tr class="memitem:aa5edda3a1ce57eb0bf3a9649f0d5539c" id="r_aa5edda3a1ce57eb0bf3a9649f0d5539c"><td class="memItemLeft" align="right" valign="top">std::any&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5edda3a1ce57eb0bf3a9649f0d5539c">call</a> (const std::string &amp;unique_name, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; &amp;args, <a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a> progress=nullptr)</td></tr>
+<tr class="memdesc:aa5edda3a1ce57eb0bf3a9649f0d5539c"><td class="mdescLeft">&#160;</td><td class="mdescRight">算法调用接口  <br /></td></tr>
+<tr class="memitem:a36a8dc61bcd961ea31828227cae20ea9" id="r_a36a8dc61bcd961ea31828227cae20ea9"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classsystems_1_1job_1_1Job.html">systems::job::Job</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36a8dc61bcd961ea31828227cae20ea9">callAsync</a> (std::string unique_name, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; args)</td></tr>
+<tr class="memdesc:a36a8dc61bcd961ea31828227cae20ea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">完整异步入口：所属线程准备，worker 计算，所属线程提交；不可影子化时同步执行。  <br /></td></tr>
+<tr class="memitem:ab334a3be31f673343a5b7f97c67fadde" id="r_ab334a3be31f673343a5b7f97c67fadde"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab334a3be31f673343a5b7f97c67fadde">setJobRunner</a> (<a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> *<a class="el" href="TestFeatureSystem_8cpp.html#aac03e783a58a9ecf9bfcf92584375f35">runner</a>)</td></tr>
+<tr class="memdesc:ab334a3be31f673343a5b7f97c67fadde"><td class="mdescLeft">&#160;</td><td class="mdescRight">组合根一次注入共享执行器，缺省为原生同步配置。  <br /></td></tr>
+<tr class="memitem:afb38dc7d0e40dc341307ccf2416005cd" id="r_afb38dc7d0e40dc341307ccf2416005cd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb38dc7d0e40dc341307ccf2416005cd">registerHandler</a> (const <a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a> &amp;meta_data, <a class="el" href="#a0d8434a13e322022619cd021ead7dd13">SystemHandlerPtr</a> handler)</td></tr>
+<tr class="memdesc:afb38dc7d0e40dc341307ccf2416005cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">注册算法处理器插件  <br /></td></tr>
+<tr class="memitem:aeee1312f2026c3aec2d1bcb8b74e502a" id="r_aeee1312f2026c3aec2d1bcb8b74e502a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeee1312f2026c3aec2d1bcb8b74e502a">unregisterHandler</a> (const <a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a> &amp;meta_data)</td></tr>
+<tr class="memdesc:aeee1312f2026c3aec2d1bcb8b74e502a"><td class="mdescLeft">&#160;</td><td class="mdescRight">注销算法处理器插件  <br /></td></tr>
+<tr class="memitem:a8070d5f13544187d1628156fed971266" id="r_a8070d5f13544187d1628156fed971266"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structsystems_1_1algo_1_1AlgorithmInfo.html">AlgorithmInfo</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8070d5f13544187d1628156fed971266">getAlgorithmInfos</a> ()</td></tr>
+<tr class="memdesc:a8070d5f13544187d1628156fed971266"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取已注册算法类型信息  <br /></td></tr>
+<tr class="memitem:a70c463a4fcdc22915f39ac1d07c2fbf5" id="r_a70c463a4fcdc22915f39ac1d07c2fbf5"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a70c463a4fcdc22915f39ac1d07c2fbf5">getArgTypes</a> (const std::string &amp;unique_name)</td></tr>
+<tr class="memdesc:a70c463a4fcdc22915f39ac1d07c2fbf5"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取参数类型  <br /></td></tr>
+<tr class="memitem:a5a58b6376b5d53aed9cbef0702a3ca38" id="r_a5a58b6376b5d53aed9cbef0702a3ca38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5a58b6376b5d53aed9cbef0702a3ca38">setOnAlgorithmInfosChanged</a> (std::function&lt; void()&gt; callback)</td></tr>
+<tr class="memdesc:a5a58b6376b5d53aed9cbef0702a3ca38"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置算法信息变更回调函数  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:a59fc07d004c1eafabf7c7195cd4ff997" id="r_a59fc07d004c1eafabf7c7195cd4ff997"><td class="memItemLeft" align="right" valign="top">static const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59fc07d004c1eafabf7c7195cd4ff997">name</a> = &quot;AlgorithmSystem&quot;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a6f52e911741d4268f4a4eee12224def8" id="r_a6f52e911741d4268f4a4eee12224def8"><td class="memItemLeft" align="right" valign="top">std::any&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f52e911741d4268f4a4eee12224def8">executeAlgorithm</a> (const <a class="el" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html">AlgorithmEntry</a> &amp;entry, <a class="el" href="classComponentOperator.html">ComponentOperator</a> &amp;<a class="el" href="TestFeatureSystem_8cpp.html#a50aa9159ca4c9e08050d5572202941a1">target</a>, const std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; &amp;args, <a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a> progress, const std::string &amp;owner={ })</td></tr>
+<tr class="memdesc:a6f52e911741d4268f4a4eee12224def8"><td class="mdescLeft">&#160;</td><td class="mdescRight">已解析真实目标的共同执行段；占用与预览处置由入口负责。  <br /></td></tr>
+<tr class="memitem:a6632d0f9f6fac0bd561f91ff811531c1" id="r_a6632d0f9f6fac0bd561f91ff811531c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsystems_1_1job_1_1JobWork.html">systems::job::JobWork</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6632d0f9f6fac0bd561f91ff811531c1">prepareAlgorithm</a> (const std::string &amp;unique_name, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; args, const std::string &amp;owner)</td></tr>
+<tr class="memitem:ab485721701104da86865d018bbc00e2e" id="r_ab485721701104da86865d018bbc00e2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab485721701104da86865d018bbc00e2e">computeShadow</a> (<a class="el" href="structsystems_1_1algo_1_1PreparedAlgorithm.html">PreparedAlgorithm</a> &amp;prep, <a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a> progress)</td></tr>
+<tr class="memitem:ad66929235c0004c415590fa6e40ab3bd" id="r_ad66929235c0004c415590fa6e40ab3bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad66929235c0004c415590fa6e40ab3bd">applyShadow</a> (<a class="el" href="structsystems_1_1algo_1_1PreparedAlgorithm.html">PreparedAlgorithm</a> &amp;prep)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:ab9d73b13c1c70f259babbb03b7a0a84d" id="r_ab9d73b13c1c70f259babbb03b7a0a84d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9d73b13c1c70f259babbb03b7a0a84d">job_runner_</a> { nullptr }</td></tr>
+<tr class="memitem:a99507878386dc92c1886ecd752f9a18a" id="r_a99507878386dc92c1886ecd752f9a18a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">io::ModelIOSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a99507878386dc92c1886ecd752f9a18a">io_system_</a></td></tr>
+<tr class="memitem:ac0fd59653921cd6573e9c140c69ea8dc" id="r_ac0fd59653921cd6573e9c140c69ea8dc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0fd59653921cd6573e9c140c69ea8dc">model_manager_</a></td></tr>
+<tr class="memitem:a9220adfec4e5b070b7591ceb89476762" id="r_a9220adfec4e5b070b7591ceb89476762"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classUndoStack.html">UndoStack</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9220adfec4e5b070b7591ceb89476762">undo_stack_</a> { nullptr }</td></tr>
+<tr class="memitem:ae2d80d7a2bd5db23ebdd726b2fe7f60a" id="r_ae2d80d7a2bd5db23ebdd726b2fe7f60a"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; std::string, <a class="el" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html">AlgorithmEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae2d80d7a2bd5db23ebdd726b2fe7f60a">entries_</a></td></tr>
+<tr class="memitem:a19a4f53b1731b8d984f005dbe7f04cce" id="r_a19a4f53b1731b8d984f005dbe7f04cce"><td class="memItemLeft" align="right" valign="top">std::function&lt; void()&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a19a4f53b1731b8d984f005dbe7f04cce">on_algorithm_infos_changed_</a></td></tr>
+</table>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="aae6db223bd7e8ed813e7e2a1a2b60f09" name="aae6db223bd7e8ed813e7e2a1a2b60f09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae6db223bd7e8ed813e7e2a1a2b60f09">&#9670;&#160;</a></span>SystemHandler</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#aae6db223bd7e8ed813e7e2a1a2b60f09">systems::algo::AlgorithmSystem::SystemHandler</a> = <a class="el" href="classsystems_1_1algo_1_1AlgorithmHandler.html">AlgorithmHandler</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0d8434a13e322022619cd021ead7dd13" name="a0d8434a13e322022619cd021ead7dd13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d8434a13e322022619cd021ead7dd13">&#9670;&#160;</a></span>SystemHandlerPtr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a0d8434a13e322022619cd021ead7dd13">systems::algo::AlgorithmSystem::SystemHandlerPtr</a> = <a class="el" href="namespacesystems.html#a9cec77b8a54a3e8546f9c1cc01542eac">::systems::SystemHandlerPtr</a>&lt;<a class="el" href="#aae6db223bd7e8ed813e7e2a1a2b60f09">SystemHandler</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a012217db0cce209e143f3e65de176274" name="a012217db0cce209e143f3e65de176274"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a012217db0cce209e143f3e65de176274">&#9670;&#160;</a></span>AlgorithmSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">systems::algo::AlgorithmSystem::AlgorithmSystem </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">io::ModelIOSystem</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>io_system</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>model_manager</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classUndoStack.html">UndoStack</a> *</td>          <td class="paramname"><span class="paramname"><em>undo_stack</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad8e2e052d697c51da2f298382814bf94" name="ad8e2e052d697c51da2f298382814bf94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8e2e052d697c51da2f298382814bf94">&#9670;&#160;</a></span>~AlgorithmSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">systems::algo::AlgorithmSystem::~AlgorithmSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ad66929235c0004c415590fa6e40ab3bd" name="ad66929235c0004c415590fa6e40ab3bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad66929235c0004c415590fa6e40ab3bd">&#9670;&#160;</a></span>applyShadow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystem::applyShadow </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structsystems_1_1algo_1_1PreparedAlgorithm.html">PreparedAlgorithm</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>prep</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa5edda3a1ce57eb0bf3a9649f0d5539c" name="aa5edda3a1ce57eb0bf3a9649f0d5539c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5edda3a1ce57eb0bf3a9649f0d5539c">&#9670;&#160;</a></span>call()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::any systems::algo::AlgorithmSystem::call </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a></td>          <td class="paramname"><span class="paramname"><em>progress</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>算法调用接口 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_name</td><td>算法唯一名称 </td></tr>
+    <tr><td class="paramname">component_id</td><td></td></tr>
+    <tr><td class="paramname">args</td><td>算法参数 </td></tr>
+    <tr><td class="paramname">progress</td><td>可选进度回调（0~1 + 阶段名）；空则退化为 no-op，handler 内上报不生效 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a36a8dc61bcd961ea31828227cae20ea9" name="a36a8dc61bcd961ea31828227cae20ea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36a8dc61bcd961ea31828227cae20ea9">&#9670;&#160;</a></span>callAsync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classsystems_1_1job_1_1Job.html">systems::job::Job</a> &gt; systems::algo::AlgorithmSystem::callAsync </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>完整异步入口：所属线程准备，worker 计算，所属线程提交；不可影子化时同步执行。 </p>
+
+</div>
+</div>
+<a id="ab485721701104da86865d018bbc00e2e" name="ab485721701104da86865d018bbc00e2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab485721701104da86865d018bbc00e2e">&#9670;&#160;</a></span>computeShadow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystem::computeShadow </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structsystems_1_1algo_1_1PreparedAlgorithm.html">PreparedAlgorithm</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>prep</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a></td>          <td class="paramname"><span class="paramname"><em>progress</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f52e911741d4268f4a4eee12224def8" name="a6f52e911741d4268f4a4eee12224def8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f52e911741d4268f4a4eee12224def8">&#9670;&#160;</a></span>executeAlgorithm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::any systems::algo::AlgorithmSystem::executeAlgorithm </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html">AlgorithmEntry</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>entry</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classComponentOperator.html">ComponentOperator</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>target</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1algo.html#a47898515a2091e48ff5c46388254233d">ProgressFn</a></td>          <td class="paramname"><span class="paramname"><em>progress</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>owner</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{&#160;}</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>已解析真实目标的共同执行段；占用与预览处置由入口负责。 </p>
+
+</div>
+</div>
+<a id="a8070d5f13544187d1628156fed971266" name="a8070d5f13544187d1628156fed971266"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8070d5f13544187d1628156fed971266">&#9670;&#160;</a></span>getAlgorithmInfos()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vector&lt; <a class="el" href="structsystems_1_1algo_1_1AlgorithmInfo.html">AlgorithmInfo</a> * &gt; systems::algo::AlgorithmSystem::getAlgorithmInfos </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取已注册算法类型信息 </p>
+
+</div>
+</div>
+<a id="a70c463a4fcdc22915f39ac1d07c2fbf5" name="a70c463a4fcdc22915f39ac1d07c2fbf5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70c463a4fcdc22915f39ac1d07c2fbf5">&#9670;&#160;</a></span>getArgTypes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt; &gt; systems::algo::AlgorithmSystem::getArgTypes </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取参数类型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_name</td><td>算法唯一名称 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>参数类型 </dd></dl>
+
+</div>
+</div>
+<a id="a6632d0f9f6fac0bd561f91ff811531c1" name="a6632d0f9f6fac0bd561f91ff811531c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6632d0f9f6fac0bd561f91ff811531c1">&#9670;&#160;</a></span>prepareAlgorithm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsystems_1_1job_1_1JobWork.html">systems::job::JobWork</a> systems::algo::AlgorithmSystem::prepareAlgorithm </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>owner</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb38dc7d0e40dc341307ccf2416005cd" name="afb38dc7d0e40dc341307ccf2416005cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb38dc7d0e40dc341307ccf2416005cd">&#9670;&#160;</a></span>registerHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool systems::algo::AlgorithmSystem::registerHandler </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>meta_data</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="#a0d8434a13e322022619cd021ead7dd13">SystemHandlerPtr</a></td>          <td class="paramname"><span class="paramname"><em>handler</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>注册算法处理器插件 </p>
+
+</div>
+</div>
+<a id="ab334a3be31f673343a5b7f97c67fadde" name="ab334a3be31f673343a5b7f97c67fadde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab334a3be31f673343a5b7f97c67fadde">&#9670;&#160;</a></span>setJobRunner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystem::setJobRunner </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> *</td>          <td class="paramname"><span class="paramname"><em>runner</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>组合根一次注入共享执行器，缺省为原生同步配置。 </p>
+
+</div>
+</div>
+<a id="a5a58b6376b5d53aed9cbef0702a3ca38" name="a5a58b6376b5d53aed9cbef0702a3ca38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a58b6376b5d53aed9cbef0702a3ca38">&#9670;&#160;</a></span>setOnAlgorithmInfosChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystem::setOnAlgorithmInfosChanged </td>
+          <td>(</td>
+          <td class="paramtype">std::function&lt; void()&gt;</td>          <td class="paramname"><span class="paramname"><em>callback</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置算法信息变更回调函数 </p>
+
+</div>
+</div>
+<a id="aeee1312f2026c3aec2d1bcb8b74e502a" name="aeee1312f2026c3aec2d1bcb8b74e502a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeee1312f2026c3aec2d1bcb8b74e502a">&#9670;&#160;</a></span>unregisterHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystem::unregisterHandler </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>meta_data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>注销算法处理器插件 </p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="ae2d80d7a2bd5db23ebdd726b2fe7f60a" name="ae2d80d7a2bd5db23ebdd726b2fe7f60a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2d80d7a2bd5db23ebdd726b2fe7f60a">&#9670;&#160;</a></span>entries_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;std::string, <a class="el" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html">AlgorithmEntry</a>&gt; systems::algo::AlgorithmSystem::entries_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a99507878386dc92c1886ecd752f9a18a" name="a99507878386dc92c1886ecd752f9a18a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99507878386dc92c1886ecd752f9a18a">&#9670;&#160;</a></span>io_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">io::ModelIOSystem</a>* systems::algo::AlgorithmSystem::io_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab9d73b13c1c70f259babbb03b7a0a84d" name="ab9d73b13c1c70f259babbb03b7a0a84d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9d73b13c1c70f259babbb03b7a0a84d">&#9670;&#160;</a></span>job_runner_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a>* systems::algo::AlgorithmSystem::job_runner_ { nullptr }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac0fd59653921cd6573e9c140c69ea8dc" name="ac0fd59653921cd6573e9c140c69ea8dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0fd59653921cd6573e9c140c69ea8dc">&#9670;&#160;</a></span>model_manager_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a>* systems::algo::AlgorithmSystem::model_manager_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a59fc07d004c1eafabf7c7195cd4ff997" name="a59fc07d004c1eafabf7c7195cd4ff997"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59fc07d004c1eafabf7c7195cd4ff997">&#9670;&#160;</a></span>name</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const string systems::algo::AlgorithmSystem::name = &quot;AlgorithmSystem&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a19a4f53b1731b8d984f005dbe7f04cce" name="a19a4f53b1731b8d984f005dbe7f04cce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19a4f53b1731b8d984f005dbe7f04cce">&#9670;&#160;</a></span>on_algorithm_infos_changed_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::function&lt;void()&gt; systems::algo::AlgorithmSystem::on_algorithm_infos_changed_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9220adfec4e5b070b7591ceb89476762" name="a9220adfec4e5b070b7591ceb89476762"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9220adfec4e5b070b7591ceb89476762">&#9670;&#160;</a></span>undo_stack_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classUndoStack.html">UndoStack</a>* systems::algo::AlgorithmSystem::undo_stack_ { nullptr }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/systems/algo/<a class="el" href="AlgorithmSystem_8h_source.html">AlgorithmSystem.h</a></li>
+<li>model/systems/algo/<a class="el" href="AlgorithmSystem_8cpp.html">AlgorithmSystem.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

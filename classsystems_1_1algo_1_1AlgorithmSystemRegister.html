@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: systems::algo::AlgorithmSystemRegister类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesystems.html">systems</a></li><li class="navelem"><a href="namespacesystems_1_1algo.html">algo</a></li><li class="navelem"><a href="classsystems_1_1algo_1_1AlgorithmSystemRegister.html">AlgorithmSystemRegister</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classsystems_1_1algo_1_1AlgorithmSystemRegister-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">systems::algo::AlgorithmSystemRegister类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>算法系统的操作器，负责注册和注销算法插件  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="AlgorithmSystemRegister_8h_source.html">AlgorithmSystemRegister.h</a>&gt;</code></p>
+<div class="dynheader">
+类 systems::algo::AlgorithmSystemRegister 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsystems_1_1algo_1_1AlgorithmSystemRegister__inherit__graph.png" border="0" usemap="#asystems_1_1algo_1_1AlgorithmSystemRegister_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="asystems_1_1algo_1_1AlgorithmSystemRegister_inherit__map" id="asystems_1_1algo_1_1AlgorithmSystemRegister_inherit__map">
+<area shape="rect" title="算法系统的操作器，负责注册和注销算法插件" alt="" coords="23,79,208,119"/>
+<area shape="rect" href="classsystems_1_1SystemRegisterBase.html" title="系统功能插件的注册器，系统的交互接口，用于注册和注销系统的插件PluginBase。本身不储存状态" alt="" coords="5,5,225,31"/>
+<area shape="poly" title=" " alt="" coords="118,44,118,79,113,79,113,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+systems::algo::AlgorithmSystemRegister 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsystems_1_1algo_1_1AlgorithmSystemRegister__coll__graph.png" border="0" usemap="#asystems_1_1algo_1_1AlgorithmSystemRegister_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="asystems_1_1algo_1_1AlgorithmSystemRegister_coll__map" id="asystems_1_1algo_1_1AlgorithmSystemRegister_coll__map">
+<area shape="rect" title="算法系统的操作器，负责注册和注销算法插件" alt="" coords="3199,920,3384,960"/>
+<area shape="rect" href="classsystems_1_1SystemRegisterBase.html" title="系统功能插件的注册器，系统的交互接口，用于注册和注销系统的插件PluginBase。本身不储存状态" alt="" coords="2867,899,3087,925"/>
+<area shape="poly" title=" " alt="" coords="3100,920,3199,929,3198,934,3100,926"/>
+<area shape="rect" href="classsystems_1_1algo_1_1AlgorithmSystem.html" title=" " alt="" coords="2884,949,3069,989"/>
+<area shape="poly" title=" " alt="" coords="3083,962,3174,955,3198,952,3198,957,3175,960,3083,967"/>
+<area shape="rect" title=" " alt="" coords="265,1078,352,1103"/>
+<area shape="poly" title=" " alt="" coords="318,1116,332,1168,357,1233,374,1266,395,1298,420,1326,449,1350,482,1368,511,1378,539,1382,566,1382,624,1374,697,1368,2631,1368,2667,1365,2701,1355,2734,1340,2764,1321,2818,1270,2864,1209,2902,1145,2931,1083,2967,989,2972,991,2936,1085,2906,1147,2868,1212,2822,1274,2767,1325,2736,1345,2703,1360,2668,1370,2631,1373,697,1373,625,1379,566,1387,538,1387,510,1383,480,1373,447,1354,417,1330,391,1301,370,1269,352,1235,326,1169,312,1117"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="652,785,745,810"/>
+<area shape="poly" title=" " alt="" coords="320,1065,341,1031,369,991,405,950,447,916,464,908,481,904,511,903,539,902,553,896,567,886,577,871,579,855,581,838,591,821,620,804,651,796,653,802,622,809,595,825,586,840,584,856,582,873,571,890,555,901,540,907,511,909,481,909,466,913,449,921,408,954,373,994,345,1034,325,1068"/>
+<area shape="rect" href="structComponentData.html" title="模型的组成单元：一个 ComponentData 表示模型中的一个物体部件" alt="" coords="635,970,763,995"/>
+<area shape="poly" title=" " alt="" coords="343,1069,391,1045,447,1023,545,999,634,986,635,991,546,1005,449,1028,394,1050,345,1074"/>
+<area shape="rect" href="classUndoStack.html" title=" " alt="" coords="2185,721,2277,746"/>
+<area shape="poly" title=" " alt="" coords="365,1076,514,1051,606,1041,697,1037,1908,1037,1933,1035,1954,1029,1970,1020,1983,1007,2001,973,2014,932,2025,887,2040,841,2065,797,2082,778,2104,760,2143,742,2184,734,2185,739,2145,747,2107,765,2086,782,2069,800,2045,843,2030,888,2019,934,2006,976,1987,1010,1973,1024,1956,1034,1934,1040,1908,1043,697,1043,606,1047,515,1056,366,1081"/>
+<area shape="rect" href="structUndoRecord.html" title="一次操作 = 一条记录" alt="" coords="648,203,749,229"/>
+<area shape="poly" title=" " alt="" coords="316,1064,334,1020,361,966,398,910,421,885,446,863,463,854,480,849,511,849,540,848,554,843,567,832,578,803,593,741,632,554,692,228,698,229,637,555,599,742,583,805,571,835,556,847,541,853,511,855,481,855,465,859,450,868,425,889,403,914,365,968,338,1022,321,1066"/>
+<area shape="rect" href="classsystems_1_1job_1_1Job.html" title="任务单元：持有执行体、提交体、取消令牌与状态" alt="" coords="1840,178,1973,203"/>
+<area shape="poly" title=" " alt="" coords="317,1064,385,887,493,631,551,506,606,400,656,327,678,306,697,299,1501,299,1585,302,1651,307,1715,303,1751,295,1792,280,1824,264,1852,242,1893,201,1897,205,1855,246,1827,268,1794,285,1752,300,1715,308,1651,313,1585,308,1501,304,698,304,681,311,660,330,611,403,555,508,497,633,390,889,322,1066"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystem.html" title="模型IO系统，每种文件格式只能注册一个处理器" alt="" coords="2525,926,2733,951"/>
+<area shape="poly" title=" " alt="" coords="341,1109,390,1138,449,1164,517,1185,571,1197,626,1202,697,1203,2232,1203,2266,1200,2299,1194,2363,1171,2423,1137,2478,1096,2525,1053,2565,1012,2617,950,2621,953,2569,1015,2529,1057,2481,1100,2426,1141,2366,1176,2301,1199,2267,1206,2232,1208,697,1208,626,1207,570,1202,515,1191,447,1169,388,1143,338,1113"/>
+<area shape="rect" title=" " alt="" coords="1388,1078,1612,1133"/>
+<area shape="poly" title=" " alt="" coords="366,1089,1388,1101,1388,1107,366,1094"/>
+<area shape="rect" href="structsystems_1_1io_1_1ModelIOInfo.html" title="模型层文件读写支持的文件类型信息" alt="" coords="607,1139,791,1165"/>
+<area shape="poly" title=" " alt="" coords="344,1108,392,1131,449,1149,529,1159,606,1158,606,1164,529,1164,447,1155,390,1136,342,1112"/>
+<area shape="rect" title=" " alt="" coords="1411,1253,1589,1323"/>
+<area shape="poly" title=" " alt="" coords="328,1113,378,1171,411,1199,449,1222,503,1242,549,1252,592,1256,633,1255,719,1246,769,1243,828,1244,1096,1256,1364,1272,1411,1276,1410,1281,1364,1277,1096,1262,828,1249,770,1248,719,1251,633,1260,592,1261,549,1258,501,1247,447,1226,408,1204,374,1174,324,1117"/>
+<area shape="rect" href="structsystems_1_1algo_1_1AlgorithmInfo.html" title=" " alt="" coords="593,1305,804,1330"/>
+<area shape="poly" title=" " alt="" coords="319,1116,334,1163,360,1222,377,1251,398,1279,422,1303,449,1323,475,1335,502,1342,559,1345,614,1338,659,1327,660,1333,615,1344,560,1350,502,1347,473,1340,447,1328,418,1307,394,1282,373,1254,355,1224,329,1165,314,1117"/>
+<area shape="rect" title=" " alt="" coords="5,1071,144,1111"/>
+<area shape="poly" title=" " alt="" coords="158,1088,265,1088,265,1093,158,1093"/>
+<area shape="rect" href="classsystems_1_1job_1_1JobRunner.html" title="所属线程管理一个在飞任务；worker 不等待 GUI。 发布、准备、查询、清理、终态与 stop 均在构造线程。 异步运行须向该线程投递；计算结束后保持槽与模型占用直到 GUI 收尾。" alt="" coords="2540,326,2719,351"/>
+<area shape="poly" title=" " alt="" coords="2649,361,2690,426,2744,520,2799,632,2824,692,2845,751,2851,793,2852,847,2856,899,2861,920,2869,934,2885,948,2882,952,2865,938,2856,922,2851,900,2847,847,2845,793,2840,753,2819,693,2795,634,2739,523,2685,429,2645,364"/>
+<area shape="rect" title=" " alt="" coords="2147,226,2314,251"/>
+<area shape="poly" title=" " alt="" coords="2328,237,2414,246,2502,265,2564,293,2612,324,2609,328,2562,298,2500,271,2413,251,2328,242"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="1857,721,1956,746"/>
+<area shape="poly" title=" " alt="" coords="1923,757,1951,802,1991,857,2044,911,2074,934,2107,952,2157,973,2209,991,2318,1015,2428,1027,2538,1029,2642,1024,2738,1013,2892,987,2893,992,2739,1019,2643,1029,2538,1034,2428,1032,2317,1020,2208,996,2155,978,2104,957,2071,938,2040,915,1987,860,1946,805,1919,759"/>
+<area shape="poly" title=" " alt="" coords="1940,711,2126,604,2379,463,2601,349,2603,354,2381,468,2129,608,1943,716"/>
+<area shape="poly" title=" " alt="" coords="1970,731,2185,731,2185,736,1970,736"/>
+<area shape="poly" title=" " alt="" coords="1966,747,2584,923,2583,928,1965,752"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="1429,627,1571,653"/>
+<area shape="poly" title=" " alt="" coords="1585,645,1685,660,1794,684,1841,700,1881,718,1879,723,1839,705,1793,689,1684,665,1584,651"/>
+<area shape="rect" title=" " alt="" coords="938,470,1125,525"/>
+<area shape="poly" title=" " alt="" coords="1139,507,1249,528,1308,543,1365,562,1431,593,1482,625,1479,629,1428,598,1363,566,1306,548,1248,533,1138,513"/>
+<area shape="rect" title=" " alt="" coords="943,549,1119,603"/>
+<area shape="poly" title=" " alt="" coords="1133,585,1364,615,1430,625,1429,630,1364,620,1133,590"/>
+<area shape="rect" title=" " alt="" coords="945,627,1118,682"/>
+<area shape="poly" title=" " alt="" coords="1132,649,1429,640,1429,645,1132,654"/>
+<area shape="rect" title=" " alt="" coords="943,706,1119,761"/>
+<area shape="poly" title=" " alt="" coords="1133,724,1245,708,1305,694,1363,676,1387,662,1428,649,1430,654,1389,666,1365,681,1307,700,1246,713,1133,730"/>
+<area shape="rect" title=" " alt="" coords="1419,677,1581,731"/>
+<area shape="poly" title=" " alt="" coords="1595,708,1857,727,1857,732,1595,713"/>
+<area shape="rect" title=" " alt="" coords="921,785,1141,810"/>
+<area shape="poly" title=" " alt="" coords="1155,783,1257,769,1363,748,1419,729,1421,734,1365,753,1258,774,1155,788"/>
+<area shape="poly" title=" " alt="" coords="759,795,921,795,921,800,759,800"/>
+<area shape="rect" title=" " alt="" coords="230,750,387,775"/>
+<area shape="poly" title=" " alt="" coords="334,739,424,668,563,573,645,523,734,477,826,437,921,405,1006,391,1116,385,1240,387,1371,398,1501,418,1620,445,1721,479,1762,500,1795,522,1819,545,1840,571,1872,627,1893,681,1905,719,1900,721,1888,682,1867,630,1835,574,1815,548,1792,526,1759,504,1719,484,1619,450,1500,423,1371,404,1240,393,1116,390,1007,396,922,411,828,441,736,482,648,528,566,577,427,673,337,743"/>
+<area shape="poly" title=" " alt="" coords="401,768,652,791,651,796,401,773"/>
+<area shape="poly" title=" " alt="" coords="324,787,344,822,371,864,407,905,449,939,482,951,529,961,634,975,634,980,528,967,480,956,447,944,403,909,367,867,339,825,319,789"/>
+<area shape="rect" title=" " alt="" coords="1401,919,1599,974"/>
+<area shape="poly" title=" " alt="" coords="1613,959,1658,959,1705,953,1750,942,1792,922,1815,904,1835,882,1867,832,1888,782,1900,746,1905,747,1893,784,1872,834,1840,885,1819,908,1795,926,1752,947,1706,959,1658,964,1613,964"/>
+<area shape="rect" title=" " alt="" coords="927,963,1136,1003"/>
+<area shape="poly" title=" " alt="" coords="1150,971,1400,952,1401,957,1150,976"/>
+<area shape="poly" title=" " alt="" coords="776,980,927,980,927,985,776,985"/>
+<area shape="rect" title=" " alt="" coords="1424,805,1576,845"/>
+<area shape="poly" title=" " alt="" coords="1589,831,1689,829,1742,821,1792,808,1822,795,1849,778,1891,744,1894,748,1852,782,1824,800,1794,813,1743,827,1689,834,1590,836"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="1451,755,1549,781"/>
+<area shape="poly" title=" " alt="" coords="1563,773,1671,779,1732,778,1793,771,1838,759,1877,744,1879,749,1839,764,1794,776,1733,783,1671,785,1563,779"/>
+<area shape="rect" title=" " alt="" coords="925,835,1137,875"/>
+<area shape="poly" title=" " alt="" coords="1151,858,1275,856,1327,849,1363,836,1371,827,1374,816,1377,803,1386,791,1417,775,1450,768,1451,773,1419,780,1390,795,1382,806,1379,817,1376,830,1365,841,1328,854,1275,861,1152,864"/>
+<area shape="rect" title=" " alt="" coords="607,835,790,875"/>
+<area shape="poly" title=" " alt="" coords="804,852,925,852,925,857,804,857"/>
+<area shape="rect" title=" " alt="" coords="960,899,1103,939"/>
+<area shape="poly" title=" " alt="" coords="1116,920,1186,920,1259,916,1322,906,1345,898,1362,889,1371,878,1375,867,1374,843,1373,817,1377,804,1386,791,1416,773,1450,765,1451,771,1418,778,1390,795,1382,806,1378,818,1379,843,1380,868,1376,881,1366,893,1348,903,1323,911,1259,921,1186,925,1116,925"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="1439,870,1561,895"/>
+<area shape="poly" title=" " alt="" coords="1574,890,1625,892,1681,890,1738,880,1792,860,1828,835,1858,803,1881,771,1896,745,1901,748,1886,774,1862,806,1832,839,1795,865,1740,885,1682,895,1625,898,1574,895"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="1443,343,1557,369"/>
+<area shape="poly" title=" " alt="" coords="1571,364,1711,386,1795,404,1829,441,1855,484,1875,530,1889,576,1904,662,1908,720,1903,721,1899,663,1884,578,1870,531,1851,486,1825,444,1792,409,1710,391,1571,369"/>
+<area shape="poly" title=" " alt="" coords="1571,339,1621,333,1678,331,1737,336,1794,351,1872,387,1944,434,2012,487,2072,543,2124,598,2168,648,2222,719,2218,722,2164,652,2120,602,2068,547,2008,491,1941,438,1869,392,1792,356,1736,341,1678,337,1621,338,1571,344"/>
+<area shape="rect" title=" " alt="" coords="1395,485,1605,525"/>
+<area shape="poly" title=" " alt="" coords="1581,527,1685,568,1741,595,1795,626,1826,649,1854,674,1896,719,1892,722,1851,678,1822,653,1792,630,1739,600,1683,573,1579,532"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="931,421,1132,446"/>
+<area shape="poly" title=" " alt="" coords="1146,439,1252,450,1365,467,1432,483,1431,488,1363,472,1252,455,1145,444"/>
+<area shape="poly" title=" " alt="" coords="2291,740,2390,759,2502,787,2601,817,2676,845,2844,920,2868,934,2903,947,2901,952,2866,938,2841,925,2674,850,2599,823,2501,792,2389,764,2290,745"/>
+<area shape="poly" title=" " alt="" coords="2257,709,2365,615,2499,486,2567,410,2616,350,2620,353,2571,413,2503,490,2369,619,2260,713"/>
+<area shape="poly" title=" " alt="" coords="2265,751,2318,781,2381,810,2414,820,2442,824,2469,829,2502,842,2537,861,2569,884,2616,924,2613,928,2565,888,2534,866,2500,846,2468,834,2441,829,2413,825,2379,814,2316,785,2263,755"/>
+<area shape="rect" title=" " alt="" coords="1165,214,1364,239"/>
+<area shape="poly" title=" " alt="" coords="1378,225,1514,236,1592,247,1675,264,1760,286,1844,316,1924,354,1998,400,2028,425,2049,448,2066,474,2084,510,2093,541,2095,567,2096,592,2108,621,2130,652,2157,679,2210,718,2206,723,2154,683,2126,656,2103,624,2091,594,2089,568,2088,542,2079,512,2062,477,2045,451,2025,429,1994,405,1921,359,1842,321,1758,291,1674,269,1592,252,1513,241,1378,230"/>
+<area shape="poly" title=" " alt="" coords="763,215,1165,222,1165,227,763,220"/>
+<area shape="rect" title=" " alt="" coords="193,177,424,202"/>
+<area shape="poly" title=" " alt="" coords="438,195,648,210,648,215,438,201"/>
+<area shape="rect" title=" " alt="" coords="199,230,418,255"/>
+<area shape="poly" title=" " alt="" coords="432,239,569,232,647,222,648,227,570,237,432,244"/>
+<area shape="rect" title=" " alt="" coords="2105,11,2356,51"/>
+<area shape="poly" title=" " alt="" coords="2370,22,2439,36,2473,49,2503,67,2534,96,2560,130,2581,167,2597,205,2619,276,2629,325,2624,326,2614,277,2592,207,2576,169,2556,133,2530,99,2500,71,2470,54,2438,41,2369,28"/>
+<area shape="rect" href="structsystems_1_1job_1_1JobRunner_1_1ModelOperation.html" title=" " alt="" coords="1817,11,1996,51"/>
+<area shape="poly" title=" " alt="" coords="2010,28,2105,28,2105,33,2010,33"/>
+<area shape="rect" title=" " alt="" coords="1395,11,1605,51"/>
+<area shape="poly" title=" " alt="" coords="1619,28,1817,28,1817,33,1619,33"/>
+<area shape="rect" title=" " alt="" coords="2136,281,2325,321"/>
+<area shape="poly" title=" " alt="" coords="2339,309,2540,328,2539,333,2339,314"/>
+<area shape="poly" title=" " alt="" coords="1988,201,2036,215,2083,236,2095,249,2107,260,2147,279,2144,284,2104,265,2091,252,2080,241,2034,220,1986,206"/>
+<area shape="rect" title=" " alt="" coords="1407,164,1593,204"/>
+<area shape="poly" title=" " alt="" coords="1607,183,1840,187,1840,192,1607,188"/>
+<area shape="rect" title=" " alt="" coords="1454,94,1546,119"/>
+<area shape="poly" title=" " alt="" coords="1560,101,1669,100,1793,104,1903,110,1998,112,2160,116,2236,124,2316,141,2403,171,2503,215,2541,240,2575,270,2621,324,2617,327,2571,274,2538,244,2500,220,2401,176,2314,146,2235,129,2159,121,1998,117,1903,115,1793,109,1668,105,1560,107"/>
+<area shape="poly" title=" " alt="" coords="1560,114,1794,157,1863,175,1862,181,1793,163,1559,119"/>
+<area shape="rect" title=" " alt="" coords="2185,353,2277,378"/>
+<area shape="poly" title=" " alt="" coords="2291,366,2389,367,2501,361,2576,349,2576,354,2502,367,2389,372,2290,371"/>
+<area shape="poly" title=" " alt="" coords="2747,946,2884,959,2883,964,2747,952"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystemBase.html" title="ModelIOSystem接口基类，出于插件开发而设计的接口基类。" alt="" coords="2111,918,2351,943"/>
+<area shape="poly" title=" " alt="" coords="2365,931,2525,934,2525,939,2365,936"/>
+<area shape="poly" title=" " alt="" coords="1626,1107,1725,1108,1840,1104,1961,1095,2081,1079,2166,1058,2230,1033,2295,1006,2379,980,2460,962,2538,949,2539,954,2461,968,2381,985,2296,1012,2232,1038,2168,1063,2082,1084,1962,1101,1840,1110,1725,1113,1626,1113"/>
+<area shape="rect" href="structsystems_1_1io_1_1ModelIOSystem_1_1IOEntry.html" title="文件格式处理器与信息共同持有，占用期注册表保持只读。" alt="" coords="927,1128,1135,1168"/>
+<area shape="poly" title=" " alt="" coords="1149,1144,1254,1139,1364,1129,1388,1126,1388,1131,1364,1135,1254,1145,1149,1149"/>
+<area shape="poly" title=" " alt="" coords="805,1148,927,1147,927,1152,805,1153"/>
+<area shape="poly" title=" " alt="" coords="1603,1281,1905,1273,2631,1273,2662,1271,2692,1264,2750,1239,2802,1201,2848,1157,2887,1108,2920,1062,2963,988,2968,991,2925,1064,2892,1112,2852,1160,2805,1205,2752,1243,2694,1269,2663,1276,2631,1279,1905,1279,1603,1286"/>
+<area shape="rect" href="structsystems_1_1algo_1_1AlgorithmSystem_1_1AlgorithmEntry.html" title="同一注册的 handler 与信息共同持有，节点扩容不改变信息地址。" alt="" coords="939,1293,1124,1333"/>
+<area shape="poly" title=" " alt="" coords="1138,1306,1364,1295,1410,1292,1410,1297,1364,1300,1138,1311"/>
+<area shape="poly" title=" " alt="" coords="818,1313,938,1312,939,1317,818,1319"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ac9798227d716c5f73417d32ade8055fb" id="r_ac9798227d716c5f73417d32ade8055fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9798227d716c5f73417d32ade8055fb">AlgorithmSystemRegister</a> (<a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">AlgorithmSystem</a> &amp;<a class="el" href="TestFeatureSystem_8cpp.html#a14a836ee7331e7487d2d7f94df86c5bc">system</a>)</td></tr>
+<tr class="memitem:a420ab8d48a59f9b78f00f8900d8a8827" id="r_a420ab8d48a59f9b78f00f8900d8a8827"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a420ab8d48a59f9b78f00f8900d8a8827">registerPlugin</a> (const QJsonObject &amp;meta_data, <a class="el" href="classsystems_1_1PluginBase.html">PluginBase</a> &amp;plugin) override</td></tr>
+<tr class="memdesc:a420ab8d48a59f9b78f00f8900d8a8827"><td class="mdescLeft">&#160;</td><td class="mdescRight">注册一个插件。  <br /></td></tr>
+<tr class="memitem:a271d7a7e420216523b8a2c1893bb2931" id="r_a271d7a7e420216523b8a2c1893bb2931"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a271d7a7e420216523b8a2c1893bb2931">unregisterPlugin</a> (const QJsonObject &amp;meta_data) override</td></tr>
+<tr class="memdesc:a271d7a7e420216523b8a2c1893bb2931"><td class="mdescLeft">&#160;</td><td class="mdescRight">注销指定的插件  <br /></td></tr>
+<tr class="inherit_header pub_methods_classsystems_1_1SystemRegisterBase"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classsystems_1_1SystemRegisterBase')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classsystems_1_1SystemRegisterBase.html">systems::SystemRegisterBase</a></td></tr>
+<tr class="memitem:aa1646d285893219257d8247b32e2204e inherit pub_methods_classsystems_1_1SystemRegisterBase" id="r_aa1646d285893219257d8247b32e2204e"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1SystemRegisterBase.html#aa1646d285893219257d8247b32e2204e">~SystemRegisterBase</a> ()=default</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a6a0a02948ca8d2b8e68cd8f36d160cfb" id="r_a6a0a02948ca8d2b8e68cd8f36d160cfb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6a0a02948ca8d2b8e68cd8f36d160cfb">toMetaData</a> (const QJsonObject &amp;meta_data) const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:ad5794cde5c160bca4d7708228a03b127" id="r_ad5794cde5c160bca4d7708228a03b127"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">AlgorithmSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5794cde5c160bca4d7708228a03b127">system_</a></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>算法系统的操作器，负责注册和注销算法插件 </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="ac9798227d716c5f73417d32ade8055fb" name="ac9798227d716c5f73417d32ade8055fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9798227d716c5f73417d32ade8055fb">&#9670;&#160;</a></span>AlgorithmSystemRegister()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">systems::algo::AlgorithmSystemRegister::AlgorithmSystemRegister </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">AlgorithmSystem</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>system</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a420ab8d48a59f9b78f00f8900d8a8827" name="a420ab8d48a59f9b78f00f8900d8a8827"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a420ab8d48a59f9b78f00f8900d8a8827">&#9670;&#160;</a></span>registerPlugin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool systems::algo::AlgorithmSystemRegister::registerPlugin </td>
+          <td>(</td>
+          <td class="paramtype">const QJsonObject &amp;</td>          <td class="paramname"><span class="paramname"><em>meta_data</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classsystems_1_1PluginBase.html">PluginBase</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>plugin</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>注册一个插件。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">meta_data</td><td>插件的元信息，包括包含的处理器的类型、名称等信息 </td></tr>
+    <tr><td class="paramname">plugin</td><td>要注册的插件 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>注册是否成功 </dd></dl>
+
+<p>实现了 <a class="el" href="classsystems_1_1SystemRegisterBase.html#a537af28be223a0289d919e3f62b2bc1b">systems::SystemRegisterBase</a>.</p>
+
+</div>
+</div>
+<a id="a6a0a02948ca8d2b8e68cd8f36d160cfb" name="a6a0a02948ca8d2b8e68cd8f36d160cfb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a0a02948ca8d2b8e68cd8f36d160cfb">&#9670;&#160;</a></span>toMetaData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsystems_1_1algo_1_1HandlerMetaData.html">HandlerMetaData</a> systems::algo::AlgorithmSystemRegister::toMetaData </td>
+          <td>(</td>
+          <td class="paramtype">const QJsonObject &amp;</td>          <td class="paramname"><span class="paramname"><em>meta_data</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a271d7a7e420216523b8a2c1893bb2931" name="a271d7a7e420216523b8a2c1893bb2931"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a271d7a7e420216523b8a2c1893bb2931">&#9670;&#160;</a></span>unregisterPlugin()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::algo::AlgorithmSystemRegister::unregisterPlugin </td>
+          <td>(</td>
+          <td class="paramtype">const QJsonObject &amp;</td>          <td class="paramname"><span class="paramname"><em>meta_data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>注销指定的插件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">meta_data</td><td>处理器的元信息，包含处理器的类型、名称等信息 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>实现了 <a class="el" href="classsystems_1_1SystemRegisterBase.html#a0ce24938790d35a9c06eb1f14f874722">systems::SystemRegisterBase</a>.</p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="ad5794cde5c160bca4d7708228a03b127" name="ad5794cde5c160bca4d7708228a03b127"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5794cde5c160bca4d7708228a03b127">&#9670;&#160;</a></span>system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">AlgorithmSystem</a>* systems::algo::AlgorithmSystemRegister::system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/systems/algo/<a class="el" href="AlgorithmSystemRegister_8h_source.html">AlgorithmSystemRegister.h</a></li>
+<li>model/systems/algo/<a class="el" href="AlgorithmSystemRegister_8cpp.html">AlgorithmSystemRegister.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

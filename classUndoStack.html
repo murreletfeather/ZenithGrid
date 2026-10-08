@@ -1,0 +1,1856 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: UndoStack类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-attribs">静态 Public 属性</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="#friends">友元</a> &#124;
+<a href="classUndoStack-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">UndoStack类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="UndoStack_8h_source.html">UndoStack.h</a>&gt;</code></p>
+<div class="dynheader">
+类 UndoStack 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classUndoStack__inherit__graph.png" border="0" usemap="#aUndoStack_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="aUndoStack_inherit__map" id="aUndoStack_inherit__map">
+<area shape="rect" title=" " alt="" coords="17,79,109,104"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="5,5,120,31"/>
+<area shape="poly" title=" " alt="" coords="65,44,65,79,60,79,60,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+UndoStack 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classUndoStack__coll__graph.png" border="0" usemap="#aUndoStack_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aUndoStack_coll__map" id="aUndoStack_coll__map">
+<area shape="rect" title=" " alt="" coords="3880,865,3972,890"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="2631,62,2745,87"/>
+<area shape="poly" title=" " alt="" coords="2759,72,3113,72,3686,72,3718,80,3747,102,3773,137,3797,182,3818,236,3837,296,3869,430,3893,568,3910,696,3926,864,3921,864,3905,697,3888,569,3864,431,3832,298,3813,238,3792,184,3769,140,3743,106,3716,85,3686,77,3113,77,2759,77"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="3065,373,3163,398"/>
+<area shape="poly" title=" " alt="" coords="2760,84,2795,96,2807,105,2819,114,2841,121,2862,124,2899,124,2935,126,2955,132,2976,144,3006,170,3031,200,3071,265,3098,327,3112,372,3107,373,3093,329,3067,268,3027,203,3002,174,2973,149,2953,137,2934,131,2899,129,2861,130,2840,126,2816,118,2804,110,2792,101,2758,89"/>
+<area shape="poly" title=" " alt="" coords="3149,403,3905,862,3902,867,3147,408"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="2617,401,2759,426"/>
+<area shape="poly" title=" " alt="" coords="2772,413,2869,412,2974,407,3064,393,3065,398,2975,412,2870,418,2772,418"/>
+<area shape="rect" title=" " alt="" coords="2187,419,2374,474"/>
+<area shape="poly" title=" " alt="" coords="2388,435,2617,416,2617,422,2388,441"/>
+<area shape="rect" title=" " alt="" coords="2193,183,2369,238"/>
+<area shape="poly" title=" " alt="" coords="2383,205,2429,210,2477,221,2522,241,2561,270,2571,285,2576,300,2573,330,2571,359,2575,373,2585,386,2600,398,2618,405,2616,410,2597,402,2581,390,2570,375,2566,359,2568,330,2570,301,2566,287,2557,274,2519,245,2475,226,2428,215,2382,210"/>
+<area shape="rect" title=" " alt="" coords="2194,262,2367,317"/>
+<area shape="poly" title=" " alt="" coords="2382,292,2426,299,2472,311,2518,328,2560,351,2569,360,2573,370,2577,378,2584,386,2618,401,2616,406,2581,390,2572,381,2568,372,2565,363,2557,355,2516,333,2471,316,2425,305,2381,297"/>
+<area shape="rect" title=" " alt="" coords="2193,341,2369,395"/>
+<area shape="poly" title=" " alt="" coords="2383,376,2559,395,2617,402,2617,407,2558,400,2382,381"/>
+<area shape="rect" title=" " alt="" coords="1688,545,1851,599"/>
+<area shape="poly" title=" " alt="" coords="1864,569,2115,569,2689,569,2772,571,2837,571,2899,559,2973,528,3017,498,3054,461,3083,425,3103,397,3107,400,3088,428,3058,465,3020,503,2976,533,2901,565,2838,576,2772,576,2689,575,2115,575,1864,575"/>
+<area shape="rect" title=" " alt="" coords="932,553,1152,578"/>
+<area shape="poly" title=" " alt="" coords="1166,564,1688,569,1687,574,1166,569"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="565,550,659,575"/>
+<area shape="poly" title=" " alt="" coords="673,560,932,562,932,567,673,566"/>
+<area shape="rect" title=" " alt="" coords="229,1581,315,1606"/>
+<area shape="poly" title=" " alt="" coords="298,1614,350,1658,424,1710,467,1734,514,1753,562,1766,611,1771,3686,1771,3703,1769,3719,1762,3749,1738,3776,1700,3801,1650,3822,1590,3842,1522,3872,1373,3894,1218,3909,1075,3921,890,3927,891,3914,1075,3900,1218,3878,1374,3847,1524,3828,1592,3806,1652,3781,1703,3753,1742,3721,1767,3704,1774,3686,1776,611,1776,561,1771,512,1758,465,1739,421,1715,346,1663,294,1618"/>
+<area shape="poly" title=" " alt="" coords="278,1567,366,1230,428,980,487,721,490,682,488,649,492,618,499,603,512,586,536,569,564,562,566,567,538,574,515,590,503,605,497,620,493,649,495,682,492,722,433,981,371,1232,283,1568"/>
+<area shape="rect" href="structComponentData.html" title="模型的组成单元：一个 ComponentData 表示模型中的一个物体部件" alt="" coords="1902,1193,2030,1218"/>
+<area shape="poly" title=" " alt="" coords="329,1589,661,1574,1142,1545,1383,1525,1596,1501,1759,1473,1815,1458,1849,1442,1876,1418,1899,1389,1917,1357,1932,1325,1951,1263,1960,1218,1965,1219,1956,1264,1937,1326,1922,1360,1903,1392,1880,1422,1852,1446,1817,1463,1760,1478,1597,1506,1384,1530,1142,1550,661,1579,329,1594"/>
+<area shape="rect" title=" " alt="" coords="520,1495,704,1535"/>
+<area shape="poly" title=" " alt="" coords="312,1573,374,1551,448,1534,519,1522,520,1528,449,1539,375,1556,314,1578"/>
+<area shape="rect" href="structUndoRecord.html" title="一次操作 = 一条记录" alt="" coords="3367,1219,3468,1245"/>
+<area shape="poly" title=" " alt="" coords="318,1608,376,1628,448,1648,529,1664,611,1671,3115,1671,3153,1667,3188,1655,3220,1638,3248,1615,3274,1587,3298,1555,3337,1485,3368,1411,3389,1342,3411,1244,3417,1245,3395,1343,3373,1413,3342,1487,3302,1558,3279,1590,3252,1618,3222,1642,3190,1660,3154,1672,3115,1676,611,1676,528,1670,447,1653,374,1633,317,1613"/>
+<area shape="rect" href="structModelSnapshot.html" title="模型级结构快照：整模型的深拷贝，用于撤销/恢复结构操作" alt="" coords="551,1610,673,1635"/>
+<area shape="poly" title=" " alt="" coords="329,1603,375,1611,467,1618,550,1620,550,1626,467,1623,374,1616,328,1609"/>
+<area shape="rect" title=" " alt="" coords="5,1573,144,1613"/>
+<area shape="poly" title=" " alt="" coords="157,1591,228,1591,228,1596,157,1596"/>
+<area shape="rect" title=" " alt="" coords="193,714,351,739"/>
+<area shape="poly" title=" " alt="" coords="279,700,292,667,312,628,339,589,373,557,432,523,485,510,541,508,611,509,2689,509,2749,506,2809,496,2867,482,2923,465,3020,427,3087,396,3089,401,3022,432,2925,470,2869,487,2810,501,2749,511,2689,515,611,515,541,513,486,515,434,528,376,561,343,592,316,630,297,669,284,702"/>
+<area shape="poly" title=" " alt="" coords="291,702,327,665,373,630,422,606,473,588,564,567,566,572,475,593,424,611,376,634,330,669,294,705"/>
+<area shape="poly" title=" " alt="" coords="275,753,279,881,288,971,307,1070,336,1171,355,1221,379,1269,406,1314,437,1356,474,1393,515,1426,540,1440,563,1446,584,1447,606,1444,653,1433,710,1425,913,1424,1071,1421,1146,1416,1227,1406,1318,1391,1425,1368,1573,1330,1717,1287,1928,1216,1930,1221,1718,1292,1574,1335,1426,1373,1319,1396,1228,1412,1147,1421,1071,1427,913,1430,711,1431,654,1438,607,1450,585,1453,562,1452,538,1445,512,1430,470,1397,433,1359,401,1317,374,1271,350,1223,331,1173,301,1071,283,972,273,882,270,753"/>
+<area shape="rect" href="structMeshData.html" title=" " alt="" coords="998,1217,1086,1242"/>
+<area shape="poly" title=" " alt="" coords="285,751,313,820,361,911,392,959,428,1006,469,1048,515,1084,567,1114,615,1130,659,1137,703,1138,796,1139,849,1146,909,1161,971,1188,1021,1214,1018,1219,968,1192,907,1167,848,1151,796,1144,703,1144,659,1142,613,1135,565,1119,512,1089,466,1052,424,1009,388,962,357,914,308,822,280,753"/>
+<area shape="rect" title=" " alt="" coords="513,599,711,654"/>
+<area shape="poly" title=" " alt="" coords="323,707,374,691,512,651,514,656,375,696,325,712"/>
+<area shape="rect" href="classMeshAdjacency.html" title=" " alt="" coords="1495,1219,1619,1245"/>
+<area shape="poly" title=" " alt="" coords="302,745,336,766,376,784,425,796,469,800,547,793,584,790,623,791,665,801,712,822,721,829,725,837,737,853,785,887,832,915,877,937,921,954,1006,978,1088,994,1170,1012,1253,1040,1295,1059,1338,1085,1382,1116,1427,1156,1436,1168,1439,1180,1443,1192,1451,1202,1472,1214,1495,1223,1494,1228,1470,1219,1448,1206,1438,1194,1434,1182,1431,1170,1423,1159,1379,1120,1335,1089,1292,1064,1251,1045,1169,1017,1087,1000,1005,983,919,959,875,942,829,920,782,892,733,857,721,840,717,833,709,826,664,806,623,797,584,795,547,798,469,805,424,802,374,789,334,771,299,750"/>
+<area shape="rect" title=" " alt="" coords="2589,914,2787,969"/>
+<area shape="poly" title=" " alt="" coords="2724,902,2839,777,2907,696,2973,612,3014,550,3052,489,3104,397,3108,399,3057,491,3019,553,2977,615,2911,699,2843,780,2727,906"/>
+<area shape="rect" title=" " alt="" coords="2176,1185,2385,1225"/>
+<area shape="poly" title=" " alt="" coords="2323,1175,2643,967,2646,971,2326,1180"/>
+<area shape="rect" href="structComponentEntry.html" title="组件数据变更（双向快照）" alt="" coords="2623,1193,2753,1218"/>
+<area shape="poly" title=" " alt="" coords="2399,1203,2622,1203,2622,1208,2399,1208"/>
+<area shape="rect" href="structStructuralEntry.html" title="结构变更（四选一）" alt="" coords="2629,1246,2747,1271"/>
+<area shape="poly" title=" " alt="" coords="2381,1225,2411,1231,2527,1245,2628,1253,2628,1258,2526,1250,2410,1236,2380,1231"/>
+<area shape="poly" title=" " alt="" coords="2044,1203,2176,1203,2176,1208,2044,1208"/>
+<area shape="rect" title=" " alt="" coords="1449,1166,1664,1191"/>
+<area shape="poly" title=" " alt="" coords="1678,1184,1902,1199,1902,1204,1678,1189"/>
+<area shape="poly" title=" " alt="" coords="1099,1217,1176,1205,1318,1191,1449,1182,1449,1187,1319,1197,1176,1211,1100,1222"/>
+<area shape="poly" title=" " alt="" coords="1100,1227,1176,1228,1494,1229,1494,1235,1176,1233,1100,1233"/>
+<area shape="rect" title=" " alt="" coords="528,1312,696,1352"/>
+<area shape="poly" title=" " alt="" coords="709,1326,808,1311,859,1297,907,1276,918,1265,931,1252,964,1239,997,1231,999,1236,965,1244,933,1257,922,1269,909,1281,861,1302,809,1317,710,1332"/>
+<area shape="rect" title=" " alt="" coords="529,1376,695,1416"/>
+<area shape="poly" title=" " alt="" coords="708,1405,759,1404,812,1397,862,1380,885,1367,906,1351,915,1340,919,1329,918,1305,917,1279,921,1266,930,1253,945,1241,962,1234,997,1226,998,1232,964,1239,948,1246,934,1257,926,1268,922,1280,923,1304,924,1330,920,1343,910,1355,888,1372,864,1385,813,1402,759,1410,708,1410"/>
+<area shape="rect" title=" " alt="" coords="535,1154,689,1209"/>
+<area shape="poly" title=" " alt="" coords="703,1187,908,1208,998,1220,997,1225,908,1213,702,1192"/>
+<area shape="rect" title=" " alt="" coords="535,1233,689,1287"/>
+<area shape="poly" title=" " alt="" coords="702,1251,998,1230,998,1235,702,1256"/>
+<area shape="poly" title=" " alt="" coords="708,1534,760,1538,813,1535,863,1521,886,1509,906,1493,916,1474,920,1447,919,1376,916,1304,920,1274,930,1253,944,1241,961,1233,997,1225,998,1231,963,1238,947,1245,934,1256,925,1276,921,1304,924,1376,926,1447,921,1476,910,1496,889,1513,865,1526,814,1541,760,1544,708,1539"/>
+<area shape="rect" title=" " alt="" coords="1457,863,1656,903"/>
+<area shape="poly" title=" " alt="" coords="1596,909,1950,1190,1947,1194,1592,913"/>
+<area shape="rect" href="structGeometryData.html" title=" " alt="" coords="983,731,1101,757"/>
+<area shape="poly" title=" " alt="" coords="1104,758,1482,860,1480,865,1103,763"/>
+<area shape="rect" title=" " alt="" coords="521,728,703,768"/>
+<area shape="poly" title=" " alt="" coords="717,744,982,742,982,747,717,750"/>
+<area shape="rect" href="structGeometrySubshapeIndex.html" title=" " alt="" coords="519,678,705,703"/>
+<area shape="poly" title=" " alt="" coords="720,697,908,717,982,730,982,735,908,723,719,702"/>
+<area shape="rect" title=" " alt="" coords="1457,737,1656,777"/>
+<area shape="poly" title=" " alt="" coords="1614,781,1669,811,1732,851,1796,900,1853,957,1896,1020,1929,1088,1951,1149,1964,1191,1959,1193,1946,1151,1924,1090,1891,1023,1849,960,1792,904,1729,856,1666,816,1612,786"/>
+<area shape="rect" href="structGeometryMeshMap.html" title="Geometry 子形状与 MeshData 局部拓扑之间的通用映射" alt="" coords="967,645,1117,670"/>
+<area shape="poly" title=" " alt="" coords="1123,670,1458,736,1457,741,1122,675"/>
+<area shape="poly" title=" " alt="" coords="725,632,967,649,966,655,724,637"/>
+<area shape="poly" title=" " alt="" coords="1632,1231,1736,1230,1850,1223,1902,1215,1903,1221,1851,1228,1736,1235,1632,1236"/>
+<area shape="rect" title=" " alt="" coords="938,1267,1146,1307"/>
+<area shape="poly" title=" " alt="" coords="1159,1279,1287,1271,1425,1256,1501,1242,1502,1247,1426,1261,1288,1276,1160,1285"/>
+<area shape="rect" title=" " alt="" coords="953,1339,1131,1379"/>
+<area shape="poly" title=" " alt="" coords="1144,1363,1209,1362,1280,1357,1354,1346,1424,1326,1460,1308,1493,1285,1541,1243,1545,1247,1496,1290,1463,1313,1426,1330,1355,1351,1281,1363,1209,1368,1144,1368"/>
+<area shape="rect" title=" " alt="" coords="2612,221,2764,261"/>
+<area shape="poly" title=" " alt="" coords="2778,240,2875,252,2926,263,2976,280,3014,300,3050,325,3102,370,3098,374,3047,329,3012,305,2974,285,2925,269,2874,257,2777,246"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="2639,111,2737,137"/>
+<area shape="poly" title=" " alt="" coords="2723,141,2767,165,2818,187,2862,196,2898,197,2934,201,2976,218,3022,254,3061,297,3090,339,3108,371,3104,374,3085,342,3056,301,3019,258,2973,222,2933,206,2898,202,2861,201,2817,192,2765,170,2720,146"/>
+<area shape="rect" title=" " alt="" coords="2175,69,2387,109"/>
+<area shape="poly" title=" " alt="" coords="2401,97,2639,117,2638,123,2400,102"/>
+<area shape="rect" title=" " alt="" coords="1875,69,2057,109"/>
+<area shape="poly" title=" " alt="" coords="2071,87,2174,87,2174,92,2071,92"/>
+<area shape="rect" title=" " alt="" coords="2209,5,2352,45"/>
+<area shape="poly" title=" " alt="" coords="2366,24,2412,28,2462,37,2512,51,2560,71,2573,84,2584,96,2611,108,2639,116,2638,121,2609,113,2581,101,2569,88,2557,76,2511,56,2461,42,2411,33,2366,29"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="2627,286,2749,311"/>
+<area shape="poly" title=" " alt="" coords="2763,302,2864,314,2975,335,3033,352,3083,370,3081,375,3031,357,2974,340,2863,319,2762,307"/>
+<area shape="rect" title=" " alt="" coords="2583,336,2793,376"/>
+<area shape="poly" title=" " alt="" coords="2807,361,3065,379,3064,385,2807,367"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="2180,134,2381,159"/>
+<area shape="poly" title=" " alt="" coords="2395,145,2493,156,2533,166,2560,181,2574,198,2579,216,2575,252,2570,288,2574,305,2585,322,2598,334,2595,338,2581,326,2569,307,2565,288,2569,252,2573,217,2569,201,2557,185,2532,171,2492,161,2395,151"/>
+<area shape="rect" title=" " alt="" coords="3585,1010,3784,1035"/>
+<area shape="poly" title=" " alt="" coords="3717,1000,3902,888,3905,892,3720,1005"/>
+<area shape="poly" title=" " alt="" coords="3444,1209,3665,1033,3669,1038,3447,1213"/>
+<area shape="rect" title=" " alt="" coords="2999,1193,3229,1218"/>
+<area shape="poly" title=" " alt="" coords="3243,1214,3367,1225,3366,1230,3243,1219"/>
+<area shape="poly" title=" " alt="" coords="2767,1203,2999,1203,2999,1208,2767,1208"/>
+<area shape="rect" title=" " alt="" coords="3005,1246,3223,1271"/>
+<area shape="poly" title=" " alt="" coords="3237,1258,3342,1249,3375,1242,3377,1247,3343,1255,3237,1263"/>
+<area shape="poly" title=" " alt="" coords="2761,1256,3004,1256,3004,1261,2761,1261"/>
+<area shape="rect" title=" " alt="" coords="1176,1590,1425,1615"/>
+<area shape="poly" title=" " alt="" coords="1439,1598,1635,1584,1743,1571,1850,1552,1975,1521,2100,1484,2338,1401,2534,1323,2658,1269,2660,1274,2536,1328,2340,1406,2102,1489,1976,1527,1851,1557,1744,1576,1635,1590,1439,1603"/>
+<area shape="poly" title=" " alt="" coords="687,1618,1176,1604,1176,1609,687,1623"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:Capture" id="r_Capture"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">正式与预览使用同一种捕获数据，各自只保留一个实例。  <a href="structUndoStack_1_1Capture.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:OwnerScope" id="r_OwnerScope"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUndoStack_1_1OwnerScope.html">OwnerScope</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">所有者上下文守卫：功能入口（invoke / 按键路由 / 事件回调）进入时压入功能 唯一名，析构弹出——嵌套安全（各功能的入口可相互重入）  <a href="classUndoStack_1_1OwnerScope.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:PreviewAccess" id="r_PreviewAccess"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUndoStack_1_1PreviewAccess.html">PreviewAccess</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">事件与预览回写访问：只允许写自己的临时层，不允许修改正式历史。  <a href="classUndoStack_1_1PreviewAccess.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:RecordingPause" id="r_RecordingPause"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUndoStack_1_1RecordingPause.html">RecordingPause</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">框架生命周期清理／初始化：不生成历史，仍受线程和在飞写权限制。  <a href="classUndoStack_1_1RecordingPause.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:adcd0d3406ba41362f7a44c8ccaab4b46" id="r_adcd0d3406ba41362f7a44c8ccaab4b46"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcd0d3406ba41362f7a44c8ccaab4b46">UndoStack</a> (<a class="el" href="classModelLayer.html">ModelLayer</a> &amp;model)</td></tr>
+<tr class="memitem:a2513807d68ace1bcaf8a0a087fc974d9" id="r_a2513807d68ace1bcaf8a0a087fc974d9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2513807d68ace1bcaf8a0a087fc974d9">UndoStack</a> (const <a class="el" href="classUndoStack.html">UndoStack</a> &amp;)=delete</td></tr>
+<tr class="memdesc:a2513807d68ace1bcaf8a0a087fc974d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">栈绑定模型且独占撤销快照，不可复制。  <br /></td></tr>
+<tr class="memitem:a988f7717c41cd2612e6778643d62441c" id="r_a988f7717c41cd2612e6778643d62441c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classUndoStack.html">UndoStack</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a988f7717c41cd2612e6778643d62441c">operator=</a> (const <a class="el" href="classUndoStack.html">UndoStack</a> &amp;)=delete</td></tr>
+<tr class="memitem:ae640c9516d22bcb95fe8ed1bb5e0d363" id="r_ae640c9516d22bcb95fe8ed1bb5e0d363"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae640c9516d22bcb95fe8ed1bb5e0d363">scopeId</a> () const</td></tr>
+<tr class="memdesc:ae640c9516d22bcb95fe8ed1bb5e0d363"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前所有者的预览身份；没有自己的层时为零。  <br /></td></tr>
+<tr class="memitem:abde95765e6a9d55ecff3ccdee4356ee1" id="r_abde95765e6a9d55ecff3ccdee4356ee1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abde95765e6a9d55ecff3ccdee4356ee1">inPreviewCallback</a> () const</td></tr>
+<tr class="memitem:a80b1bffaa74d2d7bce43ac65ee103012" id="r_a80b1bffaa74d2d7bce43ac65ee103012"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a80b1bffaa74d2d7bce43ac65ee103012">beginOperation</a> (std::string label, bool finish_preview=false)</td></tr>
+<tr class="memdesc:a80b1bffaa74d2d7bce43ac65ee103012"><td class="mdescLeft">&#160;</td><td class="mdescRight">开正式边界；普通入口先回滚旧预览，同 owner execute 保留并吸收预览。  <br /></td></tr>
+<tr class="memitem:a2c34aa1b87ce2f480bda8eaa9afc4d43" id="r_a2c34aa1b87ce2f480bda8eaa9afc4d43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c34aa1b87ce2f480bda8eaa9afc4d43">prepareOperation</a> ()</td></tr>
+<tr class="memdesc:a2c34aa1b87ce2f480bda8eaa9afc4d43"><td class="mdescLeft">&#160;</td><td class="mdescRight">正式入口准备：在解析目标或拷贝模型前回滚旧预览；execute 内同步嵌套保留本层。  <br /></td></tr>
+<tr class="memitem:aa99bf1c4e83b29f3d895961e71f71ded" id="r_aa99bf1c4e83b29f3d895961e71f71ded"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa99bf1c4e83b29f3d895961e71f71ded">commitOperation</a> ()</td></tr>
+<tr class="memdesc:aa99bf1c4e83b29f3d895961e71f71ded"><td class="mdescLeft">&#160;</td><td class="mdescRight">深度-1；归零时：空操作丢弃，否则补 after-image、入栈、清空 redo  <br /></td></tr>
+<tr class="memitem:ab5d011e59768eaeb1e631aeee24bff52" id="r_ab5d011e59768eaeb1e631aeee24bff52"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5d011e59768eaeb1e631aeee24bff52">beginScope</a> (std::string label)</td></tr>
+<tr class="memdesc:ab5d011e59768eaeb1e631aeee24bff52"><td class="mdescLeft">&#160;</td><td class="mdescRight">开启唯一预览捕获（插件可 cancelScope / revertScope）  <br /></td></tr>
+<tr class="memitem:ab8de1e65110260ead8397f2bae3913c8" id="r_ab8de1e65110260ead8397f2bae3913c8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8de1e65110260ead8397f2bae3913c8">cancelScope</a> ()</td></tr>
+<tr class="memdesc:ab8de1e65110260ead8397f2bae3913c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">按层内捕获回滚（结构条目逆序 → 组件 before-image）并关闭层，不成记录（不产生栈项——不受最外层规则限制）；无层空转  <br /></td></tr>
+<tr class="memitem:a0ee95bca8524be10a6de7b48c8a20735" id="r_a0ee95bca8524be10a6de7b48c8a20735"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ee95bca8524be10a6de7b48c8a20735">revertScope</a> ()</td></tr>
+<tr class="memdesc:a0ee95bca8524be10a6de7b48c8a20735"><td class="mdescLeft">&#160;</td><td class="mdescRight">按层内捕获回滚，层保持打开（纯预览重试；捕获清空，后续改动重新捕获）；无层空转  <br /></td></tr>
+<tr class="memitem:abeb7aadf38ecbada12efa69f3fb0c93a" id="r_abeb7aadf38ecbada12efa69f3fb0c93a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abeb7aadf38ecbada12efa69f3fb0c93a">scopeActive</a> () const</td></tr>
+<tr class="memdesc:abeb7aadf38ecbada12efa69f3fb0c93a"><td class="mdescLeft">&#160;</td><td class="mdescRight">是否有进行中的预览  <br /></td></tr>
+<tr class="memitem:a248bd91077b1f2dbea32eeae00db65e0" id="r_a248bd91077b1f2dbea32eeae00db65e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a248bd91077b1f2dbea32eeae00db65e0">beginSession</a> (std::string owner, std::string label)</td></tr>
+<tr class="memdesc:a248bd91077b1f2dbea32eeae00db65e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">开始功能会话：此后**所有者 = owner** 成的记录打上会话标  <br /></td></tr>
+<tr class="memitem:a578a180080ce0df84c5d38fdbe0419a4" id="r_a578a180080ce0df84c5d38fdbe0419a4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a578a180080ce0df84c5d38fdbe0419a4">endSession</a> (std::string owner)</td></tr>
+<tr class="memdesc:a578a180080ce0df84c5d38fdbe0419a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">结束功能会话：把**栈顶连续**的同会话标记录折叠成一条（名字 = beginSession 的 label）  <br /></td></tr>
+<tr class="memitem:a1a364c4d892ba4bef48b4629ae666c61" id="r_a1a364c4d892ba4bef48b4629ae666c61"><td class="memItemLeft" align="right" valign="top">const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a364c4d892ba4bef48b4629ae666c61">currentOwner</a> () const noexcept</td></tr>
+<tr class="memdesc:a1a364c4d892ba4bef48b4629ae666c61"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前所有者上下文（功能入口压入的名字；空 = 无归属）——任务提交闭包延迟打标用  <br /></td></tr>
+<tr class="memitem:aae7c606ee7d5b0c61d0c4d28315973fc" id="r_aae7c606ee7d5b0c61d0c4d28315973fc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae7c606ee7d5b0c61d0c4d28315973fc">inOperation</a> () const noexcept</td></tr>
+<tr class="memdesc:aae7c606ee7d5b0c61d0c4d28315973fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">正式边界是否开着（框架提交门查询，同线程读）。  <br /></td></tr>
+<tr class="memitem:a8257053a0f23867db2fae51a85e4a66d" id="r_a8257053a0f23867db2fae51a85e4a66d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8257053a0f23867db2fae51a85e4a66d">hasPendingOperationWrites</a> () const</td></tr>
+<tr class="memdesc:a8257053a0f23867db2fae51a85e4a66d"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前未收尾的边界是否已写模型；异步任务只能从尚未写入的入口发布。  <br /></td></tr>
+<tr class="memitem:acc257e16ce0e48bb0f3b6dd6277e4df5" id="r_acc257e16ce0e48bb0f3b6dd6277e4df5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc257e16ce0e48bb0f3b6dd6277e4df5">canUndo</a> () const</td></tr>
+<tr class="memitem:a2d253e7359bd9ab69cfaab824e1e767e" id="r_a2d253e7359bd9ab69cfaab824e1e767e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d253e7359bd9ab69cfaab824e1e767e">canRedo</a> () const</td></tr>
+<tr class="memitem:a1146107365ea5241f831a72190c116d1" id="r_a1146107365ea5241f831a72190c116d1"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1146107365ea5241f831a72190c116d1">undoLabel</a> () const</td></tr>
+<tr class="memitem:afa20922c6ea8c178521f40bfd2b6b266" id="r_afa20922c6ea8c178521f40bfd2b6b266"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afa20922c6ea8c178521f40bfd2b6b266">redoLabel</a> () const</td></tr>
+<tr class="memitem:a2e05b9f2aac88244819c572b9412c1dc" id="r_a2e05b9f2aac88244819c572b9412c1dc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2e05b9f2aac88244819c572b9412c1dc">undo</a> ()</td></tr>
+<tr class="memdesc:a2e05b9f2aac88244819c572b9412c1dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">层打开 = cancelScope（按捕获回滚并关闭，消费本次，全局栈不动）；否则正常撤销  <br /></td></tr>
+<tr class="memitem:a52f3e8220159f3153816bfb328f180a4" id="r_a52f3e8220159f3153816bfb328f180a4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52f3e8220159f3153816bfb328f180a4">redo</a> ()</td></tr>
+<tr class="memdesc:a52f3e8220159f3153816bfb328f180a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">层打开空转；否则正常重做  <br /></td></tr>
+<tr class="memitem:a5b06b6aa2e92e5e272ac7bdbce331d94" id="r_a5b06b6aa2e92e5e272ac7bdbce331d94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b06b6aa2e92e5e272ac7bdbce331d94">clear</a> ()</td></tr>
+<tr class="memitem:a3f37e3e2102f5e93ec590c1291217550" id="r_a3f37e3e2102f5e93ec590c1291217550"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f37e3e2102f5e93ec590c1291217550">onComponentDirty</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const <a class="el" href="structComponentData.html">ComponentData</a> &amp;data) override</td></tr>
+<tr class="memitem:a20159fc94db4e79a70575303acc5f58c" id="r_a20159fc94db4e79a70575303acc5f58c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20159fc94db4e79a70575303acc5f58c">allowsUnrecordedWrite</a> () const override</td></tr>
+<tr class="memdesc:a20159fc94db4e79a70575303acc5f58c"><td class="mdescLeft">&#160;</td><td class="mdescRight">写前归属判定：边界内 / 恢复中 / 层自写三者有其一即放行，否则写前拒绝（接口默认放行，本实现收紧）  <br /></td></tr>
+<tr class="memitem:a70b16f86c95fad0778665a65b1f48b58" id="r_a70b16f86c95fad0778665a65b1f48b58"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a70b16f86c95fad0778665a65b1f48b58">onModelAdded</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id) override</td></tr>
+<tr class="memdesc:a70b16f86c95fad0778665a65b1f48b58"><td class="mdescLeft">&#160;</td><td class="mdescRight">addModel 完成后回调  <br /></td></tr>
+<tr class="memitem:a8e0a13f50ba9d2361c982fa580f29b30" id="r_a8e0a13f50ba9d2361c982fa580f29b30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e0a13f50ba9d2361c982fa580f29b30">onModelRemoving</a> (const <a class="el" href="classModelData.html">ModelData</a> &amp;model) override</td></tr>
+<tr class="memdesc:a8e0a13f50ba9d2361c982fa580f29b30"><td class="mdescLeft">&#160;</td><td class="mdescRight">removeModel 前捕获 <a class="el" href="structModelSnapshot.html" title="模型级结构快照：整模型的深拷贝，用于撤销/恢复结构操作">ModelSnapshot</a>  <br /></td></tr>
+<tr class="memitem:abc921532cc87a346c2826e58168a8e02" id="r_abc921532cc87a346c2826e58168a8e02"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc921532cc87a346c2826e58168a8e02">onComponentAdded</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id) override</td></tr>
+<tr class="memdesc:abc921532cc87a346c2826e58168a8e02"><td class="mdescLeft">&#160;</td><td class="mdescRight">组件加入模型后回调（ModelOperator::addGeometryComponent）  <br /></td></tr>
+<tr class="memitem:a1af099be710a333a097db8706c9b2e72" id="r_a1af099be710a333a097db8706c9b2e72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1af099be710a333a097db8706c9b2e72">onComponentRemoving</a> (const <a class="el" href="structComponentData.html">ComponentData</a> &amp;component) override</td></tr>
+<tr class="memdesc:a1af099be710a333a097db8706c9b2e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">removeComponent 前克隆  <br /></td></tr>
+<tr class="memitem:abbca91451e860cd3a4c99af8f3a8d952" id="r_abbca91451e860cd3a4c99af8f3a8d952"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abbca91451e860cd3a4c99af8f3a8d952">setOnChanged</a> (std::function&lt; void()&gt; callback)</td></tr>
+<tr class="memdesc:abbca91451e860cd3a4c99af8f3a8d952"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置栈内容变更回调（入栈/撤销/重做/清空/层状态变化时触发；app 层 QML 刷新用）  <br /></td></tr>
+<tr class="inherit_header pub_methods_classUndoRecorder"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classUndoRecorder')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classUndoRecorder.html">UndoRecorder</a></td></tr>
+<tr class="memitem:aeab708d1704c16dc3253ff0c6f4fdad7 inherit pub_methods_classUndoRecorder" id="r_aeab708d1704c16dc3253ff0c6f4fdad7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUndoRecorder.html#aeab708d1704c16dc3253ff0c6f4fdad7">~UndoRecorder</a> ()=default</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-attribs" class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:a064f911147ae4a7d120bacb38fbee6b0" id="r_a064f911147ae4a7d120bacb38fbee6b0"><td class="memItemLeft" align="right" valign="top">static constexpr std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a064f911147ae4a7d120bacb38fbee6b0">kMaxDepth</a> = 32</td></tr>
+<tr class="memdesc:a064f911147ae4a7d120bacb38fbee6b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">栈深度上限（before+after 双快照，大网格内存受控），溢出丢最旧  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a95261583bed450bb1a8564ef3b61dda8" id="r_a95261583bed450bb1a8564ef3b61dda8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95261583bed450bb1a8564ef3b61dda8">detachOperation</a> ()</td></tr>
+<tr class="memdesc:a95261583bed450bb1a8564ef3b61dda8"><td class="mdescLeft">&#160;</td><td class="mdescRight">后台续接使用现有捕获；只由唯一 Runner 在模型占用期调用。  <br /></td></tr>
+<tr class="memitem:ad7a7cfece82f7021dea84817c7a3189c" id="r_ad7a7cfece82f7021dea84817c7a3189c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7a7cfece82f7021dea84817c7a3189c">resumeOperation</a> (<a class="el" href="structUndoStack_1_1Capture.html">Capture</a> capture)</td></tr>
+<tr class="memitem:ade56ef33c025ac154ef1e38cdcb80f7c" id="r_ade56ef33c025ac154ef1e38cdcb80f7c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ade56ef33c025ac154ef1e38cdcb80f7c">discardOperation</a> (<a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &amp;capture)</td></tr>
+<tr class="memitem:adefdcd295c05f2a6a1f1d078aef07fb0" id="r_adefdcd295c05f2a6a1f1d078aef07fb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adefdcd295c05f2a6a1f1d078aef07fb0">absorbPreview</a> (<a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &amp;capture)</td></tr>
+<tr class="memitem:a9e70ba2aef77f49ed59e1f802bbfe647" id="r_a9e70ba2aef77f49ed59e1f802bbfe647"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e70ba2aef77f49ed59e1f802bbfe647">restorePreview</a> (bool close)</td></tr>
+<tr class="memdesc:a9e70ba2aef77f49ed59e1f802bbfe647"><td class="mdescLeft">&#160;</td><td class="mdescRight">回滚本预览，关闭或清空捕获保持同一身份；不产生历史或 redo。  <br /></td></tr>
+<tr class="memitem:abae4725fe6b2c96d5f6db4f15127dc94" id="r_abae4725fe6b2c96d5f6db4f15127dc94"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abae4725fe6b2c96d5f6db4f15127dc94">rollbackChanges</a> (const std::vector&lt; <a class="el" href="structComponentEntry.html">ComponentEntry</a> &gt; &amp;components, std::vector&lt; <a class="el" href="structStructuralEntry.html">StructuralEntry</a> &gt; &amp;structural)</td></tr>
+<tr class="memdesc:abae4725fe6b2c96d5f6db4f15127dc94"><td class="mdescLeft">&#160;</td><td class="mdescRight">结构逆序 → 组件 before-image；调用方须持 ApplyingGuard。  <br /></td></tr>
+<tr class="memitem:a41fb4596075afa8d01b3b8a05cffff48" id="r_a41fb4596075afa8d01b3b8a05cffff48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a41fb4596075afa8d01b3b8a05cffff48">rollbackStructural</a> (std::vector&lt; <a class="el" href="structStructuralEntry.html">StructuralEntry</a> &gt; &amp;entries)</td></tr>
+<tr class="memdesc:a41fb4596075afa8d01b3b8a05cffff48"><td class="mdescLeft">&#160;</td><td class="mdescRight">结构条目逆序回滚（undo 与层回滚共用；回滚中重新捕获的快照存回条目供 redo 用）  <br /></td></tr>
+<tr class="memitem:af1594dc787229cdb5ed3aab74ee93859" id="r_af1594dc787229cdb5ed3aab74ee93859"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1594dc787229cdb5ed3aab74ee93859">captureTarget</a> ()</td></tr>
+<tr class="memdesc:af1594dc787229cdb5ed3aab74ee93859"><td class="mdescLeft">&#160;</td><td class="mdescRight">写钩子的共同目标：预览优先，否则正式捕获；无归属返回 nullptr。  <br /></td></tr>
+<tr class="memitem:a184f9425890630a77ef453b379e547f3" id="r_a184f9425890630a77ef453b379e547f3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a184f9425890630a77ef453b379e547f3">hasBoundaryFrame</a> () const</td></tr>
+<tr class="memdesc:a184f9425890630a77ef453b379e547f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">是否存在正式操作边界  <br /></td></tr>
+<tr class="memitem:a38d06c876d9255716754d327eab54a04" id="r_a38d06c876d9255716754d327eab54a04"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38d06c876d9255716754d327eab54a04">pushRecord</a> (<a class="el" href="structUndoRecord.html">UndoRecord</a> record, const std::string &amp;owner)</td></tr>
+<tr class="memdesc:a38d06c876d9255716754d327eab54a04"><td class="mdescLeft">&#160;</td><td class="mdescRight">入栈（超 kMaxDepth 丢最旧）、清空 redo、触发变更回调；owner 匹配进行中会话时给记录打会话标  <br /></td></tr>
+<tr class="memitem:ac40cd11de37bb6684f4f29c0061e9ede" id="r_ac40cd11de37bb6684f4f29c0061e9ede"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac40cd11de37bb6684f4f29c0061e9ede">recordStructural</a> (<a class="el" href="structStructuralEntry.html">StructuralEntry</a> entry)</td></tr>
+<tr class="memdesc:ac40cd11de37bb6684f4f29c0061e9ede"><td class="mdescLeft">&#160;</td><td class="mdescRight">结构条目只归预览或正式捕获；无边界结构写由模型层预先拒绝。  <br /></td></tr>
+<tr class="memitem:ab87bb8cea9f003d366016b9ef27a62f8" id="r_ab87bb8cea9f003d366016b9ef27a62f8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab87bb8cea9f003d366016b9ef27a62f8">applyRecordUndo</a> (<a class="el" href="structUndoRecord.html">UndoRecord</a> record)</td></tr>
+<tr class="memdesc:ab87bb8cea9f003d366016b9ef27a62f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">把弹出的记录兑现成撤销：结构条目逆序 → 组件 before-image → 移入 redo  <br /></td></tr>
+<tr class="memitem:a6701d77146c75effec2dc457952abb27" id="r_a6701d77146c75effec2dc457952abb27"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6701d77146c75effec2dc457952abb27">prepareMutation</a> (const char *op) const</td></tr>
+<tr class="memdesc:a6701d77146c75effec2dc457952abb27"><td class="mdescLeft">&#160;</td><td class="mdescRight">undo/redo 共同入口守卫（临界区拒绝优先于一切副作用）： 边界内（operation_depth_&gt;0，记录/兑现中）或恢复中（applying_）直接拒绝——零副作用 （不触发任务取消、不动栈不动模型）；任务占用期返回 false；拒绝不取消任务、不改变模型或栈  <br /></td></tr>
+<tr class="memitem:a4e0ed61b7dc08ca8145b6b47746a36ee" id="r_a4e0ed61b7dc08ca8145b6b47746a36ee"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e0ed61b7dc08ca8145b6b47746a36ee">restoreComponentSnapshot</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const <a class="el" href="structComponentData.html">ComponentData</a> &amp;snapshot)</td></tr>
+<tr class="memdesc:a4e0ed61b7dc08ca8145b6b47746a36ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">组件存在则恢复快照（gid 对账内建于 restoreSnapshot），返回是否恢复  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a9c020de439aab01792c36eaab3719ad4" id="r_a9c020de439aab01792c36eaab3719ad4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9c020de439aab01792c36eaab3719ad4">model_</a></td></tr>
+<tr class="memitem:a60a29e1f253477ef9a2dc15d949709a3" id="r_a60a29e1f253477ef9a2dc15d949709a3"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a60a29e1f253477ef9a2dc15d949709a3">preview_access_depth_</a> { 0 }</td></tr>
+<tr class="memitem:aed218e8c99168c0379205a4ee338c9f4" id="r_aed218e8c99168c0379205a4ee338c9f4"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed218e8c99168c0379205a4ee338c9f4">recording_pause_depth_</a> { 0 }</td></tr>
+<tr class="memitem:a39b090d96a06c63367214821b09eb1b4" id="r_a39b090d96a06c63367214821b09eb1b4"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39b090d96a06c63367214821b09eb1b4">next_scope_id_</a> { 0 }</td></tr>
+<tr class="memitem:a46a2e422255b5122e324e6ea5afb8e63" id="r_a46a2e422255b5122e324e6ea5afb8e63"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46a2e422255b5122e324e6ea5afb8e63">applying_</a> { false }</td></tr>
+<tr class="memdesc:a46a2e422255b5122e324e6ea5afb8e63"><td class="mdescLeft">&#160;</td><td class="mdescRight">undo/redo/cancelScope 应用中：抑制一切记录（恢复会回触钩子）  <br /></td></tr>
+<tr class="memitem:a945178801d6c3f45121640dd82b49c7a" id="r_a945178801d6c3f45121640dd82b49c7a"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a945178801d6c3f45121640dd82b49c7a">owner_</a></td></tr>
+<tr class="memdesc:a945178801d6c3f45121640dd82b49c7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">当前所有者上下文（OwnerScope 压入/还原）；开层、开边界时打到帧上  <br /></td></tr>
+<tr class="memitem:a870f4827bde74475978eb49bf727938e" id="r_a870f4827bde74475978eb49bf727938e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a870f4827bde74475978eb49bf727938e">session_owner_</a></td></tr>
+<tr class="memdesc:a870f4827bde74475978eb49bf727938e"><td class="mdescLeft">&#160;</td><td class="mdescRight">进行中的功能会话所有者（空 = 无会话）——记录打标判据  <br /></td></tr>
+<tr class="memitem:a30dbdefa3d882aee1446afa81e0e2fa0" id="r_a30dbdefa3d882aee1446afa81e0e2fa0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a30dbdefa3d882aee1446afa81e0e2fa0">session_label_</a></td></tr>
+<tr class="memdesc:a30dbdefa3d882aee1446afa81e0e2fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">会话收尾折叠后那条记录的名字（功能显示名）  <br /></td></tr>
+<tr class="memitem:a017a19aea8ee17c436e29932bca7c412" id="r_a017a19aea8ee17c436e29932bca7c412"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a017a19aea8ee17c436e29932bca7c412">operation_</a></td></tr>
+<tr class="memdesc:a017a19aea8ee17c436e29932bca7c412"><td class="mdescLeft">&#160;</td><td class="mdescRight">唯一正式捕获，子调用共用  <br /></td></tr>
+<tr class="memitem:a107da34acc9ea1dfee132cf786937cb6" id="r_a107da34acc9ea1dfee132cf786937cb6"><td class="memItemLeft" align="right" valign="top">unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a107da34acc9ea1dfee132cf786937cb6">operation_depth_</a> { 0 }</td></tr>
+<tr class="memdesc:a107da34acc9ea1dfee132cf786937cb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">同步嵌套深度，不跨事件轮次  <br /></td></tr>
+<tr class="memitem:a201b4d815a1d2e4ab3822f215c1be975" id="r_a201b4d815a1d2e4ab3822f215c1be975"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a201b4d815a1d2e4ab3822f215c1be975">preview_</a></td></tr>
+<tr class="memdesc:a201b4d815a1d2e4ab3822f215c1be975"><td class="mdescLeft">&#160;</td><td class="mdescRight">唯一预览捕获，独立于正式边界  <br /></td></tr>
+<tr class="memitem:a2b8b81caf06bc5c7a6b8959e7d704ddb" id="r_a2b8b81caf06bc5c7a6b8959e7d704ddb"><td class="memItemLeft" align="right" valign="top">std::deque&lt; <a class="el" href="structUndoRecord.html">UndoRecord</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2b8b81caf06bc5c7a6b8959e7d704ddb">undo_</a></td></tr>
+<tr class="memitem:aa52cac1fe065a7a83b79a97147ca20f8" id="r_aa52cac1fe065a7a83b79a97147ca20f8"><td class="memItemLeft" align="right" valign="top">std::deque&lt; <a class="el" href="structUndoRecord.html">UndoRecord</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa52cac1fe065a7a83b79a97147ca20f8">redo_</a></td></tr>
+<tr class="memitem:a2432b93d213aff3084a3ef168e5c9f2e" id="r_a2432b93d213aff3084a3ef168e5c9f2e"><td class="memItemLeft" align="right" valign="top">std::function&lt; void()&gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2432b93d213aff3084a3ef168e5c9f2e">on_changed_</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-friends" class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:a022bcc3cee1a47d1395b33a0c696bb4d" id="r_a022bcc3cee1a47d1395b33a0c696bb4d"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a022bcc3cee1a47d1395b33a0c696bb4d">systems::job::JobRunner</a></td></tr>
+<tr class="memitem:a0df67365c871ff6cd6876ba7f5ad1477" id="r_a0df67365c871ff6cd6876ba7f5ad1477"><td class="memItemLeft" align="right" valign="top">struct&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0df67365c871ff6cd6876ba7f5ad1477">UndoStackTestPeer</a></td></tr>
+<tr class="memdesc:a0df67365c871ff6cd6876ba7f5ad1477"><td class="mdescLeft">&#160;</td><td class="mdescRight">集成测试只读检查历史条目数量，验证事件不入栈。  <br /></td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="adcd0d3406ba41362f7a44c8ccaab4b46" name="adcd0d3406ba41362f7a44c8ccaab4b46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcd0d3406ba41362f7a44c8ccaab4b46">&#9670;&#160;</a></span>UndoStack() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">UndoStack::UndoStack </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>model</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2513807d68ace1bcaf8a0a087fc974d9" name="a2513807d68ace1bcaf8a0a087fc974d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2513807d68ace1bcaf8a0a087fc974d9">&#9670;&#160;</a></span>UndoStack() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">UndoStack::UndoStack </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classUndoStack.html">UndoStack</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>栈绑定模型且独占撤销快照，不可复制。 </p>
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="adefdcd295c05f2a6a1f1d078aef07fb0" name="adefdcd295c05f2a6a1f1d078aef07fb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adefdcd295c05f2a6a1f1d078aef07fb0">&#9670;&#160;</a></span>absorbPreview()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::absorbPreview </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>capture</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20159fc94db4e79a70575303acc5f58c" name="a20159fc94db4e79a70575303acc5f58c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20159fc94db4e79a70575303acc5f58c">&#9670;&#160;</a></span>allowsUnrecordedWrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::allowsUnrecordedWrite </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>写前归属判定：边界内 / 恢复中 / 层自写三者有其一即放行，否则写前拒绝（接口默认放行，本实现收紧） </p>
+
+<p>重载 <a class="el" href="classUndoRecorder.html#a16ebb97b18972de208913a66b5b26654">UndoRecorder</a> .</p>
+
+</div>
+</div>
+<a id="ab87bb8cea9f003d366016b9ef27a62f8" name="ab87bb8cea9f003d366016b9ef27a62f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab87bb8cea9f003d366016b9ef27a62f8">&#9670;&#160;</a></span>applyRecordUndo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::applyRecordUndo </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structUndoRecord.html">UndoRecord</a></td>          <td class="paramname"><span class="paramname"><em>record</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>把弹出的记录兑现成撤销：结构条目逆序 → 组件 before-image → 移入 redo </p>
+
+</div>
+</div>
+<a id="a80b1bffaa74d2d7bce43ac65ee103012" name="a80b1bffaa74d2d7bce43ac65ee103012"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80b1bffaa74d2d7bce43ac65ee103012">&#9670;&#160;</a></span>beginOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::beginOperation </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>label</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>finish_preview</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>开正式边界；普通入口先回滚旧预览，同 owner execute 保留并吸收预览。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">finish_preview</td><td>execute 收尾吸收并关闭临时层；普通事件禁止开边界。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab5d011e59768eaeb1e631aeee24bff52" name="ab5d011e59768eaeb1e631aeee24bff52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5d011e59768eaeb1e631aeee24bff52">&#9670;&#160;</a></span>beginScope()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::beginScope </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>label</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>开启唯一预览捕获（插件可 cancelScope / revertScope） </p>
+<p>层不指定目标组件：层开着期间的组件写与结构操作都归层，回滚覆盖层内全部捕获。 已有未完成的层时不拒绝：新请求 = 旧层被放弃的证明，先驱逐旧层（回滚关闭）再开 新层——预览层是便宜的（改动从未确认，回滚即净），不必等新层的第一次真实改动 来间接驱逐。 </p><dl class="section return"><dt>返回</dt><dd>false = 恢复中（applying_）被拒，预览保持不变 </dd></dl>
+
+</div>
+</div>
+<a id="a248bd91077b1f2dbea32eeae00db65e0" name="a248bd91077b1f2dbea32eeae00db65e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a248bd91077b1f2dbea32eeae00db65e0">&#9670;&#160;</a></span>beginSession()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::beginSession </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>owner</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>label</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>开始功能会话：此后**所有者 = owner** 成的记录打上会话标 </p>
+<p>会话**不是帧**——不进帧栈，因此撤销守卫、模态事件循环规则、层的归属判定全部不受 影响（会话跨任意多次事件轮次是设计使然）。粒度设计：会话期内每条记录各自独立 （每次 execute 一步、可逐步撤销），<span class="tt">endSession</span> 收尾时折叠——一个功能会话 = 一条撤销条目。 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">owner</td><td>功能唯一名（与功能入口压入的所有者一致） </td></tr>
+    <tr><td class="paramname">label</td><td>折叠后那条记录的名字（功能显示名） </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ab8de1e65110260ead8397f2bae3913c8" name="ab8de1e65110260ead8397f2bae3913c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8de1e65110260ead8397f2bae3913c8">&#9670;&#160;</a></span>cancelScope()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::cancelScope </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>按层内捕获回滚（结构条目逆序 → 组件 before-image）并关闭层，不成记录（不产生栈项——不受最外层规则限制）；无层空转 </p>
+
+</div>
+</div>
+<a id="a2d253e7359bd9ab69cfaab824e1e767e" name="a2d253e7359bd9ab69cfaab824e1e767e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d253e7359bd9ab69cfaab824e1e767e">&#9670;&#160;</a></span>canRedo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::canRedo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc257e16ce0e48bb0f3b6dd6277e4df5" name="acc257e16ce0e48bb0f3b6dd6277e4df5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc257e16ce0e48bb0f3b6dd6277e4df5">&#9670;&#160;</a></span>canUndo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::canUndo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1594dc787229cdb5ed3aab74ee93859" name="af1594dc787229cdb5ed3aab74ee93859"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1594dc787229cdb5ed3aab74ee93859">&#9670;&#160;</a></span>captureTarget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structUndoStack_1_1Capture.html">UndoStack::Capture</a> * UndoStack::captureTarget </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>写钩子的共同目标：预览优先，否则正式捕获；无归属返回 nullptr。 </p>
+
+</div>
+</div>
+<a id="a5b06b6aa2e92e5e272ac7bdbce331d94" name="a5b06b6aa2e92e5e272ac7bdbce331d94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b06b6aa2e92e5e272ac7bdbce331d94">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa99bf1c4e83b29f3d895961e71f71ded" name="aa99bf1c4e83b29f3d895961e71f71ded"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa99bf1c4e83b29f3d895961e71f71ded">&#9670;&#160;</a></span>commitOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::commitOperation </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>深度-1；归零时：空操作丢弃，否则补 after-image、入栈、清空 redo </p>
+
+</div>
+</div>
+<a id="a1a364c4d892ba4bef48b4629ae666c61" name="a1a364c4d892ba4bef48b4629ae666c61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a364c4d892ba4bef48b4629ae666c61">&#9670;&#160;</a></span>currentOwner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::string &amp; UndoStack::currentOwner </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>当前所有者上下文（功能入口压入的名字；空 = 无归属）——任务提交闭包延迟打标用 </p>
+
+</div>
+</div>
+<a id="a95261583bed450bb1a8564ef3b61dda8" name="a95261583bed450bb1a8564ef3b61dda8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95261583bed450bb1a8564ef3b61dda8">&#9670;&#160;</a></span>detachOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structUndoStack_1_1Capture.html">UndoStack::Capture</a> UndoStack::detachOperation </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>后台续接使用现有捕获；只由唯一 Runner 在模型占用期调用。 </p>
+
+</div>
+</div>
+<a id="ade56ef33c025ac154ef1e38cdcb80f7c" name="ade56ef33c025ac154ef1e38cdcb80f7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade56ef33c025ac154ef1e38cdcb80f7c">&#9670;&#160;</a></span>discardOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::discardOperation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>capture</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a578a180080ce0df84c5d38fdbe0419a4" name="a578a180080ce0df84c5d38fdbe0419a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a578a180080ce0df84c5d38fdbe0419a4">&#9670;&#160;</a></span>endSession()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::endSession </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>owner</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>结束功能会话：把**栈顶连续**的同会话标记录折叠成一条（名字 = beginSession 的 label） </p>
+<p>只折叠栈顶连续段：会话中途夹了别人的记录（旁路操作）时，早先的会话记录保持独立—— 跨过别人的记录合并会把别人的改动卷进同一条前像，撤销时会多撤。 owner 与进行中会话不符 → warn 空转；无会话标记录 → 空转。 </p>
+
+</div>
+</div>
+<a id="a184f9425890630a77ef453b379e547f3" name="a184f9425890630a77ef453b379e547f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a184f9425890630a77ef453b379e547f3">&#9670;&#160;</a></span>hasBoundaryFrame()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::hasBoundaryFrame </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>是否存在正式操作边界 </p>
+
+</div>
+</div>
+<a id="a8257053a0f23867db2fae51a85e4a66d" name="a8257053a0f23867db2fae51a85e4a66d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8257053a0f23867db2fae51a85e4a66d">&#9670;&#160;</a></span>hasPendingOperationWrites()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::hasPendingOperationWrites </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>当前未收尾的边界是否已写模型；异步任务只能从尚未写入的入口发布。 </p>
+
+</div>
+</div>
+<a id="aae7c606ee7d5b0c61d0c4d28315973fc" name="aae7c606ee7d5b0c61d0c4d28315973fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae7c606ee7d5b0c61d0c4d28315973fc">&#9670;&#160;</a></span>inOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::inOperation </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>正式边界是否开着（框架提交门查询，同线程读）。 </p>
+
+</div>
+</div>
+<a id="abde95765e6a9d55ecff3ccdee4356ee1" name="abde95765e6a9d55ecff3ccdee4356ee1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abde95765e6a9d55ecff3ccdee4356ee1">&#9670;&#160;</a></span>inPreviewCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::inPreviewCallback </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abc921532cc87a346c2826e58168a8e02" name="abc921532cc87a346c2826e58168a8e02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc921532cc87a346c2826e58168a8e02">&#9670;&#160;</a></span>onComponentAdded()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::onComponentAdded </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>组件加入模型后回调（ModelOperator::addGeometryComponent） </p>
+
+<p>实现了 <a class="el" href="classUndoRecorder.html#a01f6b16f4d86e378f0c03ed6d8498bf2">UndoRecorder</a>.</p>
+
+</div>
+</div>
+<a id="a3f37e3e2102f5e93ec590c1291217550" name="a3f37e3e2102f5e93ec590c1291217550"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f37e3e2102f5e93ec590c1291217550">&#9670;&#160;</a></span>onComponentDirty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::onComponentDirty </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structComponentData.html">ComponentData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>首次写捕前像；事件归自己的预览，正式写归当前捕获 </p>
+
+<p>实现了 <a class="el" href="classUndoRecorder.html#a9c8287f6a18cfbd63056cd6f4984ca04">UndoRecorder</a>.</p>
+
+</div>
+</div>
+<a id="a1af099be710a333a097db8706c9b2e72" name="a1af099be710a333a097db8706c9b2e72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1af099be710a333a097db8706c9b2e72">&#9670;&#160;</a></span>onComponentRemoving()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::onComponentRemoving </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structComponentData.html">ComponentData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>component</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>removeComponent 前克隆 </p>
+
+<p>实现了 <a class="el" href="classUndoRecorder.html#a2af0a05d5105bec5ddc7e0745ba377cc">UndoRecorder</a>.</p>
+
+</div>
+</div>
+<a id="a70b16f86c95fad0778665a65b1f48b58" name="a70b16f86c95fad0778665a65b1f48b58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70b16f86c95fad0778665a65b1f48b58">&#9670;&#160;</a></span>onModelAdded()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::onModelAdded </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>addModel 完成后回调 </p>
+
+<p>实现了 <a class="el" href="classUndoRecorder.html#a72fd83aaf5a46ac3c3243c5f935fa3d1">UndoRecorder</a>.</p>
+
+</div>
+</div>
+<a id="a8e0a13f50ba9d2361c982fa580f29b30" name="a8e0a13f50ba9d2361c982fa580f29b30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e0a13f50ba9d2361c982fa580f29b30">&#9670;&#160;</a></span>onModelRemoving()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::onModelRemoving </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classModelData.html">ModelData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>model</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>removeModel 前捕获 <a class="el" href="structModelSnapshot.html" title="模型级结构快照：整模型的深拷贝，用于撤销/恢复结构操作">ModelSnapshot</a> </p>
+
+<p>实现了 <a class="el" href="classUndoRecorder.html#a9883c8e665c8f03ee61e70a3eb78ec95">UndoRecorder</a>.</p>
+
+</div>
+</div>
+<a id="a988f7717c41cd2612e6778643d62441c" name="a988f7717c41cd2612e6778643d62441c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a988f7717c41cd2612e6778643d62441c">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classUndoStack.html">UndoStack</a> &amp; UndoStack::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classUndoStack.html">UndoStack</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6701d77146c75effec2dc457952abb27" name="a6701d77146c75effec2dc457952abb27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6701d77146c75effec2dc457952abb27">&#9670;&#160;</a></span>prepareMutation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::prepareMutation </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>op</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>undo/redo 共同入口守卫（临界区拒绝优先于一切副作用）： 边界内（operation_depth_&gt;0，记录/兑现中）或恢复中（applying_）直接拒绝——零副作用 （不触发任务取消、不动栈不动模型）；任务占用期返回 false；拒绝不取消任务、不改变模型或栈 </p>
+<p>undo/redo 共同入口：临界区拒绝优先（零副作用），任务占用期同样零副作用拒绝 </p>
+
+</div>
+</div>
+<a id="a2c34aa1b87ce2f480bda8eaa9afc4d43" name="a2c34aa1b87ce2f480bda8eaa9afc4d43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c34aa1b87ce2f480bda8eaa9afc4d43">&#9670;&#160;</a></span>prepareOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::prepareOperation </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>正式入口准备：在解析目标或拷贝模型前回滚旧预览；execute 内同步嵌套保留本层。 </p>
+
+</div>
+</div>
+<a id="a38d06c876d9255716754d327eab54a04" name="a38d06c876d9255716754d327eab54a04"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38d06c876d9255716754d327eab54a04">&#9670;&#160;</a></span>pushRecord()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::pushRecord </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structUndoRecord.html">UndoRecord</a></td>          <td class="paramname"><span class="paramname"><em>record</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>owner</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>入栈（超 kMaxDepth 丢最旧）、清空 redo、触发变更回调；owner 匹配进行中会话时给记录打会话标 </p>
+
+</div>
+</div>
+<a id="ac40cd11de37bb6684f4f29c0061e9ede" name="ac40cd11de37bb6684f4f29c0061e9ede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac40cd11de37bb6684f4f29c0061e9ede">&#9670;&#160;</a></span>recordStructural()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::recordStructural </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structStructuralEntry.html">StructuralEntry</a></td>          <td class="paramname"><span class="paramname"><em>entry</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>结构条目只归预览或正式捕获；无边界结构写由模型层预先拒绝。 </p>
+
+</div>
+</div>
+<a id="a52f3e8220159f3153816bfb328f180a4" name="a52f3e8220159f3153816bfb328f180a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52f3e8220159f3153816bfb328f180a4">&#9670;&#160;</a></span>redo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::redo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>层打开空转；否则正常重做 </p>
+<dl class="section return"><dt>返回</dt><dd>true = 已重做；忙、空栈或层会话期拒绝时返回 false。 </dd></dl>
+
+</div>
+</div>
+<a id="afa20922c6ea8c178521f40bfd2b6b266" name="afa20922c6ea8c178521f40bfd2b6b266"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa20922c6ea8c178521f40bfd2b6b266">&#9670;&#160;</a></span>redoLabel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::string &gt; UndoStack::redoLabel </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4e0ed61b7dc08ca8145b6b47746a36ee" name="a4e0ed61b7dc08ca8145b6b47746a36ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e0ed61b7dc08ca8145b6b47746a36ee">&#9670;&#160;</a></span>restoreComponentSnapshot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::restoreComponentSnapshot </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structComponentData.html">ComponentData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>snapshot</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>组件存在则恢复快照（gid 对账内建于 restoreSnapshot），返回是否恢复 </p>
+
+</div>
+</div>
+<a id="a9e70ba2aef77f49ed59e1f802bbfe647" name="a9e70ba2aef77f49ed59e1f802bbfe647"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e70ba2aef77f49ed59e1f802bbfe647">&#9670;&#160;</a></span>restorePreview()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::restorePreview </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>close</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>回滚本预览，关闭或清空捕获保持同一身份；不产生历史或 redo。 </p>
+
+</div>
+</div>
+<a id="ad7a7cfece82f7021dea84817c7a3189c" name="ad7a7cfece82f7021dea84817c7a3189c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7a7cfece82f7021dea84817c7a3189c">&#9670;&#160;</a></span>resumeOperation()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::resumeOperation </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structUndoStack_1_1Capture.html">Capture</a></td>          <td class="paramname"><span class="paramname"><em>capture</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0ee95bca8524be10a6de7b48c8a20735" name="a0ee95bca8524be10a6de7b48c8a20735"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ee95bca8524be10a6de7b48c8a20735">&#9670;&#160;</a></span>revertScope()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::revertScope </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>按层内捕获回滚，层保持打开（纯预览重试；捕获清空，后续改动重新捕获）；无层空转 </p>
+
+</div>
+</div>
+<a id="abae4725fe6b2c96d5f6db4f15127dc94" name="abae4725fe6b2c96d5f6db4f15127dc94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abae4725fe6b2c96d5f6db4f15127dc94">&#9670;&#160;</a></span>rollbackChanges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::rollbackChanges </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="structComponentEntry.html">ComponentEntry</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>components</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="structStructuralEntry.html">StructuralEntry</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>structural</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>结构逆序 → 组件 before-image；调用方须持 ApplyingGuard。 </p>
+
+</div>
+</div>
+<a id="a41fb4596075afa8d01b3b8a05cffff48" name="a41fb4596075afa8d01b3b8a05cffff48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41fb4596075afa8d01b3b8a05cffff48">&#9670;&#160;</a></span>rollbackStructural()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::rollbackStructural </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="structStructuralEntry.html">StructuralEntry</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>entries</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>结构条目逆序回滚（undo 与层回滚共用；回滚中重新捕获的快照存回条目供 redo 用） </p>
+
+</div>
+</div>
+<a id="abeb7aadf38ecbada12efa69f3fb0c93a" name="abeb7aadf38ecbada12efa69f3fb0c93a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abeb7aadf38ecbada12efa69f3fb0c93a">&#9670;&#160;</a></span>scopeActive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::scopeActive </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>是否有进行中的预览 </p>
+
+</div>
+</div>
+<a id="ae640c9516d22bcb95fe8ed1bb5e0d363" name="ae640c9516d22bcb95fe8ed1bb5e0d363"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae640c9516d22bcb95fe8ed1bb5e0d363">&#9670;&#160;</a></span>scopeId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::uint64_t UndoStack::scopeId </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>当前所有者的预览身份；没有自己的层时为零。 </p>
+
+</div>
+</div>
+<a id="abbca91451e860cd3a4c99af8f3a8d952" name="abbca91451e860cd3a4c99af8f3a8d952"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbca91451e860cd3a4c99af8f3a8d952">&#9670;&#160;</a></span>setOnChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void UndoStack::setOnChanged </td>
+          <td>(</td>
+          <td class="paramtype">std::function&lt; void()&gt;</td>          <td class="paramname"><span class="paramname"><em>callback</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置栈内容变更回调（入栈/撤销/重做/清空/层状态变化时触发；app 层 QML 刷新用） </p>
+
+</div>
+</div>
+<a id="a2e05b9f2aac88244819c572b9412c1dc" name="a2e05b9f2aac88244819c572b9412c1dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e05b9f2aac88244819c572b9412c1dc">&#9670;&#160;</a></span>undo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::undo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>层打开 = cancelScope（按捕获回滚并关闭，消费本次，全局栈不动）；否则正常撤销 </p>
+<dl class="section return"><dt>返回</dt><dd>true = 已恢复模型；忙、空栈或边界内拒绝时返回 false。 </dd></dl>
+
+</div>
+</div>
+<a id="a1146107365ea5241f831a72190c116d1" name="a1146107365ea5241f831a72190c116d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1146107365ea5241f831a72190c116d1">&#9670;&#160;</a></span>undoLabel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::string &gt; UndoStack::undoLabel </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-related-members" id="doc-related-members"></a><h2 id="header-doc-related-members" class="groupheader">友元及相关符号说明</h2>
+<a id="a022bcc3cee1a47d1395b33a0c696bb4d" name="a022bcc3cee1a47d1395b33a0c696bb4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a022bcc3cee1a47d1395b33a0c696bb4d">&#9670;&#160;</a></span>systems::job::JobRunner</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0df67365c871ff6cd6876ba7f5ad1477" name="a0df67365c871ff6cd6876ba7f5ad1477"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0df67365c871ff6cd6876ba7f5ad1477">&#9670;&#160;</a></span>UndoStackTestPeer</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend struct <a class="el" href="structUndoStackTestPeer.html">UndoStackTestPeer</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel friend">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>集成测试只读检查历史条目数量，验证事件不入栈。 </p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a46a2e422255b5122e324e6ea5afb8e63" name="a46a2e422255b5122e324e6ea5afb8e63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46a2e422255b5122e324e6ea5afb8e63">&#9670;&#160;</a></span>applying_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool UndoStack::applying_ { false }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>undo/redo/cancelScope 应用中：抑制一切记录（恢复会回触钩子） </p>
+
+</div>
+</div>
+<a id="a064f911147ae4a7d120bacb38fbee6b0" name="a064f911147ae4a7d120bacb38fbee6b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a064f911147ae4a7d120bacb38fbee6b0">&#9670;&#160;</a></span>kMaxDepth</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t UndoStack::kMaxDepth = 32</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>栈深度上限（before+after 双快照，大网格内存受控），溢出丢最旧 </p>
+
+</div>
+</div>
+<a id="a9c020de439aab01792c36eaab3719ad4" name="a9c020de439aab01792c36eaab3719ad4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c020de439aab01792c36eaab3719ad4">&#9670;&#160;</a></span>model_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a>* UndoStack::model_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a39b090d96a06c63367214821b09eb1b4" name="a39b090d96a06c63367214821b09eb1b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39b090d96a06c63367214821b09eb1b4">&#9670;&#160;</a></span>next_scope_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::uint64_t UndoStack::next_scope_id_ { 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2432b93d213aff3084a3ef168e5c9f2e" name="a2432b93d213aff3084a3ef168e5c9f2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2432b93d213aff3084a3ef168e5c9f2e">&#9670;&#160;</a></span>on_changed_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::function&lt;void()&gt; UndoStack::on_changed_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a017a19aea8ee17c436e29932bca7c412" name="a017a19aea8ee17c436e29932bca7c412"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a017a19aea8ee17c436e29932bca7c412">&#9670;&#160;</a></span>operation_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;<a class="el" href="structUndoStack_1_1Capture.html">Capture</a>&gt; UndoStack::operation_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>唯一正式捕获，子调用共用 </p>
+
+</div>
+</div>
+<a id="a107da34acc9ea1dfee132cf786937cb6" name="a107da34acc9ea1dfee132cf786937cb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a107da34acc9ea1dfee132cf786937cb6">&#9670;&#160;</a></span>operation_depth_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned UndoStack::operation_depth_ { 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>同步嵌套深度，不跨事件轮次 </p>
+
+</div>
+</div>
+<a id="a945178801d6c3f45121640dd82b49c7a" name="a945178801d6c3f45121640dd82b49c7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a945178801d6c3f45121640dd82b49c7a">&#9670;&#160;</a></span>owner_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string UndoStack::owner_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>当前所有者上下文（OwnerScope 压入/还原）；开层、开边界时打到帧上 </p>
+
+</div>
+</div>
+<a id="a201b4d815a1d2e4ab3822f215c1be975" name="a201b4d815a1d2e4ab3822f215c1be975"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a201b4d815a1d2e4ab3822f215c1be975">&#9670;&#160;</a></span>preview_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt;<a class="el" href="structUndoStack_1_1Capture.html">Capture</a>&gt; UndoStack::preview_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>唯一预览捕获，独立于正式边界 </p>
+
+</div>
+</div>
+<a id="a60a29e1f253477ef9a2dc15d949709a3" name="a60a29e1f253477ef9a2dc15d949709a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60a29e1f253477ef9a2dc15d949709a3">&#9670;&#160;</a></span>preview_access_depth_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned UndoStack::preview_access_depth_ { 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aed218e8c99168c0379205a4ee338c9f4" name="aed218e8c99168c0379205a4ee338c9f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed218e8c99168c0379205a4ee338c9f4">&#9670;&#160;</a></span>recording_pause_depth_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned UndoStack::recording_pause_depth_ { 0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa52cac1fe065a7a83b79a97147ca20f8" name="aa52cac1fe065a7a83b79a97147ca20f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa52cac1fe065a7a83b79a97147ca20f8">&#9670;&#160;</a></span>redo_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::deque&lt;<a class="el" href="structUndoRecord.html">UndoRecord</a>&gt; UndoStack::redo_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a30dbdefa3d882aee1446afa81e0e2fa0" name="a30dbdefa3d882aee1446afa81e0e2fa0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a30dbdefa3d882aee1446afa81e0e2fa0">&#9670;&#160;</a></span>session_label_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string UndoStack::session_label_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>会话收尾折叠后那条记录的名字（功能显示名） </p>
+
+</div>
+</div>
+<a id="a870f4827bde74475978eb49bf727938e" name="a870f4827bde74475978eb49bf727938e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a870f4827bde74475978eb49bf727938e">&#9670;&#160;</a></span>session_owner_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string UndoStack::session_owner_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>进行中的功能会话所有者（空 = 无会话）——记录打标判据 </p>
+
+</div>
+</div>
+<a id="a2b8b81caf06bc5c7a6b8959e7d704ddb" name="a2b8b81caf06bc5c7a6b8959e7d704ddb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b8b81caf06bc5c7a6b8959e7d704ddb">&#9670;&#160;</a></span>undo_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::deque&lt;<a class="el" href="structUndoRecord.html">UndoRecord</a>&gt; UndoStack::undo_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/data/<a class="el" href="UndoStack_8h_source.html">UndoStack.h</a></li>
+<li>model/data/<a class="el" href="UndoStack_8cpp.html">UndoStack.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

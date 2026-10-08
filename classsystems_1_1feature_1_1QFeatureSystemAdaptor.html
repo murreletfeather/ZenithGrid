@@ -1,0 +1,804 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: systems::feature::QFeatureSystemAdaptor类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesystems.html">systems</a></li><li class="navelem"><a href="namespacesystems_1_1feature.html">feature</a></li><li class="navelem"><a href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html">QFeatureSystemAdaptor</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#signals">信号</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#properties">属性</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classsystems_1_1feature_1_1QFeatureSystemAdaptor-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">systems::feature::QFeatureSystemAdaptor类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="QFeatureSystemAdaptor_8h_source.html">QFeatureSystemAdaptor.h</a>&gt;</code></p>
+<div class="dynheader">
+类 systems::feature::QFeatureSystemAdaptor 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsystems_1_1feature_1_1QFeatureSystemAdaptor__inherit__graph.png" border="0" usemap="#asystems_1_1feature_1_1QFeatureSystemAdaptor_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="asystems_1_1feature_1_1QFeatureSystemAdaptor_inherit__map" id="asystems_1_1feature_1_1QFeatureSystemAdaptor_inherit__map">
+<area shape="rect" title="功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步" alt="" coords="5,79,204,119"/>
+<area shape="rect" title=" " alt="" coords="67,5,142,31"/>
+<area shape="poly" title=" " alt="" coords="107,44,107,79,102,79,102,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+systems::feature::QFeatureSystemAdaptor 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsystems_1_1feature_1_1QFeatureSystemAdaptor__coll__graph.png" border="0" usemap="#asystems_1_1feature_1_1QFeatureSystemAdaptor_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="asystems_1_1feature_1_1QFeatureSystemAdaptor_coll__map" id="asystems_1_1feature_1_1QFeatureSystemAdaptor_coll__map">
+<area shape="rect" title="功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步" alt="" coords="3263,509,3462,549"/>
+<area shape="rect" title=" " alt="" coords="2960,354,3035,379"/>
+<area shape="poly" title=" " alt="" coords="3049,369,3093,377,3142,391,3191,413,3235,443,3245,457,3248,471,3251,483,3259,495,3276,507,3273,511,3255,499,3246,486,3243,472,3240,459,3231,447,3189,418,3140,396,3092,383,3048,374"/>
+<area shape="rect" href="classsystems_1_1feature_1_1FeatureSystem.html" title="功能系统：管理功能插件的注册、注销、调用与事件路由" alt="" coords="2903,637,3092,677"/>
+<area shape="poly" title=" " alt="" coords="3039,628,3075,607,3115,588,3189,563,3263,545,3264,550,3191,568,3117,593,3078,612,3042,632"/>
+<area shape="rect" href="classsystems_1_1feature_1_1InteractionContext.html" title="视口交互上下文（FeatureContext 成员）：功能在 setup() 中经它订阅交互回调" alt="" coords="3257,573,3468,613"/>
+<area shape="poly" title=" " alt="" coords="3105,636,3256,609,3257,614,3106,641"/>
+<area shape="rect" href="structsystems_1_1feature_1_1FeatureContext.html" title="功能上下文，由 FeatureSystem 装配并在 setup()/activate()/execute() 时传给功能" alt="" coords="3635,600,3824,640"/>
+<area shape="poly" title=" " alt="" coords="3106,655,3276,653,3468,645,3634,629,3635,635,3468,651,3276,658,3106,661"/>
+<area shape="rect" title=" " alt="" coords="229,365,315,390"/>
+<area shape="poly" title=" " alt="" coords="290,352,325,316,348,300,374,287,405,279,431,280,457,284,489,287,905,285,1087,287,1320,296,1939,352,2557,411,2621,433,2684,461,2803,524,2903,587,2971,635,2968,639,2900,591,2801,529,2682,466,2619,438,2555,416,1938,357,1320,301,1087,292,905,290,489,292,456,289,431,285,406,284,376,292,351,304,329,320,294,356"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="517,967,611,993"/>
+<area shape="poly" title=" " alt="" coords="288,401,559,966,554,968,283,404"/>
+<area shape="rect" href="classUndoStack.html" title=" " alt="" coords="2263,489,2355,514"/>
+<area shape="poly" title=" " alt="" coords="329,369,466,358,657,353,765,355,877,362,989,375,1098,395,1122,405,1194,417,1315,428,1640,452,2160,485,2264,495,2263,500,2160,491,1639,458,1315,434,1193,422,1121,411,1097,400,988,380,877,367,765,360,657,358,466,364,329,374"/>
+<area shape="rect" href="structUndoRecord.html" title="一次操作 = 一条记录" alt="" coords="513,310,615,335"/>
+<area shape="poly" title=" " alt="" coords="328,364,513,329,514,335,329,369"/>
+<area shape="rect" title=" " alt="" coords="4236,1196,4419,1265"/>
+<area shape="poly" title=" " alt="" coords="277,404,288,583,309,849,323,983,339,1101,357,1190,367,1220,377,1238,397,1259,417,1273,437,1281,458,1286,505,1287,563,1285,2837,1285,3550,1289,4025,1289,4080,1286,4135,1279,4235,1256,4236,1262,4136,1284,4080,1292,4025,1295,3550,1295,2837,1291,563,1291,505,1292,457,1291,436,1286,415,1277,394,1263,373,1242,362,1223,352,1192,334,1102,317,984,304,850,283,584,272,404"/>
+<area shape="rect" href="structsystems_1_1feature_1_1FeatureInfo.html" title="功能信息：元数据与 setup() 声明的聚合，供 UI 查询" alt="" coords="639,63,853,89"/>
+<area shape="poly" title=" " alt="" coords="272,350,279,299,295,234,308,200,325,167,347,138,373,113,408,91,446,75,486,64,527,58,606,55,675,61,675,66,606,60,527,63,487,69,448,80,410,95,376,117,351,141,330,170,313,202,300,235,284,300,277,351"/>
+<area shape="rect" href="classsystems_1_1feature_1_1FeatureEventGateway.html" title="包装事件订阅：回调只写自己的预览，结束或异常时 flush，不创建操作记录。" alt="" coords="2580,245,2769,285"/>
+<area shape="poly" title=" " alt="" coords="284,351,324,291,352,255,386,218,424,184,466,157,513,138,562,131,2311,131,2360,134,2409,143,2503,173,2584,210,2643,243,2640,248,2581,215,2501,178,2408,148,2359,139,2311,136,563,136,514,143,469,161,427,189,389,222,356,258,328,294,289,354"/>
+<area shape="poly" title=" " alt="" coords="276,404,278,558,290,787,302,906,320,1015,345,1106,360,1141,377,1168,417,1207,436,1219,457,1227,504,1234,563,1235,1931,1235,2166,1237,2366,1243,2542,1249,2706,1251,2868,1247,3042,1231,3238,1202,3467,1156,3547,1141,3577,1127,3609,1098,3631,1062,3651,1009,3669,944,3685,874,3709,736,3723,640,3728,641,3714,737,3690,875,3674,945,3656,1010,3635,1064,3613,1102,3580,1131,3548,1146,3469,1161,3239,1208,3043,1237,2869,1252,2706,1257,2542,1255,2366,1249,2166,1243,1931,1240,563,1240,503,1239,456,1232,434,1224,413,1211,373,1171,355,1143,340,1107,315,1016,297,907,285,788,272,559,270,404"/>
+<area shape="rect" href="classsystems_1_1job_1_1Job.html" title="任务单元：持有执行体、提交体、取消令牌与状态" alt="" coords="1863,1029,1996,1054"/>
+<area shape="poly" title=" " alt="" coords="278,403,286,477,304,583,333,704,353,764,377,822,420,903,466,967,516,1017,571,1056,634,1086,705,1110,786,1129,878,1148,951,1155,1048,1156,1276,1143,1487,1122,1606,1108,1697,1092,1787,1071,1811,1064,1866,1052,1867,1057,1813,1069,1789,1076,1698,1098,1607,1113,1487,1128,1277,1148,1049,1161,951,1161,877,1153,785,1135,703,1115,632,1091,569,1061,512,1021,462,971,416,906,372,824,348,766,328,705,299,584,281,478,273,404"/>
+<area shape="rect" title=" " alt="" coords="5,357,144,397"/>
+<area shape="poly" title=" " alt="" coords="157,375,228,375,228,380,157,380"/>
+<area shape="rect" title=" " alt="" coords="2226,775,2393,801"/>
+<area shape="poly" title=" " alt="" coords="2406,781,2663,762,2789,746,2839,736,2878,724,2926,701,2967,675,2969,680,2928,706,2880,729,2841,741,2789,751,2663,767,2407,786"/>
+<area shape="rect" href="classsystems_1_1job_1_1JobRunner.html" title="所属线程管理一个在飞任务；worker 不等待 GUI。 发布、准备、查询、清理、终态与 stop 均在构造线程。 异步运行须向该线程投递；计算结束后保持槽与模型占用直到 GUI 收尾。" alt="" coords="2585,863,2764,889"/>
+<area shape="poly" title=" " alt="" coords="2392,801,2557,837,2636,861,2634,866,2555,843,2391,806"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="1880,729,1979,754"/>
+<area shape="poly" title=" " alt="" coords="1991,724,2082,705,2184,689,2384,671,2583,660,2902,654,2903,659,2584,666,2384,676,2184,695,2083,711,1993,729"/>
+<area shape="poly" title=" " alt="" coords="1956,718,2069,636,2188,564,2283,512,2285,516,2191,569,2072,641,1959,722"/>
+<area shape="poly" title=" " alt="" coords="1944,716,1996,642,2031,599,2069,558,2131,504,2199,456,2271,414,2344,377,2484,320,2597,283,2598,288,2485,325,2347,382,2274,418,2202,460,2134,508,2073,562,2035,602,2000,645,1948,719"/>
+<area shape="poly" title=" " alt="" coords="1944,766,2049,1017,2057,1051,2061,1064,2072,1077,2122,1111,2169,1137,2214,1157,2258,1171,2301,1180,2343,1185,2427,1183,2515,1172,2610,1156,2715,1143,2835,1137,3364,1137,3408,1133,3449,1120,3486,1100,3521,1073,3552,1042,3580,1006,3628,925,3665,840,3693,758,3722,640,3727,641,3698,760,3670,842,3633,927,3584,1009,3556,1045,3524,1077,3489,1104,3451,1125,3409,1138,3364,1143,2835,1143,2715,1148,2610,1162,2516,1177,2428,1188,2343,1190,2300,1186,2257,1177,2213,1162,2167,1142,2119,1115,2069,1081,2056,1067,2051,1052,2044,1018,1939,768"/>
+<area shape="poly" title=" " alt="" coords="1970,757,2066,797,2125,817,2185,833,2261,845,2367,855,2585,869,2585,874,2367,860,2261,850,2183,839,2123,822,2065,802,1968,762"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="1405,571,1546,597"/>
+<area shape="poly" title=" " alt="" coords="1560,586,1671,602,1731,617,1789,638,1828,658,1864,682,1916,726,1913,730,1860,686,1825,662,1787,642,1730,622,1670,608,1560,591"/>
+<area shape="rect" title=" " alt="" coords="894,567,1081,622"/>
+<area shape="poly" title=" " alt="" coords="1095,590,1404,583,1404,588,1095,595"/>
+<area shape="rect" title=" " alt="" coords="899,646,1075,701"/>
+<area shape="poly" title=" " alt="" coords="1089,663,1201,646,1261,634,1319,618,1343,605,1404,591,1405,596,1345,611,1321,622,1262,639,1202,652,1089,668"/>
+<area shape="rect" title=" " alt="" coords="901,410,1074,465"/>
+<area shape="poly" title=" " alt="" coords="1088,451,1231,478,1289,491,1321,503,1331,513,1335,523,1338,532,1346,541,1374,557,1406,569,1404,574,1372,562,1342,545,1334,535,1330,525,1326,516,1319,508,1288,496,1230,483,1087,456"/>
+<area shape="rect" title=" " alt="" coords="899,489,1075,543"/>
+<area shape="poly" title=" " alt="" coords="1089,526,1320,557,1405,570,1404,575,1320,563,1089,531"/>
+<area shape="rect" title=" " alt="" coords="1394,929,1557,983"/>
+<area shape="poly" title=" " alt="" coords="1570,953,1696,944,1750,934,1786,918,1797,904,1800,889,1802,872,1810,852,1833,821,1860,793,1908,752,1912,756,1864,797,1837,825,1814,855,1807,873,1805,890,1802,906,1790,922,1752,939,1697,950,1570,958"/>
+<area shape="rect" title=" " alt="" coords="877,967,1097,993"/>
+<area shape="poly" title=" " alt="" coords="1111,981,1213,981,1320,976,1394,967,1394,973,1320,981,1213,986,1111,986"/>
+<area shape="poly" title=" " alt="" coords="624,977,877,977,877,983,624,983"/>
+<area shape="rect" title=" " alt="" coords="193,1253,351,1278"/>
+<area shape="poly" title=" " alt="" coords="310,1282,341,1294,375,1304,432,1313,457,1311,489,1304,552,1282,603,1256,645,1228,683,1197,721,1165,763,1135,813,1106,876,1080,984,1049,1076,1031,1159,1021,1237,1018,1400,1015,1495,1008,1606,993,1660,989,1704,989,1744,982,1764,972,1786,955,1797,941,1801,926,1803,908,1810,888,1835,847,1864,809,1914,752,1918,756,1868,812,1840,850,1814,890,1808,909,1806,926,1802,943,1790,959,1767,976,1746,987,1705,995,1661,995,1607,999,1496,1013,1401,1020,1237,1023,1160,1027,1077,1036,985,1054,878,1085,815,1111,765,1139,724,1170,686,1201,648,1232,606,1261,555,1287,490,1309,458,1316,432,1318,374,1309,340,1299,308,1286"/>
+<area shape="poly" title=" " alt="" coords="294,1241,548,991,551,995,298,1245"/>
+<area shape="rect" title=" " alt="" coords="1376,621,1575,675"/>
+<area shape="poly" title=" " alt="" coords="1589,659,1686,674,1789,695,1893,726,1892,731,1787,700,1685,679,1588,664"/>
+<area shape="rect" title=" " alt="" coords="883,725,1092,765"/>
+<area shape="poly" title=" " alt="" coords="1105,725,1319,685,1375,672,1376,677,1321,691,1106,730"/>
+<area shape="rect" title=" " alt="" coords="1399,700,1551,740"/>
+<area shape="poly" title=" " alt="" coords="1565,721,1788,731,1880,736,1879,741,1788,736,1565,726"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="1426,765,1525,790"/>
+<area shape="poly" title=" " alt="" coords="1539,781,1655,786,1722,785,1788,779,1843,767,1893,752,1894,757,1845,772,1788,784,1722,790,1655,792,1538,786"/>
+<area shape="rect" title=" " alt="" coords="881,789,1093,829"/>
+<area shape="poly" title=" " alt="" coords="1107,805,1320,795,1426,782,1426,787,1320,800,1107,810"/>
+<area shape="rect" title=" " alt="" coords="916,853,1059,893"/>
+<area shape="poly" title=" " alt="" coords="1073,879,1130,878,1194,873,1259,858,1319,832,1326,826,1330,818,1334,809,1343,800,1384,783,1425,776,1426,781,1385,788,1345,805,1338,812,1335,820,1330,829,1321,837,1260,863,1195,878,1131,884,1073,884"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="1415,814,1536,839"/>
+<area shape="poly" title=" " alt="" coords="1550,831,1663,831,1726,826,1787,813,1823,801,1856,785,1909,752,1912,756,1859,789,1825,806,1789,819,1727,831,1663,837,1550,836"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="1418,506,1533,531"/>
+<area shape="poly" title=" " alt="" coords="1546,527,1697,552,1789,571,1837,608,1876,652,1905,695,1924,727,1919,730,1901,698,1872,655,1833,611,1787,576,1696,557,1545,532"/>
+<area shape="poly" title=" " alt="" coords="1546,515,2263,500,2263,505,1547,520"/>
+<area shape="rect" title=" " alt="" coords="1370,864,1581,904"/>
+<area shape="poly" title=" " alt="" coords="1594,891,1691,885,1740,875,1787,860,1829,837,1865,807,1916,752,1920,756,1869,811,1831,841,1789,865,1741,881,1691,890,1595,896"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="887,918,1088,943"/>
+<area shape="poly" title=" " alt="" coords="1102,935,1208,934,1319,923,1343,915,1392,901,1393,907,1345,920,1321,928,1208,939,1102,940"/>
+<area shape="rect" href="classcore_1_1EventBus.html" title="类型安全的轻量级事件总线，以事件类型为键分发事件" alt="" coords="2250,255,2369,281"/>
+<area shape="poly" title=" " alt="" coords="2383,279,2580,317,2627,323,2669,324,2742,320,2777,321,2810,329,2845,346,2881,374,2897,398,2900,422,2899,447,2905,477,2946,567,2986,636,2981,638,2942,569,2900,478,2894,448,2895,423,2892,400,2877,378,2842,350,2809,334,2776,327,2742,325,2669,329,2627,328,2580,323,2382,285"/>
+<area shape="poly" title=" " alt="" coords="2382,265,2580,263,2580,269,2382,270"/>
+<area shape="rect" title=" " alt="" coords="1812,240,2047,309"/>
+<area shape="poly" title=" " alt="" coords="2060,270,2249,266,2250,272,2061,275"/>
+<area shape="rect" title=" " alt="" coords="1344,245,1607,285"/>
+<area shape="poly" title=" " alt="" coords="1621,266,1812,270,1812,275,1621,271"/>
+<area shape="rect" title=" " alt="" coords="1827,176,2032,216"/>
+<area shape="poly" title=" " alt="" coords="2046,215,2250,254,2249,259,2045,221"/>
+<area shape="rect" href="structcore_1_1EventBus_1_1LifetimeToken.html" title=" " alt="" coords="1385,181,1566,221"/>
+<area shape="poly" title=" " alt="" coords="1580,197,1827,195,1827,200,1580,203"/>
+<area shape="poly" title=" " alt="" coords="2369,509,2557,547,2753,593,2920,635,2919,640,2752,598,2555,552,2368,515"/>
+<area shape="poly" title=" " alt="" coords="2367,484,2413,469,2463,446,2512,416,2554,378,2563,360,2565,342,2567,323,2578,304,2605,283,2608,288,2582,307,2572,325,2570,343,2569,362,2558,382,2515,421,2466,451,2415,474,2369,490"/>
+<area shape="poly" title=" " alt="" coords="2350,518,2476,581,2558,627,2571,651,2576,672,2573,712,2570,752,2573,773,2582,796,2597,816,2615,834,2651,861,2648,865,2611,838,2593,820,2578,799,2568,774,2564,752,2568,711,2570,673,2566,652,2554,631,2474,586,2347,522"/>
+<area shape="rect" title=" " alt="" coords="1121,309,1320,334"/>
+<area shape="poly" title=" " alt="" coords="1310,334,1321,336,1345,341,1487,372,1631,396,1711,404,1780,405,1897,402,1954,401,2014,404,2082,412,2161,429,2197,441,2232,456,2289,486,2286,491,2230,461,2195,446,2159,435,2081,418,2014,409,1954,406,1897,407,1780,411,1711,409,1630,401,1486,378,1343,347,1319,341,1309,339"/>
+<area shape="poly" title=" " alt="" coords="629,320,1121,319,1121,324,629,325"/>
+<area shape="poly" title=" " alt="" coords="4222,1241,4044,1250,3832,1253,3728,1250,3632,1243,3551,1231,3491,1212,3443,1187,3397,1158,3312,1090,3235,1013,3167,932,3110,853,3064,781,3006,679,3011,676,3068,778,3115,850,3172,929,3239,1009,3315,1086,3400,1153,3446,1182,3493,1207,3552,1225,3633,1238,3728,1245,3832,1248,4044,1244,4222,1235"/>
+<area shape="rect" href="structsystems_1_1feature_1_1FeatureSystem_1_1FeatureEntry.html" title=" " alt="" coords="3929,445,4119,485"/>
+<area shape="poly" title=" " alt="" coords="4041,497,4315,1195,4310,1197,4036,499"/>
+<area shape="poly" title=" " alt="" coords="867,72,1219,71,3731,71,3765,74,3797,84,3826,98,3854,118,3901,168,3940,228,3971,291,3994,352,4021,444,4016,446,3989,354,3966,293,3935,230,3897,171,3850,122,3824,103,3795,88,3764,79,3731,76,1219,76,867,78"/>
+<area shape="rect" href="classsystems_1_1feature_1_1FeatureParams.html" title="功能的持久参数集：参数类型与当前值一一对应" alt="" coords="3268,445,3457,485"/>
+<area shape="poly" title=" " alt="" coords="3471,463,3929,463,3929,468,3471,468"/>
+<area shape="poly" title=" " alt="" coords="3449,487,3469,495,3517,516,3553,536,3636,579,3678,597,3676,602,3634,584,3551,540,3515,521,3467,500,3447,492"/>
+<area shape="rect" href="structsystems_1_1interaction_1_1InteractionState.html" title="单个功能的视口交互状态：回调订阅（功能写入）+ 标注与结果（渲染层拉取）" alt="" coords="2920,425,3075,465"/>
+<area shape="poly" title=" " alt="" coords="3089,438,3413,427,3618,427,3824,435,3929,446,3929,452,3824,440,3618,432,3413,432,3089,443"/>
+<area shape="poly" title=" " alt="" coords="3089,461,3163,486,3201,504,3235,526,3243,535,3248,544,3252,552,3259,559,3279,571,3276,575,3256,563,3247,555,3243,546,3239,538,3232,530,3198,509,3161,491,3088,466"/>
+<area shape="poly" title=" " alt="" coords="3480,568,3928,481,3930,486,3481,573"/>
+<area shape="poly" title=" " alt="" coords="3482,599,3634,610,3634,616,3482,605"/>
+<area shape="poly" title=" " alt="" coords="2783,263,2996,263,3731,263,3778,268,3823,284,3865,307,3904,334,3968,394,4010,443,4006,447,3964,397,3900,338,3862,311,3821,289,3777,274,3731,268,2996,268,2783,268"/>
+<area shape="poly" title=" " alt="" coords="2783,281,3002,321,3262,373,3384,401,3490,428,3568,454,3595,466,3613,478,3624,495,3627,511,3629,527,3637,544,3665,574,3696,598,3693,602,3661,578,3632,547,3624,528,3622,512,3619,497,3609,482,3593,471,3566,459,3488,433,3383,406,3261,378,3001,326,2782,286"/>
+<area shape="poly" title=" " alt="" coords="3837,613,3872,604,3904,591,3938,568,3967,539,4008,484,4013,487,3971,543,3941,572,3907,596,3873,609,3838,618"/>
+<area shape="poly" title=" " alt="" coords="2760,857,2820,838,2877,807,2912,776,2942,741,2983,676,2988,679,2947,744,2916,780,2880,812,2822,843,2762,863"/>
+<area shape="rect" title=" " alt="" coords="2184,1013,2435,1053"/>
+<area shape="poly" title=" " alt="" coords="2448,1026,2503,1015,2555,995,2590,971,2621,941,2663,887,2667,891,2625,945,2594,975,2557,1000,2504,1020,2449,1032"/>
+<area shape="rect" href="structsystems_1_1job_1_1JobRunner_1_1ModelOperation.html" title=" " alt="" coords="1840,1079,2019,1119"/>
+<area shape="poly" title=" " alt="" coords="2032,1078,2192,1051,2193,1056,2033,1084"/>
+<area shape="rect" title=" " alt="" coords="2215,949,2404,989"/>
+<area shape="poly" title=" " alt="" coords="2417,971,2486,965,2555,949,2585,936,2614,920,2657,887,2661,891,2617,924,2588,941,2557,955,2487,970,2418,976"/>
+<area shape="poly" title=" " alt="" coords="2009,1024,2214,985,2215,990,2010,1029"/>
+<area shape="rect" title=" " alt="" coords="1382,1059,1569,1099"/>
+<area shape="poly" title=" " alt="" coords="1556,1052,1630,1031,1710,1015,1744,1008,1787,994,1850,965,1901,935,1983,874,2022,844,2066,815,2118,787,2183,761,2296,740,2493,713,2902,665,2903,670,2494,718,2297,745,2185,767,2120,792,2069,820,2025,849,1986,878,1904,939,1853,969,1789,998,1746,1013,1711,1020,1631,1036,1557,1057"/>
+<area shape="poly" title=" " alt="" coords="1582,1069,1788,1053,1862,1046,1863,1051,1788,1059,1582,1074"/>
+<area shape="rect" title=" " alt="" coords="1429,1174,1521,1199"/>
+<area shape="poly" title=" " alt="" coords="1535,1182,1652,1177,1788,1167,1971,1147,2113,1127,2254,1101,2434,1063,2498,1053,2524,1046,2554,1030,2593,996,2625,956,2665,887,2670,890,2630,959,2597,999,2558,1034,2526,1051,2499,1059,2435,1068,2255,1107,2114,1132,1972,1152,1788,1172,1652,1182,1535,1188"/>
+<area shape="poly" title=" " alt="" coords="1535,1179,1686,1163,1752,1152,1786,1141,1797,1124,1798,1105,1798,1085,1810,1065,1834,1049,1861,1041,1863,1046,1837,1054,1814,1069,1804,1086,1803,1105,1802,1125,1790,1145,1753,1157,1687,1168,1535,1184"/>
+<area shape="rect" title=" " alt="" coords="2263,899,2355,925"/>
+<area shape="poly" title=" " alt="" coords="2369,907,2457,902,2556,893,2605,886,2606,891,2556,899,2457,908,2369,913"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-signals" class="groupheader"><a id="signals" name="signals"></a>
+信号</h2></td></tr>
+<tr class="memitem:a3a7b99b10cab0fecdb1a39824b05c20d" id="r_a3a7b99b10cab0fecdb1a39824b05c20d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a7b99b10cab0fecdb1a39824b05c20d">featuresInfoChanged</a> ()</td></tr>
+<tr class="memitem:af0ac7efa6a48377b10df37e2fdca140a" id="r_af0ac7efa6a48377b10df37e2fdca140a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0ac7efa6a48377b10df37e2fdca140a">scalarAttributeDisplayRequested</a> (int component_id, QString attribute_name)</td></tr>
+<tr class="memdesc:af0ac7efa6a48377b10df37e2fdca140a"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能请求在指定 Component 上渲染标量属性  <br /></td></tr>
+<tr class="memitem:aef859cf3d3950a2c9cd16ed6bbd6047c" id="r_aef859cf3d3950a2c9cd16ed6bbd6047c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef859cf3d3950a2c9cd16ed6bbd6047c">paramValueChanged</a> (QString feature, int index, QVariant value)</td></tr>
+<tr class="memdesc:aef859cf3d3950a2c9cd16ed6bbd6047c"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能参数值变化（功能侧回写结果等场景，QML 据此同步显示）  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a183479006d373b1150d2f11542209f43" id="r_a183479006d373b1150d2f11542209f43"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a183479006d373b1150d2f11542209f43">QFeatureSystemAdaptor</a> (<a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a> &amp;feature_system)</td></tr>
+<tr class="memitem:a6219b84cf2eed18fd271b9dc266364b7" id="r_a6219b84cf2eed18fd271b9dc266364b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6219b84cf2eed18fd271b9dc266364b7">~QFeatureSystemAdaptor</a> () override</td></tr>
+<tr class="memitem:af847c5b57910dc89a5632e8992e976e3" id="r_af847c5b57910dc89a5632e8992e976e3"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af847c5b57910dc89a5632e8992e976e3">invoke</a> (const QString &amp;unique_name)</td></tr>
+<tr class="memdesc:af847c5b57910dc89a5632e8992e976e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">菜单触发的功能调用  <br /></td></tr>
+<tr class="memitem:ae8631246cdd7f8fb47d503c0782d6f6a" id="r_ae8631246cdd7f8fb47d503c0782d6f6a"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8631246cdd7f8fb47d503c0782d6f6a">setParameter</a> (const QString &amp;unique_name, int index, const QVariant &amp;value)</td></tr>
+<tr class="memdesc:ae8631246cdd7f8fb47d503c0782d6f6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">修改功能参数，实时生效并广播参数变更事件  <br /></td></tr>
+<tr class="memitem:a44a4730f77da63ea33d4acb3c155aa8f" id="r_a44a4730f77da63ea33d4acb3c155aa8f"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44a4730f77da63ea33d4acb3c155aa8f">postKeyEvent</a> (int key, int modifiers, bool pressed)</td></tr>
+<tr class="memdesc:a44a4730f77da63ea33d4acb3c155aa8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">UI层向功能系统派发按键事件  <br /></td></tr>
+<tr class="memitem:a6784a3f0b04bbdc6327101e07439dd71" id="r_a6784a3f0b04bbdc6327101e07439dd71"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6784a3f0b04bbdc6327101e07439dd71">setFeatureActive</a> (const QString &amp;unique_name)</td></tr>
+<tr class="memdesc:a6784a3f0b04bbdc6327101e07439dd71"><td class="mdescLeft">&#160;</td><td class="mdescRight">切换当前进入的功能（活动操作切换驱动，幂等）  <br /></td></tr>
+<tr class="memitem:afbdc42f2f57ba7ea1fc740e191a8c8d2" id="r_afbdc42f2f57ba7ea1fc740e191a8c8d2"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afbdc42f2f57ba7ea1fc740e191a8c8d2">setActiveModel</a> (int <a class="el" href="TestComponentModel_8cpp.html#a39f48d78b28941e045e423f59f774459">id</a>)</td></tr>
+<tr class="memdesc:afbdc42f2f57ba7ea1fc740e191a8c8d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">QML侧同步当前活动模型id，供功能上下文动态获取  <br /></td></tr>
+<tr class="memitem:a4c61f0b81b6b0c388b35e5bd8b203241" id="r_a4c61f0b81b6b0c388b35e5bd8b203241"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c61f0b81b6b0c388b35e5bd8b203241">setActiveComponent</a> (int <a class="el" href="TestComponentModel_8cpp.html#a39f48d78b28941e045e423f59f774459">id</a>)</td></tr>
+<tr class="memdesc:a4c61f0b81b6b0c388b35e5bd8b203241"><td class="mdescLeft">&#160;</td><td class="mdescRight">QML侧同步当前活动组件id，供功能上下文动态获取  <br /></td></tr>
+<tr class="memitem:a63f614642346f019e806532efda74d91" id="r_a63f614642346f019e806532efda74d91"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="classQFeatureInfo.html">QFeatureInfo</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63f614642346f019e806532efda74d91">getFeaturesInfo</a> () const</td></tr>
+<tr class="memdesc:a63f614642346f019e806532efda74d91"><td class="mdescLeft">&#160;</td><td class="mdescRight">由qml获取所有已注册的功能和参数列表  <br /></td></tr>
+<tr class="memitem:af39ef0cfadc4c98138dd2d135840bd61" id="r_af39ef0cfadc4c98138dd2d135840bd61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af39ef0cfadc4c98138dd2d135840bd61">featureSystem</a> () const</td></tr>
+<tr class="memdesc:af39ef0cfadc4c98138dd2d135840bd61"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取底层功能系统指针（interaction 交互状态等系统级接口用）  <br /></td></tr>
+<tr class="memitem:a52768151ba31b6ce6e4434cdbb0d803d" id="r_a52768151ba31b6ce6e4434cdbb0d803d"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a52768151ba31b6ce6e4434cdbb0d803d">activeModel</a> () const</td></tr>
+<tr class="memitem:a1f2d0132a3f33a7846edd7ccd30a9c84" id="r_a1f2d0132a3f33a7846edd7ccd30a9c84"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1f2d0132a3f33a7846edd7ccd30a9c84">activeComponent</a> () const</td></tr>
+<tr class="memitem:a94ce177fbb6883c08e3de52ed942aa42" id="r_a94ce177fbb6883c08e3de52ed942aa42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a94ce177fbb6883c08e3de52ed942aa42">notifyParameterChanged</a> (const std::string &amp;feature, std::size_t index, const <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &amp;value)</td></tr>
+<tr class="memdesc:a94ce177fbb6883c08e3de52ed942aa42"><td class="mdescLeft">&#160;</td><td class="mdescRight">参数变更通知入口（QModelManager 桥接 <a class="el" href="classEventBus.html" title="类型安全的轻量级事件总线，以事件类型为键分发事件">EventBus</a> 的 <a class="el" href="structsystems_1_1feature_1_1ParameterChangedEvent.html" title="功能参数变更事件，FeatureSystem::setParameter 成功后发布">ParameterChangedEvent</a> 调用）  <br /></td></tr>
+<tr class="memitem:a92ed231e4bb4221bc0d05b6da3865a50" id="r_a92ed231e4bb4221bc0d05b6da3865a50"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92ed231e4bb4221bc0d05b6da3865a50">notifyScalarAttributeDisplayRequested</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const std::string &amp;attribute_name)</td></tr>
+<tr class="memdesc:a92ed231e4bb4221bc0d05b6da3865a50"><td class="mdescLeft">&#160;</td><td class="mdescRight">将标量属性显示请求转换为排队发送的 Qt 信号  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-properties" class="groupheader"><a id="properties" name="properties"></a>
+属性</h2></td></tr>
+<tr class="memitem:a067d8649880bec56dc4a91843d28257a" id="r_a067d8649880bec56dc4a91843d28257a"><td class="memItemLeft" align="right" valign="top">QML_ELEMENTQList&lt; <a class="el" href="classQFeatureInfo.html">QFeatureInfo</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a067d8649880bec56dc4a91843d28257a">featuresInfo</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a4a84799be9789b5282e5e1bbb20397d6" id="r_a4a84799be9789b5282e5e1bbb20397d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4a84799be9789b5282e5e1bbb20397d6">feature_system_</a></td></tr>
+<tr class="memitem:acbc63b0ae588b702612cdbdb767611fb" id="r_acbc63b0ae588b702612cdbdb767611fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acbc63b0ae588b702612cdbdb767611fb">active_model_id_</a> { -1 }</td></tr>
+<tr class="memitem:aaaa7abe24ef25754e93520de5a68d88f" id="r_aaaa7abe24ef25754e93520de5a68d88f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaaa7abe24ef25754e93520de5a68d88f">active_component_id_</a> { -1 }</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步 </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a183479006d373b1150d2f11542209f43" name="a183479006d373b1150d2f11542209f43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a183479006d373b1150d2f11542209f43">&#9670;&#160;</a></span>QFeatureSystemAdaptor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">systems::feature::QFeatureSystemAdaptor::QFeatureSystemAdaptor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>feature_system</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6219b84cf2eed18fd271b9dc266364b7" name="a6219b84cf2eed18fd271b9dc266364b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6219b84cf2eed18fd271b9dc266364b7">&#9670;&#160;</a></span>~QFeatureSystemAdaptor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">systems::feature::QFeatureSystemAdaptor::~QFeatureSystemAdaptor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a1f2d0132a3f33a7846edd7ccd30a9c84" name="a1f2d0132a3f33a7846edd7ccd30a9c84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f2d0132a3f33a7846edd7ccd30a9c84">&#9670;&#160;</a></span>activeComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; systems::feature::QFeatureSystemAdaptor::activeComponent </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a52768151ba31b6ce6e4434cdbb0d803d" name="a52768151ba31b6ce6e4434cdbb0d803d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52768151ba31b6ce6e4434cdbb0d803d">&#9670;&#160;</a></span>activeModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; systems::feature::QFeatureSystemAdaptor::activeModel </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3a7b99b10cab0fecdb1a39824b05c20d" name="a3a7b99b10cab0fecdb1a39824b05c20d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a7b99b10cab0fecdb1a39824b05c20d">&#9670;&#160;</a></span>featuresInfoChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::featuresInfoChanged </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af39ef0cfadc4c98138dd2d135840bd61" name="af39ef0cfadc4c98138dd2d135840bd61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af39ef0cfadc4c98138dd2d135840bd61">&#9670;&#160;</a></span>featureSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a> * systems::feature::QFeatureSystemAdaptor::featureSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取底层功能系统指针（interaction 交互状态等系统级接口用） </p>
+
+</div>
+</div>
+<a id="a63f614642346f019e806532efda74d91" name="a63f614642346f019e806532efda74d91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63f614642346f019e806532efda74d91">&#9670;&#160;</a></span>getFeaturesInfo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; <a class="el" href="classQFeatureInfo.html">QFeatureInfo</a> * &gt; systems::feature::QFeatureSystemAdaptor::getFeaturesInfo </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>由qml获取所有已注册的功能和参数列表 </p>
+
+</div>
+</div>
+<a id="af847c5b57910dc89a5632e8992e976e3" name="af847c5b57910dc89a5632e8992e976e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af847c5b57910dc89a5632e8992e976e3">&#9670;&#160;</a></span>invoke()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QVariant systems::feature::QFeatureSystemAdaptor::invoke </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>菜单触发的功能调用 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_name</td><td>功能唯一名称 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a94ce177fbb6883c08e3de52ed942aa42" name="a94ce177fbb6883c08e3de52ed942aa42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94ce177fbb6883c08e3de52ed942aa42">&#9670;&#160;</a></span>notifyParameterChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::notifyParameterChanged </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>feature</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>index</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classcore_1_1ArgObject.html">core::ArgObject</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>参数变更通知入口（QModelManager 桥接 <a class="el" href="classEventBus.html" title="类型安全的轻量级事件总线，以事件类型为键分发事件">EventBus</a> 的 <a class="el" href="structsystems_1_1feature_1_1ParameterChangedEvent.html" title="功能参数变更事件，FeatureSystem::setParameter 成功后发布">ParameterChangedEvent</a> 调用） </p>
+<dl class="section note"><dt>注解</dt><dd>转换 ArgObject 为 QVariant 后发射 paramValueChanged </dd></dl>
+
+</div>
+</div>
+<a id="a92ed231e4bb4221bc0d05b6da3865a50" name="a92ed231e4bb4221bc0d05b6da3865a50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92ed231e4bb4221bc0d05b6da3865a50">&#9670;&#160;</a></span>notifyScalarAttributeDisplayRequested()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::notifyScalarAttributeDisplayRequested </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>attribute_name</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将标量属性显示请求转换为排队发送的 Qt 信号 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">component_id</td><td>属性所属的 Component ID </td></tr>
+    <tr><td class="paramname">attribute_name</td><td>模型中的标量属性名 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aef859cf3d3950a2c9cd16ed6bbd6047c" name="aef859cf3d3950a2c9cd16ed6bbd6047c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aef859cf3d3950a2c9cd16ed6bbd6047c">&#9670;&#160;</a></span>paramValueChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::paramValueChanged </td>
+          <td>(</td>
+          <td class="paramtype">QString</td>          <td class="paramname"><span class="paramname"><em>feature</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>index</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariant</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>功能参数值变化（功能侧回写结果等场景，QML 据此同步显示） </p>
+
+</div>
+</div>
+<a id="a44a4730f77da63ea33d4acb3c155aa8f" name="a44a4730f77da63ea33d4acb3c155aa8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44a4730f77da63ea33d4acb3c155aa8f">&#9670;&#160;</a></span>postKeyEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool systems::feature::QFeatureSystemAdaptor::postKeyEvent </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>key</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>modifiers</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>pressed</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>UI层向功能系统派发按键事件 </p>
+<dl class="section return"><dt>返回</dt><dd>事件已被功能消费（应 accept）时为 true </dd></dl>
+
+</div>
+</div>
+<a id="af0ac7efa6a48377b10df37e2fdca140a" name="af0ac7efa6a48377b10df37e2fdca140a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0ac7efa6a48377b10df37e2fdca140a">&#9670;&#160;</a></span>scalarAttributeDisplayRequested</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::scalarAttributeDisplayRequested </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString</td>          <td class="paramname"><span class="paramname"><em>attribute_name</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>功能请求在指定 Component 上渲染标量属性 </p>
+
+</div>
+</div>
+<a id="a4c61f0b81b6b0c388b35e5bd8b203241" name="a4c61f0b81b6b0c388b35e5bd8b203241"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c61f0b81b6b0c388b35e5bd8b203241">&#9670;&#160;</a></span>setActiveComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::setActiveComponent </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>QML侧同步当前活动组件id，供功能上下文动态获取 </p>
+
+</div>
+</div>
+<a id="afbdc42f2f57ba7ea1fc740e191a8c8d2" name="afbdc42f2f57ba7ea1fc740e191a8c8d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbdc42f2f57ba7ea1fc740e191a8c8d2">&#9670;&#160;</a></span>setActiveModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void systems::feature::QFeatureSystemAdaptor::setActiveModel </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>QML侧同步当前活动模型id，供功能上下文动态获取 </p>
+
+</div>
+</div>
+<a id="a6784a3f0b04bbdc6327101e07439dd71" name="a6784a3f0b04bbdc6327101e07439dd71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6784a3f0b04bbdc6327101e07439dd71">&#9670;&#160;</a></span>setFeatureActive()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool systems::feature::QFeatureSystemAdaptor::setFeatureActive </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>切换当前进入的功能（活动操作切换驱动，幂等） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_name</td><td>要进入的功能唯一名称；空串表示退出当前功能 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae8631246cdd7f8fb47d503c0782d6f6a" name="ae8631246cdd7f8fb47d503c0782d6f6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8631246cdd7f8fb47d503c0782d6f6a">&#9670;&#160;</a></span>setParameter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool systems::feature::QFeatureSystemAdaptor::setParameter </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>unique_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>index</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QVariant &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>修改功能参数，实时生效并广播参数变更事件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">unique_name</td><td>功能唯一名称 </td></tr>
+    <tr><td class="paramname">index</td><td>参数在参数列表中的下标 </td></tr>
+    <tr><td class="paramname">value</td><td>新参数值 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="aaaa7abe24ef25754e93520de5a68d88f" name="aaaa7abe24ef25754e93520de5a68d88f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaa7abe24ef25754e93520de5a68d88f">&#9670;&#160;</a></span>active_component_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> systems::feature::QFeatureSystemAdaptor::active_component_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acbc63b0ae588b702612cdbdb767611fb" name="acbc63b0ae588b702612cdbdb767611fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbc63b0ae588b702612cdbdb767611fb">&#9670;&#160;</a></span>active_model_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> systems::feature::QFeatureSystemAdaptor::active_model_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4a84799be9789b5282e5e1bbb20397d6" name="a4a84799be9789b5282e5e1bbb20397d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a84799be9789b5282e5e1bbb20397d6">&#9670;&#160;</a></span>feature_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a>* systems::feature::QFeatureSystemAdaptor::feature_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-property-members" id="doc-property-members"></a><h2 id="header-doc-property-members" class="groupheader">属性说明</h2>
+<a id="a067d8649880bec56dc4a91843d28257a" name="a067d8649880bec56dc4a91843d28257a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a067d8649880bec56dc4a91843d28257a">&#9670;&#160;</a></span>featuresInfo</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QML_ELEMENTQList&lt;<a class="el" href="classQFeatureInfo.html">QFeatureInfo</a>*&gt; systems::feature::QFeatureSystemAdaptor::featuresInfo</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>app/model/systems/feature/<a class="el" href="QFeatureSystemAdaptor_8h_source.html">QFeatureSystemAdaptor.h</a></li>
+<li>app/model/systems/feature/<a class="el" href="QFeatureSystemAdaptor_8cpp.html">QFeatureSystemAdaptor.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: TreeModel类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#properties">属性</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classTreeModel-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">TreeModel类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="TreeModel_8h_source.html">TreeModel.h</a>&gt;</code></p>
+<div class="dynheader">
+类 TreeModel 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classTreeModel__inherit__graph.png" border="0" usemap="#aTreeModel_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="aTreeModel_inherit__map" id="aTreeModel_inherit__map">
+<area shape="rect" title=" " alt="" coords="39,79,128,104"/>
+<area shape="rect" title=" " alt="" coords="5,5,161,31"/>
+<area shape="poly" title=" " alt="" coords="86,44,86,79,81,79,81,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+TreeModel 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classTreeModel__coll__graph.png" border="0" usemap="#aTreeModel_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aTreeModel_coll__map" id="aTreeModel_coll__map">
+<area shape="rect" title=" " alt="" coords="3773,1159,3863,1185"/>
+<area shape="rect" title=" " alt="" coords="3407,1010,3563,1035"/>
+<area shape="poly" title=" " alt="" coords="3578,1033,3664,1056,3709,1073,3751,1095,3786,1126,3810,1157,3806,1161,3782,1130,3748,1100,3707,1078,3663,1061,3576,1038"/>
+<area shape="rect" href="structTreeNode.html" title=" " alt="" coords="3444,1106,3527,1131"/>
+<area shape="poly" title=" " alt="" coords="3541,1118,3639,1127,3750,1145,3786,1157,3785,1162,3749,1151,3638,1132,3540,1124"/>
+<area shape="poly" title=" " alt="" coords="3458,1091,3466,1083,3485,1079,3501,1082,3511,1088,3514,1098,3509,1107,3504,1105,3509,1097,3507,1091,3500,1087,3485,1085,3469,1088,3462,1095"/>
+<area shape="rect" href="classQModelQuery.html" title="ModelQuery 类封装所有网格数据的查询操作（CQRS 查询部分的 QML 适配器）" alt="" coords="3430,1155,3541,1181"/>
+<area shape="poly" title=" " alt="" coords="3555,1167,3591,1168,3773,1169,3773,1175,3591,1173,3554,1173"/>
+<area shape="rect" title=" " alt="" coords="3165,1133,3239,1158"/>
+<area shape="poly" title=" " alt="" coords="3254,1147,3430,1161,3430,1166,3253,1152"/>
+<area shape="rect" href="classsession_1_1SessionQuery.html" title="模型层只读查询（CQRS 查询端，读写分离中的读视图）" alt="" coords="3118,1182,3286,1207"/>
+<area shape="poly" title=" " alt="" coords="3299,1191,3380,1185,3429,1177,3430,1183,3380,1191,3300,1196"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="2913,1182,3012,1207"/>
+<area shape="poly" title=" " alt="" coords="3026,1192,3118,1192,3118,1197,3026,1197"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="2532,223,2673,249"/>
+<area shape="poly" title=" " alt="" coords="2688,249,2741,266,2797,290,2849,324,2872,345,2892,369,2901,389,2909,421,2923,512,2945,765,2958,1022,2964,1182,2958,1182,2953,1023,2940,765,2918,513,2904,422,2896,391,2887,372,2868,349,2846,328,2794,295,2739,271,2686,254"/>
+<area shape="rect" title=" " alt="" coords="2107,51,2294,106"/>
+<area shape="poly" title=" " alt="" coords="2308,97,2391,120,2474,151,2538,187,2587,221,2584,225,2535,191,2472,156,2389,125,2307,102"/>
+<area shape="rect" title=" " alt="" coords="2113,130,2289,185"/>
+<area shape="poly" title=" " alt="" coords="2303,173,2474,205,2545,221,2544,226,2473,211,2302,178"/>
+<area shape="rect" title=" " alt="" coords="2114,209,2287,263"/>
+<area shape="poly" title=" " alt="" coords="2301,233,2532,233,2532,239,2301,239"/>
+<area shape="rect" title=" " alt="" coords="2113,287,2289,342"/>
+<area shape="poly" title=" " alt="" coords="2302,294,2473,261,2544,246,2545,251,2474,267,2303,299"/>
+<area shape="rect" title=" " alt="" coords="1608,7,1771,62"/>
+<area shape="poly" title=" " alt="" coords="1776,68,1801,91,1821,116,1852,168,1874,221,1893,272,1913,318,1940,354,1957,368,1978,378,2004,384,2035,387,2604,387,2637,389,2668,395,2725,417,2773,451,2815,497,2850,551,2879,611,2903,677,2922,745,2948,884,2960,1013,2965,1117,2964,1181,2959,1181,2959,1117,2955,1014,2942,885,2917,747,2898,678,2874,613,2845,553,2811,500,2770,455,2722,421,2667,400,2637,394,2604,392,2035,392,2003,390,1976,383,1954,372,1936,358,1908,320,1888,274,1869,223,1847,170,1817,119,1797,95,1773,72"/>
+<area shape="rect" title=" " alt="" coords="932,13,1152,38"/>
+<area shape="poly" title=" " alt="" coords="1166,24,1608,31,1608,36,1166,30"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="565,22,659,47"/>
+<area shape="poly" title=" " alt="" coords="673,31,932,25,932,30,673,36"/>
+<area shape="rect" title=" " alt="" coords="229,73,315,98"/>
+<area shape="poly" title=" " alt="" coords="328,73,374,65,565,38,565,43,375,71,329,78"/>
+<area shape="rect" href="structComponentData.html" title="模型的组成单元：一个 ComponentData 表示模型中的一个物体部件" alt="" coords="1822,427,1950,453"/>
+<area shape="poly" title=" " alt="" coords="329,83,611,83,1478,83,1530,85,1575,91,1614,103,1649,119,1681,142,1711,171,1773,248,1783,266,1787,284,1786,316,1784,348,1788,365,1797,382,1822,408,1852,425,1850,430,1819,412,1793,386,1783,367,1779,349,1780,316,1782,284,1778,268,1768,251,1707,174,1678,146,1646,124,1612,108,1574,96,1530,90,1478,88,611,88,329,88"/>
+<area shape="rect" title=" " alt="" coords="520,245,704,285"/>
+<area shape="poly" title=" " alt="" coords="291,108,326,153,350,177,376,196,410,215,447,229,520,249,519,255,445,234,408,220,373,201,346,181,322,157,287,111"/>
+<area shape="rect" title=" " alt="" coords="5,65,144,105"/>
+<area shape="poly" title=" " alt="" coords="157,83,228,83,228,88,157,88"/>
+<area shape="rect" title=" " alt="" coords="193,449,351,474"/>
+<area shape="poly" title=" " alt="" coords="275,488,277,577,289,708,301,781,320,856,344,930,377,999,422,1068,445,1094,470,1115,498,1130,530,1141,567,1147,611,1149,2604,1149,2748,1150,2810,1155,2890,1168,2930,1179,2928,1185,2889,1173,2810,1160,2747,1155,2604,1155,611,1155,567,1153,529,1146,496,1135,467,1119,441,1098,417,1071,372,1001,340,932,315,858,296,782,284,709,272,577,270,488"/>
+<area shape="poly" title=" " alt="" coords="274,435,283,383,302,315,330,242,350,206,373,174,411,142,469,106,583,45,586,50,471,111,414,146,377,178,354,209,335,244,307,316,289,384,279,436"/>
+<area shape="poly" title=" " alt="" coords="349,444,471,425,541,419,611,416,1478,416,1666,422,1822,432,1821,437,1665,427,1478,421,611,421,541,424,472,430,349,449"/>
+<area shape="rect" href="structMeshData.html" title=" " alt="" coords="998,707,1086,733"/>
+<area shape="poly" title=" " alt="" coords="278,488,292,591,307,662,329,739,359,817,400,892,424,926,451,958,481,987,515,1012,553,1032,592,1041,631,1041,671,1034,711,1020,750,1000,826,948,896,887,955,824,1029,731,1033,735,959,828,899,891,830,953,753,1005,713,1025,672,1039,632,1047,591,1046,551,1037,512,1017,478,991,447,962,420,929,395,894,354,819,324,740,302,663,286,592,273,488"/>
+<area shape="rect" title=" " alt="" coords="513,326,711,381"/>
+<area shape="poly" title=" " alt="" coords="300,438,334,417,374,398,444,376,513,362,514,367,445,381,376,402,337,421,303,443"/>
+<area shape="rect" href="classMeshAdjacency.html" title=" " alt="" coords="1415,577,1539,602"/>
+<area shape="poly" title=" " alt="" coords="365,466,528,487,620,504,712,527,735,537,794,547,867,552,1039,556,1212,557,1346,563,1416,574,1416,579,1345,568,1212,562,1039,561,867,558,793,552,734,543,710,532,619,509,527,492,364,471"/>
+<area shape="rect" title=" " alt="" coords="2503,885,2702,939"/>
+<area shape="poly" title=" " alt="" coords="2653,946,2891,1131,2948,1180,2945,1184,2888,1135,2650,950"/>
+<area shape="rect" title=" " alt="" coords="2096,763,2305,803"/>
+<area shape="poly" title=" " alt="" coords="2278,804,2517,882,2516,887,2276,809"/>
+<area shape="poly" title=" " alt="" coords="1910,461,2183,761,2179,764,1906,465"/>
+<area shape="rect" title=" " alt="" coords="1369,691,1584,717"/>
+<area shape="poly" title=" " alt="" coords="1531,684,1645,639,1709,606,1769,567,1802,538,1832,506,1874,451,1878,455,1836,509,1806,542,1772,571,1712,611,1647,644,1533,689"/>
+<area shape="poly" title=" " alt="" coords="1083,736,1127,753,1177,765,1261,777,1298,774,1345,765,1376,756,1407,742,1455,714,1458,719,1409,747,1378,761,1346,771,1299,780,1261,782,1175,771,1126,758,1081,741"/>
+<area shape="poly" title=" " alt="" coords="1100,721,1153,722,1215,718,1281,708,1344,690,1369,675,1401,651,1459,600,1463,604,1404,655,1372,679,1346,694,1282,714,1216,724,1153,727,1100,727"/>
+<area shape="rect" title=" " alt="" coords="528,700,696,740"/>
+<area shape="poly" title=" " alt="" coords="710,717,998,717,998,723,710,723"/>
+<area shape="rect" title=" " alt="" coords="529,1075,695,1115"/>
+<area shape="poly" title=" " alt="" coords="708,1108,758,1109,810,1104,861,1091,906,1066,944,1029,974,985,997,937,1013,887,1032,795,1038,733,1043,733,1037,796,1019,888,1002,939,979,988,948,1033,910,1070,863,1096,811,1110,758,1114,708,1113"/>
+<area shape="rect" title=" " alt="" coords="535,542,689,597"/>
+<area shape="poly" title=" " alt="" coords="703,585,834,614,910,635,920,650,923,666,925,680,934,693,964,709,998,716,997,722,963,714,930,697,920,682,917,666,915,652,906,640,833,619,702,590"/>
+<area shape="rect" title=" " alt="" coords="535,621,689,675"/>
+<area shape="poly" title=" " alt="" coords="703,657,908,689,998,708,997,713,908,695,702,663"/>
+<area shape="poly" title=" " alt="" coords="718,283,842,309,888,320,910,329,919,343,925,361,929,405,923,513,916,620,921,663,926,680,934,693,947,704,963,712,998,719,997,724,961,717,944,709,930,696,921,682,915,664,911,620,917,512,924,405,919,362,914,345,906,333,886,325,841,314,717,288"/>
+<area shape="rect" title=" " alt="" coords="1377,248,1576,288"/>
+<area shape="poly" title=" " alt="" coords="1590,271,1637,279,1685,293,1731,314,1773,343,1783,360,1786,376,1788,391,1797,406,1827,425,1824,430,1793,410,1783,393,1780,377,1778,362,1769,347,1729,319,1683,298,1636,284,1589,276"/>
+<area shape="rect" href="structGeometryData.html" title=" " alt="" coords="983,175,1101,201"/>
+<area shape="poly" title=" " alt="" coords="1115,199,1378,247,1377,252,1114,204"/>
+<area shape="rect" title=" " alt="" coords="521,123,703,163"/>
+<area shape="poly" title=" " alt="" coords="718,145,908,161,983,173,982,179,908,167,717,150"/>
+<area shape="rect" href="structGeometrySubshapeIndex.html" title=" " alt="" coords="519,187,705,213"/>
+<area shape="poly" title=" " alt="" coords="719,194,982,187,982,192,719,200"/>
+<area shape="rect" title=" " alt="" coords="1377,340,1576,380"/>
+<area shape="poly" title=" " alt="" coords="1590,367,1679,379,1771,397,1850,425,1848,430,1770,403,1678,385,1589,373"/>
+<area shape="rect" href="structGeometryMeshMap.html" title="Geometry 子形状与 MeshData 局部拓扑之间的通用映射" alt="" coords="967,346,1117,371"/>
+<area shape="poly" title=" " alt="" coords="1131,356,1377,357,1377,362,1131,362"/>
+<area shape="poly" title=" " alt="" coords="725,370,735,371,821,375,908,371,966,366,967,371,908,376,821,380,734,376,724,375"/>
+<area shape="poly" title=" " alt="" coords="1525,569,1849,450,1851,455,1527,574"/>
+<area shape="rect" title=" " alt="" coords="938,579,1146,619"/>
+<area shape="poly" title=" " alt="" coords="1160,593,1414,588,1415,593,1160,599"/>
+<area shape="rect" title=" " alt="" coords="953,643,1131,683"/>
+<area shape="poly" title=" " alt="" coords="1144,662,1242,657,1345,641,1403,622,1451,600,1453,605,1405,627,1346,647,1243,663,1145,667"/>
+<area shape="rect" title=" " alt="" coords="2527,1189,2679,1229"/>
+<area shape="poly" title=" " alt="" coords="2692,1203,2913,1194,2913,1199,2693,1208"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="2553,1255,2652,1281"/>
+<area shape="poly" title=" " alt="" coords="2666,1272,2716,1275,2772,1273,2831,1265,2888,1250,2923,1229,2948,1205,2952,1209,2926,1233,2890,1254,2833,1271,2773,1278,2716,1280,2666,1278"/>
+<area shape="rect" title=" " alt="" coords="2095,1213,2307,1253"/>
+<area shape="poly" title=" " alt="" coords="2320,1241,2553,1261,2553,1266,2320,1246"/>
+<area shape="rect" title=" " alt="" coords="1795,1213,1977,1253"/>
+<area shape="poly" title=" " alt="" coords="1991,1231,2094,1231,2094,1236,1991,1236"/>
+<area shape="rect" title=" " alt="" coords="2129,1277,2272,1317"/>
+<area shape="poly" title=" " alt="" coords="2286,1296,2376,1294,2473,1288,2553,1276,2553,1281,2474,1293,2376,1300,2286,1301"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="2542,1309,2663,1334"/>
+<area shape="poly" title=" " alt="" coords="2677,1331,2727,1335,2782,1333,2837,1323,2888,1302,2913,1281,2932,1255,2955,1207,2960,1209,2937,1258,2917,1285,2891,1306,2838,1328,2782,1338,2727,1340,2677,1337"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="2545,1362,2660,1387"/>
+<area shape="poly" title=" " alt="" coords="2665,1388,2717,1395,2775,1397,2834,1388,2862,1378,2888,1363,2906,1347,2921,1328,2942,1284,2953,1240,2958,1207,2963,1208,2958,1241,2947,1285,2925,1331,2910,1351,2891,1368,2864,1382,2836,1393,2775,1402,2716,1401,2664,1393"/>
+<area shape="rect" title=" " alt="" coords="2497,1412,2708,1452"/>
+<area shape="poly" title=" " alt="" coords="2689,1452,2738,1458,2791,1458,2842,1448,2866,1438,2888,1425,2911,1402,2929,1374,2942,1343,2950,1311,2959,1251,2959,1207,2965,1208,2964,1251,2956,1313,2947,1345,2934,1377,2915,1405,2891,1429,2868,1443,2844,1453,2791,1463,2738,1464,2688,1457"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="2100,1419,2301,1445"/>
+<area shape="poly" title=" " alt="" coords="2315,1429,2497,1429,2497,1435,2315,1435"/>
+<area shape="rect" title=" " alt="" coords="3409,1205,3561,1245"/>
+<area shape="poly" title=" " alt="" coords="3575,1221,3660,1213,3749,1197,3790,1182,3792,1187,3750,1203,3661,1219,3575,1226"/>
+<area shape="rect" title=" " alt="" coords="3404,1270,3567,1325"/>
+<area shape="poly" title=" " alt="" coords="3580,1293,3665,1280,3708,1267,3748,1248,3767,1234,3784,1217,3807,1184,3812,1187,3788,1220,3771,1238,3751,1253,3710,1272,3666,1285,3581,1299"/>
+<area shape="rect" title=" " alt="" coords="3117,1285,3287,1310"/>
+<area shape="poly" title=" " alt="" coords="3300,1295,3404,1295,3404,1300,3300,1300"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:aab6367624db733c58760195c14f7c4b5" id="r_aab6367624db733c58760195c14f7c4b5"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab6367624db733c58760195c14f7c4b5">TreeRole</a> { <br />
+&#160;&#160;<a class="el" href="#aab6367624db733c58760195c14f7c4b5aa4cbb8ba7a8a9233883bcb1e7cea9130">NameRole</a> = Qt::UserRole + 1
+, <a class="el" href="#aab6367624db733c58760195c14f7c4b5a6191c5b5d65179da8aabb55b65768920">NumberRole</a>
+, <a class="el" href="#aab6367624db733c58760195c14f7c4b5a6d3106273bde13d32115e04f747334b5">NodeIdRole</a>
+, <a class="el" href="#aab6367624db733c58760195c14f7c4b5ab4e63735c06dd91a665960b96af3ba0f">IsVisibleRole</a>
+, <br />
+&#160;&#160;<a class="el" href="#aab6367624db733c58760195c14f7c4b5a4e340a7f798650084f2b87a073fb6e27">ComponentIdRole</a>
+, <a class="el" href="#aab6367624db733c58760195c14f7c4b5a53c23c7ccec2260a74ea335708b8a7aa">NodeTypeRole</a>
+<br />
+ }</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:aaf3785f824253b25b086bc8cc6692d1f" id="r_aaf3785f824253b25b086bc8cc6692d1f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf3785f824253b25b086bc8cc6692d1f">TreeModel</a> (QObject *<a class="el" href="#a7af800974f07f2246e8677c9c0a16394">parent</a>=nullptr)</td></tr>
+<tr class="memitem:af0998d55a63c2b18be1f03e4e8567926" id="r_af0998d55a63c2b18be1f03e4e8567926"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af0998d55a63c2b18be1f03e4e8567926">~TreeModel</a> ()</td></tr>
+<tr class="memitem:a708ec451d6a9dfda530e36284eae78c4" id="r_a708ec451d6a9dfda530e36284eae78c4"><td class="memItemLeft" align="right" valign="top">QModelIndex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a708ec451d6a9dfda530e36284eae78c4">index</a> (int row, int column, const QModelIndex &amp;<a class="el" href="#a7af800974f07f2246e8677c9c0a16394">parent</a>=QModelIndex()) const override</td></tr>
+<tr class="memitem:a7af800974f07f2246e8677c9c0a16394" id="r_a7af800974f07f2246e8677c9c0a16394"><td class="memItemLeft" align="right" valign="top">QModelIndex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7af800974f07f2246e8677c9c0a16394">parent</a> (const QModelIndex &amp;child) const override</td></tr>
+<tr class="memitem:a6aa892d5029263b35e5b1438b7e18bef" id="r_a6aa892d5029263b35e5b1438b7e18bef"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6aa892d5029263b35e5b1438b7e18bef">rowCount</a> (const QModelIndex &amp;<a class="el" href="#a7af800974f07f2246e8677c9c0a16394">parent</a>=QModelIndex()) const override</td></tr>
+<tr class="memitem:ac83e24d07fb82d8d14dbcc9d3beaa0ec" id="r_ac83e24d07fb82d8d14dbcc9d3beaa0ec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac83e24d07fb82d8d14dbcc9d3beaa0ec">columnCount</a> (const QModelIndex &amp;<a class="el" href="#a7af800974f07f2246e8677c9c0a16394">parent</a>=QModelIndex()) const override</td></tr>
+<tr class="memitem:aa78ce00412e354f39e946bc25738d028" id="r_aa78ce00412e354f39e946bc25738d028"><td class="memItemLeft" align="right" valign="top">QVariant&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa78ce00412e354f39e946bc25738d028">data</a> (const QModelIndex &amp;<a class="el" href="#a708ec451d6a9dfda530e36284eae78c4">index</a>, int role=Qt::DisplayRole) const override</td></tr>
+<tr class="memitem:a99c348b9c26c29b438e19af1aab3f63a" id="r_a99c348b9c26c29b438e19af1aab3f63a"><td class="memItemLeft" align="right" valign="top">QHash&lt; int, QByteArray &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a99c348b9c26c29b438e19af1aab3f63a">roleNames</a> () const override</td></tr>
+<tr class="memitem:ae48786145852f8e1052a75450ab27e44" id="r_ae48786145852f8e1052a75450ab27e44"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae48786145852f8e1052a75450ab27e44">refresh</a> ()</td></tr>
+<tr class="memitem:a73844970c5827a1429c341ad58b9c849" id="r_a73844970c5827a1429c341ad58b9c849"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73844970c5827a1429c341ad58b9c849">setVisibility</a> (const QModelIndex &amp;idx, bool visible)</td></tr>
+<tr class="memitem:a856e0a0770784805a92c4c2ec1ead38a" id="r_a856e0a0770784805a92c4c2ec1ead38a"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE QModelIndex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a856e0a0770784805a92c4c2ec1ead38a">findIndexByNodeId</a> (int nodeId, int depth) const</td></tr>
+<tr class="memitem:a936fc094472c4670f1e3be25c274afd4" id="r_a936fc094472c4670f1e3be25c274afd4"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a936fc094472c4670f1e3be25c274afd4">setAllVisibility</a> (bool visible)</td></tr>
+<tr class="memitem:aff64ec5c6c13a3976e9c33d21f75f441" id="r_aff64ec5c6c13a3976e9c33d21f75f441"><td class="memItemLeft" align="right" valign="top">QObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff64ec5c6c13a3976e9c33d21f75f441">getModelQuery</a> () const</td></tr>
+<tr class="memitem:ae8c22a64a5792e32c247cac76b8f486d" id="r_ae8c22a64a5792e32c247cac76b8f486d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8c22a64a5792e32c247cac76b8f486d">setModelQuery</a> (QObject *query)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-properties" class="groupheader"><a id="properties" name="properties"></a>
+属性</h2></td></tr>
+<tr class="memitem:a4e92093bec57c9e8ecbe400c5f58215f" id="r_a4e92093bec57c9e8ecbe400c5f58215f"><td class="memItemLeft" align="right" valign="top">QObject *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4e92093bec57c9e8ecbe400c5f58215f">modelQuery</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a068068c71d4a20b98e2a48724fce5b2c" id="r_a068068c71d4a20b98e2a48724fce5b2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTreeNode.html">TreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a068068c71d4a20b98e2a48724fce5b2c">getNode</a> (const QModelIndex &amp;<a class="el" href="#a708ec451d6a9dfda530e36284eae78c4">index</a>) const</td></tr>
+<tr class="memitem:a62bec23ec113129c36f4728814460db0" id="r_a62bec23ec113129c36f4728814460db0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62bec23ec113129c36f4728814460db0">emitDescendantDataChanged</a> (const QModelIndex &amp;parentIndex)</td></tr>
+<tr class="memitem:a7fe84c9ef47b8d65942ac260e236577c" id="r_a7fe84c9ef47b8d65942ac260e236577c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fe84c9ef47b8d65942ac260e236577c">setComponentVisibility</a> (<a class="el" href="structTreeNode.html">TreeNode</a> *node, bool visible)</td></tr>
+<tr class="memitem:a2c43f8c1318d19eca36208c562cb9204" id="r_a2c43f8c1318d19eca36208c562cb9204"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c43f8c1318d19eca36208c562cb9204">syncSubNodes</a> (<a class="el" href="structTreeNode.html">TreeNode</a> *node)</td></tr>
+<tr class="memitem:aa7574a1e9fa97b69cd67139902fc806b" id="r_aa7574a1e9fa97b69cd67139902fc806b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7574a1e9fa97b69cd67139902fc806b">propagateUp</a> (<a class="el" href="structTreeNode.html">TreeNode</a> *node)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:aac53582cfe69fe0c2e15f7c2217e295d" id="r_aac53582cfe69fe0c2e15f7c2217e295d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structTreeNode.html">TreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac53582cfe69fe0c2e15f7c2217e295d">rootNode</a> = nullptr</td></tr>
+<tr class="memitem:a8e19857d7cd8b9b52d4f64cb3dc582fe" id="r_a8e19857d7cd8b9b52d4f64cb3dc582fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQModelQuery.html">QModelQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e19857d7cd8b9b52d4f64cb3dc582fe">modelQuery_</a> = nullptr</td></tr>
+<tr class="memitem:a12106fcc009752bf64722ca427f55e03" id="r_a12106fcc009752bf64722ca427f55e03"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; int, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12106fcc009752bf64722ca427f55e03">components_visibility_</a></td></tr>
+<tr class="memitem:af05a328f23108e526967c3502f9ecf16" id="r_af05a328f23108e526967c3502f9ecf16"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; int, std::pair&lt; bool, bool &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af05a328f23108e526967c3502f9ecf16">sub_visibility_</a></td></tr>
+</table>
+<a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">成员枚举类型说明</h2>
+<a id="aab6367624db733c58760195c14f7c4b5" name="aab6367624db733c58760195c14f7c4b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab6367624db733c58760195c14f7c4b5">&#9670;&#160;</a></span>TreeRole</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#aab6367624db733c58760195c14f7c4b5">TreeModel::TreeRole</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5aa4cbb8ba7a8a9233883bcb1e7cea9130" name="aab6367624db733c58760195c14f7c4b5aa4cbb8ba7a8a9233883bcb1e7cea9130"></a>NameRole&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5a6191c5b5d65179da8aabb55b65768920" name="aab6367624db733c58760195c14f7c4b5a6191c5b5d65179da8aabb55b65768920"></a>NumberRole&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5a6d3106273bde13d32115e04f747334b5" name="aab6367624db733c58760195c14f7c4b5a6d3106273bde13d32115e04f747334b5"></a>NodeIdRole&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5ab4e63735c06dd91a665960b96af3ba0f" name="aab6367624db733c58760195c14f7c4b5ab4e63735c06dd91a665960b96af3ba0f"></a>IsVisibleRole&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5a4e340a7f798650084f2b87a073fb6e27" name="aab6367624db733c58760195c14f7c4b5a4e340a7f798650084f2b87a073fb6e27"></a>ComponentIdRole&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="aab6367624db733c58760195c14f7c4b5a53c23c7ccec2260a74ea335708b8a7aa" name="aab6367624db733c58760195c14f7c4b5a53c23c7ccec2260a74ea335708b8a7aa"></a>NodeTypeRole&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="aaf3785f824253b25b086bc8cc6692d1f" name="aaf3785f824253b25b086bc8cc6692d1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf3785f824253b25b086bc8cc6692d1f">&#9670;&#160;</a></span>TreeModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">TreeModel::TreeModel </td>
+          <td>(</td>
+          <td class="paramtype">QObject *</td>          <td class="paramname"><span class="paramname"><em>parent</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af0998d55a63c2b18be1f03e4e8567926" name="af0998d55a63c2b18be1f03e4e8567926"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0998d55a63c2b18be1f03e4e8567926">&#9670;&#160;</a></span>~TreeModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TreeModel::~TreeModel </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ac83e24d07fb82d8d14dbcc9d3beaa0ec" name="ac83e24d07fb82d8d14dbcc9d3beaa0ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac83e24d07fb82d8d14dbcc9d3beaa0ec">&#9670;&#160;</a></span>columnCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TreeModel::columnCount </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>parent</em></span><span class="paramdefsep"> = </span><span class="paramdefval">QModelIndex()</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa78ce00412e354f39e946bc25738d028" name="aa78ce00412e354f39e946bc25738d028"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa78ce00412e354f39e946bc25738d028">&#9670;&#160;</a></span>data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QVariant TreeModel::data </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>index</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>role</em></span><span class="paramdefsep"> = </span><span class="paramdefval">Qt::DisplayRole</span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a62bec23ec113129c36f4728814460db0" name="a62bec23ec113129c36f4728814460db0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62bec23ec113129c36f4728814460db0">&#9670;&#160;</a></span>emitDescendantDataChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::emitDescendantDataChanged </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>parentIndex</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a856e0a0770784805a92c4c2ec1ead38a" name="a856e0a0770784805a92c4c2ec1ead38a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a856e0a0770784805a92c4c2ec1ead38a">&#9670;&#160;</a></span>findIndexByNodeId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QModelIndex TreeModel::findIndexByNodeId </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nodeId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>depth</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff64ec5c6c13a3976e9c33d21f75f441" name="aff64ec5c6c13a3976e9c33d21f75f441"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff64ec5c6c13a3976e9c33d21f75f441">&#9670;&#160;</a></span>getModelQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QObject * TreeModel::getModelQuery </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a068068c71d4a20b98e2a48724fce5b2c" name="a068068c71d4a20b98e2a48724fce5b2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068068c71d4a20b98e2a48724fce5b2c">&#9670;&#160;</a></span>getNode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structTreeNode.html">TreeNode</a> * TreeModel::getNode </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>index</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a708ec451d6a9dfda530e36284eae78c4" name="a708ec451d6a9dfda530e36284eae78c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a708ec451d6a9dfda530e36284eae78c4">&#9670;&#160;</a></span>index()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QModelIndex TreeModel::index </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>row</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>column</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>parent</em></span><span class="paramdefsep"> = </span><span class="paramdefval">QModelIndex()</span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7af800974f07f2246e8677c9c0a16394" name="a7af800974f07f2246e8677c9c0a16394"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7af800974f07f2246e8677c9c0a16394">&#9670;&#160;</a></span>parent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QModelIndex TreeModel::parent </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>child</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa7574a1e9fa97b69cd67139902fc806b" name="aa7574a1e9fa97b69cd67139902fc806b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7574a1e9fa97b69cd67139902fc806b">&#9670;&#160;</a></span>propagateUp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::propagateUp </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTreeNode.html">TreeNode</a> *</td>          <td class="paramname"><span class="paramname"><em>node</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae48786145852f8e1052a75450ab27e44" name="ae48786145852f8e1052a75450ab27e44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae48786145852f8e1052a75450ab27e44">&#9670;&#160;</a></span>refresh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TreeModel::refresh </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a99c348b9c26c29b438e19af1aab3f63a" name="a99c348b9c26c29b438e19af1aab3f63a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99c348b9c26c29b438e19af1aab3f63a">&#9670;&#160;</a></span>roleNames()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QHash&lt; int, QByteArray &gt; TreeModel::roleNames </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6aa892d5029263b35e5b1438b7e18bef" name="a6aa892d5029263b35e5b1438b7e18bef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6aa892d5029263b35e5b1438b7e18bef">&#9670;&#160;</a></span>rowCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int TreeModel::rowCount </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>parent</em></span><span class="paramdefsep"> = </span><span class="paramdefval">QModelIndex()</span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a936fc094472c4670f1e3be25c274afd4" name="a936fc094472c4670f1e3be25c274afd4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a936fc094472c4670f1e3be25c274afd4">&#9670;&#160;</a></span>setAllVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::setAllVisibility </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visible</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7fe84c9ef47b8d65942ac260e236577c" name="a7fe84c9ef47b8d65942ac260e236577c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fe84c9ef47b8d65942ac260e236577c">&#9670;&#160;</a></span>setComponentVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::setComponentVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTreeNode.html">TreeNode</a> *</td>          <td class="paramname"><span class="paramname"><em>node</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visible</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8c22a64a5792e32c247cac76b8f486d" name="ae8c22a64a5792e32c247cac76b8f486d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8c22a64a5792e32c247cac76b8f486d">&#9670;&#160;</a></span>setModelQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::setModelQuery </td>
+          <td>(</td>
+          <td class="paramtype">QObject *</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a73844970c5827a1429c341ad58b9c849" name="a73844970c5827a1429c341ad58b9c849"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73844970c5827a1429c341ad58b9c849">&#9670;&#160;</a></span>setVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool TreeModel::setVisibility </td>
+          <td>(</td>
+          <td class="paramtype">const QModelIndex &amp;</td>          <td class="paramname"><span class="paramname"><em>idx</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visible</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2c43f8c1318d19eca36208c562cb9204" name="a2c43f8c1318d19eca36208c562cb9204"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c43f8c1318d19eca36208c562cb9204">&#9670;&#160;</a></span>syncSubNodes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void TreeModel::syncSubNodes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTreeNode.html">TreeNode</a> *</td>          <td class="paramname"><span class="paramname"><em>node</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a12106fcc009752bf64722ca427f55e03" name="a12106fcc009752bf64722ca427f55e03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12106fcc009752bf64722ca427f55e03">&#9670;&#160;</a></span>components_visibility_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;int, bool&gt; TreeModel::components_visibility_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8e19857d7cd8b9b52d4f64cb3dc582fe" name="a8e19857d7cd8b9b52d4f64cb3dc582fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e19857d7cd8b9b52d4f64cb3dc582fe">&#9670;&#160;</a></span>modelQuery_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classQModelQuery.html">QModelQuery</a>* TreeModel::modelQuery_ = nullptr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aac53582cfe69fe0c2e15f7c2217e295d" name="aac53582cfe69fe0c2e15f7c2217e295d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac53582cfe69fe0c2e15f7c2217e295d">&#9670;&#160;</a></span>rootNode</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structTreeNode.html">TreeNode</a>* TreeModel::rootNode = nullptr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af05a328f23108e526967c3502f9ecf16" name="af05a328f23108e526967c3502f9ecf16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af05a328f23108e526967c3502f9ecf16">&#9670;&#160;</a></span>sub_visibility_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;int, std::pair&lt;bool, bool&gt; &gt; TreeModel::sub_visibility_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-property-members" id="doc-property-members"></a><h2 id="header-doc-property-members" class="groupheader">属性说明</h2>
+<a id="a4e92093bec57c9e8ecbe400c5f58215f" name="a4e92093bec57c9e8ecbe400c5f58215f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e92093bec57c9e8ecbe400c5f58215f">&#9670;&#160;</a></span>modelQuery</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QObject* TreeModel::modelQuery</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span><span class="mlabel write">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>app/<a class="el" href="TreeModel_8h_source.html">TreeModel.h</a></li>
+<li>app/<a class="el" href="TreeModel_8cpp.html">TreeModel.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

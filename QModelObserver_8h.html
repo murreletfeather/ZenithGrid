@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/model/QModelObserver.h 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_7264f15838153470b7a2e9ca1ba7b2a9.html">model</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a>  </div>
+  <div class="headertitle"><div class="title">QModelObserver.h 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="Core_8h_source.html">Core.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ModelObserver_8h_source.html">ModelObserver.h</a>&quot;</code><br />
+<code>#include &lt;QObject&gt;</code><br />
+<code>#include &lt;qqmlintegration.h&gt;</code><br />
+<code>#include &lt;unordered_set&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+QModelObserver.h 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="QModelObserver_8h__incl.png" border="0" usemap="#aapp_2model_2QModelObserver_8h" loading="lazy" alt=""/></div>
+<map name="aapp_2model_2QModelObserver_8h" id="aapp_2model_2QModelObserver_8h">
+<area shape="rect" title=" " alt="" coords="361,5,575,31"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="204,152,268,177"/>
+<area shape="poly" title=" " alt="" coords="361,32,309,50,284,63,263,81,253,93,247,108,240,139,235,138,242,106,249,91,259,77,281,59,306,45,359,27"/>
+<area shape="rect" href="ModelObserver_8h.html" title=" " alt="" coords="274,79,406,104"/>
+<area shape="poly" title=" " alt="" coords="449,33,374,74,372,69,446,28"/>
+<area shape="rect" title=" " alt="" coords="431,79,505,104"/>
+<area shape="poly" title=" " alt="" coords="471,31,471,65,465,65,465,31"/>
+<area shape="rect" title=" " alt="" coords="529,79,668,104"/>
+<area shape="poly" title=" " alt="" coords="490,28,567,70,564,74,488,33"/>
+<area shape="rect" title=" " alt="" coords="692,79,807,104"/>
+<area shape="poly" title=" " alt="" coords="514,28,691,73,690,78,513,33"/>
+<area shape="rect" title=" " alt="" coords="5,225,61,251"/>
+<area shape="poly" title=" " alt="" coords="205,180,75,225,73,220,203,175"/>
+<area shape="rect" title=" " alt="" coords="85,225,136,251"/>
+<area shape="poly" title=" " alt="" coords="217,180,144,221,142,216,215,175"/>
+<area shape="rect" title=" " alt="" coords="160,225,237,251"/>
+<area shape="poly" title=" " alt="" coords="232,179,213,215,209,212,227,176"/>
+<area shape="rect" title=" " alt="" coords="349,225,408,251"/>
+<area shape="poly" title=" " alt="" coords="260,175,344,217,342,221,258,180"/>
+<area shape="rect" title=" " alt="" coords="262,225,325,251"/>
+<area shape="poly" title=" " alt="" coords="248,176,277,213,273,216,243,179"/>
+<area shape="poly" title=" " alt="" coords="325,106,266,146,263,142,322,102"/>
+<area shape="poly" title=" " alt="" coords="346,104,375,211,369,213,341,105"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+此图展示该文件被哪些文件直接或间接地引用了:</div>
+<div class="dyncontent">
+<div class="center"><img src="QModelObserver_8h__dep__incl.png" border="0" usemap="#aapp_2model_2QModelObserver_8hdep" loading="lazy" alt=""/></div>
+<map name="aapp_2model_2QModelObserver_8hdep" id="aapp_2model_2QModelObserver_8hdep">
+<area shape="rect" title=" " alt="" coords="109,5,324,31"/>
+<area shape="rect" href="QModelManager_8cpp.html" title=" " alt="" coords="5,152,233,177"/>
+<area shape="poly" title=" " alt="" coords="203,44,129,153,125,150,199,41"/>
+<area shape="rect" href="QModelManager_8h.html" title=" " alt="" coords="206,79,419,104"/>
+<area shape="poly" title=" " alt="" coords="245,37,299,76,295,81,242,41"/>
+<area shape="poly" title=" " alt="" coords="270,111,152,154,150,149,268,106"/>
+<area shape="rect" href="main_8cpp.html" title=" " alt="" coords="257,152,368,177"/>
+<area shape="poly" title=" " alt="" coords="315,118,315,152,310,152,310,118"/>
+<area shape="rect" href="TestQModelDeletion_8cpp.html" title="Qt 删除入口的忙时拒绝与撤销状态通知回归测试" alt="" coords="393,152,630,177"/>
+<area shape="poly" title=" " alt="" coords="358,106,480,149,478,154,357,111"/>
+<area shape="rect" href="TestUndoQml_8cpp.html" title="实际 QML 删除与选择器失效路径回归测试" alt="" coords="655,152,848,177"/>
+<area shape="poly" title=" " alt="" coords="397,104,681,149,680,155,396,109"/>
+</map>
+</div>
+</div>
+<p><a href="QModelObserver_8h_source.html">浏览该文件的源代码.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:QModelObserver" id="r_QModelObserver"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classQModelObserver.html">QModelObserver</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">QModelObserver：用于监听模型数据更改并向外通知的观察者类  <a href="classQModelObserver.html#details">更多...</a><br /></td></tr>
+</table>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

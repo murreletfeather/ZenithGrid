@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/model/QArgObject.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_7264f15838153470b7a2e9ca1ba7b2a9.html">model</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">QArgObject.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="QArgObject_8h_source.html">QArgObject.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ArgObject_8h_source.html">ArgObject.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="QSelection_8h_source.html">QSelection.h</a>&quot;</code><br />
+<code>#include &lt;QFileInfo&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+QArgObject.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="QArgObject_8cpp__incl.png" border="0" usemap="#aapp_2model_2QArgObject_8cpp" loading="lazy" alt=""/></div>
+<map name="aapp_2model_2QArgObject_8cpp" id="aapp_2model_2QArgObject_8cpp">
+<area shape="rect" title=" " alt="" coords="630,5,826,31"/>
+<area shape="rect" href="QArgObject_8h.html" title=" " alt="" coords="721,79,829,104"/>
+<area shape="poly" title=" " alt="" coords="738,30,762,66,757,69,733,32"/>
+<area shape="rect" href="ArgObject_8h.html" title=" " alt="" coords="633,152,732,177"/>
+<area shape="poly" title=" " alt="" coords="727,32,711,79,692,139,687,138,705,78,722,30"/>
+<area shape="rect" href="QSelection_8h.html" title=" " alt="" coords="247,79,351,104"/>
+<area shape="poly" title=" " alt="" coords="659,33,365,82,364,77,659,28"/>
+<area shape="rect" title=" " alt="" coords="853,79,933,104"/>
+<area shape="poly" title=" " alt="" coords="756,28,855,71,853,76,754,33"/>
+<area shape="poly" title=" " alt="" coords="762,106,710,146,707,141,758,102"/>
+<area shape="rect" title=" " alt="" coords="860,152,956,177"/>
+<area shape="poly" title=" " alt="" coords="797,102,875,143,873,148,795,106"/>
+<area shape="rect" title=" " alt="" coords="757,152,835,177"/>
+<area shape="poly" title=" " alt="" coords="781,104,791,138,786,140,776,105"/>
+<area shape="rect" href="ArgType_8h.html" title="用于模型层描述功能参数类型" alt="" coords="639,225,726,251"/>
+<area shape="poly" title=" " alt="" coords="685,178,685,212,680,212,680,178"/>
+<area shape="rect" title=" " alt="" coords="750,225,797,251"/>
+<area shape="poly" title=" " alt="" coords="699,175,749,214,746,219,696,179"/>
+<area shape="rect" title=" " alt="" coords="865,299,956,324"/>
+<area shape="poly" title=" " alt="" coords="720,248,861,292,860,297,719,253"/>
+<area shape="rect" title=" " alt="" coords="583,299,641,324"/>
+<area shape="poly" title=" " alt="" coords="673,253,635,291,631,287,669,249"/>
+<area shape="rect" href="private__ArgTypeEnum_8h.html" title="参数类型枚举类定义，只被ArgType.h和QArgType.h.in使用。" alt="" coords="665,299,841,324"/>
+<area shape="poly" title=" " alt="" coords="696,249,734,287,730,291,692,253"/>
+<area shape="rect" title=" " alt="" coords="5,152,80,177"/>
+<area shape="poly" title=" " alt="" coords="258,107,94,152,93,147,257,101"/>
+<area shape="rect" title=" " alt="" coords="104,152,205,177"/>
+<area shape="poly" title=" " alt="" coords="277,106,192,148,189,143,274,102"/>
+<area shape="rect" title=" " alt="" coords="229,152,368,177"/>
+<area shape="poly" title=" " alt="" coords="301,104,301,138,296,138,296,104"/>
+<area shape="rect" href="Selection_8h.html" title=" " alt="" coords="393,152,487,177"/>
+<area shape="poly" title=" " alt="" coords="323,102,406,143,404,148,320,106"/>
+<area shape="rect" title=" " alt="" coords="239,299,302,324"/>
+<area shape="poly" title=" " alt="" coords="428,180,296,292,293,287,424,176"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="408,225,472,251"/>
+<area shape="poly" title=" " alt="" coords="443,178,443,212,437,212,437,178"/>
+<area shape="poly" title=" " alt="" coords="469,248,572,291,570,296,467,253"/>
+<area shape="poly" title=" " alt="" coords="414,253,312,296,310,291,412,248"/>
+<area shape="rect" title=" " alt="" coords="503,299,559,324"/>
+<area shape="poly" title=" " alt="" coords="456,249,507,288,503,292,453,253"/>
+<area shape="rect" title=" " alt="" coords="327,299,377,324"/>
+<area shape="poly" title=" " alt="" coords="428,253,379,292,375,288,424,249"/>
+<area shape="rect" title=" " alt="" coords="401,299,479,324"/>
+<area shape="poly" title=" " alt="" coords="443,251,443,285,437,285,437,251"/>
+</map>
+</div>
+</div></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

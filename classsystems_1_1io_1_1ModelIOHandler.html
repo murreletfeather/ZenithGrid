@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: systems::io::ModelIOHandler类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesystems.html">systems</a></li><li class="navelem"><a href="namespacesystems_1_1io.html">io</a></li><li class="navelem"><a href="classsystems_1_1io_1_1ModelIOHandler.html">ModelIOHandler</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="classsystems_1_1io_1_1ModelIOHandler-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">systems::io::ModelIOHandler类 参考<span class="mlabels"><span class="mlabel abstract">abstract</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>模型IO系统的功能接口，继承他来实现具体的模型读写功能  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="ModelIOHandler_8h_source.html">ModelIOHandler.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a63e74b9e431c9d7642e3b19418c9152f" id="r_a63e74b9e431c9d7642e3b19418c9152f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a63e74b9e431c9d7642e3b19418c9152f">~ModelIOHandler</a> ()=default</td></tr>
+<tr class="memitem:ac1290ae25d6603e80d61deace966f25f" id="r_ac1290ae25d6603e80d61deace966f25f"><td class="memItemLeft" align="right" valign="top">virtual std::optional&lt; <a class="el" href="structModelPayload.html">ModelPayload</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1290ae25d6603e80d61deace966f25f">read_model</a> (const fs::path &amp;<a class="el" href="TestObjMeshIO_8cpp.html#ab972f994f7bb41f885fdf2268e4a8799">path</a>, const std::vector&lt; std::any &gt; &amp;args)=0</td></tr>
+<tr class="memdesc:ac1290ae25d6603e80d61deace966f25f"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取模型功能  <br /></td></tr>
+<tr class="memitem:ae1e8e54e616dd14374667a1d0b3f24c9" id="r_ae1e8e54e616dd14374667a1d0b3f24c9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1e8e54e616dd14374667a1d0b3f24c9">write_components</a> (const <a class="el" href="classModelLayer.html">ModelLayer</a> &amp;mgr, const std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &amp;component_ids, const fs::path &amp;<a class="el" href="TestObjMeshIO_8cpp.html#ab972f994f7bb41f885fdf2268e4a8799">path</a>, const std::vector&lt; std::any &gt; &amp;args)=0</td></tr>
+<tr class="memdesc:ae1e8e54e616dd14374667a1d0b3f24c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">写出组件集合到文件  <br /></td></tr>
+<tr class="memitem:a0bc0c1aa034d9f1f60051d67656ddd7a" id="r_a0bc0c1aa034d9f1f60051d67656ddd7a"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0bc0c1aa034d9f1f60051d67656ddd7a">read_args_type</a> () const =0</td></tr>
+<tr class="memdesc:a0bc0c1aa034d9f1f60051d67656ddd7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">读取文件参数类型，交给UI使用  <br /></td></tr>
+<tr class="memitem:a74a010ff84f38dce321a891122aa8d12" id="r_a74a010ff84f38dce321a891122aa8d12"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74a010ff84f38dce321a891122aa8d12">write_args_type</a> () const =0</td></tr>
+<tr class="memdesc:a74a010ff84f38dce321a891122aa8d12"><td class="mdescLeft">&#160;</td><td class="mdescRight">写出文件参数类型，交给UI使用  <br /></td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>模型IO系统的功能接口，继承他来实现具体的模型读写功能 </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a63e74b9e431c9d7642e3b19418c9152f" name="a63e74b9e431c9d7642e3b19418c9152f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63e74b9e431c9d7642e3b19418c9152f">&#9670;&#160;</a></span>~ModelIOHandler()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual systems::io::ModelIOHandler::~ModelIOHandler </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel virtual">virtual</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a0bc0c1aa034d9f1f60051d67656ddd7a" name="a0bc0c1aa034d9f1f60051d67656ddd7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bc0c1aa034d9f1f60051d67656ddd7a">&#9670;&#160;</a></span>read_args_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt; systems::io::ModelIOHandler::read_args_type </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>读取文件参数类型，交给UI使用 </p>
+<dl class="section return"><dt>返回</dt><dd>返回参数类型列表 TODO: 待存放到元数据 </dd></dl>
+
+</div>
+</div>
+<a id="ac1290ae25d6603e80d61deace966f25f" name="ac1290ae25d6603e80d61deace966f25f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1290ae25d6603e80d61deace966f25f">&#9670;&#160;</a></span>read_model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::optional&lt; <a class="el" href="structModelPayload.html">ModelPayload</a> &gt; systems::io::ModelIOHandler::read_model </td>
+          <td>(</td>
+          <td class="paramtype">const fs::path &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::any &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>读取模型功能 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>待读取文件路径，本地系统环境编码 </td></tr>
+    <tr><td class="paramname">args</td><td>读取文件要传入参数 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>构造的模型数据对象 </dd></dl>
+
+</div>
+</div>
+<a id="a74a010ff84f38dce321a891122aa8d12" name="a74a010ff84f38dce321a891122aa8d12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74a010ff84f38dce321a891122aa8d12">&#9670;&#160;</a></span>write_args_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt; <a class="el" href="structcore_1_1ArgType.html">core::ArgType</a> &gt; systems::io::ModelIOHandler::write_args_type </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>写出文件参数类型，交给UI使用 </p>
+<dl class="section return"><dt>返回</dt><dd>返回参数类型列表 TODO: 待存放到元数据 </dd></dl>
+
+</div>
+</div>
+<a id="ae1e8e54e616dd14374667a1d0b3f24c9" name="ae1e8e54e616dd14374667a1d0b3f24c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1e8e54e616dd14374667a1d0b3f24c9">&#9670;&#160;</a></span>write_components()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void systems::io::ModelIOHandler::write_components </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classModelLayer.html">ModelLayer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mgr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>component_ids</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const fs::path &amp;</td>          <td class="paramname"><span class="paramname"><em>path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::any &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>写出组件集合到文件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mgr</td><td>ModelLayer（运行期权威：component pool + 点/边全局 id 映射） </td></tr>
+    <tr><td class="paramname">component_ids</td><td>要写出的组件 id 集合 </td></tr>
+    <tr><td class="paramname">path</td><td>写出文件目标路径 </td></tr>
+    <tr><td class="paramname">args</td><td>写出文件要传入参数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/systems/io/<a class="el" href="ModelIOHandler_8h_source.html">ModelIOHandler.h</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

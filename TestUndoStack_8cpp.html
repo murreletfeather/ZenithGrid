@@ -1,0 +1,1072 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: model/data/test/TestUndoStack.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_3f14f6767c31cb4a1d22c13c18cc6fc3.html">model</a></li><li class="navelem"><a href="dir_84846e69b963a5367080adb8af90c8fe.html">data</a></li><li class="navelem"><a href="dir_a2500666a617fcb70f7565c3cb90ec66.html">test</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle"><div class="title">TestUndoStack.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><a class="el" href="classUndoStack.html">UndoStack</a> 单元测试：边界自动记录、结构记录、插件层会话、执行路径完备性  
+<a href="#details">更多...</a></p>
+<div class="textblock"><code>#include &quot;<a class="el" href="ComponentData_8h_source.html">ComponentData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ComponentOperator_8h_source.html">ComponentOperator.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeometryData_8h_source.html">GeometryData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="MeshData_8h_source.html">MeshData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="MeshIDMap_8h_source.html">MeshIDMap.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ModelLayer_8h_source.html">ModelLayer.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ModelObserver_8h_source.html">ModelObserver.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="ModelScope_8h_source.html">ModelScope.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="UndoStack_8h_source.html">UndoStack.h</a>&quot;</code><br />
+<code>#include &lt;functional&gt;</code><br />
+<code>#include &lt;BRepPrimAPI_MakeBox.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Shape.hxx&gt;</code><br />
+<code>#include &lt;catch2/catch_test_macros.hpp&gt;</code><br />
+<code>#include &lt;array&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+<code>#include &lt;stdexcept&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
+<code>#include &lt;type_traits&gt;</code><br />
+<code>#include &lt;utility&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+TestUndoStack.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="TestUndoStack_8cpp__incl.png" border="0" usemap="#amodel_2data_2test_2TestUndoStack_8cpp" loading="lazy" alt=""/></div>
+<map name="amodel_2data_2test_2TestUndoStack_8cpp" id="amodel_2data_2test_2TestUndoStack_8cpp">
+<area shape="rect" title="UndoStack 单元测试：边界自动记录、结构记录、插件层会话、执行路径完备性" alt="" coords="2453,5,2643,45"/>
+<area shape="rect" href="ComponentData_8h.html" title=" " alt="" coords="2579,460,2719,485"/>
+<area shape="poly" title=" " alt="" coords="2573,44,2598,68,2624,99,2644,136,2650,157,2652,178,2652,327,2652,446,2647,446,2647,327,2647,178,2645,158,2639,139,2619,102,2594,71,2570,47"/>
+<area shape="rect" title=" " alt="" coords="1340,680,1396,705"/>
+<area shape="poly" title=" " alt="" coords="2453,30,1876,37,1476,46,1056,60,658,79,323,105,192,121,92,138,29,158,13,168,8,179,8,547,11,575,19,596,34,613,57,630,87,641,134,651,272,667,451,678,654,685,1054,690,1326,689,1326,694,1054,695,654,690,451,683,271,672,133,656,86,646,55,634,30,617,14,599,5,577,3,547,3,177,9,165,27,153,91,133,191,115,323,100,658,74,1056,54,1476,41,1876,32,2453,25"/>
+<area shape="rect" title=" " alt="" coords="2647,680,2724,705"/>
+<area shape="poly" title=" " alt="" coords="2643,27,2915,40,3083,51,3253,66,3409,86,3539,110,3590,125,3629,140,3653,158,3660,168,3663,178,3663,548,3659,571,3650,589,3636,602,3618,611,3574,622,3523,635,3450,651,3358,661,3141,669,2919,673,2820,676,2738,683,2738,677,2820,671,2919,667,3141,664,3358,655,3450,645,3522,629,3572,617,3616,606,3633,598,3646,586,3654,570,3657,547,3657,178,3655,170,3650,161,3626,145,3588,130,3538,116,3409,91,3252,72,3083,57,2915,45,2643,32"/>
+<area shape="rect" title=" " alt="" coords="3327,680,3385,705"/>
+<area shape="poly" title=" " alt="" coords="2643,23,2908,24,3243,32,3404,41,3544,53,3650,69,3686,79,3709,91,3769,142,3818,194,3856,249,3882,305,3895,364,3894,426,3877,492,3845,560,3819,593,3790,611,3714,635,3628,659,3541,676,3399,692,3399,686,3541,671,3627,654,3713,629,3788,606,3815,589,3840,557,3872,490,3889,426,3890,365,3877,307,3851,251,3814,198,3765,146,3707,96,3684,84,3649,74,3543,58,3404,46,3243,38,2908,30,2643,29"/>
+<area shape="rect" title=" " alt="" coords="1438,680,1501,705"/>
+<area shape="poly" title=" " alt="" coords="2453,28,2077,30,1834,36,1583,48,1349,66,1245,79,1154,93,1078,111,1020,131,984,154,975,166,972,178,972,401,974,443,982,479,994,510,1011,536,1034,560,1061,583,1129,630,1167,650,1200,663,1231,669,1261,671,1327,670,1365,672,1408,677,1425,680,1424,686,1408,683,1364,677,1327,675,1261,676,1230,674,1198,668,1164,655,1127,634,1057,587,1030,564,1007,540,989,512,977,481,969,444,967,401,967,178,970,163,980,150,1018,126,1076,106,1153,88,1244,73,1348,61,1583,42,1833,31,2077,25,2453,23"/>
+<area shape="rect" href="MeshData_8h.html" title=" " alt="" coords="2451,533,2551,559"/>
+<area shape="poly" title=" " alt="" coords="2526,47,2502,71,2477,102,2457,139,2451,158,2449,178,2449,401,2453,434,2463,467,2489,521,2484,523,2458,469,2448,435,2444,401,2444,178,2446,157,2452,136,2472,99,2498,68,2523,44"/>
+<area shape="rect" href="ComponentOperator_8h.html" title=" " alt="" coords="1256,533,1421,559"/>
+<area shape="poly" title=" " alt="" coords="2453,32,2258,40,2017,52,1785,71,1690,83,1618,96,1511,116,1425,133,1387,146,1352,167,1318,198,1285,241,1269,277,1262,315,1264,354,1272,394,1298,466,1326,520,1322,523,1293,468,1267,395,1259,355,1257,315,1264,275,1280,239,1314,194,1348,163,1385,141,1423,127,1510,111,1617,91,1689,77,1785,66,2017,47,2258,34,2453,27"/>
+<area shape="rect" href="GeometryData_8h.html" title=" " alt="" coords="1443,460,1573,485"/>
+<area shape="poly" title=" " alt="" coords="2454,43,2318,68,2148,108,2057,134,1965,165,1874,201,1788,242,1707,293,1634,351,1573,408,1530,451,1526,448,1569,404,1630,347,1704,288,1785,238,1872,196,1963,160,2055,129,2147,103,2317,62,2453,38"/>
+<area shape="rect" title=" " alt="" coords="883,607,1029,632"/>
+<area shape="poly" title=" " alt="" coords="2453,30,2086,36,1599,48,1164,68,1019,81,975,88,952,96,934,112,925,130,922,151,921,178,921,401,925,455,932,508,951,593,946,594,927,509,919,455,916,401,916,178,916,151,920,129,930,109,949,91,973,83,1019,75,1164,62,1599,43,2086,31,2453,25"/>
+<area shape="rect" href="MeshIDMap_8h.html" title=" " alt="" coords="1109,240,1219,265"/>
+<area shape="poly" title=" " alt="" coords="2453,29,2158,29,1777,37,1592,45,1431,57,1308,74,1267,84,1240,96,1212,123,1191,159,1178,195,1170,227,1165,225,1173,193,1186,156,1207,120,1237,91,1265,79,1307,69,1430,52,1592,40,1777,31,2158,24,2453,23"/>
+<area shape="rect" title=" " alt="" coords="1058,313,1118,339"/>
+<area shape="poly" title=" " alt="" coords="2453,29,2153,32,1764,42,1574,50,1408,61,1282,77,1238,86,1209,96,1166,124,1138,154,1118,191,1099,241,1091,271,1089,300,1084,300,1086,270,1093,239,1113,189,1134,151,1162,120,1207,91,1236,81,1281,71,1408,56,1574,45,1764,36,2153,27,2453,24"/>
+<area shape="rect" href="ModelLayer_8h.html" title="负责管理多个模型实例的类" alt="" coords="1605,167,1715,192"/>
+<area shape="poly" title=" " alt="" coords="2453,29,2281,32,2075,41,1973,49,1880,61,1802,76,1744,96,1724,108,1706,123,1677,157,1673,153,1702,120,1721,104,1742,91,1800,71,1879,56,1973,44,2075,36,2281,26,2453,24"/>
+<area shape="rect" title=" " alt="" coords="1295,240,1382,265"/>
+<area shape="poly" title=" " alt="" coords="2453,33,2060,54,1854,73,1769,84,1705,96,1607,126,1513,165,1432,204,1372,236,1369,231,1429,199,1511,160,1605,121,1703,91,1768,78,1853,67,2060,49,2453,28"/>
+<area shape="rect" href="ModelObserver_8h.html" title=" " alt="" coords="3698,533,3830,559"/>
+<area shape="poly" title=" " alt="" coords="2643,24,2902,26,3226,35,3382,44,3518,55,3621,71,3657,80,3680,91,3700,109,3711,128,3715,151,3716,178,3716,401,3720,434,3729,466,3753,520,3748,522,3724,468,3714,435,3711,401,3711,178,3710,151,3706,130,3696,112,3677,96,3655,85,3620,76,3518,61,3382,49,3226,40,2902,31,2643,29"/>
+<area shape="rect" href="ModelScope_8h.html" title="模型操作作用域（RAII）：模型写段的记账与通知收尾" alt="" coords="2687,93,2801,119"/>
+<area shape="poly" title=" " alt="" coords="2596,43,2703,86,2701,91,2594,48"/>
+<area shape="rect" href="UndoStack_8h.html" title="一个正式历史栈与临时预览捕获：事件不入栈，execute 收尾吸收预览。" alt="" coords="3060,240,3164,265"/>
+<area shape="poly" title=" " alt="" coords="2644,42,2728,63,2814,91,2893,125,2968,163,3084,230,3081,235,2966,168,2891,130,2812,96,2726,68,2642,47"/>
+<area shape="rect" title=" " alt="" coords="3434,313,3521,339"/>
+<area shape="poly" title=" " alt="" coords="2643,41,2748,62,2859,91,3031,146,3197,207,3439,305,3437,310,3195,212,3029,151,2858,96,2747,67,2642,46"/>
+<area shape="rect" title=" " alt="" coords="3855,93,4057,119"/>
+<area shape="poly" title=" " alt="" coords="2643,28,3153,50,3492,68,3836,91,3841,91,3841,96,3836,96,3491,74,3152,55,2643,33"/>
+<area shape="rect" title=" " alt="" coords="4081,93,4300,119"/>
+<area shape="poly" title=" " alt="" coords="2643,27,3239,47,3647,66,4068,91,4067,96,3647,71,3239,52,2643,32"/>
+<area shape="rect" title=" " alt="" coords="4325,93,4417,119"/>
+<area shape="poly" title=" " alt="" coords="2643,26,3462,46,3946,65,4151,77,4312,91,4311,96,4151,83,3946,71,3462,51,2643,31"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="2697,607,2761,632"/>
+<area shape="poly" title=" " alt="" coords="2699,483,2737,501,2755,515,2769,532,2774,549,2771,567,2753,598,2748,595,2766,565,2769,549,2764,535,2751,519,2735,506,2697,488"/>
+<area shape="poly" title=" " alt="" coords="2714,483,2755,501,2774,514,2789,532,2795,553,2795,580,2788,608,2776,633,2753,658,2727,676,2724,671,2750,654,2771,631,2783,606,2789,579,2790,553,2784,535,2770,518,2753,505,2712,488"/>
+<area shape="poly" title=" " alt="" coords="2687,483,3315,676,3313,681,2686,488"/>
+<area shape="poly" title=" " alt="" coords="2579,482,2380,502,2282,517,2213,536,2192,547,2176,559,2151,585,2127,611,2110,624,2088,634,2038,649,1971,661,1808,678,1642,688,1515,693,1514,688,1641,683,1808,673,1970,656,2037,644,2086,630,2107,619,2123,607,2148,581,2172,555,2189,542,2211,531,2281,512,2380,496,2579,476"/>
+<area shape="poly" title=" " alt="" coords="2627,488,2539,530,2537,525,2624,483"/>
+<area shape="rect" title=" " alt="" coords="2278,607,2402,632"/>
+<area shape="poly" title=" " alt="" coords="2582,488,2511,506,2440,536,2397,566,2362,598,2358,594,2393,562,2437,531,2510,501,2580,483"/>
+<area shape="rect" href="MeshAdjacency_8h.html" title="网格邻接查询索引——统一边表 + 稳定边 id" alt="" coords="2575,533,2710,559"/>
+<area shape="poly" title=" " alt="" coords="2651,486,2648,520,2642,520,2646,485"/>
+<area shape="poly" title=" " alt="" coords="2697,625,2509,635,2204,644,1966,646,1729,654,1590,665,1426,683,1410,685,1409,680,1425,677,1589,660,1729,649,1966,640,2204,638,2509,629,2697,620"/>
+<area shape="rect" title=" " alt="" coords="2748,680,2799,705"/>
+<area shape="poly" title=" " alt="" coords="2739,631,2761,667,2757,670,2734,634"/>
+<area shape="poly" title=" " alt="" coords="2724,634,2702,670,2697,667,2720,631"/>
+<area shape="poly" title=" " alt="" coords="2762,622,3313,684,3313,689,2761,627"/>
+<area shape="poly" title=" " alt="" coords="2698,629,2662,635,2317,664,1980,682,1698,690,1514,694,1514,688,1698,685,1980,676,2316,659,2661,629,2697,624"/>
+<area shape="poly" title=" " alt="" coords="2539,556,2685,601,2683,607,2537,561"/>
+<area shape="poly" title=" " alt="" coords="2496,560,2464,599,2441,619,2414,634,2372,649,2322,661,2205,675,2070,681,1925,681,1643,676,1522,677,1426,683,1410,685,1409,680,1425,677,1522,671,1643,671,1925,676,2069,676,2204,670,2321,655,2371,644,2412,630,2438,614,2460,595,2492,557"/>
+<area shape="poly" title=" " alt="" coords="2511,557,2537,592,2575,630,2610,653,2646,672,2643,677,2607,658,2572,634,2533,596,2507,561"/>
+<area shape="poly" title=" " alt="" coords="2522,556,2592,594,2638,614,2686,629,2742,641,2816,651,2996,668,3313,687,3313,692,2996,673,2816,656,2741,646,2685,635,2636,619,2590,599,2519,561"/>
+<area shape="poly" title=" " alt="" coords="2476,561,2380,603,2378,599,2474,556"/>
+<area shape="rect" title=" " alt="" coords="1709,607,1824,632"/>
+<area shape="poly" title=" " alt="" coords="2451,555,2387,561,1838,614,1838,609,2386,556,2451,550"/>
+<area shape="rect" title=" " alt="" coords="2000,607,2075,632"/>
+<area shape="poly" title=" " alt="" coords="2452,558,2089,613,2088,608,2451,552"/>
+<area shape="poly" title=" " alt="" coords="2658,557,2706,596,2703,600,2655,561"/>
+<area shape="poly" title=" " alt="" coords="2618,561,2451,635,2298,664,2167,678,2050,681,1941,677,1832,671,1714,667,1581,669,1426,683,1410,685,1409,680,1425,677,1581,664,1714,661,1832,666,1941,672,2051,676,2167,673,2297,659,2450,629,2616,556"/>
+<area shape="poly" title=" " alt="" coords="2631,561,2581,599,2547,619,2510,635,2420,655,2299,670,2158,681,2006,688,1717,694,1514,694,1514,689,1717,689,2006,683,2157,675,2298,665,2419,649,2509,629,2544,614,2578,594,2628,557"/>
+<area shape="poly" title=" " alt="" coords="2595,561,2403,606,2402,601,2593,556"/>
+<area shape="poly" title=" " alt="" coords="2575,560,2563,561,2089,615,2088,610,2562,556,2575,554"/>
+<area shape="rect" title=" " alt="" coords="3444,607,3511,632"/>
+<area shape="poly" title=" " alt="" coords="2710,550,3430,611,3430,617,2710,556"/>
+<area shape="poly" title=" " alt="" coords="1422,549,2684,613,2684,618,1421,554"/>
+<area shape="poly" title=" " alt="" coords="1344,559,1366,666,1360,667,1338,560"/>
+<area shape="poly" title=" " alt="" coords="1367,556,1470,594,1536,614,1603,629,1697,642,1822,654,2122,671,2633,688,2632,693,2122,676,1822,659,1697,648,1602,635,1534,619,1468,599,1365,561"/>
+<area shape="poly" title=" " alt="" coords="1422,553,1612,575,1836,604,1912,618,1988,629,2279,649,2675,667,3313,688,3313,693,2675,672,2279,655,1988,635,1911,623,1836,609,1611,580,1421,559"/>
+<area shape="poly" title=" " alt="" coords="1351,557,1452,668,1448,671,1347,561"/>
+<area shape="rect" title=" " alt="" coords="1206,607,1330,632"/>
+<area shape="poly" title=" " alt="" coords="1329,561,1291,599,1287,595,1325,557"/>
+<area shape="poly" title=" " alt="" coords="1512,485,1522,520,1531,540,1543,557,1579,589,1612,607,1650,618,1698,629,1782,645,1894,658,2166,675,2437,684,2633,688,2633,693,2437,690,2166,680,1894,663,1781,650,1697,635,1648,623,1610,612,1576,593,1539,560,1526,542,1517,522,1507,487"/>
+<area shape="poly" title=" " alt="" coords="1530,483,1601,519,1694,556,1751,570,1830,584,1986,608,1986,613,1829,589,1750,575,1693,561,1599,524,1527,488"/>
+<area shape="rect" href="GeometrySubshapeIndex_8h.html" title=" " alt="" coords="701,533,899,559"/>
+<area shape="poly" title=" " alt="" coords="1443,483,913,536,913,531,1442,478"/>
+<area shape="poly" title=" " alt="" coords="900,548,2684,614,2684,619,900,554"/>
+<area shape="poly" title=" " alt="" coords="700,561,471,588,378,601,339,609,334,619,339,630,353,636,382,642,480,653,774,671,1097,682,1326,688,1326,693,1097,688,774,676,480,659,382,647,351,641,335,634,329,619,336,605,377,596,470,583,700,556"/>
+<area shape="poly" title=" " alt="" coords="808,558,832,595,850,614,872,630,920,647,983,658,1056,665,1135,668,1289,671,1408,677,1425,680,1424,685,1408,683,1289,676,1135,673,1056,670,982,663,919,652,869,634,847,618,828,598,804,561"/>
+<area shape="rect" title=" " alt="" coords="94,607,274,632"/>
+<area shape="poly" title=" " alt="" coords="701,561,288,609,287,603,701,556"/>
+<area shape="rect" title=" " alt="" coords="349,607,560,632"/>
+<area shape="poly" title=" " alt="" coords="745,561,524,606,523,601,744,556"/>
+<area shape="rect" title=" " alt="" coords="583,607,809,632"/>
+<area shape="poly" title=" " alt="" coords="785,561,726,601,723,596,782,556"/>
+<area shape="poly" title=" " alt="" coords="826,556,919,598,917,603,824,561"/>
+<area shape="poly" title=" " alt="" coords="1216,263,1892,409,2052,426,2318,451,2456,467,2579,485,2673,507,2705,519,2725,531,2734,546,2738,562,2738,593,2732,593,2733,562,2729,548,2721,535,2703,523,2672,512,2578,491,2456,472,2318,456,2051,431,1892,415,1215,268"/>
+<area shape="poly" title=" " alt="" coords="1161,267,1137,329,1124,375,1113,426,1108,480,1111,534,1124,585,1136,609,1151,630,1425,680,1424,686,1148,634,1131,611,1119,587,1106,535,1103,480,1108,425,1119,373,1132,327,1156,265"/>
+<area shape="poly" title=" " alt="" coords="1220,260,1305,281,1355,298,1407,318,1458,344,1507,376,1551,414,1588,459,1594,473,1596,486,1590,510,1586,534,1588,545,1594,557,1615,577,1640,592,1668,603,1697,610,1695,615,1667,608,1638,597,1612,582,1590,560,1583,547,1580,534,1585,509,1590,486,1589,474,1583,461,1547,418,1504,380,1456,349,1405,323,1353,303,1304,286,1219,266"/>
+<area shape="poly" title=" " alt="" coords="1154,267,1112,306,1109,302,1150,263"/>
+<area shape="poly" title=" " alt="" coords="1605,185,1245,201,725,230,472,250,259,273,175,286,112,299,71,312,62,319,59,325,59,547,60,595,67,613,83,630,102,637,141,643,267,655,642,672,1048,683,1326,688,1326,693,1048,688,642,678,267,660,140,648,101,642,80,634,62,616,54,596,53,547,53,324,58,316,69,308,110,294,174,280,258,268,472,245,725,225,1244,195,1605,180"/>
+<area shape="poly" title=" " alt="" coords="1715,177,1820,179,1961,187,2120,205,2200,219,2278,237,2427,275,2488,292,2543,310,2596,333,2650,364,2706,405,2769,458,2804,499,2816,520,2823,541,2825,564,2822,586,2814,610,2799,634,2771,660,2738,678,2736,674,2768,656,2795,630,2809,607,2817,585,2820,563,2818,542,2811,522,2800,502,2765,462,2703,409,2647,369,2594,338,2541,315,2486,297,2426,280,2277,243,2199,225,2119,211,1961,193,1820,184,1715,183"/>
+<area shape="poly" title=" " alt="" coords="1606,194,1534,213,1458,242,1398,276,1348,310,1308,346,1276,385,1251,429,1230,480,1212,539,1196,607,1192,620,1195,630,1282,650,1425,680,1424,685,1281,656,1192,634,1187,620,1191,606,1207,538,1225,478,1246,427,1272,382,1304,342,1345,306,1395,271,1456,238,1532,207,1604,188"/>
+<area shape="poly" title=" " alt="" coords="1715,184,1833,199,1976,225,2046,242,2108,262,2158,285,2191,312,2210,344,2216,375,2213,405,2206,435,2198,465,2194,494,2198,525,2214,557,2241,583,2275,600,2272,604,2238,587,2210,560,2193,527,2189,494,2193,464,2200,434,2208,404,2211,375,2205,345,2187,315,2155,290,2106,267,2044,247,1975,230,1832,204,1715,189"/>
+<area shape="poly" title=" " alt="" coords="1663,192,1667,256,1684,355,1700,409,1722,463,1752,513,1790,557,1823,574,1875,589,1987,609,1986,614,1873,594,1821,579,1786,561,1747,517,1717,466,1695,411,1679,356,1662,257,1657,192"/>
+<area shape="poly" title=" " alt="" coords="1715,179,2425,196,2858,214,3039,225,3176,237,3233,241,3285,239,3377,234,3418,237,3458,249,3497,273,3535,312,3555,346,3564,385,3562,425,3554,466,3541,505,3525,541,3495,596,3490,594,3521,538,3536,503,3549,464,3557,425,3558,385,3550,348,3531,315,3494,277,3456,254,3417,243,3377,240,3285,245,3233,246,3176,243,3039,230,2858,219,2425,202,1715,184"/>
+<area shape="poly" title=" " alt="" coords="1652,194,1586,267,1530,322,1483,361,1439,403,1389,462,1352,522,1348,519,1385,458,1435,399,1480,357,1526,318,1582,263,1648,191"/>
+<area shape="poly" title=" " alt="" coords="1609,195,1553,213,1497,242,1407,306,1372,335,1341,365,1315,397,1291,435,1269,480,1247,534,1244,549,1245,565,1256,594,1251,596,1240,566,1238,549,1241,533,1264,477,1286,432,1311,394,1337,361,1368,331,1404,302,1495,238,1551,208,1608,190"/>
+<area shape="poly" title=" " alt="" coords="1605,184,1486,188,1338,198,1196,215,1139,227,1097,242,1066,258,1043,274,1028,294,1023,325,1023,401,1016,417,998,432,934,463,841,492,727,521,480,572,272,607,271,602,479,566,726,516,839,487,932,458,995,428,1012,414,1017,400,1017,324,1023,292,1039,270,1064,254,1095,238,1137,222,1195,210,1337,192,1486,183,1605,179"/>
+<area shape="poly" title=" " alt="" coords="1605,191,1233,244,1233,239,1605,186"/>
+<area shape="rect" href="ModelData_8h.html" title="负责管理和操作网格模型数据的核心类" alt="" coords="1905,387,2010,412"/>
+<area shape="poly" title=" " alt="" coords="1668,191,1708,259,1740,301,1779,337,1805,353,1834,366,1892,384,1890,389,1832,371,1803,357,1776,341,1736,304,1703,262,1663,193"/>
+<area shape="rect" href="GeometryRegistry_8h.html" title=" " alt="" coords="2225,533,2375,559"/>
+<area shape="poly" title=" " alt="" coords="1715,179,1836,183,1987,193,2132,210,2191,222,2234,238,2267,253,2294,269,2312,291,2319,324,2319,401,2315,466,2307,520,2302,519,2309,465,2313,401,2313,325,2307,294,2291,273,2265,258,2232,242,2189,228,2131,215,1987,198,1836,189,1715,184"/>
+<area shape="rect" href="ModelOperator_8h.html" title=" " alt="" coords="1799,240,1929,265"/>
+<area shape="poly" title=" " alt="" coords="1694,190,1819,233,1817,238,1692,195"/>
+<area shape="poly" title=" " alt="" coords="1609,195,1396,241,1395,236,1608,189"/>
+<area shape="rect" title=" " alt="" coords="1508,240,1572,265"/>
+<area shape="poly" title=" " alt="" coords="1642,194,1573,235,1570,230,1639,190"/>
+<area shape="poly" title=" " alt="" coords="2011,403,2566,460,2565,465,2010,409"/>
+<area shape="poly" title=" " alt="" coords="1957,413,1950,455,1947,514,1950,546,1958,577,1970,606,1990,630,2002,638,2023,645,2087,657,2270,674,2474,684,2633,688,2633,693,2474,689,2270,680,2086,662,2022,650,2000,642,1986,634,1966,608,1953,579,1945,547,1942,514,1945,454,1952,412"/>
+<area shape="poly" title=" " alt="" coords="2010,397,2139,398,2319,405,2525,424,2630,438,2733,457,2850,488,2939,521,3027,558,3140,604,3316,672,3314,677,3138,609,3025,563,2937,526,2849,493,2731,463,2629,444,2524,429,2318,411,2139,403,2010,403"/>
+<area shape="poly" title=" " alt="" coords="1964,411,2031,593,2026,595,1959,413"/>
+<area shape="rect" href="Selection_8h.html" title=" " alt="" coords="1801,533,1895,559"/>
+<area shape="poly" title=" " alt="" coords="1909,415,1871,432,1854,445,1841,461,1836,475,1834,490,1840,520,1835,521,1829,490,1830,474,1836,459,1850,441,1868,428,1907,410"/>
+<area shape="rect" title=" " alt="" coords="1851,460,1919,485"/>
+<area shape="poly" title=" " alt="" coords="1947,414,1909,452,1905,448,1944,410"/>
+<area shape="poly" title=" " alt="" coords="1896,548,2684,612,2683,617,1895,554"/>
+<area shape="poly" title=" " alt="" coords="1819,561,1513,678,1511,673,1817,556"/>
+<area shape="poly" title=" " alt="" coords="2369,556,2684,608,2683,613,2369,561"/>
+<area shape="poly" title=" " alt="" coords="2309,558,2329,593,2324,596,2304,560"/>
+<area shape="poly" title=" " alt="" coords="2225,554,1043,616,1042,611,2224,549"/>
+<area shape="poly" title=" " alt="" coords="1878,264,1902,298,1908,319,1904,340,1887,358,1867,366,1848,373,1830,388,1798,433,1777,473,1772,493,1772,513,1778,534,1790,557,1808,579,1825,595,1844,605,1863,612,1909,619,1964,629,2024,640,2102,650,2292,667,2633,686,2633,692,2292,672,2102,656,2023,646,1964,635,1908,625,1862,617,1842,610,1822,599,1804,583,1786,560,1773,536,1767,514,1767,492,1772,471,1794,430,1826,385,1845,368,1865,361,1884,354,1899,337,1903,319,1897,300,1874,267"/>
+<area shape="poly" title=" " alt="" coords="1841,268,1818,282,1796,299,1785,318,1785,327,1789,337,1809,358,1835,374,1863,384,1892,391,1891,396,1862,389,1833,378,1806,362,1784,340,1779,329,1780,317,1792,296,1814,277,1838,263"/>
+<area shape="rect" href="ModelOperatorBase_8h.html" title=" " alt="" coords="2015,313,2177,339"/>
+<area shape="poly" title=" " alt="" coords="1902,263,2046,307,2045,312,1900,268"/>
+<area shape="rect" title=" " alt="" coords="1799,313,1889,339"/>
+<area shape="poly" title=" " alt="" coords="1863,266,1853,301,1848,299,1858,265"/>
+<area shape="poly" title=" " alt="" coords="2165,336,2489,395,2645,429,2701,445,2733,458,2763,478,2784,501,2795,527,2794,543,2789,560,2776,582,2758,600,2754,596,2771,579,2784,558,2789,542,2789,528,2780,503,2759,482,2731,462,2699,450,2644,434,2488,400,2164,341"/>
+<area shape="poly" title=" " alt="" coords="2075,341,1993,383,1991,378,2073,336"/>
+<area shape="poly" title=" " alt="" coords="3698,555,2775,618,2775,612,3698,549"/>
+<area shape="poly" title=" " alt="" coords="3758,561,3727,598,3705,618,3680,634,3606,664,3529,682,3457,691,3399,694,3399,689,3457,685,3528,676,3605,659,3677,630,3702,614,3723,594,3754,557"/>
+<area shape="poly" title=" " alt="" coords="2801,113,2972,140,3197,185,3311,212,3414,242,3500,276,3534,293,3560,311,3583,330,3599,348,3609,369,3612,398,3612,548,3606,581,3589,610,3563,633,3533,651,3498,665,3463,676,3400,689,3399,684,3462,671,3496,660,3530,646,3560,628,3585,606,3601,579,3607,547,3607,398,3604,371,3595,351,3579,334,3557,315,3531,298,3498,280,3412,247,3309,217,3196,190,2971,146,2800,118"/>
+<area shape="poly" title=" " alt="" coords="2725,121,2628,179,2475,275,2296,398,2205,466,2119,535,2058,598,2054,594,2116,531,2202,461,2292,394,2472,271,2625,174,2723,116"/>
+<area shape="poly" title=" " alt="" coords="2687,114,1729,176,1728,171,2687,108"/>
+<area shape="poly" title=" " alt="" coords="2774,116,3071,233,3069,237,2773,121"/>
+<area shape="poly" title=" " alt="" coords="3060,267,2995,286,2928,316,2879,345,2862,362,2845,388,2834,412,2829,433,2829,473,2828,514,2822,536,2810,560,2790,584,2766,602,2763,597,2786,580,2806,557,2817,534,2823,513,2824,473,2824,432,2829,410,2840,385,2858,359,2876,341,2925,311,2994,281,3059,262"/>
+<area shape="poly" title=" " alt="" coords="3115,265,3122,300,3129,320,3141,337,3153,348,3166,354,3194,358,3222,364,3235,372,3246,385,3265,425,3269,462,3261,497,3243,529,3217,559,3183,587,3145,612,3104,634,3054,656,3009,669,2968,675,2928,676,2844,674,2795,676,2738,683,2738,677,2794,671,2844,669,2928,671,2967,669,3008,664,3052,651,3101,630,3142,607,3180,583,3213,555,3239,526,3256,495,3264,462,3260,426,3242,388,3231,376,3220,369,3193,364,3165,359,3150,352,3137,340,3125,322,3117,302,3110,266"/>
+<area shape="poly" title=" " alt="" coords="3165,255,3256,272,3306,288,3353,311,3376,327,3391,343,3418,385,3445,420,3472,451,3522,508,3539,537,3547,566,3543,598,3525,634,3499,659,3466,676,3432,687,3400,692,3399,687,3431,681,3464,671,3496,655,3521,630,3538,597,3542,567,3534,539,3518,511,3468,455,3440,423,3414,388,3387,347,3372,331,3351,316,3304,293,3255,277,3164,260"/>
+<area shape="poly" title=" " alt="" coords="3060,258,2538,277,2229,294,2100,305,2003,316,1433,462,1431,472,1431,491,1440,548,1466,666,1461,668,1434,549,1426,492,1425,471,1429,458,2002,311,2100,299,2228,289,2537,272,3060,253"/>
+<area shape="poly" title=" " alt="" coords="3065,268,2879,316,2676,368,2517,407,2441,428,2362,455,2272,490,2169,536,2112,568,2065,600,2062,596,2109,563,2167,531,2270,485,2360,450,2440,423,2516,402,2675,363,2878,311,3064,263"/>
+<area shape="poly" title=" " alt="" coords="3165,256,3242,274,3283,289,3322,311,3356,341,3386,377,3411,415,3431,456,3460,533,3475,592,3470,594,3455,535,3426,458,3406,418,3381,380,3352,345,3318,316,3281,294,3241,279,3163,262"/>
+<area shape="rect" href="UndoRecord_8h.html" title="撤销/重做记录模型：一次操作 = 一条记录" alt="" coords="2961,313,3074,339"/>
+<area shape="poly" title=" " alt="" coords="3098,267,3045,307,3042,303,3095,263"/>
+<area shape="rect" href="UndoRecorder_8h.html" title="模型层 undo 记录钩子接口" alt="" coords="2855,387,2980,412"/>
+<area shape="poly" title=" " alt="" coords="3061,264,3003,282,2976,296,2951,315,2933,343,2924,374,2918,372,2928,341,2947,312,2973,292,3001,277,3059,259"/>
+<area shape="rect" title=" " alt="" coords="3150,313,3221,339"/>
+<area shape="poly" title=" " alt="" coords="3126,264,3165,302,3162,306,3122,268"/>
+<area shape="rect" title=" " alt="" coords="3245,313,3307,339"/>
+<area shape="poly" title=" " alt="" coords="3139,263,3238,305,3236,310,3137,268"/>
+<area shape="poly" title=" " alt="" coords="3165,262,3421,311,3420,316,3164,267"/>
+<area shape="poly" title=" " alt="" coords="3020,340,3015,376,3007,397,2994,414,2975,426,2949,436,2882,452,2806,463,2733,469,2733,464,2805,458,2881,447,2947,431,2973,421,2990,410,3002,394,3010,375,3015,339"/>
+<area shape="poly" title=" " alt="" coords="3075,335,3152,356,3184,369,3205,385,3210,399,3205,413,3188,442,3167,468,3117,512,3059,547,2997,573,2934,592,2874,605,2776,618,2775,613,2873,600,2933,587,2995,568,3057,542,3114,508,3163,464,3183,439,3200,411,3204,399,3201,388,3182,374,3150,361,3074,341"/>
+<area shape="poly" title=" " alt="" coords="3075,333,3163,353,3201,368,3225,385,3230,397,3232,411,3223,444,3204,482,3178,521,3118,593,3072,634,3028,657,2988,671,2950,677,2913,678,2835,676,2790,677,2738,683,2738,677,2790,671,2835,670,2913,673,2950,671,2986,665,3026,652,3069,630,3115,589,3174,518,3200,479,3218,442,3226,411,3225,398,3221,388,3198,372,3161,359,3074,339"/>
+<area shape="poly" title=" " alt="" coords="3075,334,3173,353,3282,382,3331,400,3371,421,3399,444,3407,458,3409,471,3409,547,3406,582,3396,615,3372,669,3367,667,3391,613,3400,581,3404,547,3404,472,3402,459,3395,448,3368,425,3329,405,3280,387,3171,358,3074,339"/>
+<area shape="poly" title=" " alt="" coords="2960,331,2384,349,2072,366,1958,377,1893,389,1827,417,1764,451,1703,490,1647,532,1553,612,1491,672,1488,668,1550,608,1644,528,1700,486,1761,447,1825,412,1891,384,1958,371,2071,361,2383,343,2960,326"/>
+<area shape="rect" href="ModelSnapshot_8h.html" title="模型级结构快照（undo/redo 原语）" alt="" coords="3055,387,3190,412"/>
+<area shape="poly" title=" " alt="" coords="3036,336,3096,377,3093,381,3033,341"/>
+<area shape="poly" title=" " alt="" coords="3055,413,2733,461,2733,456,3054,408"/>
+<area shape="poly" title=" " alt="" coords="3150,410,3187,430,3224,458,3269,510,3305,568,3332,622,3350,666,3345,668,3327,625,3301,570,3265,513,3221,462,3184,434,3147,414"/>
+<area shape="poly" title=" " alt="" coords="2930,411,2952,439,2973,478,2981,499,2984,520,2981,541,2971,560,2958,572,2939,581,2887,597,2775,616,2775,611,2886,592,2937,576,2955,567,2967,557,2976,539,2979,520,2976,500,2969,480,2947,442,2926,414"/>
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:ad24d2e4d58eb61137d7d8550d2a6aff8" id="r_ad24d2e4d58eb61137d7d8550d2a6aff8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad24d2e4d58eb61137d7d8550d2a6aff8">TEST_CASE</a> (&quot;UndoStack records writes within an operation boundary&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:af1603ed51afa3f9cb0677955967ac194" id="r_af1603ed51afa3f9cb0677955967ac194"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1603ed51afa3f9cb0677955967ac194">TEST_CASE</a> (&quot;UndoStack captures before-image only on first dirty and groups components into one record&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:ac627b2b943b02fa4f8d342aabbae2c48" id="r_ac627b2b943b02fa4f8d342aabbae2c48"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac627b2b943b02fa4f8d342aabbae2c48">TEST_CASE</a> (&quot;UndoStack discards empty operations&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:a163d3955dd4e0a351662ff449040561b" id="r_a163d3955dd4e0a351662ff449040561b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a163d3955dd4e0a351662ff449040561b">TEST_CASE</a> (&quot;UndoStack records addModel and redo restores original ids&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:a5970e5210943be80d54a2183e333b643" id="r_a5970e5210943be80d54a2183e333b643"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5970e5210943be80d54a2183e333b643">TEST_CASE</a> (&quot;UndoStack undoes removeModel with snapshot restore and gid reclaim&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:ac636c1596ec49e8759ea238b2577e040" id="r_ac636c1596ec49e8759ea238b2577e040"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac636c1596ec49e8759ea238b2577e040">TEST_CASE</a> (&quot;UndoStack suppresses recording during undo/redo&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:acac374a1810c7fe95b695ddc21121e30" id="r_acac374a1810c7fe95b695ddc21121e30"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acac374a1810c7fe95b695ddc21121e30">TEST_CASE</a> (&quot;UndoStack drops the oldest record beyond kMaxDepth&quot;, &quot;[UndoStack]&quot;)</td></tr>
+<tr class="memitem:a9545d6fbde5bff76b8e2131ab9aec8c2" id="r_a9545d6fbde5bff76b8e2131ab9aec8c2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9545d6fbde5bff76b8e2131ab9aec8c2">TEST_CASE</a> (&quot;UndoStack scope session commit/cancel/revert&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:af230d9df921d50931460f86341615543" id="r_af230d9df921d50931460f86341615543"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af230d9df921d50931460f86341615543">TEST_CASE</a> (&quot;UndoStack undo during scope session cancels it without touching global stack&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:aaeae02372d461a4edd394de5837917db" id="r_aaeae02372d461a4edd394de5837917db"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaeae02372d461a4edd394de5837917db">TEST_CASE</a> (&quot;UndoStack read-only operation boundary does not cancel an open scope session&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:a38aa61d13ac474673393c1b7243c0e53" id="r_a38aa61d13ac474673393c1b7243c0e53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a38aa61d13ac474673393c1b7243c0e53">TEST_CASE</a> (&quot;UndoStack real <a class="el" href="TestFeatureSystem_8cpp.html#ad6fae20171c3c7cc1a32c899b095376e">write</a> inside a boundary implicitly cancels an open scope session&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:a7e2d57dba8289fd2848c5d4a7e0a093f" id="r_a7e2d57dba8289fd2848c5d4a7e0a093f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e2d57dba8289fd2848c5d4a7e0a093f">TEST_CASE</a> (&quot;UndoStack <a class="el" href="TestFeatureSystem_8cpp.html#ad6fae20171c3c7cc1a32c899b095376e">write</a> after implicit cancel still notifies at boundary flush&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:a5019d22faff3924ce2f1362bd0cceaff" id="r_a5019d22faff3924ce2f1362bd0cceaff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5019d22faff3924ce2f1362bd0cceaff">TEST_CASE</a> (&quot;UndoStack structural operation inside an open scope belongs to the scope&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:a8e1b6c8535fd87b42a46a35a9d8ffa03" id="r_a8e1b6c8535fd87b42a46a35a9d8ffa03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e1b6c8535fd87b42a46a35a9d8ffa03">TEST_CASE</a> (&quot;UndoStack structural operation crossing an entry boundary evicts the open scope first&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:ac1d2141861273c3c66acb4beb32a0a80" id="r_ac1d2141861273c3c66acb4beb32a0a80"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac1d2141861273c3c66acb4beb32a0a80">TEST_CASE</a> (&quot;UndoStack scope-created model removed across a boundary rolls back cleanly&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:a68035340db913b5e34454a16bed53315" id="r_a68035340db913b5e34454a16bed53315"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68035340db913b5e34454a16bed53315">TEST_CASE</a> (&quot;UndoStack scope rolls back writes to every component it touched&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:acdddbca89620d066891b856e4b9d3c60" id="r_acdddbca89620d066891b856e4b9d3c60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acdddbca89620d066891b856e4b9d3c60">TEST_CASE</a> (&quot;UndoStack session folds its own top contiguous records into one entry&quot;, &quot;[UndoStack][session]&quot;)</td></tr>
+<tr class="memitem:a05c767871dc431971e54ff57745c7b5a" id="r_a05c767871dc431971e54ff57745c7b5a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a05c767871dc431971e54ff57745c7b5a">TEST_CASE</a> (&quot;UndoStack undo during a session steps back its own step, foreign record still undone&quot;, &quot;[UndoStack][session]&quot;)</td></tr>
+<tr class="memitem:a2a009ee26e44dcf12fdc83324774e66e" id="r_a2a009ee26e44dcf12fdc83324774e66e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a009ee26e44dcf12fdc83324774e66e">TEST_CASE</a> (&quot;UndoStack session folds overlapping components without crossing foreign records&quot;, &quot;[UndoStack][session]&quot;)</td></tr>
+<tr class="memitem:a25f37c743b36ec4a672fcfec286437d4" id="r_a25f37c743b36ec4a672fcfec286437d4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a25f37c743b36ec4a672fcfec286437d4">TEST_CASE</a> (&quot;UndoStack undoes replaceMesh back to the pre-replacement mesh&quot;, &quot;[UndoStack][replaceMesh]&quot;)</td></tr>
+<tr class="memitem:afd8cac11e69a86bcf9efc286b94a9696" id="r_afd8cac11e69a86bcf9efc286b94a9696"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd8cac11e69a86bcf9efc286b94a9696">TEST_CASE</a> (&quot;UndoStack undoes removeMesh and restores the mesh with gids&quot;, &quot;[UndoStack][removeMesh]&quot;)</td></tr>
+<tr class="memitem:a058af0ea2e7b096bd6009bb16bcbcede" id="r_a058af0ea2e7b096bd6009bb16bcbcede"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a058af0ea2e7b096bd6009bb16bcbcede">TEST_CASE</a> (&quot;UndoStack undo after appendPoint and appendFace leaves no residual elements&quot;, &quot;[UndoStack][append]&quot;)</td></tr>
+<tr class="memitem:af1fbb8c21d0711a7fefd9c94ac5e54a8" id="r_af1fbb8c21d0711a7fefd9c94ac5e54a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af1fbb8c21d0711a7fefd9c94ac5e54a8">TEST_CASE</a> (&quot;materializeEdge idempotent <a class="el" href="TestObjMeshIO_8cpp.html#ab972f994f7bb41f885fdf2268e4a8799">path</a> does not push an empty undo record&quot;, &quot;[UndoStack][materializeEdge]&quot;)</td></tr>
+<tr class="memitem:ae28123ae021b388d9cf95b453795e924" id="r_ae28123ae021b388d9cf95b453795e924"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae28123ae021b388d9cf95b453795e924">TEST_CASE</a> (&quot;G1: undo/redo refused inside operation boundary with zero side effects&quot;, &quot;[UndoStack][G1]&quot;)</td></tr>
+<tr class="memitem:af6c7f312903b1e319fc00ee48f82314c" id="r_af6c7f312903b1e319fc00ee48f82314c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6c7f312903b1e319fc00ee48f82314c">TEST_CASE</a> (&quot;G2: restore observer cannot enter an undo operation&quot;, &quot;[UndoStack][G2]&quot;)</td></tr>
+<tr class="memitem:aee97eeba9ebfbcf162b602c7622eab68" id="r_aee97eeba9ebfbcf162b602c7622eab68"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee97eeba9ebfbcf162b602c7622eab68">TEST_CASE</a> (&quot;G2: nested beginOperation outside restore still nests and merges into outer record&quot;, &quot;[UndoStack][G2]&quot;)</td></tr>
+<tr class="memitem:ac14dc1ead352930ed03639ad589fcc64" id="r_ac14dc1ead352930ed03639ad589fcc64"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac14dc1ead352930ed03639ad589fcc64">TEST_CASE</a> (&quot;UndoStack execute absorbs preview without plugin confirmation&quot;, &quot;[UndoStack][scope]&quot;)</td></tr>
+<tr class="memitem:aa51c69b4153ab182bda898b313fb33a1" id="r_aa51c69b4153ab182bda898b313fb33a1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa51c69b4153ab182bda898b313fb33a1">TEST_CASE</a> (&quot;Formal undo and execute preview revert keep distinct rollback origins&quot;, &quot;[UndoStack][preview]&quot;)</td></tr>
+<tr class="memitem:adf9a61977465b84084ec36d308c0785b" id="r_adf9a61977465b84084ec36d308c0785b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf9a61977465b84084ec36d308c0785b">TEST_CASE</a> (&quot;Execute absorbs overlapping preview components with their earliest before images&quot;, &quot;[UndoStack][preview]&quot;)</td></tr>
+<tr class="memitem:a48f11b00158f743700ef18a4a2d2603a" id="r_a48f11b00158f743700ef18a4a2d2603a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a48f11b00158f743700ef18a4a2d2603a">TEST_CASE</a> (&quot;Structural writes require explicit history or framework cleanup&quot;, &quot;[UndoStack][structural]&quot;)</td></tr>
+<tr class="memitem:ab1a27919b0963ab6b13125357cc3b871" id="r_ab1a27919b0963ab6b13125357cc3b871"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1a27919b0963ab6b13125357cc3b871">TEST_CASE</a> (&quot;Structural undo and redo preserve identities over repeated cycles&quot;, &quot;[UndoStack][structural]&quot;)</td></tr>
+<tr class="memitem:adcb7b0bd1232131b5488cb19f6719025" id="r_adcb7b0bd1232131b5488cb19f6719025"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcb7b0bd1232131b5488cb19f6719025">TEST_CASE</a> (&quot;Mixed structural sequences restore owners before components&quot;, &quot;[UndoStack][structural]&quot;)</td></tr>
+<tr class="memitem:ac0a239c5c4ce1c2f13c4a89518fe5816" id="r_ac0a239c5c4ce1c2f13c4a89518fe5816"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac0a239c5c4ce1c2f13c4a89518fe5816">TEST_CASE</a> (&quot;Preview revert consumes structural captures before subsequent cancel&quot;, &quot;[UndoStack][structural][preview]&quot;)</td></tr>
+<tr class="memitem:a1a2914c0e9e61ab7d48e9baa12026cff" id="r_a1a2914c0e9e61ab7d48e9baa12026cff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1a2914c0e9e61ab7d48e9baa12026cff">TEST_CASE</a> (&quot;Closed sessions cannot absorb records when the same owner reenters&quot;, &quot;[UndoStack][session]&quot;)</td></tr>
+<tr class="memitem:a9e67591fcc6895c9dc6e39aefd8b6c1c" id="r_a9e67591fcc6895c9dc6e39aefd8b6c1c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e67591fcc6895c9dc6e39aefd8b6c1c">TEST_CASE</a> (&quot;Opening and replacing previews notifies observable undo state&quot;, &quot;[UndoStack][preview]&quot;)</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p><a class="el" href="classUndoStack.html">UndoStack</a> 单元测试：边界自动记录、结构记录、插件层会话、执行路径完备性 </p>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="a1a2914c0e9e61ab7d48e9baa12026cff" name="a1a2914c0e9e61ab7d48e9baa12026cff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a2914c0e9e61ab7d48e9baa12026cff">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[1/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Closed sessions cannot absorb records when the same owner reenters&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][session]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adf9a61977465b84084ec36d308c0785b" name="adf9a61977465b84084ec36d308c0785b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf9a61977465b84084ec36d308c0785b">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[2/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Execute absorbs overlapping preview components with their earliest before images&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][preview]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa51c69b4153ab182bda898b313fb33a1" name="aa51c69b4153ab182bda898b313fb33a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa51c69b4153ab182bda898b313fb33a1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[3/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Formal undo and execute preview revert keep distinct rollback origins&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][preview]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae28123ae021b388d9cf95b453795e924" name="ae28123ae021b388d9cf95b453795e924"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae28123ae021b388d9cf95b453795e924">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[4/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;G1: undo/redo refused inside operation boundary with zero side effects&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][G1]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aee97eeba9ebfbcf162b602c7622eab68" name="aee97eeba9ebfbcf162b602c7622eab68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee97eeba9ebfbcf162b602c7622eab68">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[5/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;G2: nested beginOperation outside restore still nests and merges into outer record&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][G2]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6c7f312903b1e319fc00ee48f82314c" name="af6c7f312903b1e319fc00ee48f82314c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6c7f312903b1e319fc00ee48f82314c">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[6/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;G2: restore observer cannot enter an undo operation&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][G2]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1fbb8c21d0711a7fefd9c94ac5e54a8" name="af1fbb8c21d0711a7fefd9c94ac5e54a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1fbb8c21d0711a7fefd9c94ac5e54a8">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[7/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;materializeEdge idempotent <a class="el" href="TestObjMeshIO_8cpp.html#ab972f994f7bb41f885fdf2268e4a8799">path</a> does not push an empty undo record&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][materializeEdge]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adcb7b0bd1232131b5488cb19f6719025" name="adcb7b0bd1232131b5488cb19f6719025"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcb7b0bd1232131b5488cb19f6719025">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[8/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Mixed structural sequences restore owners before components&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][structural]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9e67591fcc6895c9dc6e39aefd8b6c1c" name="a9e67591fcc6895c9dc6e39aefd8b6c1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e67591fcc6895c9dc6e39aefd8b6c1c">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[9/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Opening and replacing previews notifies observable undo state&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][preview]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac0a239c5c4ce1c2f13c4a89518fe5816" name="ac0a239c5c4ce1c2f13c4a89518fe5816"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0a239c5c4ce1c2f13c4a89518fe5816">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[10/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Preview revert consumes structural captures before subsequent cancel&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][structural][preview]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab1a27919b0963ab6b13125357cc3b871" name="ab1a27919b0963ab6b13125357cc3b871"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1a27919b0963ab6b13125357cc3b871">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[11/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Structural undo and redo preserve identities over repeated cycles&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][structural]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a48f11b00158f743700ef18a4a2d2603a" name="a48f11b00158f743700ef18a4a2d2603a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48f11b00158f743700ef18a4a2d2603a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[12/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Structural writes require explicit history or framework cleanup&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][structural]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af1603ed51afa3f9cb0677955967ac194" name="af1603ed51afa3f9cb0677955967ac194"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1603ed51afa3f9cb0677955967ac194">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[13/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack captures before-image only on first dirty and groups components into one record&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac627b2b943b02fa4f8d342aabbae2c48" name="ac627b2b943b02fa4f8d342aabbae2c48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac627b2b943b02fa4f8d342aabbae2c48">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[14/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack discards empty operations&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acac374a1810c7fe95b695ddc21121e30" name="acac374a1810c7fe95b695ddc21121e30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acac374a1810c7fe95b695ddc21121e30">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[15/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack drops the oldest record beyond kMaxDepth&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac14dc1ead352930ed03639ad589fcc64" name="ac14dc1ead352930ed03639ad589fcc64"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac14dc1ead352930ed03639ad589fcc64">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[16/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack execute absorbs preview without plugin confirmation&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaeae02372d461a4edd394de5837917db" name="aaeae02372d461a4edd394de5837917db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaeae02372d461a4edd394de5837917db">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[17/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack read-only operation boundary does not cancel an open scope session&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a38aa61d13ac474673393c1b7243c0e53" name="a38aa61d13ac474673393c1b7243c0e53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38aa61d13ac474673393c1b7243c0e53">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[18/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack real <a class="el" href="TestFeatureSystem_8cpp.html#ad6fae20171c3c7cc1a32c899b095376e">write</a> inside a boundary implicitly cancels an open scope session&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a163d3955dd4e0a351662ff449040561b" name="a163d3955dd4e0a351662ff449040561b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a163d3955dd4e0a351662ff449040561b">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[19/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack records addModel and redo restores original ids&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad24d2e4d58eb61137d7d8550d2a6aff8" name="ad24d2e4d58eb61137d7d8550d2a6aff8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad24d2e4d58eb61137d7d8550d2a6aff8">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[20/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack records writes within an operation boundary&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68035340db913b5e34454a16bed53315" name="a68035340db913b5e34454a16bed53315"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68035340db913b5e34454a16bed53315">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[21/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack scope rolls back writes to every component it touched&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9545d6fbde5bff76b8e2131ab9aec8c2" name="a9545d6fbde5bff76b8e2131ab9aec8c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9545d6fbde5bff76b8e2131ab9aec8c2">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[22/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack scope session commit/cancel/revert&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac1d2141861273c3c66acb4beb32a0a80" name="ac1d2141861273c3c66acb4beb32a0a80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1d2141861273c3c66acb4beb32a0a80">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[23/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack scope-created model removed across a boundary rolls back cleanly&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acdddbca89620d066891b856e4b9d3c60" name="acdddbca89620d066891b856e4b9d3c60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acdddbca89620d066891b856e4b9d3c60">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[24/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack session folds its own top contiguous records into one entry&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][session]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2a009ee26e44dcf12fdc83324774e66e" name="a2a009ee26e44dcf12fdc83324774e66e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a009ee26e44dcf12fdc83324774e66e">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[25/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack session folds overlapping components without crossing foreign records&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][session]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8e1b6c8535fd87b42a46a35a9d8ffa03" name="a8e1b6c8535fd87b42a46a35a9d8ffa03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e1b6c8535fd87b42a46a35a9d8ffa03">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[26/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack structural operation crossing an entry boundary evicts the open scope first&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5019d22faff3924ce2f1362bd0cceaff" name="a5019d22faff3924ce2f1362bd0cceaff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5019d22faff3924ce2f1362bd0cceaff">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[27/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack structural operation inside an open scope belongs to the scope&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac636c1596ec49e8759ea238b2577e040" name="ac636c1596ec49e8759ea238b2577e040"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac636c1596ec49e8759ea238b2577e040">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[28/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack suppresses recording during undo/redo&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a058af0ea2e7b096bd6009bb16bcbcede" name="a058af0ea2e7b096bd6009bb16bcbcede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a058af0ea2e7b096bd6009bb16bcbcede">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[29/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undo after appendPoint and appendFace leaves no residual elements&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][append]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a05c767871dc431971e54ff57745c7b5a" name="a05c767871dc431971e54ff57745c7b5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05c767871dc431971e54ff57745c7b5a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[30/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undo during a session steps back its own</td>          <td class="paramname"><span class="paramname"><em>step</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">foreign record still undone&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][session]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af230d9df921d50931460f86341615543" name="af230d9df921d50931460f86341615543"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af230d9df921d50931460f86341615543">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[31/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undo during scope session cancels it without touching global stack&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afd8cac11e69a86bcf9efc286b94a9696" name="afd8cac11e69a86bcf9efc286b94a9696"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd8cac11e69a86bcf9efc286b94a9696">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[32/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undoes removeMesh and restores the mesh with gids&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][removeMesh]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5970e5210943be80d54a2183e333b643" name="a5970e5210943be80d54a2183e333b643"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5970e5210943be80d54a2183e333b643">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[33/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undoes removeModel with snapshot restore and gid reclaim&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25f37c743b36ec4a672fcfec286437d4" name="a25f37c743b36ec4a672fcfec286437d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25f37c743b36ec4a672fcfec286437d4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[34/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack undoes replaceMesh back to the pre-replacement mesh&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][replaceMesh]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7e2d57dba8289fd2848c5d4a7e0a093f" name="a7e2d57dba8289fd2848c5d4a7e0a093f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e2d57dba8289fd2848c5d4a7e0a093f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[35/35]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;UndoStack <a class="el" href="TestFeatureSystem_8cpp.html#ad6fae20171c3c7cc1a32c899b095376e">write</a> after implicit cancel still notifies at boundary flush&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[UndoStack][scope]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

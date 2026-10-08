@@ -1,0 +1,1138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: session::Session类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesession.html">session</a></li><li class="navelem"><a href="classsession_1_1Session.html">Session</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classsession_1_1Session-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">session::Session类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="Session_8h_source.html">Session.h</a>&gt;</code></p>
+<div class="dynheader">
+session::Session 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classsession_1_1Session__coll__graph.png" border="0" usemap="#asession_1_1Session_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="asession_1_1Session_coll__map" id="asession_1_1Session_coll__map">
+<area shape="rect" title=" " alt="" coords="3036,534,3165,559"/>
+<area shape="rect" href="classcore_1_1EventBus.html" title="类型安全的轻量级事件总线，以事件类型为键分发事件" alt="" coords="1770,178,1889,203"/>
+<area shape="poly" title=" " alt="" coords="1902,182,2148,167,2308,162,2478,161,2645,168,2798,185,2866,197,2925,213,2975,233,3014,257,3044,287,3066,323,3082,363,3093,404,3102,481,3103,534,3097,534,3097,481,3087,405,3077,365,3061,326,3039,290,3010,261,2972,238,2923,218,2865,202,2798,190,2645,173,2478,166,2308,167,2148,172,1902,187"/>
+<area shape="rect" href="classsession_1_1Session_1_1ObserverRelay.html" title="内部转发观察者：宿主观察者（可为 nullptr）照常收到模型层通知， 同时把通知桥接为 ModelEvent 发布到事件总线（与原 app 层 Qt connect 等价）" alt="" coords="2217,56,2413,96"/>
+<area shape="poly" title=" " alt="" coords="1897,172,2229,93,2230,99,1898,177"/>
+<area shape="rect" href="classsystems_1_1feature_1_1FeatureSystem.html" title="功能系统：管理功能插件的注册、注销、调用与事件路由" alt="" coords="2221,519,2410,559"/>
+<area shape="poly" title=" " alt="" coords="1883,205,2177,306,2204,330,2227,358,2265,417,2293,474,2310,518,2305,519,2288,476,2261,420,2223,361,2200,334,2175,310,1881,210"/>
+<area shape="rect" title=" " alt="" coords="1257,113,1492,183"/>
+<area shape="poly" title=" " alt="" coords="1506,158,1770,183,1770,188,1506,163"/>
+<area shape="rect" title=" " alt="" coords="832,128,1095,168"/>
+<area shape="poly" title=" " alt="" coords="1109,145,1257,145,1257,151,1109,151"/>
+<area shape="rect" title=" " alt="" coords="1272,207,1477,247"/>
+<area shape="poly" title=" " alt="" coords="1491,219,1701,204,1769,196,1770,202,1702,209,1491,224"/>
+<area shape="rect" href="structcore_1_1EventBus_1_1LifetimeToken.html" title=" " alt="" coords="873,207,1054,247"/>
+<area shape="poly" title=" " alt="" coords="1068,224,1272,224,1272,229,1068,229"/>
+<area shape="rect" title=" " alt="" coords="2668,97,2867,137"/>
+<area shape="poly" title=" " alt="" coords="2881,115,2916,121,2952,132,2985,148,3014,170,3033,199,3050,242,3076,350,3092,459,3101,534,3095,534,3087,460,3070,351,3045,243,3028,202,3010,174,2982,152,2950,137,2915,126,2880,120"/>
+<area shape="poly" title=" " alt="" coords="2427,84,2668,106,2667,111,2427,89"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="461,53,582,78"/>
+<area shape="poly" title=" " alt="" coords="592,47,760,18,861,7,962,3,1831,3,1939,8,2047,20,2229,53,2229,59,2046,25,1939,13,1831,8,962,8,861,12,761,24,593,52"/>
+<area shape="poly" title=" " alt="" coords="595,63,962,63,1831,63,2217,70,2217,75,1831,68,962,68,595,68"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="914,503,1013,529"/>
+<area shape="poly" title=" " alt="" coords="563,82,616,110,681,149,748,197,810,253,864,321,908,393,940,458,959,502,955,504,935,460,903,396,859,324,806,256,745,201,678,153,614,115,561,86"/>
+<area shape="poly" title=" " alt="" coords="991,493,1048,456,1118,420,1226,384,1314,369,1404,364,1519,360,1724,350,1899,346,2053,348,2196,356,2338,370,2491,391,2867,452,2942,465,3013,490,3052,510,3084,531,3081,536,3049,515,3011,494,2940,470,2866,457,2490,396,2338,375,2195,361,2052,353,1899,352,1725,356,1519,365,1404,369,1314,374,1227,389,1120,425,1051,460,994,497"/>
+<area shape="rect" href="classsession_1_1SessionQuery.html" title="模型层只读查询（CQRS 查询端，读写分离中的读视图）" alt="" coords="1526,266,1694,291"/>
+<area shape="poly" title=" " alt="" coords="973,489,994,449,1025,400,1067,352,1091,331,1117,314,1150,301,1194,292,1302,280,1421,275,1526,274,1526,280,1421,280,1303,285,1194,297,1152,306,1120,318,1094,335,1070,356,1030,403,999,451,978,492"/>
+<area shape="rect" href="classUndoStack.html" title=" " alt="" coords="1329,805,1421,830"/>
+<area shape="poly" title=" " alt="" coords="979,540,1000,580,1032,629,1072,679,1120,720,1149,733,1175,736,1202,738,1232,751,1245,766,1256,781,1292,798,1329,808,1328,813,1290,803,1253,785,1241,770,1229,755,1200,743,1174,741,1147,738,1117,725,1068,682,1028,632,996,583,974,543"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystem.html" title="模型IO系统，每种文件格式只能注册一个处理器" alt="" coords="1725,1042,1933,1067"/>
+<area shape="poly" title=" " alt="" coords="985,538,1042,599,1079,632,1120,660,1150,672,1177,676,1204,681,1233,698,1242,712,1245,727,1247,740,1256,751,1287,768,1318,774,1348,772,1378,766,1407,761,1437,760,1467,769,1497,790,1510,809,1514,828,1510,866,1505,903,1509,921,1521,938,1542,954,1563,961,1584,962,1607,959,1653,956,1678,961,1703,975,1713,988,1716,1001,1719,1013,1727,1025,1753,1040,1751,1044,1724,1029,1714,1016,1711,1002,1708,990,1700,979,1676,966,1653,961,1607,965,1585,967,1562,967,1539,959,1517,942,1504,923,1499,903,1504,865,1509,828,1505,811,1493,794,1465,774,1437,766,1408,766,1379,771,1348,777,1317,779,1286,773,1253,755,1243,742,1240,728,1237,714,1229,702,1202,686,1177,681,1149,678,1117,665,1076,636,1038,602,982,541"/>
+<area shape="rect" href="classsystems_1_1algo_1_1AlgorithmSystem.html" title=" " alt="" coords="2223,849,2408,889"/>
+<area shape="poly" title=" " alt="" coords="1027,527,1495,629,1556,636,1606,637,1629,639,1653,645,1677,656,1703,675,1714,692,1716,708,1718,724,1727,738,1764,760,1815,778,1876,792,1943,803,2075,819,2176,835,2229,847,2228,852,2176,840,2074,825,1942,808,1875,797,1814,783,1762,765,1723,742,1713,726,1711,709,1709,694,1699,679,1674,661,1651,650,1628,644,1606,642,1556,642,1494,635,1026,532"/>
+<area shape="rect" href="classsystems_1_1job_1_1JobRunner.html" title="所属线程管理一个在飞任务；worker 不等待 GUI。 发布、准备、查询、清理、终态与 stop 均在构造线程。 异步运行须向该线程投递；计算结束后保持槽与模型占用直到 GUI 收尾。" alt="" coords="1740,503,1919,529"/>
+<area shape="poly" title=" " alt="" coords="1026,513,1740,513,1740,519,1026,519"/>
+<area shape="rect" href="classsystems_1_1edit_1_1EditSystem.html" title="模型编辑操作系统，负责管理和调用各种模型编辑操作处理器。所有模型编辑操作的入口。" alt="" coords="1733,989,1925,1014"/>
+<area shape="poly" title=" " alt="" coords="990,536,1047,582,1082,606,1120,627,1175,647,1226,656,1319,657,1363,659,1407,667,1451,687,1497,723,1505,734,1509,746,1510,768,1510,789,1513,799,1521,809,1542,827,1563,837,1605,844,1651,848,1676,855,1703,868,1741,897,1775,930,1821,987,1817,990,1771,934,1737,901,1700,873,1674,860,1650,853,1605,849,1561,842,1539,831,1517,812,1509,801,1505,790,1504,768,1504,747,1500,737,1493,727,1448,692,1405,672,1362,664,1319,662,1226,661,1174,652,1118,632,1080,611,1044,587,987,540"/>
+<area shape="poly" title=" " alt="" coords="1005,495,1116,454,1185,434,1254,419,1344,407,1457,397,1584,390,1719,388,1854,390,1980,399,2090,414,2177,437,2212,454,2244,475,2295,516,2291,520,2241,479,2209,459,2175,443,2089,419,1979,404,1854,396,1719,393,1585,396,1457,402,1345,412,1255,424,1186,439,1118,459,1007,500"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="451,387,592,413"/>
+<area shape="poly" title=" " alt="" coords="606,408,704,424,809,449,879,475,937,501,935,506,877,480,807,455,703,430,605,413"/>
+<area shape="rect" title=" " alt="" coords="22,215,209,270"/>
+<area shape="poly" title=" " alt="" coords="223,247,266,255,311,269,355,288,394,315,404,330,407,346,409,360,418,373,433,383,451,390,449,395,431,388,414,377,404,362,401,347,399,332,390,319,352,293,310,274,265,260,221,252"/>
+<area shape="rect" title=" " alt="" coords="27,294,203,349"/>
+<area shape="poly" title=" " alt="" coords="217,336,393,369,465,385,463,390,391,375,216,342"/>
+<area shape="rect" title=" " alt="" coords="29,373,202,427"/>
+<area shape="poly" title=" " alt="" coords="216,397,451,397,451,403,216,403"/>
+<area shape="rect" title=" " alt="" coords="27,451,203,506"/>
+<area shape="poly" title=" " alt="" coords="216,458,391,425,463,410,465,415,393,431,217,464"/>
+<area shape="rect" title=" " alt="" coords="440,437,603,491"/>
+<area shape="poly" title=" " alt="" coords="617,472,914,508,913,513,616,478"/>
+<area shape="rect" title=" " alt="" coords="5,530,225,555"/>
+<area shape="poly" title=" " alt="" coords="195,525,439,477,440,482,196,530"/>
+<area shape="rect" title=" " alt="" coords="422,515,621,570"/>
+<area shape="poly" title=" " alt="" coords="634,536,808,527,914,518,914,523,808,532,635,541"/>
+<area shape="rect" title=" " alt="" coords="11,580,220,620"/>
+<area shape="poly" title=" " alt="" coords="234,606,312,604,391,592,415,580,445,568,447,573,417,585,393,597,313,610,234,612"/>
+<area shape="rect" title=" " alt="" coords="445,595,597,635"/>
+<area shape="poly" title=" " alt="" coords="611,601,706,585,807,564,871,546,927,526,929,531,873,551,809,569,707,591,611,606"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="472,659,571,685"/>
+<area shape="poly" title=" " alt="" coords="584,674,634,674,691,670,750,661,807,643,853,617,893,585,950,527,954,531,897,589,856,622,809,648,751,666,692,676,634,680,584,679"/>
+<area shape="rect" title=" " alt="" coords="9,648,221,688"/>
+<area shape="poly" title=" " alt="" coords="235,667,472,669,472,674,235,672"/>
+<area shape="rect" title=" " alt="" coords="44,712,187,752"/>
+<area shape="poly" title=" " alt="" coords="200,722,392,697,471,681,472,686,392,703,201,727"/>
+<area shape="rect" title=" " alt="" coords="443,273,600,298"/>
+<area shape="poly" title=" " alt="" coords="614,278,661,281,711,288,762,301,809,322,837,341,863,364,907,415,939,465,958,502,954,504,934,467,902,418,859,367,834,345,807,326,760,306,710,293,660,286,614,283"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="464,733,579,758"/>
+<area shape="poly" title=" " alt="" coords="593,746,642,745,698,738,754,724,807,702,834,683,859,661,902,612,934,563,954,528,958,530,938,566,906,615,863,665,837,688,809,706,756,729,699,743,643,750,593,752"/>
+<area shape="poly" title=" " alt="" coords="593,745,924,761,1101,772,1231,784,1329,803,1328,809,1230,789,1101,777,923,766,592,751"/>
+<area shape="rect" title=" " alt="" coords="416,323,627,363"/>
+<area shape="poly" title=" " alt="" coords="641,346,725,361,768,372,809,388,854,414,895,446,953,501,949,505,892,450,851,419,807,393,766,378,724,366,640,351"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="15,166,216,191"/>
+<area shape="poly" title=" " alt="" coords="230,170,273,174,316,184,357,201,394,226,402,236,406,247,407,268,408,288,418,308,435,320,432,325,414,311,403,289,402,268,401,248,398,239,390,230,355,206,314,189,272,180,229,175"/>
+<area shape="poly" title=" " alt="" coords="1708,276,2065,275,2769,275,2841,272,2900,270,2927,273,2955,281,2983,296,3014,318,3037,342,3057,371,3071,401,3083,433,3096,492,3101,534,3096,534,3091,493,3078,434,3067,403,3052,373,3033,346,3010,322,2980,300,2953,286,2926,278,2900,275,2841,277,2769,280,2065,280,1708,281"/>
+<area shape="rect" title=" " alt="" coords="1957,689,2176,714"/>
+<area shape="poly" title=" " alt="" coords="2166,684,3035,554,3036,559,2167,689"/>
+<area shape="poly" title=" " alt="" coords="1434,808,1465,798,1493,781,1501,768,1503,754,1506,739,1517,726,1541,717,1581,711,1695,703,1957,698,1957,703,1695,708,1581,716,1542,722,1520,730,1511,742,1509,755,1506,770,1497,785,1467,803,1435,813"/>
+<area shape="poly" title=" " alt="" coords="1387,842,1404,886,1432,939,1470,991,1494,1014,1520,1032,1548,1046,1577,1056,1639,1067,1700,1069,1755,1065,1755,1070,1700,1074,1639,1072,1576,1061,1546,1051,1517,1037,1490,1018,1466,995,1427,942,1399,888,1382,844"/>
+<area shape="poly" title=" " alt="" coords="1435,818,2223,862,2222,867,1435,823"/>
+<area shape="poly" title=" " alt="" coords="1433,811,1466,801,1493,781,1507,757,1511,733,1509,709,1503,685,1497,660,1495,635,1500,611,1517,586,1538,568,1559,559,1580,555,1602,556,1647,560,1673,560,1701,555,1724,545,1784,526,1786,531,1726,551,1702,560,1673,565,1647,566,1601,561,1581,561,1561,564,1541,573,1521,590,1505,613,1500,636,1502,659,1508,683,1514,708,1516,733,1512,759,1497,784,1468,805,1435,816"/>
+<area shape="poly" title=" " alt="" coords="1393,840,1415,870,1444,904,1479,938,1520,964,1572,984,1627,997,1682,1003,1733,1004,1733,1010,1682,1008,1627,1002,1571,989,1517,969,1476,942,1440,908,1410,873,1389,843"/>
+<area shape="poly" title=" " alt="" coords="1434,810,1466,800,1493,781,1501,768,1505,756,1503,730,1502,703,1507,689,1517,675,1589,658,1736,631,1957,592,2220,550,2221,555,1958,597,1737,636,1590,664,1520,680,1511,691,1508,703,1509,729,1510,756,1506,771,1497,785,1468,805,1435,815"/>
+<area shape="rect" title=" " alt="" coords="920,1125,1007,1150"/>
+<area shape="poly" title=" " alt="" coords="978,1112,1034,1035,1073,991,1117,951,1146,932,1172,921,1198,912,1229,898,1351,828,1354,833,1232,902,1200,917,1174,926,1149,937,1120,955,1077,995,1038,1038,982,1115"/>
+<area shape="poly" title=" " alt="" coords="1002,1154,1113,1204,1183,1229,1255,1247,1355,1261,1487,1270,1553,1269,1613,1263,1664,1251,1700,1231,1710,1220,1714,1208,1714,1183,1713,1155,1715,1140,1723,1124,1739,1105,1758,1089,1797,1065,1800,1070,1762,1093,1743,1109,1728,1127,1720,1141,1718,1155,1720,1182,1720,1209,1714,1222,1703,1235,1666,1256,1614,1268,1553,1274,1486,1275,1355,1266,1254,1252,1181,1234,1111,1209,1000,1159"/>
+<area shape="rect" title=" " alt="" coords="1263,1310,1487,1365"/>
+<area shape="poly" title=" " alt="" coords="982,1160,1004,1193,1036,1232,1075,1270,1120,1300,1154,1315,1190,1325,1263,1336,1262,1341,1189,1330,1152,1320,1117,1305,1072,1274,1032,1236,1000,1196,977,1163"/>
+<area shape="poly" title=" " alt="" coords="974,1163,990,1216,1019,1283,1039,1317,1062,1350,1089,1380,1120,1404,1197,1450,1267,1480,1333,1497,1397,1503,1463,1499,1534,1487,1701,1447,1789,1422,1864,1395,1928,1364,1984,1328,2034,1283,2080,1230,2126,1164,2174,1085,2183,1060,2186,1039,2188,1016,2198,989,2218,959,2241,931,2287,887,2291,891,2245,935,2222,962,2202,992,2193,1017,2191,1039,2189,1062,2178,1088,2130,1167,2084,1233,2037,1287,1987,1332,1931,1369,1866,1400,1791,1427,1702,1452,1535,1492,1464,1504,1397,1508,1332,1502,1265,1485,1195,1454,1117,1409,1085,1384,1058,1353,1034,1320,1015,1285,985,1217,968,1164"/>
+<area shape="rect" title=" " alt="" coords="1521,1345,1699,1415"/>
+<area shape="poly" title=" " alt="" coords="976,1162,996,1206,1026,1261,1068,1315,1093,1339,1120,1359,1168,1383,1220,1399,1273,1409,1327,1413,1431,1410,1520,1398,1521,1403,1431,1416,1327,1419,1272,1414,1218,1404,1166,1388,1117,1364,1089,1343,1064,1319,1022,1264,991,1209,971,1164"/>
+<area shape="poly" title=" " alt="" coords="1020,1123,1118,1107,1186,1100,1255,1096,1481,1093,1621,1088,1672,1082,1700,1074,1708,1064,1711,1053,1714,1041,1724,1029,1754,1012,1757,1016,1727,1033,1719,1043,1716,1055,1713,1067,1703,1078,1673,1087,1621,1093,1481,1099,1255,1101,1187,1105,1119,1112,1021,1128"/>
+<area shape="rect" title=" " alt="" coords="1265,1110,1484,1165"/>
+<area shape="poly" title=" " alt="" coords="1020,1135,1265,1135,1265,1140,1020,1140"/>
+<area shape="poly" title=" " alt="" coords="1013,1118,1118,1083,1176,1067,1227,1058,1315,1047,1356,1039,1398,1027,1443,1006,1493,975,1501,968,1505,960,1517,942,1542,923,1565,910,1608,894,1651,880,1700,851,1711,838,1724,826,1788,796,1846,782,1901,778,1953,778,2005,778,2058,772,2114,755,2175,723,2219,685,2256,639,2284,594,2303,557,2308,560,2289,596,2260,642,2223,689,2177,728,2116,760,2059,777,2005,783,1953,783,1901,783,1847,787,1790,802,1727,830,1715,842,1703,855,1653,884,1609,899,1567,915,1545,928,1521,946,1509,963,1505,971,1496,979,1446,1011,1400,1032,1358,1044,1316,1052,1228,1063,1177,1073,1119,1088,1015,1123"/>
+<area shape="rect" title=" " alt="" coords="1519,729,1701,799"/>
+<area shape="poly" title=" " alt="" coords="983,1113,1040,1058,1077,1029,1118,1004,1148,993,1174,989,1199,987,1230,979,1307,947,1365,917,1493,839,1559,796,1562,801,1496,844,1368,922,1310,952,1232,984,1200,992,1174,995,1149,998,1120,1009,1080,1033,1043,1062,987,1116"/>
+<area shape="rect" title=" " alt="" coords="864,818,1063,843"/>
+<area shape="poly" title=" " alt="" coords="1077,829,1231,827,1328,819,1329,825,1231,832,1077,835"/>
+<area shape="rect" title=" " alt="" coords="2455,1092,2644,1132"/>
+<area shape="poly" title=" " alt="" coords="2657,1088,2744,1062,2840,1023,2887,998,2932,968,2974,934,3010,896,3038,853,3060,805,3076,756,3086,706,3096,618,3097,559,3102,560,3101,618,3091,707,3081,757,3065,807,3043,855,3014,899,2977,938,2935,973,2890,1002,2842,1028,2746,1067,2658,1093"/>
+<area shape="poly" title=" " alt="" coords="1947,1061,2455,1102,2454,1107,1947,1067"/>
+<area shape="poly" title=" " alt="" coords="1921,1033,1931,1025,1939,1015,1942,1005,1942,983,1942,961,1947,950,1956,939,1974,929,2000,922,2062,915,2127,913,2176,908,2254,887,2255,892,2176,913,2127,918,2063,920,2001,927,1976,934,1959,943,1951,953,1948,962,1947,983,1947,1006,1944,1017,1935,1029,1924,1037"/>
+<area shape="rect" href="classsystems_1_1io_1_1ModelIOSystemBase.html" title="ModelIOSystem接口基类，出于插件开发而设计的接口基类。" alt="" coords="1255,1189,1495,1214"/>
+<area shape="poly" title=" " alt="" coords="1436,1214,1497,1224,1567,1226,1603,1222,1638,1214,1670,1200,1700,1181,1709,1170,1712,1160,1712,1136,1711,1111,1715,1098,1723,1085,1753,1065,1756,1070,1727,1089,1719,1100,1716,1112,1717,1136,1718,1161,1713,1173,1703,1185,1673,1205,1639,1219,1604,1227,1567,1231,1496,1229,1435,1220"/>
+<area shape="poly" title=" " alt="" coords="1500,1329,1627,1318,1675,1310,1700,1301,1708,1284,1713,1260,1712,1196,1711,1131,1714,1105,1723,1085,1750,1065,1753,1070,1727,1088,1719,1106,1716,1131,1717,1196,1718,1260,1713,1286,1703,1305,1677,1315,1628,1323,1501,1334"/>
+<area shape="rect" title=" " alt="" coords="2670,665,2865,705"/>
+<area shape="poly" title=" " alt="" coords="2878,685,2946,675,2979,665,3011,651,3038,631,3061,605,3091,558,3095,561,3065,608,3042,635,3013,656,2981,670,2947,680,2879,691"/>
+<area shape="poly" title=" " alt="" coords="2377,842,2716,703,2718,708,2379,847"/>
+<area shape="poly" title=" " alt="" coords="1898,530,1935,546,1959,564,2020,596,2071,614,2121,635,2148,651,2178,674,2221,718,2257,766,2306,847,2301,850,2253,769,2217,721,2174,678,2145,656,2119,640,2069,619,2018,601,1956,569,1932,550,1896,535"/>
+<area shape="poly" title=" " alt="" coords="1932,526,1958,528,2095,534,2220,536,2220,542,2095,540,1957,533,1932,531"/>
+<area shape="rect" title=" " alt="" coords="2455,459,2644,499"/>
+<area shape="poly" title=" " alt="" coords="1932,507,1957,505,2454,480,2455,486,1957,511,1932,512"/>
+<area shape="rect" title=" " alt="" coords="1291,434,1458,459"/>
+<area shape="poly" title=" " alt="" coords="1463,459,1519,468,1740,501,1740,506,1518,473,1462,464"/>
+<area shape="poly" title=" " alt="" coords="1472,441,1641,439,1844,440,2037,448,2116,456,2177,467,2235,489,2284,516,2282,521,2233,494,2175,472,2115,461,2037,453,1844,445,1641,444,1472,447"/>
+<area shape="poly" title=" " alt="" coords="1694,1336,1700,1332,1774,1280,1829,1234,1883,1187,1956,1131,2017,1093,2067,1067,2116,1040,2174,999,2242,940,2294,888,2297,891,2245,944,2178,1003,2118,1044,2069,1071,2020,1097,1959,1136,1886,1191,1832,1238,1778,1284,1703,1337,1697,1341"/>
+<area shape="rect" title=" " alt="" coords="2455,839,2644,879"/>
+<area shape="poly" title=" " alt="" coords="2657,839,2740,819,2833,789,2926,747,2970,721,3010,691,3041,659,3064,622,3093,559,3097,561,3069,624,3045,662,3014,695,2973,726,2928,752,2835,794,2742,824,2658,844"/>
+<area shape="poly" title=" " alt="" coords="1939,993,2053,984,2176,967,2304,938,2430,899,2495,876,2497,881,2432,904,2305,943,2176,972,2054,989,1939,999"/>
+<area shape="poly" title=" " alt="" coords="1473,1165,1530,1175,1590,1176,1619,1173,1648,1165,1675,1154,1700,1138,1710,1126,1714,1114,1712,1087,1710,1058,1714,1043,1723,1029,1747,1012,1750,1016,1727,1033,1719,1046,1715,1059,1718,1087,1719,1115,1714,1129,1703,1142,1678,1159,1650,1171,1620,1178,1590,1182,1529,1180,1472,1170"/>
+<area shape="rect" title=" " alt="" coords="2668,527,2867,567"/>
+<area shape="poly" title=" " alt="" coords="2881,544,3036,544,3036,549,2881,549"/>
+<area shape="poly" title=" " alt="" coords="2424,538,2668,542,2668,548,2424,543"/>
+<area shape="poly" title=" " alt="" coords="1714,735,1957,679,1991,674,2021,673,2073,675,2097,674,2122,670,2147,660,2174,642,2183,631,2186,619,2189,606,2198,592,2223,571,2252,556,2254,561,2226,576,2202,595,2194,608,2191,620,2188,633,2178,646,2149,664,2123,675,2098,679,2073,680,2021,678,1991,679,1958,684,1715,740"/>
+<area shape="rect" title=" " alt="" coords="2672,893,2863,933"/>
+<area shape="poly" title=" " alt="" coords="2875,893,2911,882,2947,867,2981,847,3010,822,3035,790,3055,755,3070,716,3080,678,3093,608,3096,559,3102,560,3098,609,3086,679,3075,718,3059,757,3039,793,3014,826,2984,851,2950,872,2913,887,2877,899"/>
+<area shape="rect" href="classsystems_1_1SystemPluginManager.html" title=" " alt="" coords="2200,1003,2431,1029"/>
+<area shape="poly" title=" " alt="" coords="2385,998,2678,931,2679,936,2386,1003"/>
+<area shape="poly" title=" " alt="" coords="2658,479,2826,490,2920,501,3013,516,3067,531,3065,537,3011,521,2919,506,2825,495,2658,484"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ObserverRelay" id="r_ObserverRelay"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsession_1_1Session_1_1ObserverRelay.html">ObserverRelay</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">内部转发观察者：宿主观察者（可为 nullptr）照常收到模型层通知， 同时把通知桥接为 ModelEvent 发布到事件总线（与原 app 层 Qt connect 等价）  <a href="classsession_1_1Session_1_1ObserverRelay.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a429c3fd7b8a9a6d913be590a5ff87f73" id="r_a429c3fd7b8a9a6d913be590a5ff87f73"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a429c3fd7b8a9a6d913be590a5ff87f73">Session</a> (<a class="el" href="classModelObserver.html">ModelObserver</a> *observer=nullptr, std::function&lt; void(std::function&lt; void()&gt;)&gt; dispatcher={ })</td></tr>
+<tr class="memdesc:a429c3fd7b8a9a6d913be590a5ff87f73"><td class="mdescLeft">&#160;</td><td class="mdescRight">装配会话  <br /></td></tr>
+<tr class="memitem:a889ef84b85a783430bfaf4822a2f9575" id="r_a889ef84b85a783430bfaf4822a2f9575"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a889ef84b85a783430bfaf4822a2f9575">jobRunner</a> ()</td></tr>
+<tr class="memdesc:a889ef84b85a783430bfaf4822a2f9575"><td class="mdescLeft">&#160;</td><td class="mdescRight">异步宿主的共享执行器；默认同步配置返回空。  <br /></td></tr>
+<tr class="memitem:a076a158793acd8af7c0efef8c304463f" id="r_a076a158793acd8af7c0efef8c304463f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a076a158793acd8af7c0efef8c304463f">setTaskCallbacks</a> (<a class="el" href="namespacesystems_1_1job.html#a2af5878d29208ac612981ea6c1e15087">systems::job::JobFinishedFn</a> started={ }, <a class="el" href="namespacesystems_1_1job.html#a62b9db7222639d1e30366a1d75475e42">systems::job::JobProgressFn</a> progress={ }, <a class="el" href="namespacesystems_1_1job.html#a2af5878d29208ac612981ea6c1e15087">systems::job::JobFinishedFn</a> finished={ })</td></tr>
+<tr class="memdesc:a076a158793acd8af7c0efef8c304463f"><td class="mdescLeft">&#160;</td><td class="mdescRight">展示回调只在空闲时装配；终态业务重放始终由 <a class="el" href="classsession_1_1Session.html">Session</a> 执行。  <br /></td></tr>
+<tr class="memitem:a9affcec963d555d47fe2b0f8ba8f6490" id="r_a9affcec963d555d47fe2b0f8ba8f6490"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9affcec963d555d47fe2b0f8ba8f6490">stopJobs</a> ()</td></tr>
+<tr class="memdesc:a9affcec963d555d47fe2b0f8ba8f6490"><td class="mdescLeft">&#160;</td><td class="mdescRight">宿主先停止任务，随后可关闭脚本运行时或拆会话。  <br /></td></tr>
+<tr class="memitem:ae3605be1a330657e9000e8f68434de40" id="r_ae3605be1a330657e9000e8f68434de40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae3605be1a330657e9000e8f68434de40">~Session</a> ()</td></tr>
+<tr class="memdesc:ae3605be1a330657e9000e8f68434de40"><td class="mdescLeft">&#160;</td><td class="mdescRight">有序拆解（见 teardown），保证任务停止、功能停用与钩子断开先于成员析构  <br /></td></tr>
+<tr class="memitem:a2f3d875076ead80e4c79ccc5507dd1f5" id="r_a2f3d875076ead80e4c79ccc5507dd1f5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f3d875076ead80e4c79ccc5507dd1f5">Session</a> (const <a class="el" href="classsession_1_1Session.html">Session</a> &amp;)=delete</td></tr>
+<tr class="memitem:a4420fc31bfd42a6a8e3d4267e3a4f96c" id="r_a4420fc31bfd42a6a8e3d4267e3a4f96c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsession_1_1Session.html">Session</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4420fc31bfd42a6a8e3d4267e3a4f96c">operator=</a> (const <a class="el" href="classsession_1_1Session.html">Session</a> &amp;)=delete</td></tr>
+<tr class="memitem:a91bba40d507c2070aae087641919bba9" id="r_a91bba40d507c2070aae087641919bba9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91bba40d507c2070aae087641919bba9">model</a> ()</td></tr>
+<tr class="memitem:a4f59a80d06e76a55e96783b1c96570fa" id="r_a4f59a80d06e76a55e96783b1c96570fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsession_1_1SessionQuery.html">SessionQuery</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4f59a80d06e76a55e96783b1c96570fa">query</a> ()</td></tr>
+<tr class="memitem:a04b807002240c762a252a3e698711ef2" id="r_a04b807002240c762a252a3e698711ef2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classUndoStack.html">UndoStack</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04b807002240c762a252a3e698711ef2">undoStack</a> ()</td></tr>
+<tr class="memitem:a130fb3959b74806163c442ab5f98b475" id="r_a130fb3959b74806163c442ab5f98b475"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcore_1_1EventBus.html">core::EventBus</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a130fb3959b74806163c442ab5f98b475">events</a> ()</td></tr>
+<tr class="memitem:ad44e6df7a3cf0c56eb407ef26b806b81" id="r_ad44e6df7a3cf0c56eb407ef26b806b81"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">systems::io::ModelIOSystem</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad44e6df7a3cf0c56eb407ef26b806b81">ioSystem</a> ()</td></tr>
+<tr class="memitem:ab2b6fc0168ea904a3f2567e0520c95d7" id="r_ab2b6fc0168ea904a3f2567e0520c95d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">systems::algo::AlgorithmSystem</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2b6fc0168ea904a3f2567e0520c95d7">algorithmSystem</a> ()</td></tr>
+<tr class="memitem:ad8b9253db5ba2ba1b921a01368f284fb" id="r_ad8b9253db5ba2ba1b921a01368f284fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1edit_1_1EditSystem.html">systems::edit::EditSystem</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad8b9253db5ba2ba1b921a01368f284fb">editSystem</a> ()</td></tr>
+<tr class="memitem:a0b7a19f39a297b84ae32842d0a5a86c6" id="r_a0b7a19f39a297b84ae32842d0a5a86c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">systems::feature::FeatureSystem</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b7a19f39a297b84ae32842d0a5a86c6">featureSystem</a> ()</td></tr>
+<tr class="memitem:ada4f3721b0799039098777f4990bfe29" id="r_ada4f3721b0799039098777f4990bfe29"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1SystemPluginManager.html">systems::SystemPluginManager</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada4f3721b0799039098777f4990bfe29">pluginManager</a> ()</td></tr>
+<tr class="memitem:ac2f5ee2e857b3eb16b595c9c44aa2836" id="r_ac2f5ee2e857b3eb16b595c9c44aa2836"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2f5ee2e857b3eb16b595c9c44aa2836">loadStaticPlugins</a> ()</td></tr>
+<tr class="memdesc:ac2f5ee2e857b3eb16b595c9c44aa2836"><td class="mdescLeft">&#160;</td><td class="mdescRight">注册全部静态插件  <br /></td></tr>
+<tr class="memitem:aabc7b197254c948171e421a5d54fed78" id="r_aabc7b197254c948171e421a5d54fed78"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabc7b197254c948171e421a5d54fed78">loadPluginsFromDirectory</a> (const std::filesystem::path &amp;plugin_dir)</td></tr>
+<tr class="memdesc:aabc7b197254c948171e421a5d54fed78"><td class="mdescLeft">&#160;</td><td class="mdescRight">扫描目录逐个注册动态插件；目录不存在时记日志跳过  <br /></td></tr>
+<tr class="memitem:aac7167f0a3de224252e1dc8b18085bcf" id="r_aac7167f0a3de224252e1dc8b18085bcf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aac7167f0a3de224252e1dc8b18085bcf">removeModel</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id)</td></tr>
+<tr class="memitem:ad333a9405259bf221fb5a25dd167cc65" id="r_ad333a9405259bf221fb5a25dd167cc65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad333a9405259bf221fb5a25dd167cc65">removeComponent</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:af8b02c37e84fc0d6792bc2316b2b1500" id="r_af8b02c37e84fc0d6792bc2316b2b1500"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8b02c37e84fc0d6792bc2316b2b1500">removeMesh</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memdesc:af8b02c37e84fc0d6792bc2316b2b1500"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除组件网格（操作边界：undo 自动记录 + 通知统一 flush）  <br /></td></tr>
+<tr class="memitem:a0ce6830828d87bc25131a07deb8189b5" id="r_a0ce6830828d87bc25131a07deb8189b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ce6830828d87bc25131a07deb8189b5">removeGeometry</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memdesc:a0ce6830828d87bc25131a07deb8189b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除组件几何（操作边界：undo 自动记录 + 通知统一 flush）  <br /></td></tr>
+<tr class="memitem:ac7097cc2c7669d305f45c636ab8aba3e" id="r_ac7097cc2c7669d305f45c636ab8aba3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7097cc2c7669d305f45c636ab8aba3e">teardown</a> ()</td></tr>
+<tr class="memdesc:ac7097cc2c7669d305f45c636ab8aba3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">有序拆解（幂等）：先停止任务，再停功能系统并断开栈与模型层的互指钩子  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:ab59d83c80b5d0a1653942a1f0877cb52" id="r_ab59d83c80b5d0a1653942a1f0877cb52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab59d83c80b5d0a1653942a1f0877cb52">boundaryWrite</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, std::string label, const std::function&lt; void(<a class="el" href="classComponentOperator.html">ComponentOperator</a> &amp;)&gt; &amp;<a class="el" href="TestFeatureSystem_8cpp.html#ad6fae20171c3c7cc1a32c899b095376e">write</a>)</td></tr>
+<tr class="memdesc:ab59d83c80b5d0a1653942a1f0877cb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">组件写操作的操作边界包装（undo 自动记录 + 异常先提交再 flush 重抛）  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:aa0c7032181b336d486047cf6a730d1b0" id="r_aa0c7032181b336d486047cf6a730d1b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcore_1_1EventBus.html">core::EventBus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0c7032181b336d486047cf6a730d1b0">event_bus_</a></td></tr>
+<tr class="memitem:a23620e352a46ac7e0afa4b772b0a7876" id="r_a23620e352a46ac7e0afa4b772b0a7876"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsession_1_1Session_1_1ObserverRelay.html">ObserverRelay</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a23620e352a46ac7e0afa4b772b0a7876">relay_</a></td></tr>
+<tr class="memitem:aa7c96bb8728912d462967457ac8b73aa" id="r_aa7c96bb8728912d462967457ac8b73aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa7c96bb8728912d462967457ac8b73aa">model_</a></td></tr>
+<tr class="memitem:a4d85fd826417ea7f8591659313a9c336" id="r_a4d85fd826417ea7f8591659313a9c336"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsession_1_1SessionQuery.html">SessionQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d85fd826417ea7f8591659313a9c336">query_</a></td></tr>
+<tr class="memitem:a2174e67a3eba740286f78a2de0544494" id="r_a2174e67a3eba740286f78a2de0544494"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classUndoStack.html">UndoStack</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2174e67a3eba740286f78a2de0544494">undo_stack_</a></td></tr>
+<tr class="memitem:acd0601c054245261f8df2f36dc84d9ca" id="r_acd0601c054245261f8df2f36dc84d9ca"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">systems::io::ModelIOSystem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acd0601c054245261f8df2f36dc84d9ca">io_system_</a></td></tr>
+<tr class="memitem:a098ed6b10144be5ae684fc781a911910" id="r_a098ed6b10144be5ae684fc781a911910"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">systems::algo::AlgorithmSystem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a098ed6b10144be5ae684fc781a911910">algo_system_</a></td></tr>
+<tr class="memitem:aff6f230a9b27f7aca2f4db6c90778f85" id="r_aff6f230a9b27f7aca2f4db6c90778f85"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1edit_1_1EditSystem.html">systems::edit::EditSystem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff6f230a9b27f7aca2f4db6c90778f85">edit_system_</a></td></tr>
+<tr class="memitem:a72c708fa5f9f8573909d8ead389c3eb8" id="r_a72c708fa5f9f8573909d8ead389c3eb8"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">systems::feature::FeatureSystem</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a72c708fa5f9f8573909d8ead389c3eb8">feature_system_</a></td></tr>
+<tr class="memitem:a98370f006637d1f49042c357f7845101" id="r_a98370f006637d1f49042c357f7845101"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1SystemPluginManager.html">systems::SystemPluginManager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a98370f006637d1f49042c357f7845101">plugin_manager_</a></td></tr>
+<tr class="memitem:ac828493e35c4d174697e0a31659d8e91" id="r_ac828493e35c4d174697e0a31659d8e91"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac828493e35c4d174697e0a31659d8e91">job_runner_</a></td></tr>
+<tr class="memdesc:ac828493e35c4d174697e0a31659d8e91"><td class="mdescLeft">&#160;</td><td class="mdescRight">先停任务，再拆功能和模型  <br /></td></tr>
+<tr class="memitem:a8a4b44c5ed6f906972dc727ea2c859d2" id="r_a8a4b44c5ed6f906972dc727ea2c859d2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a4b44c5ed6f906972dc727ea2c859d2">torn_down_</a> { false }</td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a429c3fd7b8a9a6d913be590a5ff87f73" name="a429c3fd7b8a9a6d913be590a5ff87f73"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a429c3fd7b8a9a6d913be590a5ff87f73">&#9670;&#160;</a></span>Session() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">session::Session::Session </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classModelObserver.html">ModelObserver</a> *</td>          <td class="paramname"><span class="paramname"><em>observer</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::function&lt; void(std::function&lt; void()&gt;)&gt;</td>          <td class="paramname"><span class="paramname"><em>dispatcher</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{&#160;}</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel explicit">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>装配会话 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">observer</td><td>宿主观察者（如 app 层 QModelObserver；可为 nullptr）。 内部转发观察者先通知宿主、再把模型层通知桥接为 ModelEvent。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae3605be1a330657e9000e8f68434de40" name="ae3605be1a330657e9000e8f68434de40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3605be1a330657e9000e8f68434de40">&#9670;&#160;</a></span>~Session()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">session::Session::~Session </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>有序拆解（见 teardown），保证任务停止、功能停用与钩子断开先于成员析构 </p>
+
+</div>
+</div>
+<a id="a2f3d875076ead80e4c79ccc5507dd1f5" name="a2f3d875076ead80e4c79ccc5507dd1f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f3d875076ead80e4c79ccc5507dd1f5">&#9670;&#160;</a></span>Session() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">session::Session::Session </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsession_1_1Session.html">Session</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="ab2b6fc0168ea904a3f2567e0520c95d7" name="ab2b6fc0168ea904a3f2567e0520c95d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2b6fc0168ea904a3f2567e0520c95d7">&#9670;&#160;</a></span>algorithmSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">systems::algo::AlgorithmSystem</a> &amp; session::Session::algorithmSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab59d83c80b5d0a1653942a1f0877cb52" name="ab59d83c80b5d0a1653942a1f0877cb52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab59d83c80b5d0a1653942a1f0877cb52">&#9670;&#160;</a></span>boundaryWrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::boundaryWrite </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>label</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::function&lt; void(<a class="el" href="classComponentOperator.html">ComponentOperator</a> &amp;)&gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>write</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>组件写操作的操作边界包装（undo 自动记录 + 异常先提交再 flush 重抛） </p>
+
+</div>
+</div>
+<a id="ad8b9253db5ba2ba1b921a01368f284fb" name="ad8b9253db5ba2ba1b921a01368f284fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8b9253db5ba2ba1b921a01368f284fb">&#9670;&#160;</a></span>editSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1edit_1_1EditSystem.html">systems::edit::EditSystem</a> &amp; session::Session::editSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a130fb3959b74806163c442ab5f98b475" name="a130fb3959b74806163c442ab5f98b475"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a130fb3959b74806163c442ab5f98b475">&#9670;&#160;</a></span>events()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcore_1_1EventBus.html">core::EventBus</a> &amp; session::Session::events </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0b7a19f39a297b84ae32842d0a5a86c6" name="a0b7a19f39a297b84ae32842d0a5a86c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b7a19f39a297b84ae32842d0a5a86c6">&#9670;&#160;</a></span>featureSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">systems::feature::FeatureSystem</a> &amp; session::Session::featureSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad44e6df7a3cf0c56eb407ef26b806b81" name="ad44e6df7a3cf0c56eb407ef26b806b81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad44e6df7a3cf0c56eb407ef26b806b81">&#9670;&#160;</a></span>ioSystem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">systems::io::ModelIOSystem</a> &amp; session::Session::ioSystem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a889ef84b85a783430bfaf4822a2f9575" name="a889ef84b85a783430bfaf4822a2f9575"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a889ef84b85a783430bfaf4822a2f9575">&#9670;&#160;</a></span>jobRunner()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a> * session::Session::jobRunner </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>异步宿主的共享执行器；默认同步配置返回空。 </p>
+
+</div>
+</div>
+<a id="aabc7b197254c948171e421a5d54fed78" name="aabc7b197254c948171e421a5d54fed78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabc7b197254c948171e421a5d54fed78">&#9670;&#160;</a></span>loadPluginsFromDirectory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::loadPluginsFromDirectory </td>
+          <td>(</td>
+          <td class="paramtype">const std::filesystem::path &amp;</td>          <td class="paramname"><span class="paramname"><em>plugin_dir</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>扫描目录逐个注册动态插件；目录不存在时记日志跳过 </p>
+
+</div>
+</div>
+<a id="ac2f5ee2e857b3eb16b595c9c44aa2836" name="ac2f5ee2e857b3eb16b595c9c44aa2836"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2f5ee2e857b3eb16b595c9c44aa2836">&#9670;&#160;</a></span>loadStaticPlugins()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::loadStaticPlugins </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>注册全部静态插件 </p>
+
+</div>
+</div>
+<a id="a91bba40d507c2070aae087641919bba9" name="a91bba40d507c2070aae087641919bba9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91bba40d507c2070aae087641919bba9">&#9670;&#160;</a></span>model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp; session::Session::model </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4420fc31bfd42a6a8e3d4267e3a4f96c" name="a4420fc31bfd42a6a8e3d4267e3a4f96c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4420fc31bfd42a6a8e3d4267e3a4f96c">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsession_1_1Session.html">Session</a> &amp; session::Session::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classsession_1_1Session.html">Session</a> &amp;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel delete">delete</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ada4f3721b0799039098777f4990bfe29" name="ada4f3721b0799039098777f4990bfe29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada4f3721b0799039098777f4990bfe29">&#9670;&#160;</a></span>pluginManager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1SystemPluginManager.html">systems::SystemPluginManager</a> &amp; session::Session::pluginManager </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4f59a80d06e76a55e96783b1c96570fa" name="a4f59a80d06e76a55e96783b1c96570fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f59a80d06e76a55e96783b1c96570fa">&#9670;&#160;</a></span>query()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsession_1_1SessionQuery.html">SessionQuery</a> &amp; session::Session::query </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad333a9405259bf221fb5a25dd167cc65" name="ad333a9405259bf221fb5a25dd167cc65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad333a9405259bf221fb5a25dd167cc65">&#9670;&#160;</a></span>removeComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::removeComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0ce6830828d87bc25131a07deb8189b5" name="a0ce6830828d87bc25131a07deb8189b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ce6830828d87bc25131a07deb8189b5">&#9670;&#160;</a></span>removeGeometry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::removeGeometry </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>移除组件几何（操作边界：undo 自动记录 + 通知统一 flush） </p>
+
+</div>
+</div>
+<a id="af8b02c37e84fc0d6792bc2316b2b1500" name="af8b02c37e84fc0d6792bc2316b2b1500"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8b02c37e84fc0d6792bc2316b2b1500">&#9670;&#160;</a></span>removeMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::removeMesh </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>移除组件网格（操作边界：undo 自动记录 + 通知统一 flush） </p>
+
+</div>
+</div>
+<a id="aac7167f0a3de224252e1dc8b18085bcf" name="aac7167f0a3de224252e1dc8b18085bcf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac7167f0a3de224252e1dc8b18085bcf">&#9670;&#160;</a></span>removeModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::removeModel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a076a158793acd8af7c0efef8c304463f" name="a076a158793acd8af7c0efef8c304463f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a076a158793acd8af7c0efef8c304463f">&#9670;&#160;</a></span>setTaskCallbacks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::setTaskCallbacks </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1job.html#a2af5878d29208ac612981ea6c1e15087">systems::job::JobFinishedFn</a></td>          <td class="paramname"><span class="paramname"><em>started</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{&#160;}</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1job.html#a62b9db7222639d1e30366a1d75475e42">systems::job::JobProgressFn</a></td>          <td class="paramname"><span class="paramname"><em>progress</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{&#160;}</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacesystems_1_1job.html#a2af5878d29208ac612981ea6c1e15087">systems::job::JobFinishedFn</a></td>          <td class="paramname"><span class="paramname"><em>finished</em></span><span class="paramdefsep"> = </span><span class="paramdefval">{&#160;}</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>展示回调只在空闲时装配；终态业务重放始终由 <a class="el" href="classsession_1_1Session.html">Session</a> 执行。 </p>
+
+</div>
+</div>
+<a id="a9affcec963d555d47fe2b0f8ba8f6490" name="a9affcec963d555d47fe2b0f8ba8f6490"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9affcec963d555d47fe2b0f8ba8f6490">&#9670;&#160;</a></span>stopJobs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::stopJobs </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>宿主先停止任务，随后可关闭脚本运行时或拆会话。 </p>
+
+</div>
+</div>
+<a id="ac7097cc2c7669d305f45c636ab8aba3e" name="ac7097cc2c7669d305f45c636ab8aba3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7097cc2c7669d305f45c636ab8aba3e">&#9670;&#160;</a></span>teardown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void session::Session::teardown </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>有序拆解（幂等）：先停止任务，再停功能系统并断开栈与模型层的互指钩子 </p>
+
+</div>
+</div>
+<a id="a04b807002240c762a252a3e698711ef2" name="a04b807002240c762a252a3e698711ef2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04b807002240c762a252a3e698711ef2">&#9670;&#160;</a></span>undoStack()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classUndoStack.html">UndoStack</a> &amp; session::Session::undoStack </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a098ed6b10144be5ae684fc781a911910" name="a098ed6b10144be5ae684fc781a911910"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a098ed6b10144be5ae684fc781a911910">&#9670;&#160;</a></span>algo_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1algo_1_1AlgorithmSystem.html">systems::algo::AlgorithmSystem</a>&gt; session::Session::algo_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff6f230a9b27f7aca2f4db6c90778f85" name="aff6f230a9b27f7aca2f4db6c90778f85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff6f230a9b27f7aca2f4db6c90778f85">&#9670;&#160;</a></span>edit_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1edit_1_1EditSystem.html">systems::edit::EditSystem</a>&gt; session::Session::edit_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0c7032181b336d486047cf6a730d1b0" name="aa0c7032181b336d486047cf6a730d1b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0c7032181b336d486047cf6a730d1b0">&#9670;&#160;</a></span>event_bus_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcore_1_1EventBus.html">core::EventBus</a> session::Session::event_bus_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a72c708fa5f9f8573909d8ead389c3eb8" name="a72c708fa5f9f8573909d8ead389c3eb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72c708fa5f9f8573909d8ead389c3eb8">&#9670;&#160;</a></span>feature_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">systems::feature::FeatureSystem</a>&gt; session::Session::feature_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acd0601c054245261f8df2f36dc84d9ca" name="acd0601c054245261f8df2f36dc84d9ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd0601c054245261f8df2f36dc84d9ca">&#9670;&#160;</a></span>io_system_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1io_1_1ModelIOSystem.html">systems::io::ModelIOSystem</a>&gt; session::Session::io_system_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac828493e35c4d174697e0a31659d8e91" name="ac828493e35c4d174697e0a31659d8e91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac828493e35c4d174697e0a31659d8e91">&#9670;&#160;</a></span>job_runner_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1job_1_1JobRunner.html">systems::job::JobRunner</a>&gt; session::Session::job_runner_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>先停任务，再拆功能和模型 </p>
+
+</div>
+</div>
+<a id="aa7c96bb8728912d462967457ac8b73aa" name="aa7c96bb8728912d462967457ac8b73aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7c96bb8728912d462967457ac8b73aa">&#9670;&#160;</a></span>model_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a> session::Session::model_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a98370f006637d1f49042c357f7845101" name="a98370f006637d1f49042c357f7845101"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98370f006637d1f49042c357f7845101">&#9670;&#160;</a></span>plugin_manager_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsystems_1_1SystemPluginManager.html">systems::SystemPluginManager</a>&gt; session::Session::plugin_manager_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4d85fd826417ea7f8591659313a9c336" name="a4d85fd826417ea7f8591659313a9c336"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d85fd826417ea7f8591659313a9c336">&#9670;&#160;</a></span>query_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsession_1_1SessionQuery.html">SessionQuery</a> session::Session::query_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a23620e352a46ac7e0afa4b772b0a7876" name="a23620e352a46ac7e0afa4b772b0a7876"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23620e352a46ac7e0afa4b772b0a7876">&#9670;&#160;</a></span>relay_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classsession_1_1Session_1_1ObserverRelay.html">ObserverRelay</a>&gt; session::Session::relay_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8a4b44c5ed6f906972dc727ea2c859d2" name="a8a4b44c5ed6f906972dc727ea2c859d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a4b44c5ed6f906972dc727ea2c859d2">&#9670;&#160;</a></span>torn_down_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool session::Session::torn_down_ { false }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2174e67a3eba740286f78a2de0544494" name="a2174e67a3eba740286f78a2de0544494"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2174e67a3eba740286f78a2de0544494">&#9670;&#160;</a></span>undo_stack_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classUndoStack.html">UndoStack</a>&gt; session::Session::undo_stack_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/session/<a class="el" href="Session_8h_source.html">Session.h</a></li>
+<li>model/session/<a class="el" href="Session_8cpp.html">Session.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

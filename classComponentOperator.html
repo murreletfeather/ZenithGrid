@@ -1,0 +1,935 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: ComponentOperator类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classComponentOperator-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">ComponentOperator类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>组件数据的统一写入口：写必脏  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="ComponentOperator_8h_source.html">ComponentOperator.h</a>&gt;</code></p>
+<div class="dynheader">
+ComponentOperator 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classComponentOperator__coll__graph.png" border="0" usemap="#aComponentOperator_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aComponentOperator_coll__map" id="aComponentOperator_coll__map">
+<area shape="rect" title="组件数据的统一写入口：写必脏" alt="" coords="3229,806,3384,831"/>
+<area shape="rect" href="structComponentData.html" title="模型的组成单元：一个 ComponentData 表示模型中的一个物体部件" alt="" coords="1950,770,2078,795"/>
+<area shape="poly" title=" " alt="" coords="2071,796,2188,823,2258,833,2327,837,3092,837,3162,834,3229,827,3229,833,3163,840,3092,843,2327,843,2257,839,2187,828,2070,802"/>
+<area shape="rect" title=" " alt="" coords="2224,763,2433,803"/>
+<area shape="poly" title=" " alt="" coords="2092,780,2224,780,2224,785,2092,785"/>
+<area shape="rect" title=" " alt="" coords="261,319,348,345"/>
+<area shape="poly" title=" " alt="" coords="361,316,483,290,650,263,744,253,841,247,940,246,1036,252,1162,264,1216,277,1281,303,1294,313,1305,322,1350,338,1387,344,1426,348,1474,359,1542,377,1601,389,1704,409,1752,423,1799,444,1848,476,1901,521,1927,551,1950,585,1983,657,2003,723,2013,769,2008,770,1998,725,1978,659,1945,587,1923,554,1897,525,1845,480,1796,449,1750,428,1703,414,1600,394,1541,382,1473,364,1425,353,1387,349,1349,343,1303,326,1290,317,1279,308,1214,282,1161,269,1036,257,940,251,842,252,744,259,651,269,484,295,362,321"/>
+<area shape="rect" title=" " alt="" coords="637,725,821,765"/>
+<area shape="poly" title=" " alt="" coords="317,357,372,505,408,583,425,613,442,634,486,668,537,694,589,714,638,727,637,733,587,719,535,699,484,673,438,638,421,617,403,586,367,507,312,359"/>
+<area shape="rect" href="classModelData.html" title="Model主要负责处理模型数据，先更新模型数据，再更新ModelActor调函数" alt="" coords="683,366,776,391"/>
+<area shape="poly" title=" " alt="" coords="362,334,596,359,683,370,682,375,596,364,361,340"/>
+<area shape="rect" title=" " alt="" coords="5,312,144,352"/>
+<area shape="poly" title=" " alt="" coords="158,329,261,329,261,335,158,335"/>
+<area shape="rect" title=" " alt="" coords="1497,1042,1712,1067"/>
+<area shape="poly" title=" " alt="" coords="1635,1032,1992,793,1995,798,1638,1037"/>
+<area shape="rect" href="structMeshData.html" title=" " alt="" coords="1126,1097,1214,1122"/>
+<area shape="poly" title=" " alt="" coords="1227,1100,1503,1065,1503,1070,1228,1105"/>
+<area shape="rect" href="classMeshAdjacency.html" title=" " alt="" coords="1543,770,1667,795"/>
+<area shape="poly" title=" " alt="" coords="1198,1086,1585,793,1588,798,1201,1090"/>
+<area shape="rect" title=" " alt="" coords="645,1324,813,1364"/>
+<area shape="poly" title=" " alt="" coords="827,1340,878,1335,931,1324,985,1308,1035,1283,1058,1266,1080,1245,1117,1199,1144,1154,1161,1121,1166,1123,1149,1157,1121,1202,1084,1249,1062,1270,1037,1288,987,1313,933,1330,878,1340,828,1346"/>
+<area shape="rect" title=" " alt="" coords="217,1485,392,1510"/>
+<area shape="poly" title=" " alt="" coords="375,1510,425,1516,482,1517,540,1511,595,1494,636,1467,670,1431,697,1394,716,1363,720,1365,702,1397,675,1434,639,1471,597,1498,541,1516,482,1523,425,1521,374,1515"/>
+<area shape="rect" title=" " alt="" coords="226,619,383,645"/>
+<area shape="poly" title=" " alt="" coords="310,658,317,728,331,830,356,952,394,1079,419,1141,447,1200,481,1254,519,1302,563,1342,612,1373,667,1392,728,1399,1606,1399,1649,1396,1686,1387,1716,1374,1742,1356,1763,1334,1780,1308,1808,1247,1851,1096,1880,1013,1920,931,2003,794,2007,797,1925,933,1885,1015,1856,1097,1813,1248,1785,1311,1767,1338,1745,1360,1719,1379,1687,1393,1650,1401,1606,1404,728,1404,666,1397,610,1377,560,1346,515,1306,477,1258,443,1203,414,1144,389,1081,351,953,326,831,312,729,305,658"/>
+<area shape="poly" title=" " alt="" coords="319,656,357,734,421,840,463,896,510,950,563,998,621,1038,678,1065,728,1080,774,1085,820,1085,916,1079,972,1078,1036,1084,1126,1099,1125,1104,1036,1089,972,1084,916,1084,820,1090,774,1091,727,1085,676,1070,619,1042,560,1002,506,954,459,900,417,843,353,737,314,659"/>
+<area shape="rect" title=" " alt="" coords="631,546,828,601"/>
+<area shape="poly" title=" " alt="" coords="386,614,440,605,630,581,631,586,440,611,386,620"/>
+<area shape="poly" title=" " alt="" coords="359,646,440,667,502,674,555,673,650,663,694,661,740,666,788,681,840,711,850,724,853,737,856,749,864,759,896,764,966,768,1166,772,1473,773,1543,777,1542,782,1473,779,1166,778,965,774,895,770,861,764,851,752,848,738,845,726,837,715,786,686,739,671,694,666,650,668,556,679,501,679,440,672,358,651"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="3041,511,3140,537"/>
+<area shape="poly" title=" " alt="" coords="332,609,382,573,451,529,533,486,619,453,745,423,854,407,951,402,1042,405,1232,416,1343,416,1473,408,1569,394,1644,378,1719,364,1816,359,2732,357,2816,356,2883,359,2915,365,2947,376,2981,392,3019,415,3043,437,3063,463,3087,510,3082,512,3058,466,3039,441,3016,419,2978,397,2945,381,2913,370,2882,364,2816,362,2732,363,1816,364,1719,370,1645,383,1570,399,1474,413,1343,422,1232,421,1042,410,951,408,854,412,746,428,621,459,535,491,454,534,385,577,335,613"/>
+<area shape="poly" title=" " alt="" coords="311,605,327,562,354,509,390,456,413,432,439,412,475,402,540,393,682,380,683,385,541,399,476,408,441,417,417,436,394,459,358,511,332,564,316,607"/>
+<area shape="rect" title=" " alt="" coords="647,1180,812,1220"/>
+<area shape="poly" title=" " alt="" coords="825,1185,927,1169,1035,1147,1131,1119,1132,1125,1037,1152,928,1174,826,1190"/>
+<area shape="rect" title=" " alt="" coords="653,1245,806,1299"/>
+<area shape="poly" title=" " alt="" coords="819,1262,925,1243,981,1227,1035,1207,1071,1187,1105,1163,1154,1120,1158,1124,1108,1167,1074,1192,1037,1212,983,1232,926,1248,820,1267"/>
+<area shape="rect" title=" " alt="" coords="653,1101,806,1155"/>
+<area shape="poly" title=" " alt="" coords="820,1122,1126,1109,1126,1114,820,1127"/>
+<area shape="poly" title=" " alt="" coords="827,771,841,782,853,804,855,825,856,846,865,868,896,908,932,946,1010,1012,1086,1062,1144,1094,1142,1099,1083,1066,1007,1016,928,950,892,912,860,871,851,847,850,825,848,806,837,786,824,775"/>
+<area shape="rect" title=" " alt="" coords="222,1431,387,1457"/>
+<area shape="poly" title=" " alt="" coords="308,1417,336,1302,361,1222,394,1132,435,1039,486,946,546,859,581,819,618,782,647,763,650,768,622,786,585,822,551,862,490,949,440,1041,398,1134,366,1223,341,1304,314,1418"/>
+<area shape="rect" title=" " alt="" coords="1505,477,1704,517"/>
+<area shape="poly" title=" " alt="" coords="1673,520,1784,572,1844,606,1900,646,1934,677,1965,711,2006,768,2002,771,1960,715,1931,681,1897,650,1841,611,1781,576,1671,525"/>
+<area shape="rect" href="structGeometryData.html" title=" " alt="" coords="1111,317,1229,342"/>
+<area shape="poly" title=" " alt="" coords="1243,336,1282,353,1294,367,1306,382,1356,413,1411,439,1517,475,1515,480,1409,444,1354,418,1302,386,1290,371,1278,357,1241,341"/>
+<area shape="rect" title=" " alt="" coords="638,301,821,341"/>
+<area shape="poly" title=" " alt="" coords="835,327,863,328,996,330,1111,328,1111,334,996,335,863,333,835,332"/>
+<area shape="rect" href="structGeometrySubshapeIndex.html" title=" " alt="" coords="636,117,823,142"/>
+<area shape="poly" title=" " alt="" coords="771,145,1061,279,1141,314,1138,319,1059,284,769,150"/>
+<area shape="rect" title=" " alt="" coords="193,165,416,235"/>
+<area shape="poly" title=" " alt="" coords="429,180,596,153,668,139,669,145,596,159,430,185"/>
+<area shape="rect" title=" " alt="" coords="197,10,412,35"/>
+<area shape="poly" title=" " alt="" coords="426,25,511,36,597,56,661,84,711,114,708,119,658,89,595,61,510,41,425,30"/>
+<area shape="rect" title=" " alt="" coords="203,63,407,89"/>
+<area shape="poly" title=" " alt="" coords="421,83,596,103,664,114,664,119,596,108,420,88"/>
+<area shape="rect" title=" " alt="" coords="204,115,405,141"/>
+<area shape="poly" title=" " alt="" coords="419,126,636,126,636,132,419,131"/>
+<area shape="rect" title=" " alt="" coords="1505,605,1704,645"/>
+<area shape="poly" title=" " alt="" coords="1671,648,1981,767,1979,772,1669,653"/>
+<area shape="rect" href="structGeometryMeshMap.html" title="Geometry 子形状与 MeshData 局部拓扑之间的通用映射" alt="" coords="1095,558,1245,583"/>
+<area shape="poly" title=" " alt="" coords="1259,579,1505,610,1505,616,1259,584"/>
+<area shape="poly" title=" " alt="" coords="842,570,1094,568,1094,574,842,575"/>
+<area shape="rect" title=" " alt="" coords="620,467,839,522"/>
+<area shape="poly" title=" " alt="" coords="852,497,943,506,1037,521,1092,537,1140,555,1138,560,1091,542,1035,527,942,511,852,502"/>
+<area shape="poly" title=" " alt="" coords="1680,780,1950,780,1950,785,1680,785"/>
+<area shape="rect" title=" " alt="" coords="1066,644,1274,684"/>
+<area shape="poly" title=" " alt="" coords="1275,685,1474,736,1569,767,1567,772,1473,741,1273,690"/>
+<area shape="rect" href="structMeshAdjacency_1_1EdgeRow.html" title=" " alt="" coords="634,625,825,650"/>
+<area shape="poly" title=" " alt="" coords="838,640,1036,651,1066,653,1066,658,1036,656,838,645"/>
+<area shape="rect" title=" " alt="" coords="1081,800,1259,840"/>
+<area shape="poly" title=" " alt="" coords="1272,824,1370,824,1473,816,1522,806,1567,793,1568,798,1524,811,1474,821,1370,829,1272,829"/>
+<area shape="poly" title=" " alt="" coords="3111,546,3298,804,3294,807,3107,550"/>
+<area shape="rect" href="classGeometryRegistry.html" title=" " alt="" coords="2660,541,2801,566"/>
+<area shape="poly" title=" " alt="" coords="2815,554,2912,553,3017,543,3053,534,3054,539,3018,548,2912,558,2815,559"/>
+<area shape="rect" title=" " alt="" coords="2235,447,2422,502"/>
+<area shape="poly" title=" " alt="" coords="2436,491,2602,523,2673,538,2672,543,2601,528,2435,496"/>
+<area shape="rect" title=" " alt="" coords="2241,526,2417,581"/>
+<area shape="poly" title=" " alt="" coords="2431,551,2660,551,2660,556,2431,556"/>
+<area shape="rect" title=" " alt="" coords="2242,605,2415,659"/>
+<area shape="poly" title=" " alt="" coords="2429,612,2601,579,2672,564,2673,569,2602,584,2430,617"/>
+<area shape="rect" title=" " alt="" coords="2241,683,2417,738"/>
+<area shape="poly" title=" " alt="" coords="2430,702,2473,693,2518,680,2561,661,2599,634,2608,621,2611,607,2613,592,2623,577,2640,566,2659,558,2661,563,2643,570,2627,581,2618,594,2616,608,2613,623,2603,638,2564,665,2520,685,2475,699,2431,707"/>
+<area shape="rect" title=" " alt="" coords="1736,271,1899,326"/>
+<area shape="poly" title=" " alt="" coords="1912,296,2163,296,2732,296,2816,291,2885,287,2917,290,2949,298,2983,314,3019,339,3038,358,3054,380,3075,429,3087,476,3091,511,3086,512,3081,477,3070,431,3049,383,3034,362,3016,343,2980,319,2948,304,2916,295,2885,293,2817,297,2732,301,2163,301,1912,301"/>
+<area shape="rect" title=" " alt="" coords="1060,366,1280,391"/>
+<area shape="poly" title=" " alt="" coords="1254,361,1304,353,1539,324,1735,304,1736,309,1539,329,1304,359,1255,366"/>
+<area shape="poly" title=" " alt="" coords="790,379,863,381,1036,381,1060,381,1060,386,1036,387,863,387,790,384"/>
+<area shape="rect" title=" " alt="" coords="2631,590,2830,645"/>
+<area shape="poly" title=" " alt="" coords="2843,616,2930,607,2974,596,3016,582,3050,560,3076,535,3080,539,3054,564,3018,586,2976,601,2931,612,2844,622"/>
+<area shape="poly" title=" " alt="" coords="2447,780,2487,774,2527,763,2566,747,2599,723,2610,708,2611,692,2613,674,2623,656,2639,643,2642,647,2627,659,2618,675,2617,692,2615,710,2603,727,2568,751,2529,768,2488,779,2448,786"/>
+<area shape="rect" title=" " alt="" coords="2655,669,2807,709"/>
+<area shape="poly" title=" " alt="" coords="2820,692,2868,689,2919,682,2970,667,3016,643,3042,619,3061,589,3083,536,3088,538,3066,592,3046,622,3019,648,2972,672,2920,687,2869,695,2820,697"/>
+<area shape="rect" href="classMeshIDMap.html" title=" " alt="" coords="2681,889,2780,914"/>
+<area shape="poly" title=" " alt="" coords="2792,884,2835,867,2892,839,2936,816,2975,786,3015,738,3046,684,3067,626,3079,574,3085,537,3090,537,3084,575,3072,628,3051,687,3020,742,2979,790,2939,820,2895,844,2837,872,2794,889"/>
+<area shape="rect" title=" " alt="" coords="2223,944,2435,984"/>
+<area shape="poly" title=" " alt="" coords="2449,947,2601,925,2680,910,2681,915,2602,931,2449,953"/>
+<area shape="rect" title=" " alt="" coords="1923,944,2105,984"/>
+<area shape="poly" title=" " alt="" coords="2119,961,2222,961,2222,967,2119,967"/>
+<area shape="rect" title=" " alt="" coords="2257,880,2400,920"/>
+<area shape="poly" title=" " alt="" coords="2414,898,2681,899,2681,904,2414,903"/>
+<area shape="rect" href="classModelObserver.html" title=" " alt="" coords="2670,235,2791,261"/>
+<area shape="poly" title=" " alt="" coords="2805,233,2857,230,2914,234,2969,249,2995,261,3019,278,3043,304,3062,335,3075,368,3084,402,3092,465,3093,511,3087,511,3087,466,3079,403,3070,369,3057,337,3039,307,3016,282,2993,266,2968,254,2913,240,2857,236,2805,238"/>
+<area shape="rect" href="classUndoRecorder.html" title="undo 记录钩子（ModelLayer 回调，UndoStack 实现）" alt="" coords="2673,426,2788,451"/>
+<area shape="poly" title=" " alt="" coords="2802,438,2906,448,2963,460,3018,476,3049,491,3075,509,3072,513,3047,496,3016,481,2962,465,2905,454,2802,443"/>
+<area shape="rect" title=" " alt="" coords="2625,476,2836,516"/>
+<area shape="poly" title=" " alt="" coords="2850,503,3041,518,3041,523,2850,508"/>
+<area shape="rect" href="structModelLayer_1_1WriteAuthority.html" title="写权限状态（堆上共享）：含线程亲和、冻结窗口与框架特权深度" alt="" coords="2228,398,2429,423"/>
+<area shape="poly" title=" " alt="" coords="2403,424,2636,473,2635,479,2402,429"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a140a28cbe8a70633743d890d87a4e265" id="r_a140a28cbe8a70633743d890d87a4e265"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a140a28cbe8a70633743d890d87a4e265">ComponentOperator</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, <a class="el" href="structComponentData.html">ComponentData</a> &amp;<a class="el" href="#adce3eb62fdbb0277f6ea2d5a02f8dbc1">component</a>, <a class="el" href="classModelLayer.html">ModelLayer</a> &amp;mgr, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id=-1) noexcept</td></tr>
+<tr class="memitem:afc927436cda3d7e366844a987987a95b" id="r_afc927436cda3d7e366844a987987a95b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc927436cda3d7e366844a987987a95b">componentId</a> () const noexcept</td></tr>
+<tr class="memitem:adce3eb62fdbb0277f6ea2d5a02f8dbc1" id="r_adce3eb62fdbb0277f6ea2d5a02f8dbc1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structComponentData.html">ComponentData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adce3eb62fdbb0277f6ea2d5a02f8dbc1">component</a> () const noexcept</td></tr>
+<tr class="memitem:a7491ba5dbe33a4bbc34990e699c7e6a8" id="r_a7491ba5dbe33a4bbc34990e699c7e6a8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structMeshData.html">MeshData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7491ba5dbe33a4bbc34990e699c7e6a8">mesh</a> () const noexcept</td></tr>
+<tr class="memitem:aee7c5d7a64c00a863982a91bdc7ca5fd" id="r_aee7c5d7a64c00a863982a91bdc7ca5fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGeometryData.html">GeometryData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aee7c5d7a64c00a863982a91bdc7ca5fd">geometry</a> () const noexcept</td></tr>
+<tr class="memitem:af942a0446f360e1ad76a0db1d57e3a86" id="r_af942a0446f360e1ad76a0db1d57e3a86"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structGeometryMeshMap.html">GeometryMeshMap</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af942a0446f360e1ad76a0db1d57e3a86">geometryMeshMap</a> () const noexcept</td></tr>
+<tr class="memdesc:af942a0446f360e1ad76a0db1d57e3a86"><td class="mdescLeft">&#160;</td><td class="mdescRight">只读访问 Geometry↔Mesh 映射；尚未创建时返回 nullptr  <br /></td></tr>
+<tr class="memitem:a5ee9a3137379269a57b1ff77fad85877" id="r_a5ee9a3137379269a57b1ff77fad85877"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ee9a3137379269a57b1ff77fad85877">setName</a> (std::string <a class="el" href="TestComponentModel_8cpp.html#a4f5452c5c19395231dec92c40e3d10e1">name</a>)</td></tr>
+<tr class="memdesc:a5ee9a3137379269a57b1ff77fad85877"><td class="mdescLeft">&#160;</td><td class="mdescRight">写前捕获组件元数据，通知在操作边界统一发送。  <br /></td></tr>
+<tr class="memitem:a1b6a872cd25d5b392f526b47ed8068b9" id="r_a1b6a872cd25d5b392f526b47ed8068b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b6a872cd25d5b392f526b47ed8068b9">setMaterialId</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> material_id)</td></tr>
+<tr class="memitem:a39f2de524ef35e49951a2c08953e97ab" id="r_a39f2de524ef35e49951a2c08953e97ab"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39f2de524ef35e49951a2c08953e97ab">manager</a> () const noexcept</td></tr>
+<tr class="memitem:ad1a898f241ad7fac9ab2091ade83ba6a" id="r_ad1a898f241ad7fac9ab2091ade83ba6a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad1a898f241ad7fac9ab2091ade83ba6a">modelId</a> () const noexcept</td></tr>
+<tr class="memitem:a7949069eaab1630387db6abaecf93d18" id="r_a7949069eaab1630387db6abaecf93d18"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelData.html">ModelData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7949069eaab1630387db6abaecf93d18">model</a> () const</td></tr>
+<tr class="memitem:ac3f623c6833626268157dbf52ff3df7e" id="r_ac3f623c6833626268157dbf52ff3df7e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMeshData.html">MeshData</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac3f623c6833626268157dbf52ff3df7e">editableMesh</a> (<a class="el" href="ComponentOperator_8h.html#aaa4581396b959b0a0f7d487174d19308">MeshEditKind</a> kind=<a class="el" href="ComponentOperator_8h.html#aaa4581396b959b0a0f7d487174d19308a99571eecaa5c5d622bb0d1f855752d5f">MeshEditKind::Topology</a>, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:ac3f623c6833626268157dbf52ff3df7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">申请可写网格数据（获取即标脏：Topology 立即失效邻接懒表 + 记入待通知集合）  <br /></td></tr>
+<tr class="memitem:a8ed2d182699dca14709737762e058790" id="r_a8ed2d182699dca14709737762e058790"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGeometryMeshMap.html">GeometryMeshMap</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ed2d182699dca14709737762e058790">editableGeometryMeshMap</a> (std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a8ed2d182699dca14709737762e058790"><td class="mdescLeft">&#160;</td><td class="mdescRight">申请可写 Geometry↔Mesh 映射（获取即标脏，确保映射修改进入 Undo 快照）  <br /></td></tr>
+<tr class="memitem:a5f13833aeec935e40eaac48d37a982ff" id="r_a5f13833aeec935e40eaac48d37a982ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f13833aeec935e40eaac48d37a982ff">appendPoint</a> (std::array&lt; double, 3 &gt; pos, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a5f13833aeec935e40eaac48d37a982ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">运行期加点：写前标脏后执行原子四连（push、vertex_count_ 同步、pointIdMap 分配 gid、point_global_ids_ 追加）  <br /></td></tr>
+<tr class="memitem:a068ee9f9096e7caf535597a0b35c7399" id="r_a068ee9f9096e7caf535597a0b35c7399"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a068ee9f9096e7caf535597a0b35c7399">appendFace</a> (const std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &amp;local_point_ids, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a068ee9f9096e7caf535597a0b35c7399"><td class="mdescLeft">&#160;</td><td class="mdescRight">追加面单元：写前标脏后追加（空 face_vertices_offset_ 先补 {0}）  <br /></td></tr>
+<tr class="memitem:ad0ee64e79c6fad9755d9e8f5c8a990cb" id="r_ad0ee64e79c6fad9755d9e8f5c8a990cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0ee64e79c6fad9755d9e8f5c8a990cb">replaceMesh</a> (std::unique_ptr&lt; <a class="el" href="structMeshData.html">MeshData</a> &gt; <a class="el" href="#a7491ba5dbe33a4bbc34990e699c7e6a8">mesh</a>, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:ad0ee64e79c6fad9755d9e8f5c8a990cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">整网格替换（gid 纪律内建：写前标脏 → 释放旧点/边 gid → 就位 → ensure 点/边 gid）  <br /></td></tr>
+<tr class="memitem:a4c08fe965233cb70ab8b08fe94697b26" id="r_a4c08fe965233cb70ab8b08fe94697b26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c08fe965233cb70ab8b08fe94697b26">materializeEdge</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> p0, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> p1, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a4c08fe965233cb70ab8b08fe94697b26"><td class="mdescLeft">&#160;</td><td class="mdescRight">把一条几何边物化为边单元（写入 edge_vertices_），使其可挂属性、参与边渲染  <br /></td></tr>
+<tr class="memitem:a592c40b46805509323616fbb5049f169" id="r_a592c40b46805509323616fbb5049f169"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="structComponentData.html">ComponentData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a592c40b46805509323616fbb5049f169">takeSnapshot</a> () const</td></tr>
+<tr class="memdesc:a592c40b46805509323616fbb5049f169"><td class="mdescLeft">&#160;</td><td class="mdescRight">取组件当前状态的深拷贝快照（撤销重做/预览机制的统一原语）  <br /></td></tr>
+<tr class="memitem:a587c25ba6f1c24e23f52d3643f0c3f67" id="r_a587c25ba6f1c24e23f52d3643f0c3f67"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a587c25ba6f1c24e23f52d3643f0c3f67">restoreSnapshot</a> (const <a class="el" href="structComponentData.html">ComponentData</a> &amp;snapshot, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a587c25ba6f1c24e23f52d3643f0c3f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">恢复快照：gid 对账（释放现有点/边 gid → 覆盖数据 → 按快照原值 reclaim）后标脏  <br /></td></tr>
+<tr class="memitem:a3c5e1771e2735d76afea1563b69a8790" id="r_a3c5e1771e2735d76afea1563b69a8790"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c5e1771e2735d76afea1563b69a8790">appendGeometryShape</a> (TopoDS_Shape shape, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a3c5e1771e2735d76afea1563b69a8790"><td class="mdescLeft">&#160;</td><td class="mdescRight">将新形状写入当前组件；无几何时初始化，否则追加并重建子形状索引。  <br /></td></tr>
+<tr class="memitem:a9af4eb67ad5e1ed6e91ebea9d1a01c17" id="r_a9af4eb67ad5e1ed6e91ebea9d1a01c17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9af4eb67ad5e1ed6e91ebea9d1a01c17">replaceGeometryRoot</a> (TopoDS_Shape shape, std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memdesc:a9af4eb67ad5e1ed6e91ebea9d1a01c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">替换当前组件的几何根形状，并重建子形状索引；空 Shape 表示移除 Geometry。  <br /></td></tr>
+<tr class="memitem:ae9b56647ce6b9e437d3e9bf2a813c62f" id="r_ae9b56647ce6b9e437d3e9bf2a813c62f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9b56647ce6b9e437d3e9bf2a813c62f">removeMesh</a> (std::source_location loc=std::source_location::current())</td></tr>
+<tr class="memitem:a656849ddf7cdac317874bbfea20cd7a3" id="r_a656849ddf7cdac317874bbfea20cd7a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a656849ddf7cdac317874bbfea20cd7a3">removeGeometry</a> (std::source_location loc=std::source_location::current())</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a42c09da072bd1e8e3a61338150e3b4d7" id="r_a42c09da072bd1e8e3a61338150e3b4d7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42c09da072bd1e8e3a61338150e3b4d7">component_id_</a> { -1 }</td></tr>
+<tr class="memitem:aca6752cb2203867448f3ecf13e2aa56a" id="r_aca6752cb2203867448f3ecf13e2aa56a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca6752cb2203867448f3ecf13e2aa56a">model_id_</a> { -1 }</td></tr>
+<tr class="memitem:aa387f232bb4476915ef226a6d017c87d" id="r_aa387f232bb4476915ef226a6d017c87d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structComponentData.html">ComponentData</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa387f232bb4476915ef226a6d017c87d">component_</a> { nullptr }</td></tr>
+<tr class="memitem:a2ff8610d971e1c00d59205eee97909f6" id="r_a2ff8610d971e1c00d59205eee97909f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classModelLayer.html">ModelLayer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2ff8610d971e1c00d59205eee97909f6">mgr_</a> { nullptr }</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>组件数据的统一写入口：写必脏 </p>
+<p>所有可写入口（editableMesh(kind) 与语义化方法）自动经 <a class="el" href="classModelLayer.html#a8d5b3617c745ce6c527a544d3d9e66fc" title="标记组件数据已修改（写路径自动调用；Topology 类立即失效邻接懒表并记入待通知集合）">ModelLayer::markComponentDirty</a> 标脏——Topology 类立即失效邻接懒表 + 记入待通知集合（去重）；通知不即时发出， 由操作边界 <a class="el" href="classModelLayer.html#a2a8d757c14b82dfcce638e0e3a92e5f2" title="对待通知集合逐组件发 notifyComponentChanged 并清空（操作边界调用；空集合无操作）">ModelLayer::flushNotifications()</a> 统一发 notifyComponentChanged。 只读访问（component()/mesh()）不标脏；插件不再持有通知职责。</p>
+<dl class="section note"><dt>注解</dt><dd>写前标脏契约（新增写路径必读）：标脏必须发生在任何数据修改**之前**。 <a class="el" href="classModelLayer.html#a8d5b3617c745ce6c527a544d3d9e66fc" title="标记组件数据已修改（写路径自动调用；Topology 类立即失效邻接懒表并记入待通知集合）">ModelLayer::markComponentDirty</a> 同时是 undo 钩子入口，它在调用点克隆组件作为 before-image；若等到修改数据后才标脏，撤销栈记录的是修改后状态，撤销将失效 （整网格替换/整体删除类操作表现为"撤销完全无效"，增量追加类表现为"残留新元素"）。 函数内标脏应保持在前置校验之后、首个数据修改之前；幂等提前返回路径**不得**标脏， 否则未改数据却捕获 before-image，会在操作边界 commit 时入栈一条空记录。 </dd></dl>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a140a28cbe8a70633743d890d87a4e265" name="a140a28cbe8a70633743d890d87a4e265"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a140a28cbe8a70633743d890d87a4e265">&#9670;&#160;</a></span>ComponentOperator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ComponentOperator::ComponentOperator </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structComponentData.html">ComponentData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>component</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>mgr</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span><span class="paramdefsep"> = </span><span class="paramdefval">-1</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a068ee9f9096e7caf535597a0b35c7399" name="a068ee9f9096e7caf535597a0b35c7399"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a068ee9f9096e7caf535597a0b35c7399">&#9670;&#160;</a></span>appendFace()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::appendFace </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>local_point_ids</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>追加面单元：写前标脏后追加（空 face_vertices_offset_ 先补 {0}） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">local_point_ids</td><td>面顶点（组件内局部点 id，与 <a class="el" href="structMeshData.html">MeshData</a> 连通性同一键空间） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>新面单元序号 </dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>点数为 0 或局部 id 越界 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3c5e1771e2735d76afea1563b69a8790" name="a3c5e1771e2735d76afea1563b69a8790"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c5e1771e2735d76afea1563b69a8790">&#9670;&#160;</a></span>appendGeometryShape()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::appendGeometryShape </td>
+          <td>(</td>
+          <td class="paramtype">TopoDS_Shape</td>          <td class="paramname"><span class="paramname"><em>shape</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将新形状写入当前组件；无几何时初始化，否则追加并重建子形状索引。 </p>
+<dl class="section return"><dt>返回</dt><dd>当前组件 ID。 </dd></dl>
+
+</div>
+</div>
+<a id="a5f13833aeec935e40eaac48d37a982ff" name="a5f13833aeec935e40eaac48d37a982ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f13833aeec935e40eaac48d37a982ff">&#9670;&#160;</a></span>appendPoint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::appendPoint </td>
+          <td>(</td>
+          <td class="paramtype">std::array&lt; double, 3 &gt;</td>          <td class="paramname"><span class="paramname"><em>pos</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>运行期加点：写前标脏后执行原子四连（push、vertex_count_ 同步、pointIdMap 分配 gid、point_global_ids_ 追加） </p>
+
+</div>
+</div>
+<a id="adce3eb62fdbb0277f6ea2d5a02f8dbc1" name="adce3eb62fdbb0277f6ea2d5a02f8dbc1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adce3eb62fdbb0277f6ea2d5a02f8dbc1">&#9670;&#160;</a></span>component()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structComponentData.html">ComponentData</a> &amp; ComponentOperator::component </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afc927436cda3d7e366844a987987a95b" name="afc927436cda3d7e366844a987987a95b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc927436cda3d7e366844a987987a95b">&#9670;&#160;</a></span>componentId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::componentId </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ed2d182699dca14709737762e058790" name="a8ed2d182699dca14709737762e058790"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ed2d182699dca14709737762e058790">&#9670;&#160;</a></span>editableGeometryMeshMap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structGeometryMeshMap.html">GeometryMeshMap</a> &amp; ComponentOperator::editableGeometryMeshMap </td>
+          <td>(</td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>申请可写 Geometry↔Mesh 映射（获取即标脏，确保映射修改进入 Undo 快照） </p>
+
+</div>
+</div>
+<a id="ac3f623c6833626268157dbf52ff3df7e" name="ac3f623c6833626268157dbf52ff3df7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3f623c6833626268157dbf52ff3df7e">&#9670;&#160;</a></span>editableMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMeshData.html">MeshData</a> &amp; ComponentOperator::editableMesh </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ComponentOperator_8h.html#aaa4581396b959b0a0f7d487174d19308">MeshEditKind</a></td>          <td class="paramname"><span class="paramname"><em>kind</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="ComponentOperator_8h.html#aaa4581396b959b0a0f7d487174d19308a99571eecaa5c5d622bb0d1f855752d5f">MeshEditKind::Topology</a></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>申请可写网格数据（获取即标脏：Topology 立即失效邻接懒表 + 记入待通知集合） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">kind</td><td>修改类别，默认 Topology；仅写属性等附着数据时传 NonTopology 避免过度失效 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>组件无网格 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aee7c5d7a64c00a863982a91bdc7ca5fd" name="aee7c5d7a64c00a863982a91bdc7ca5fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee7c5d7a64c00a863982a91bdc7ca5fd">&#9670;&#160;</a></span>geometry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structGeometryData.html">GeometryData</a> * ComponentOperator::geometry </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af942a0446f360e1ad76a0db1d57e3a86" name="af942a0446f360e1ad76a0db1d57e3a86"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af942a0446f360e1ad76a0db1d57e3a86">&#9670;&#160;</a></span>geometryMeshMap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structGeometryMeshMap.html">GeometryMeshMap</a> * ComponentOperator::geometryMeshMap </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>只读访问 Geometry↔Mesh 映射；尚未创建时返回 nullptr </p>
+
+</div>
+</div>
+<a id="a39f2de524ef35e49951a2c08953e97ab" name="a39f2de524ef35e49951a2c08953e97ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39f2de524ef35e49951a2c08953e97ab">&#9670;&#160;</a></span>manager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a> &amp; ComponentOperator::manager </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c08fe965233cb70ab8b08fe94697b26" name="a4c08fe965233cb70ab8b08fe94697b26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c08fe965233cb70ab8b08fe94697b26">&#9670;&#160;</a></span>materializeEdge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::materializeEdge </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>p0</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>p1</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>把一条几何边物化为边单元（写入 edge_vertices_），使其可挂属性、参与边渲染 </p>
+<p>幂等：该边已物化时直接返回既有 cell 序号（该路径不标脏，避免入栈空记录）。 需写入时先写前标脏再追加边单元、同步分配全局边 id（MeshIDMap）； 通知由操作边界 flush 统一发出。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">p0</td><td>边端点 id（与 <a class="el" href="structMeshData.html">MeshData</a> 连通性同一键空间，组件内局部点 id） </td></tr>
+    <tr><td class="paramname">p1</td><td>边另一端点 id </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>物化边在 edge_vertices_ 中的 cell 序号 </dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>组件无网格 </td></tr>
+    <tr><td class="paramname">std::invalid_argument</td><td>端点非法（负值或两端点相同） </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7491ba5dbe33a4bbc34990e699c7e6a8" name="a7491ba5dbe33a4bbc34990e699c7e6a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7491ba5dbe33a4bbc34990e699c7e6a8">&#9670;&#160;</a></span>mesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structMeshData.html">MeshData</a> * ComponentOperator::mesh </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7949069eaab1630387db6abaecf93d18" name="a7949069eaab1630387db6abaecf93d18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7949069eaab1630387db6abaecf93d18">&#9670;&#160;</a></span>model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelData.html">ModelData</a> * ComponentOperator::model </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad1a898f241ad7fac9ab2091ade83ba6a" name="ad1a898f241ad7fac9ab2091ade83ba6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1a898f241ad7fac9ab2091ade83ba6a">&#9670;&#160;</a></span>modelId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::modelId </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel noexcept">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a656849ddf7cdac317874bbfea20cd7a3" name="a656849ddf7cdac317874bbfea20cd7a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a656849ddf7cdac317874bbfea20cd7a3">&#9670;&#160;</a></span>removeGeometry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::removeGeometry </td>
+          <td>(</td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae9b56647ce6b9e437d3e9bf2a813c62f" name="ae9b56647ce6b9e437d3e9bf2a813c62f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9b56647ce6b9e437d3e9bf2a813c62f">&#9670;&#160;</a></span>removeMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::removeMesh </td>
+          <td>(</td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9af4eb67ad5e1ed6e91ebea9d1a01c17" name="a9af4eb67ad5e1ed6e91ebea9d1a01c17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9af4eb67ad5e1ed6e91ebea9d1a01c17">&#9670;&#160;</a></span>replaceGeometryRoot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::replaceGeometryRoot </td>
+          <td>(</td>
+          <td class="paramtype">TopoDS_Shape</td>          <td class="paramname"><span class="paramname"><em>shape</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>替换当前组件的几何根形状，并重建子形状索引；空 Shape 表示移除 Geometry。 </p>
+<dl class="section return"><dt>返回</dt><dd>当前组件 ID。 </dd></dl>
+
+</div>
+</div>
+<a id="ad0ee64e79c6fad9755d9e8f5c8a990cb" name="ad0ee64e79c6fad9755d9e8f5c8a990cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0ee64e79c6fad9755d9e8f5c8a990cb">&#9670;&#160;</a></span>replaceMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::replaceMesh </td>
+          <td>(</td>
+          <td class="paramtype">std::unique_ptr&lt; <a class="el" href="structMeshData.html">MeshData</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>mesh</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>整网格替换（gid 纪律内建：写前标脏 → 释放旧点/边 gid → 就位 → ensure 点/边 gid） </p>
+
+</div>
+</div>
+<a id="a587c25ba6f1c24e23f52d3643f0c3f67" name="a587c25ba6f1c24e23f52d3643f0c3f67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a587c25ba6f1c24e23f52d3643f0c3f67">&#9670;&#160;</a></span>restoreSnapshot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::restoreSnapshot </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structComponentData.html">ComponentData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>snapshot</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::source_location</td>          <td class="paramname"><span class="paramname"><em>loc</em></span><span class="paramdefsep"> = </span><span class="paramdefval">std::source_location::current()</span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>恢复快照：gid 对账（释放现有点/边 gid → 覆盖数据 → 按快照原值 reclaim）后标脏 </p>
+<dl class="section note"><dt>注解</dt><dd>若组件带几何，几何子形状索引经重建领新 gid（索引是派生缓存，gid 身份载体在 <a class="el" href="classGeometryRegistry.html">GeometryRegistry</a> 且无法 reclaim 原值），几何 gid 跨 undo 不保持——由"undo 后
+      选择集清空"约定覆盖；mesh 侧点/边 gid 身份由 reclaim 保证。 通知不即时发出，由操作边界 flushNotifications() 统一发出。 </dd></dl>
+<dl class="exception"><dt>异常</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>gid 对账失败（reclaim 冲突） </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1b6a872cd25d5b392f526b47ed8068b9" name="a1b6a872cd25d5b392f526b47ed8068b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b6a872cd25d5b392f526b47ed8068b9">&#9670;&#160;</a></span>setMaterialId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::setMaterialId </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>material_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5ee9a3137379269a57b1ff77fad85877" name="a5ee9a3137379269a57b1ff77fad85877"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ee9a3137379269a57b1ff77fad85877">&#9670;&#160;</a></span>setName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ComponentOperator::setName </td>
+          <td>(</td>
+          <td class="paramtype">std::string</td>          <td class="paramname"><span class="paramname"><em>name</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>写前捕获组件元数据，通知在操作边界统一发送。 </p>
+
+</div>
+</div>
+<a id="a592c40b46805509323616fbb5049f169" name="a592c40b46805509323616fbb5049f169"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a592c40b46805509323616fbb5049f169">&#9670;&#160;</a></span>takeSnapshot()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="structComponentData.html">ComponentData</a> &gt; ComponentOperator::takeSnapshot </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>取组件当前状态的深拷贝快照（撤销重做/预览机制的统一原语） </p>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="aa387f232bb4476915ef226a6d017c87d" name="aa387f232bb4476915ef226a6d017c87d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa387f232bb4476915ef226a6d017c87d">&#9670;&#160;</a></span>component_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structComponentData.html">ComponentData</a>* ComponentOperator::component_ { nullptr }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a42c09da072bd1e8e3a61338150e3b4d7" name="a42c09da072bd1e8e3a61338150e3b4d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42c09da072bd1e8e3a61338150e3b4d7">&#9670;&#160;</a></span>component_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::component_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2ff8610d971e1c00d59205eee97909f6" name="a2ff8610d971e1c00d59205eee97909f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ff8610d971e1c00d59205eee97909f6">&#9670;&#160;</a></span>mgr_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classModelLayer.html">ModelLayer</a>* ComponentOperator::mgr_ { nullptr }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aca6752cb2203867448f3ecf13e2aa56a" name="aca6752cb2203867448f3ecf13e2aa56a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca6752cb2203867448f3ecf13e2aa56a">&#9670;&#160;</a></span>model_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> ComponentOperator::model_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>model/data/<a class="el" href="ComponentOperator_8h_source.html">ComponentOperator.h</a></li>
+<li>model/data/<a class="el" href="ComponentOperator_8cpp.html">ComponentOperator.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

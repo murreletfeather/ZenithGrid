@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: GeometryActorSelectOp类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classGeometryActorSelectOp-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">GeometryActorSelectOp类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="GeometryActorSelectOp_8h_source.html">GeometryActorSelectOp.h</a>&gt;</code></p>
+<div class="dynheader">
+GeometryActorSelectOp 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classGeometryActorSelectOp__coll__graph.png" border="0" usemap="#aGeometryActorSelectOp_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aGeometryActorSelectOp_coll__map" id="aGeometryActorSelectOp_coll__map">
+<area shape="rect" title=" " alt="" coords="3343,233,3521,258"/>
+<area shape="rect" title=" " alt="" coords="2977,225,3176,265"/>
+<area shape="poly" title=" " alt="" coords="3190,243,3343,243,3343,248,3190,248"/>
+<area shape="rect" href="classGeometryActor.html" title=" " alt="" coords="2781,233,2903,258"/>
+<area shape="poly" title=" " alt="" coords="2917,243,2977,243,2977,248,2917,248"/>
+<area shape="rect" href="structGeometrySubshapeIndex.html" title=" " alt="" coords="2387,179,2574,205"/>
+<area shape="poly" title=" " alt="" coords="2581,204,2781,234,2781,239,2580,209"/>
+<area shape="rect" title=" " alt="" coords="1955,5,2177,75"/>
+<area shape="poly" title=" " alt="" coords="2191,48,2275,65,2318,78,2358,94,2392,113,2423,135,2469,177,2465,181,2420,140,2389,117,2356,98,2316,83,2274,70,2190,53"/>
+<area shape="rect" title=" " alt="" coords="1959,99,2173,125"/>
+<area shape="poly" title=" " alt="" coords="2187,118,2272,129,2358,145,2407,160,2451,177,2449,182,2406,165,2357,151,2271,134,2187,123"/>
+<area shape="rect" title=" " alt="" coords="1964,153,2168,178"/>
+<area shape="poly" title=" " alt="" coords="2182,170,2387,183,2387,189,2182,175"/>
+<area shape="rect" title=" " alt="" coords="1965,206,2167,231"/>
+<area shape="poly" title=" " alt="" coords="2180,217,2267,215,2357,209,2412,202,2413,207,2358,215,2267,220,2180,222"/>
+<area shape="rect" title=" " alt="" coords="1964,259,2168,285"/>
+<area shape="poly" title=" " alt="" coords="2181,269,2268,262,2357,245,2411,225,2457,202,2459,207,2414,230,2358,251,2269,267,2182,274"/>
+<area shape="rect" title=" " alt="" coords="2381,253,2580,293"/>
+<area shape="poly" title=" " alt="" coords="2594,276,2675,274,2757,267,2804,256,2805,261,2758,272,2675,280,2595,281"/>
+<area shape="rect" href="classGeometryTopologyDiagnosticActor.html" title="计算并显示一个 GeometryActor 对应的 OCC 几何拓扑诊断结果。" alt="" coords="1959,309,2173,349"/>
+<area shape="poly" title=" " alt="" coords="2187,334,2271,333,2357,321,2401,308,2440,291,2443,296,2403,313,2358,327,2271,338,2187,340"/>
+<area shape="rect" title=" " alt="" coords="1461,93,1723,133"/>
+<area shape="poly" title=" " alt="" coords="1736,95,1788,99,1840,109,1890,129,1933,159,1945,176,1950,194,1947,228,1943,262,1946,278,1957,294,1972,307,1968,311,1953,298,1941,280,1937,262,1941,227,1945,194,1940,179,1929,163,1887,133,1839,114,1787,104,1736,101"/>
+<area shape="rect" title=" " alt="" coords="1423,229,1761,283"/>
+<area shape="poly" title=" " alt="" coords="1775,258,1854,267,1931,283,1956,294,1995,307,1993,312,1954,298,1930,288,1853,272,1775,263"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticActor_1_1DiagnosticPipeline.html" title="保存一种诊断类别的独立静态数据、映射器和 Actor。" alt="" coords="1091,183,1305,223"/>
+<area shape="poly" title=" " alt="" coords="1319,196,1399,196,1518,193,1674,188,1752,190,1825,196,1886,210,1912,220,1932,233,1944,248,1946,264,1948,280,1957,294,1975,307,1972,311,1953,298,1943,281,1941,265,1939,250,1929,237,1909,225,1885,215,1824,202,1752,195,1674,193,1519,198,1399,201,1319,201"/>
+<area shape="poly" title=" " alt="" coords="1319,217,1330,219,1423,231,1422,237,1329,224,1318,222"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticActor_1_1SizeMarkerPipeline.html" title="使用固定屏幕点大小标出肉眼难以看到的细小几何。" alt="" coords="1485,308,1699,348"/>
+<area shape="poly" title=" " alt="" coords="1713,326,1958,326,1958,332,1713,331"/>
+<area shape="rect" title=" " alt="" coords="1501,372,1683,412"/>
+<area shape="poly" title=" " alt="" coords="1697,381,1809,370,1930,355,1975,347,1976,352,1931,360,1810,376,1697,387"/>
+<area shape="rect" title=" " alt="" coords="1489,436,1695,476"/>
+<area shape="poly" title=" " alt="" coords="1708,446,1817,430,1874,418,1930,401,1987,376,2034,347,2037,352,1989,381,1932,407,1876,423,1818,436,1709,451"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticResult.html" title="几何拓扑诊断的完整结果。" alt="" coords="1091,433,1305,473"/>
+<area shape="poly" title=" " alt="" coords="1319,451,1489,453,1489,458,1319,457"/>
+<area shape="rect" title=" " alt="" coords="651,328,805,368"/>
+<area shape="poly" title=" " alt="" coords="819,347,938,357,1004,368,1067,384,1121,406,1167,431,1164,436,1119,411,1066,389,1003,374,938,363,819,352"/>
+<area shape="rect" title=" " alt="" coords="5,413,160,453"/>
+<area shape="poly" title=" " alt="" coords="174,422,184,421,228,421,464,418,648,411,832,411,940,416,1067,427,1099,431,1098,436,1066,432,939,422,831,417,648,417,464,423,228,427,184,427,174,427"/>
+<area shape="rect" href="structGeometryDuplicateFaceGroup.html" title="一组在 OCC 数值精度内覆盖相同几何区域的面。" alt="" coords="252,446,469,471"/>
+<area shape="poly" title=" " alt="" coords="174,443,184,444,252,450,251,455,184,449,174,448"/>
+<area shape="rect" title=" " alt="" coords="611,443,845,483"/>
+<area shape="poly" title=" " alt="" coords="858,457,1090,453,1091,458,858,463"/>
+<area shape="poly" title=" " alt="" coords="483,457,611,459,611,464,483,463"/>
+<area shape="rect" title=" " alt="" coords="604,507,852,547"/>
+<area shape="poly" title=" " alt="" coords="866,537,915,537,966,532,1017,522,1065,506,1077,495,1089,483,1115,471,1117,476,1092,488,1081,499,1068,510,1018,527,967,537,915,542,866,543"/>
+<area shape="rect" href="structGeometryIntersectingFacePair.html" title="一对互相穿插的面，自相交与几何干涉共用；单 Face 自交时两个成员相同。" alt="" coords="252,514,469,539"/>
+<area shape="poly" title=" " alt="" coords="483,524,604,524,604,529,483,529"/>
+<area shape="rect" title=" " alt="" coords="651,571,805,611"/>
+<area shape="poly" title=" " alt="" coords="819,608,880,614,945,611,977,606,1009,597,1038,584,1065,566,1073,557,1077,548,1077,528,1077,506,1081,495,1089,483,1104,472,1107,476,1093,487,1086,497,1082,507,1082,528,1082,549,1077,560,1068,570,1041,589,1010,602,978,611,945,617,879,619,819,613"/>
+<area shape="rect" title=" " alt="" coords="1549,502,1635,527"/>
+<area shape="poly" title=" " alt="" coords="1649,515,1709,514,1782,507,1857,492,1894,480,1929,464,1968,439,2002,408,2049,348,2054,351,2005,411,1971,443,1932,469,1896,485,1859,497,1782,512,1710,519,1649,520"/>
+<area shape="rect" title=" " alt="" coords="1129,497,1267,537"/>
+<area shape="poly" title=" " alt="" coords="1281,514,1549,512,1549,518,1281,519"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a18b9f4fa33671feef58ae4748611209c" id="r_a18b9f4fa33671feef58ae4748611209c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a18b9f4fa33671feef58ae4748611209c">GeometryActorSelectOp</a> (std::shared_ptr&lt; <a class="el" href="classGeometryActor.html">GeometryActor</a> &gt; geometry_actor)</td></tr>
+<tr class="memitem:a5bbe23d7cc3fe51000189f4562c901df" id="r_a5bbe23d7cc3fe51000189f4562c901df"><td class="memItemLeft" align="right" valign="top">IVtk_IdType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5bbe23d7cc3fe51000189f4562c901df">getShapeId</a> () const</td></tr>
+<tr class="memitem:a966d8b0ce74edd31cac53a61cb32fb47" id="r_a966d8b0ce74edd31cac53a61cb32fb47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a966d8b0ce74edd31cac53a61cb32fb47">disableSelectionModes</a> (IVtkTools_ShapePicker *picker) const</td></tr>
+<tr class="memitem:a2edb7246a4b585b5635a3c872eeb4818" id="r_a2edb7246a4b585b5635a3c872eeb4818"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2edb7246a4b585b5635a3c872eeb4818">enableSelectionMode</a> (IVtkTools_ShapePicker *picker, <a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a> mode) const</td></tr>
+<tr class="memitem:a90f6b6edfcbc1bae86fc960740ad6815" id="r_a90f6b6edfcbc1bae86fc960740ad6815"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90f6b6edfcbc1bae86fc960740ad6815">resolvePickedSubshape</a> (IVtkTools_ShapePicker *picker, IVtk_IdType shapeId, <a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a> mode, IVtk_IdType &amp;out_sub_id) const</td></tr>
+<tr class="memitem:a12f033e70030cd0fb88bf8fea064ceb4" id="r_a12f033e70030cd0fb88bf8fea064ceb4"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::pair&lt; IVtk_IdType, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12f033e70030cd0fb88bf8fea064ceb4">resolvePickedSubshapes</a> (IVtkTools_ShapePicker *picker, IVtk_IdType shapeId, <a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a> mode) const</td></tr>
+<tr class="memitem:a000cce0569d797a6c6c84cd884151579" id="r_a000cce0569d797a6c6c84cd884151579"><td class="memItemLeft" align="right" valign="top">std::optional&lt; std::array&lt; double, 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a000cce0569d797a6c6c84cd884151579">vertexPoint</a> (IVtk_IdType sub_id) const</td></tr>
+<tr class="memdesc:a000cce0569d797a6c6c84cd884151579"><td class="mdescLeft">&#160;</td><td class="mdescRight">取几何顶点子形状的世界坐标  <br /></td></tr>
+<tr class="memitem:a369060c025e32dc66d8ebd43746a575d" id="r_a369060c025e32dc66d8ebd43746a575d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a369060c025e32dc66d8ebd43746a575d">resolvePickedSolid</a> (IVtkTools_ShapePicker *picker, IVtk_IdType shapeId, <a class="el" href="Core_8h.html#a09b977d80717477b28230209e7cc183f">GeomSolidId</a> &amp;out_solid_id, std::vector&lt; IVtk_IdType &gt; &amp;out_face_sub_ids) const</td></tr>
+<tr class="memitem:a1b944073d9d1cb680389fa7b0a5d6645" id="r_a1b944073d9d1cb680389fa7b0a5d6645"><td class="memItemLeft" align="right" valign="top">vtkSmartPointer&lt; IVtkTools_SubPolyDataFilter &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b944073d9d1cb680389fa7b0a5d6645">buildHighlight</a> (<a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a> mode)</td></tr>
+<tr class="memitem:a859953f8fa63667adb77dde08d12b567" id="r_a859953f8fa63667adb77dde08d12b567"><td class="memItemLeft" align="right" valign="top">vtkActor &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a859953f8fa63667adb77dde08d12b567">getPolyActor</a> ()</td></tr>
+<tr class="memitem:a265e3b2255dac5ef6b2052373d3952b6" id="r_a265e3b2255dac5ef6b2052373d3952b6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a265e3b2255dac5ef6b2052373d3952b6">isVisible</a> () const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a76d88cd9aaee05d1658586949bf20f1e" id="r_a76d88cd9aaee05d1658586949bf20f1e"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76d88cd9aaee05d1658586949bf20f1e">toleranceForMode</a> (<a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a> m)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a42ac514f82f0a5bdbd8ce2784e39eb0a" id="r_a42ac514f82f0a5bdbd8ce2784e39eb0a"><td class="memItemLeft" align="right" valign="top">friend&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42ac514f82f0a5bdbd8ce2784e39eb0a">GeometryActorSelectOpFactory</a></td></tr>
+<tr class="memitem:aded26283e30ee1d0637e9eb653e7fb82" id="r_aded26283e30ee1d0637e9eb653e7fb82"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classGeometryActor.html">GeometryActor</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aded26283e30ee1d0637e9eb653e7fb82">geometry_actor_</a></td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a18b9f4fa33671feef58ae4748611209c" name="a18b9f4fa33671feef58ae4748611209c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a18b9f4fa33671feef58ae4748611209c">&#9670;&#160;</a></span>GeometryActorSelectOp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GeometryActorSelectOp::GeometryActorSelectOp </td>
+          <td>(</td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classGeometryActor.html">GeometryActor</a> &gt;</td>          <td class="paramname"><span class="paramname"><em>geometry_actor</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a1b944073d9d1cb680389fa7b0a5d6645" name="a1b944073d9d1cb680389fa7b0a5d6645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b944073d9d1cb680389fa7b0a5d6645">&#9670;&#160;</a></span>buildHighlight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkSmartPointer&lt; IVtkTools_SubPolyDataFilter &gt; GeometryActorSelectOp::buildHighlight </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a966d8b0ce74edd31cac53a61cb32fb47" name="a966d8b0ce74edd31cac53a61cb32fb47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a966d8b0ce74edd31cac53a61cb32fb47">&#9670;&#160;</a></span>disableSelectionModes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometryActorSelectOp::disableSelectionModes </td>
+          <td>(</td>
+          <td class="paramtype">IVtkTools_ShapePicker *</td>          <td class="paramname"><span class="paramname"><em>picker</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2edb7246a4b585b5635a3c872eeb4818" name="a2edb7246a4b585b5635a3c872eeb4818"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2edb7246a4b585b5635a3c872eeb4818">&#9670;&#160;</a></span>enableSelectionMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometryActorSelectOp::enableSelectionMode </td>
+          <td>(</td>
+          <td class="paramtype">IVtkTools_ShapePicker *</td>          <td class="paramname"><span class="paramname"><em>picker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a859953f8fa63667adb77dde08d12b567" name="a859953f8fa63667adb77dde08d12b567"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a859953f8fa63667adb77dde08d12b567">&#9670;&#160;</a></span>getPolyActor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkActor &amp; GeometryActorSelectOp::getPolyActor </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5bbe23d7cc3fe51000189f4562c901df" name="a5bbe23d7cc3fe51000189f4562c901df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5bbe23d7cc3fe51000189f4562c901df">&#9670;&#160;</a></span>getShapeId()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">IVtk_IdType GeometryActorSelectOp::getShapeId </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a265e3b2255dac5ef6b2052373d3952b6" name="a265e3b2255dac5ef6b2052373d3952b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a265e3b2255dac5ef6b2052373d3952b6">&#9670;&#160;</a></span>isVisible()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GeometryActorSelectOp::isVisible </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a369060c025e32dc66d8ebd43746a575d" name="a369060c025e32dc66d8ebd43746a575d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a369060c025e32dc66d8ebd43746a575d">&#9670;&#160;</a></span>resolvePickedSolid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool GeometryActorSelectOp::resolvePickedSolid </td>
+          <td>(</td>
+          <td class="paramtype">IVtkTools_ShapePicker *</td>          <td class="paramname"><span class="paramname"><em>picker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IVtk_IdType</td>          <td class="paramname"><span class="paramname"><em>shapeId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a09b977d80717477b28230209e7cc183f">GeomSolidId</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>out_solid_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::vector&lt; IVtk_IdType &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>out_face_sub_ids</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a90f6b6edfcbc1bae86fc960740ad6815" name="a90f6b6edfcbc1bae86fc960740ad6815"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90f6b6edfcbc1bae86fc960740ad6815">&#9670;&#160;</a></span>resolvePickedSubshape()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; GeometryActorSelectOp::resolvePickedSubshape </td>
+          <td>(</td>
+          <td class="paramtype">IVtkTools_ShapePicker *</td>          <td class="paramname"><span class="paramname"><em>picker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IVtk_IdType</td>          <td class="paramname"><span class="paramname"><em>shapeId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IVtk_IdType &amp;</td>          <td class="paramname"><span class="paramname"><em>out_sub_id</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a12f033e70030cd0fb88bf8fea064ceb4" name="a12f033e70030cd0fb88bf8fea064ceb4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12f033e70030cd0fb88bf8fea064ceb4">&#9670;&#160;</a></span>resolvePickedSubshapes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::pair&lt; IVtk_IdType, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; &gt; GeometryActorSelectOp::resolvePickedSubshapes </td>
+          <td>(</td>
+          <td class="paramtype">IVtkTools_ShapePicker *</td>          <td class="paramname"><span class="paramname"><em>picker</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">IVtk_IdType</td>          <td class="paramname"><span class="paramname"><em>shapeId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a76d88cd9aaee05d1658586949bf20f1e" name="a76d88cd9aaee05d1658586949bf20f1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76d88cd9aaee05d1658586949bf20f1e">&#9670;&#160;</a></span>toleranceForMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int GeometryActorSelectOp::toleranceForMode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a33798f6bed937e1f849ed0cf46ebe5a6">SelectMode</a></td>          <td class="paramname"><span class="paramname"><em>m</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a000cce0569d797a6c6c84cd884151579" name="a000cce0569d797a6c6c84cd884151579"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a000cce0569d797a6c6c84cd884151579">&#9670;&#160;</a></span>vertexPoint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; std::array&lt; double, 3 &gt; &gt; GeometryActorSelectOp::vertexPoint </td>
+          <td>(</td>
+          <td class="paramtype">IVtk_IdType</td>          <td class="paramname"><span class="paramname"><em>sub_id</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>取几何顶点子形状的世界坐标 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sub_id</td><td>IVtk 子形状 id（由 SM_Vertex 模式拾取得到） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>顶点坐标；子形状无效或不是顶点时返回 std::nullopt </dd></dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="aded26283e30ee1d0637e9eb653e7fb82" name="aded26283e30ee1d0637e9eb653e7fb82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aded26283e30ee1d0637e9eb653e7fb82">&#9670;&#160;</a></span>geometry_actor_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="classGeometryActor.html">GeometryActor</a>&gt; GeometryActorSelectOp::geometry_actor_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a42ac514f82f0a5bdbd8ce2784e39eb0a" name="a42ac514f82f0a5bdbd8ce2784e39eb0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42ac514f82f0a5bdbd8ce2784e39eb0a">&#9670;&#160;</a></span>GeometryActorSelectOpFactory</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend GeometryActorSelectOp::GeometryActorSelectOpFactory</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>app/render/<a class="el" href="GeometryActorSelectOp_8h_source.html">GeometryActorSelectOp.h</a></li>
+<li>app/render/<a class="el" href="GeometryActorSelectOp_8cpp.html">GeometryActorSelectOp.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

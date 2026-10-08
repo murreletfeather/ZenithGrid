@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: model/data/GeometryRegistry.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_3f14f6767c31cb4a1d22c13c18cc6fc3.html">model</a></li><li class="navelem"><a href="dir_84846e69b963a5367080adb8af90c8fe.html">data</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">GeometryRegistry.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="GeometryRegistry_8h_source.html">GeometryRegistry.h</a>&quot;</code><br />
+<code>#include &lt;TopoDS_Shape.hxx&gt;</code><br />
+<code>#include &lt;spdlog/spdlog.h&gt;</code><br />
+<code>#include &lt;TopAbs_ShapeEnum.hxx&gt;</code><br />
+<code>#include &lt;stdexcept&gt;</code><br />
+<code>#include &lt;string&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+GeometryRegistry.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="GeometryRegistry_8cpp__incl.png" border="0" usemap="#amodel_2data_2GeometryRegistry_8cpp" loading="lazy" alt=""/></div>
+<map name="amodel_2data_2GeometryRegistry_8cpp" id="amodel_2data_2GeometryRegistry_8cpp">
+<area shape="rect" title=" " alt="" coords="470,5,714,31"/>
+<area shape="rect" href="GeometryRegistry_8h.html" title=" " alt="" coords="250,79,401,104"/>
+<area shape="poly" title=" " alt="" coords="550,33,383,78,381,72,548,28"/>
+<area shape="rect" title=" " alt="" coords="409,225,468,251"/>
+<area shape="poly" title=" " alt="" coords="590,32,557,108,537,150,519,179,497,202,472,220,469,216,493,198,515,176,533,147,553,106,585,30"/>
+<area shape="rect" title=" " alt="" coords="359,152,505,177"/>
+<area shape="poly" title=" " alt="" coords="580,33,526,81,456,145,452,141,522,77,577,29"/>
+<area shape="rect" title=" " alt="" coords="581,79,705,104"/>
+<area shape="poly" title=" " alt="" coords="603,29,629,66,624,69,598,33"/>
+<area shape="rect" title=" " alt="" coords="729,79,909,104"/>
+<area shape="poly" title=" " alt="" coords="629,28,770,72,768,77,628,33"/>
+<area shape="rect" title=" " alt="" coords="933,79,1019,104"/>
+<area shape="poly" title=" " alt="" coords="659,28,920,76,919,81,658,33"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="123,152,187,177"/>
+<area shape="poly" title=" " alt="" coords="299,106,196,149,194,144,297,102"/>
+<area shape="rect" title=" " alt="" coords="211,152,335,177"/>
+<area shape="poly" title=" " alt="" coords="319,106,292,142,288,139,315,103"/>
+<area shape="poly" title=" " alt="" coords="344,102,405,142,402,147,341,106"/>
+<area shape="rect" title=" " alt="" coords="5,225,61,251"/>
+<area shape="poly" title=" " alt="" coords="137,180,66,221,63,216,134,175"/>
+<area shape="rect" title=" " alt="" coords="85,225,136,251"/>
+<area shape="poly" title=" " alt="" coords="150,179,127,215,123,212,145,176"/>
+<area shape="rect" title=" " alt="" coords="160,225,237,251"/>
+<area shape="poly" title=" " alt="" coords="164,176,187,212,182,215,160,179"/>
+<area shape="poly" title=" " alt="" coords="188,172,199,175,396,224,395,229,198,180,186,177"/>
+<area shape="rect" title=" " alt="" coords="262,225,325,251"/>
+<area shape="poly" title=" " alt="" coords="178,175,260,217,257,221,176,180"/>
+</map>
+</div>
+</div></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

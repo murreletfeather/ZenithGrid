@@ -1,0 +1,778 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: MeshActorManager类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classMeshActorManager-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">MeshActorManager类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="MeshActorManager_8h_source.html">MeshActorManager.h</a>&gt;</code></p>
+<div class="dynheader">
+MeshActorManager 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classMeshActorManager__coll__graph.png" border="0" usemap="#aMeshActorManager_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aMeshActorManager_coll__map" id="aMeshActorManager_coll__map">
+<area shape="rect" title=" " alt="" coords="3943,422,4091,447"/>
+<area shape="rect" href="classMeshActorManagerSelectOp.html" title=" " alt="" coords="4359,505,4565,530"/>
+<area shape="poly" title=" " alt="" coords="4104,421,4157,419,4215,419,4276,425,4335,437,4369,451,4400,468,4448,502,4444,507,4397,473,4367,455,4334,443,4275,430,4215,424,4157,424,4104,427"/>
+<area shape="poly" title=" " alt="" coords="4381,505,4334,496,4146,465,4073,450,4074,445,4147,460,4335,491,4382,499"/>
+<area shape="rect" title=" " alt="" coords="3938,495,4095,535"/>
+<area shape="poly" title=" " alt="" coords="4109,513,4147,513,4359,514,4358,520,4147,519,4109,518"/>
+<area shape="rect" title=" " alt="" coords="3949,559,4085,585"/>
+<area shape="poly" title=" " alt="" coords="4098,565,4211,556,4334,541,4407,527,4408,533,4335,547,4211,561,4099,570"/>
+<area shape="rect" title=" " alt="" coords="3911,609,4123,649"/>
+<area shape="poly" title=" " alt="" coords="4136,624,4234,613,4285,603,4334,589,4365,576,4395,560,4443,528,4446,532,4398,564,4368,581,4336,595,4286,609,4235,619,4137,630"/>
+<area shape="rect" title=" " alt="" coords="3534,371,3695,426"/>
+<area shape="poly" title=" " alt="" coords="3709,404,3942,425,3942,431,3709,410"/>
+<area shape="rect" title=" " alt="" coords="3177,386,3396,411"/>
+<area shape="poly" title=" " alt="" coords="3410,396,3534,396,3534,401,3410,401"/>
+<area shape="rect" href="classMeshActor.html" title="负责管理Model的Actor" alt="" coords="3012,386,3103,411"/>
+<area shape="poly" title=" " alt="" coords="3117,396,3177,396,3177,401,3117,401"/>
+<area shape="rect" title=" " alt="" coords="2616,289,2811,329"/>
+<area shape="poly" title=" " alt="" coords="2825,317,2907,331,2989,355,3017,368,3040,384,3038,388,3014,373,2987,360,2905,336,2824,322"/>
+<area shape="rect" href="classIAttributeRenderStrategy.html" title="属性渲染策略接口" alt="" coords="2184,297,2368,322"/>
+<area shape="poly" title=" " alt="" coords="2382,307,2616,307,2616,312,2382,312"/>
+<area shape="rect" title=" " alt="" coords="2392,352,2592,392"/>
+<area shape="poly" title=" " alt="" coords="2606,374,2988,392,3012,393,3012,399,2988,397,2606,379"/>
+<area shape="rect" href="structMeshDataVtk.html" title="用于存储网格数据以供 VTK 渲染使用的结构体" alt="" coords="1835,378,1946,403"/>
+<area shape="poly" title=" " alt="" coords="1960,386,2392,372,2392,378,1960,391"/>
+<area shape="rect" href="classTopologyDiagnosticActor.html" title="把拓扑诊断集合渲染为独立的边、点和面 Actor" alt="" coords="2185,462,2367,487"/>
+<area shape="poly" title=" " alt="" coords="1960,403,2217,459,2216,465,1959,408"/>
+<area shape="rect" title=" " alt="" coords="1386,271,1551,311"/>
+<area shape="poly" title=" " alt="" coords="1566,294,1658,306,1754,327,1817,350,1868,376,1865,380,1815,355,1753,332,1657,311,1565,299"/>
+<area shape="rect" title=" " alt="" coords="5,509,163,534"/>
+<area shape="poly" title=" " alt="" coords="102,496,141,452,197,403,230,380,266,362,304,350,343,345,1470,345,1612,350,1754,365,1836,378,1835,383,1753,371,1612,355,1470,351,343,351,305,355,268,367,232,385,200,407,144,456,106,499"/>
+<area shape="rect" href="structBlockData.html" title=" " alt="" coords="300,509,389,534"/>
+<area shape="poly" title=" " alt="" coords="176,519,300,519,300,524,176,524"/>
+<area shape="rect" href="structMeshTopologyDiagnosticResult.html" title="保存一次网格拓扑诊断得到的特殊实体集合" alt="" coords="1356,619,1581,645"/>
+<area shape="poly" title=" " alt="" coords="117,539,160,564,215,590,278,610,311,616,343,619,1049,619,1356,625,1356,630,1049,624,343,624,310,622,277,616,213,595,158,569,114,544"/>
+<area shape="rect" title=" " alt="" coords="1385,385,1553,425"/>
+<area shape="poly" title=" " alt="" coords="1566,399,1835,390,1835,395,1567,405"/>
+<area shape="rect" title=" " alt="" coords="960,387,1135,413"/>
+<area shape="poly" title=" " alt="" coords="1149,399,1384,402,1384,407,1148,404"/>
+<area shape="rect" title=" " alt="" coords="1377,483,1561,523"/>
+<area shape="poly" title=" " alt="" coords="1575,519,1619,521,1665,517,1711,507,1752,487,1761,478,1764,467,1767,454,1775,441,1809,417,1844,401,1847,406,1811,422,1779,445,1772,456,1769,468,1765,480,1755,491,1712,512,1666,523,1619,526,1575,524"/>
+<area shape="rect" title=" " alt="" coords="1004,441,1091,466"/>
+<area shape="poly" title=" " alt="" coords="1105,456,1332,480,1377,486,1376,491,1332,485,1104,461"/>
+<area shape="rect" title=" " alt="" coords="574,433,713,473"/>
+<area shape="poly" title=" " alt="" coords="726,451,1004,451,1004,456,726,456"/>
+<area shape="rect" title=" " alt="" coords="965,494,1130,519"/>
+<area shape="poly" title=" " alt="" coords="1144,504,1332,503,1376,502,1376,507,1332,508,1144,509"/>
+<area shape="rect" title=" " alt="" coords="1357,547,1580,573"/>
+<area shape="poly" title=" " alt="" coords="1525,573,1578,583,1638,586,1669,583,1699,577,1726,565,1752,549,1762,537,1766,525,1765,499,1763,471,1767,456,1775,441,1804,417,1837,401,1839,406,1807,421,1779,444,1771,458,1769,471,1771,499,1771,526,1766,540,1755,553,1729,570,1700,582,1670,589,1638,591,1577,588,1524,579"/>
+<area shape="rect" href="structBlockDatas.html" title=" " alt="" coords="999,545,1095,570"/>
+<area shape="poly" title=" " alt="" coords="1109,555,1188,556,1357,557,1357,562,1188,561,1109,561"/>
+<area shape="rect" title=" " alt="" coords="549,509,737,534"/>
+<area shape="poly" title=" " alt="" coords="752,528,999,550,999,556,751,534"/>
+<area shape="poly" title=" " alt="" coords="403,519,549,519,549,524,403,524"/>
+<area shape="rect" title=" " alt="" coords="2617,424,2809,464"/>
+<area shape="poly" title=" " alt="" coords="2823,435,2904,427,2988,415,3014,409,3015,414,2988,420,2905,432,2824,440"/>
+<area shape="poly" title=" " alt="" coords="2381,465,2617,448,2617,453,2381,470"/>
+<area shape="rect" title=" " alt="" coords="1795,455,1987,495"/>
+<area shape="poly" title=" " alt="" coords="2001,472,2184,472,2184,477,2001,477"/>
+<area shape="rect" href="structTopologyDiagnosticActor_1_1DiagnosticPipeline.html" title="保存一种图元的诊断数据、裁剪器、映射器和 Actor" alt="" coords="1799,548,1982,588"/>
+<area shape="poly" title=" " alt="" coords="1996,566,2077,559,2159,540,2214,514,2257,485,2260,490,2217,519,2161,545,2078,564,1996,571"/>
+<area shape="rect" title=" " alt="" coords="1777,612,2004,652"/>
+<area shape="poly" title=" " alt="" coords="2018,628,2090,616,2125,605,2159,591,2194,567,2224,538,2265,486,2269,489,2228,542,2197,572,2161,596,2127,610,2091,621,2019,633"/>
+<area shape="poly" title=" " alt="" coords="1595,629,1777,629,1777,635,1595,635"/>
+<area shape="rect" title=" " alt="" coords="931,704,1164,744"/>
+<area shape="poly" title=" " alt="" coords="1178,736,1255,734,1294,729,1331,720,1368,705,1402,684,1452,643,1456,647,1405,688,1370,709,1333,725,1295,734,1255,740,1178,742"/>
+<area shape="rect" href="structTopologyDiagnosticEdge.html" title="一条可直接用于诊断渲染的网格边" alt="" coords="553,711,734,737"/>
+<area shape="poly" title=" " alt="" coords="748,721,930,721,930,727,748,727"/>
+<area shape="rect" title=" " alt="" coords="261,711,428,737"/>
+<area shape="poly" title=" " alt="" coords="441,721,553,721,553,727,441,727"/>
+<area shape="rect" href="structFaceAttributeOffsetState.html" title=" " alt="" coords="2623,489,2804,514"/>
+<area shape="poly" title=" " alt="" coords="2818,500,2903,489,2946,478,2987,462,3020,437,3045,410,3049,414,3024,441,2989,466,2948,483,2904,494,2818,505"/>
+<area shape="rect" title=" " alt="" coords="3513,452,3716,492"/>
+<area shape="poly" title=" " alt="" coords="3730,476,3807,475,3886,468,3935,458,3979,445,3981,450,3936,463,3887,473,3807,480,3730,481"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a67b0d3234d583b0521352cb9e7ebe5ee" id="r_a67b0d3234d583b0521352cb9e7ebe5ee"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a67b0d3234d583b0521352cb9e7ebe5ee">MeshActorManager</a> ()</td></tr>
+<tr class="memitem:a74d5c7dfb308f0bcbddf1b1edf09dfd2" id="r_a74d5c7dfb308f0bcbddf1b1edf09dfd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74d5c7dfb308f0bcbddf1b1edf09dfd2">bindRender</a> (vtkRenderer *renderer)</td></tr>
+<tr class="memitem:afdb5c94a7051977099f18737f8f697c8" id="r_afdb5c94a7051977099f18737f8f697c8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afdb5c94a7051977099f18737f8f697c8">hasComponent</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id) const</td></tr>
+<tr class="memitem:a76d4432a8117c4414f1318aeb0849733" id="r_a76d4432a8117c4414f1318aeb0849733"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classMeshActor.html">MeshActor</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a76d4432a8117c4414f1318aeb0849733">getComponentActor</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id) const</td></tr>
+<tr class="memitem:a172bac7de3b75cd21f2316aa8a8d3dcb" id="r_a172bac7de3b75cd21f2316aa8a8d3dcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a172bac7de3b75cd21f2316aa8a8d3dcb">deleteComponent</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:aa626bc0f01bdf2423c28c1ca18f08dc2" id="r_aa626bc0f01bdf2423c28c1ca18f08dc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa626bc0f01bdf2423c28c1ca18f08dc2">loadMesh</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const <a class="el" href="structMeshDataVtk.html">MeshDataVtk</a> &amp;model_data, vtkRenderer *renderer)</td></tr>
+<tr class="memitem:aeb3432d33341a6a19e1ebbf27e42a307" id="r_aeb3432d33341a6a19e1ebbf27e42a307"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeb3432d33341a6a19e1ebbf27e42a307">setVisibility</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, bool visibility)</td></tr>
+<tr class="memitem:af8909a31ec5b56feba3f60611583d076" id="r_af8909a31ec5b56feba3f60611583d076"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8909a31ec5b56feba3f60611583d076">setClipPlane</a> (vtkPlane *plane)</td></tr>
+<tr class="memitem:add307f1f589353d8f1d4e27c0d884646" id="r_add307f1f589353d8f1d4e27c0d884646"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add307f1f589353d8f1d4e27c0d884646">setCurrentRenderStyle</a> (<a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a> style)</td></tr>
+<tr class="memitem:a2d51b51fef0fbe05b3cb270d0c7ace17" id="r_a2d51b51fef0fbe05b3cb270d0c7ace17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d51b51fef0fbe05b3cb270d0c7ace17">getCurrentRenderStyle</a> () const</td></tr>
+<tr class="memitem:a9fed068278fd6160ad25dabc05914224" id="r_a9fed068278fd6160ad25dabc05914224"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9fed068278fd6160ad25dabc05914224">getCount</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:ab65cb8d5199659aeeba9dcaba6abc109" id="r_ab65cb8d5199659aeeba9dcaba6abc109"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab65cb8d5199659aeeba9dcaba6abc109">setAttriMode</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, const std::string &amp;attr_name, <a class="el" href="AttributeCommon_8h.html#a46c8a310cf4c094f8c80e1cb8dc1f911">Mode</a> mode, std::map&lt; std::string, std::any &gt; args)</td></tr>
+<tr class="memitem:a7ba2baf88963bd2a0e8935d1ddf41b1e" id="r_a7ba2baf88963bd2a0e8935d1ddf41b1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7ba2baf88963bd2a0e8935d1ddf41b1e">cancelAttri</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:a4fc614e62c8fb34ac11f64b9e004ac4b" id="r_a4fc614e62c8fb34ac11f64b9e004ac4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4fc614e62c8fb34ac11f64b9e004ac4b">setTopologyDiagnosticCategoryEnabled</a> (int category, bool enabled)</td></tr>
+<tr class="memdesc:a4fc614e62c8fb34ac11f64b9e004ac4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置窗口级拓扑诊断类别是否启用；Actor 最终显隐仍跟随所属 <a class="el" href="classMeshActor.html" title="负责管理Model的Actor">MeshActor</a>  <br /></td></tr>
+<tr class="memitem:a5996f44348eb3840424e09549887577f" id="r_a5996f44348eb3840424e09549887577f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5996f44348eb3840424e09549887577f">setDihedralAngleRange</a> (double minimum, double maximum)</td></tr>
+<tr class="memdesc:a5996f44348eb3840424e09549887577f"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置二面角诊断边的筛选范围，单位为度  <br /></td></tr>
+<tr class="memitem:a6711a7d68112d9b713660636d57fc469" id="r_a6711a7d68112d9b713660636d57fc469"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6711a7d68112d9b713660636d57fc469">op</a> ()</td></tr>
+<tr class="memitem:aaf986566e0fa2e59395846d0e4cb2b77" id="r_aaf986566e0fa2e59395846d0e4cb2b77"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf986566e0fa2e59395846d0e4cb2b77">op</a> () const</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a9f775b709d48b9a27037281c1e63a16c" id="r_a9f775b709d48b9a27037281c1e63a16c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f775b709d48b9a27037281c1e63a16c">op_</a> { *this }</td></tr>
+<tr class="memitem:a46dd38741724917139503c5b8794c193" id="r_a46dd38741724917139503c5b8794c193"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::shared_ptr&lt; <a class="el" href="classMeshActor.html">MeshActor</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a46dd38741724917139503c5b8794c193">component_actors_</a></td></tr>
+<tr class="memitem:a20d3686e7fdd03025747c0cf1d8df9cc" id="r_a20d3686e7fdd03025747c0cf1d8df9cc"><td class="memItemLeft" align="right" valign="top">vtkRenderer *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20d3686e7fdd03025747c0cf1d8df9cc">renderer_</a> {}</td></tr>
+<tr class="memitem:af5b9b3955476d7252831a730a5aea1a1" id="r_af5b9b3955476d7252831a730a5aea1a1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5b9b3955476d7252831a730a5aea1a1">current_style_</a> { <a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676da27744f658fdd5ba66afc23eb0706ae78">MeshRenderStyle::FaceWithEdges</a> }</td></tr>
+<tr class="memitem:af3900deb0a1de68e17ea5271ea502dd0" id="r_af3900deb0a1de68e17ea5271ea502dd0"><td class="memItemLeft" align="right" valign="top">vtkPlane *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3900deb0a1de68e17ea5271ea502dd0">clip_plane_</a> { }</td></tr>
+<tr class="memitem:a7e4429a496307504464a10c4f68c11b2" id="r_a7e4429a496307504464a10c4f68c11b2"><td class="memItemLeft" align="right" valign="top">std::array&lt; bool, <a class="el" href="TopologyDiagnosticCategory_8h.html#a9bed0bb17f9e1b21d556ece03a64cb57">kTopologyDiagnosticCategoryCount</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e4429a496307504464a10c4f68c11b2">topology_diagnostic_category_enabled_</a> {}</td></tr>
+<tr class="memitem:a142a1c2dea6e88e32b88896f5dc562e3" id="r_a142a1c2dea6e88e32b88896f5dc562e3"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a142a1c2dea6e88e32b88896f5dc562e3">dihedral_minimum_</a> { 0.0 }</td></tr>
+<tr class="memitem:afb3b341b514b6f8ebbf992e725b8046d" id="r_afb3b341b514b6f8ebbf992e725b8046d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb3b341b514b6f8ebbf992e725b8046d">dihedral_maximum_</a> { 150.0 }</td></tr>
+<tr class="memitem:aafa7d0513d66f2a8c7ee7ebadd96a4a0" id="r_aafa7d0513d66f2a8c7ee7ebadd96a4a0"><td class="memItemLeft" align="right" valign="top">vtkNew&lt; vtkScalarBarActor &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aafa7d0513d66f2a8c7ee7ebadd96a4a0">scalar_bar_</a></td></tr>
+<tr class="memitem:ad70a7f569504b6caa5719e02185db859" id="r_ad70a7f569504b6caa5719e02185db859"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad70a7f569504b6caa5719e02185db859">scalar_bar_component_id_</a> { -1 }</td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a67b0d3234d583b0521352cb9e7ebe5ee" name="a67b0d3234d583b0521352cb9e7ebe5ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67b0d3234d583b0521352cb9e7ebe5ee">&#9670;&#160;</a></span>MeshActorManager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MeshActorManager::MeshActorManager </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a74d5c7dfb308f0bcbddf1b1edf09dfd2" name="a74d5c7dfb308f0bcbddf1b1edf09dfd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74d5c7dfb308f0bcbddf1b1edf09dfd2">&#9670;&#160;</a></span>bindRender()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::bindRender </td>
+          <td>(</td>
+          <td class="paramtype">vtkRenderer *</td>          <td class="paramname"><span class="paramname"><em>renderer</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7ba2baf88963bd2a0e8935d1ddf41b1e" name="a7ba2baf88963bd2a0e8935d1ddf41b1e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ba2baf88963bd2a0e8935d1ddf41b1e">&#9670;&#160;</a></span>cancelAttri()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::cancelAttri </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a172bac7de3b75cd21f2316aa8a8d3dcb" name="a172bac7de3b75cd21f2316aa8a8d3dcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a172bac7de3b75cd21f2316aa8a8d3dcb">&#9670;&#160;</a></span>deleteComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::deleteComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a76d4432a8117c4414f1318aeb0849733" name="a76d4432a8117c4414f1318aeb0849733"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76d4432a8117c4414f1318aeb0849733">&#9670;&#160;</a></span>getComponentActor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classMeshActor.html">MeshActor</a> &gt; MeshActorManager::getComponentActor </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9fed068278fd6160ad25dabc05914224" name="a9fed068278fd6160ad25dabc05914224"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9fed068278fd6160ad25dabc05914224">&#9670;&#160;</a></span>getCount()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MeshActorManager::getCount </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2d51b51fef0fbe05b3cb270d0c7ace17" name="a2d51b51fef0fbe05b3cb270d0c7ace17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d51b51fef0fbe05b3cb270d0c7ace17">&#9670;&#160;</a></span>getCurrentRenderStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a> MeshActorManager::getCurrentRenderStyle </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afdb5c94a7051977099f18737f8f697c8" name="afdb5c94a7051977099f18737f8f697c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdb5c94a7051977099f18737f8f697c8">&#9670;&#160;</a></span>hasComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool MeshActorManager::hasComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa626bc0f01bdf2423c28c1ca18f08dc2" name="aa626bc0f01bdf2423c28c1ca18f08dc2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa626bc0f01bdf2423c28c1ca18f08dc2">&#9670;&#160;</a></span>loadMesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::loadMesh </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="structMeshDataVtk.html">MeshDataVtk</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>model_data</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkRenderer *</td>          <td class="paramname"><span class="paramname"><em>renderer</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6711a7d68112d9b713660636d57fc469" name="a6711a7d68112d9b713660636d57fc469"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6711a7d68112d9b713660636d57fc469">&#9670;&#160;</a></span>op() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a> &amp; MeshActorManager::op </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaf986566e0fa2e59395846d0e4cb2b77" name="aaf986566e0fa2e59395846d0e4cb2b77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf986566e0fa2e59395846d0e4cb2b77">&#9670;&#160;</a></span>op() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a> &amp; MeshActorManager::op </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab65cb8d5199659aeeba9dcaba6abc109" name="ab65cb8d5199659aeeba9dcaba6abc109"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab65cb8d5199659aeeba9dcaba6abc109">&#9670;&#160;</a></span>setAttriMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setAttriMode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>attr_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="AttributeCommon_8h.html#a46c8a310cf4c094f8c80e1cb8dc1f911">Mode</a></td>          <td class="paramname"><span class="paramname"><em>mode</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::map&lt; std::string, std::any &gt;</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af8909a31ec5b56feba3f60611583d076" name="af8909a31ec5b56feba3f60611583d076"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8909a31ec5b56feba3f60611583d076">&#9670;&#160;</a></span>setClipPlane()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setClipPlane </td>
+          <td>(</td>
+          <td class="paramtype">vtkPlane *</td>          <td class="paramname"><span class="paramname"><em>plane</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="add307f1f589353d8f1d4e27c0d884646" name="add307f1f589353d8f1d4e27c0d884646"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add307f1f589353d8f1d4e27c0d884646">&#9670;&#160;</a></span>setCurrentRenderStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setCurrentRenderStyle </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a></td>          <td class="paramname"><span class="paramname"><em>style</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5996f44348eb3840424e09549887577f" name="a5996f44348eb3840424e09549887577f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5996f44348eb3840424e09549887577f">&#9670;&#160;</a></span>setDihedralAngleRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setDihedralAngleRange </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>minimum</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>maximum</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置二面角诊断边的筛选范围，单位为度 </p>
+
+</div>
+</div>
+<a id="a4fc614e62c8fb34ac11f64b9e004ac4b" name="a4fc614e62c8fb34ac11f64b9e004ac4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fc614e62c8fb34ac11f64b9e004ac4b">&#9670;&#160;</a></span>setTopologyDiagnosticCategoryEnabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setTopologyDiagnosticCategoryEnabled </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>category</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enabled</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置窗口级拓扑诊断类别是否启用；Actor 最终显隐仍跟随所属 <a class="el" href="classMeshActor.html" title="负责管理Model的Actor">MeshActor</a> </p>
+
+</div>
+</div>
+<a id="aeb3432d33341a6a19e1ebbf27e42a307" name="aeb3432d33341a6a19e1ebbf27e42a307"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb3432d33341a6a19e1ebbf27e42a307">&#9670;&#160;</a></span>setVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshActorManager::setVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visibility</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="af3900deb0a1de68e17ea5271ea502dd0" name="af3900deb0a1de68e17ea5271ea502dd0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3900deb0a1de68e17ea5271ea502dd0">&#9670;&#160;</a></span>clip_plane_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkPlane* MeshActorManager::clip_plane_ { }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a46dd38741724917139503c5b8794c193" name="a46dd38741724917139503c5b8794c193"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46dd38741724917139503c5b8794c193">&#9670;&#160;</a></span>component_actors_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::shared_ptr&lt;<a class="el" href="classMeshActor.html">MeshActor</a>&gt; &gt; MeshActorManager::component_actors_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5b9b3955476d7252831a730a5aea1a1" name="af5b9b3955476d7252831a730a5aea1a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5b9b3955476d7252831a730a5aea1a1">&#9670;&#160;</a></span>current_style_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a> MeshActorManager::current_style_ { <a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676da27744f658fdd5ba66afc23eb0706ae78">MeshRenderStyle::FaceWithEdges</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb3b341b514b6f8ebbf992e725b8046d" name="afb3b341b514b6f8ebbf992e725b8046d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb3b341b514b6f8ebbf992e725b8046d">&#9670;&#160;</a></span>dihedral_maximum_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double MeshActorManager::dihedral_maximum_ { 150.0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a142a1c2dea6e88e32b88896f5dc562e3" name="a142a1c2dea6e88e32b88896f5dc562e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a142a1c2dea6e88e32b88896f5dc562e3">&#9670;&#160;</a></span>dihedral_minimum_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double MeshActorManager::dihedral_minimum_ { 0.0 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9f775b709d48b9a27037281c1e63a16c" name="a9f775b709d48b9a27037281c1e63a16c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f775b709d48b9a27037281c1e63a16c">&#9670;&#160;</a></span>op_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classMeshActorManagerSelectOp.html">MeshActorManagerSelectOp</a> MeshActorManager::op_ { *this }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20d3686e7fdd03025747c0cf1d8df9cc" name="a20d3686e7fdd03025747c0cf1d8df9cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20d3686e7fdd03025747c0cf1d8df9cc">&#9670;&#160;</a></span>renderer_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkRenderer* MeshActorManager::renderer_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafa7d0513d66f2a8c7ee7ebadd96a4a0" name="aafa7d0513d66f2a8c7ee7ebadd96a4a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafa7d0513d66f2a8c7ee7ebadd96a4a0">&#9670;&#160;</a></span>scalar_bar_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkNew&lt;vtkScalarBarActor&gt; MeshActorManager::scalar_bar_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad70a7f569504b6caa5719e02185db859" name="ad70a7f569504b6caa5719e02185db859"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad70a7f569504b6caa5719e02185db859">&#9670;&#160;</a></span>scalar_bar_component_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> MeshActorManager::scalar_bar_component_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7e4429a496307504464a10c4f68c11b2" name="a7e4429a496307504464a10c4f68c11b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e4429a496307504464a10c4f68c11b2">&#9670;&#160;</a></span>topology_diagnostic_category_enabled_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array&lt;bool, <a class="el" href="TopologyDiagnosticCategory_8h.html#a9bed0bb17f9e1b21d556ece03a64cb57">kTopologyDiagnosticCategoryCount</a>&gt; MeshActorManager::topology_diagnostic_category_enabled_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>app/render/<a class="el" href="MeshActorManager_8h_source.html">MeshActorManager.h</a></li>
+<li>app/render/<a class="el" href="MeshActorManager_8cpp.html">MeshActorManager.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

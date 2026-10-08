@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: model/ops/ObjMeshIO.h 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_3f14f6767c31cb4a1d22c13c18cc6fc3.html">model</a></li><li class="navelem"><a href="dir_f3f991c7b5bf0583e6df7a74afc61832.html">ops</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a>  </div>
+  <div class="headertitle"><div class="title">ObjMeshIO.h 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="ComponentData_8h_source.html">ComponentData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="MeshData_8h_source.html">MeshData.h</a>&quot;</code><br />
+<code>#include &lt;filesystem&gt;</code><br />
+<code>#include &lt;iosfwd&gt;</code><br />
+<code>#include &lt;optional&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+ObjMeshIO.h 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="ObjMeshIO_8h__incl.png" border="0" usemap="#amodel_2ops_2ObjMeshIO_8h" loading="lazy" alt=""/></div>
+<map name="amodel_2ops_2ObjMeshIO_8h" id="amodel_2ops_2ObjMeshIO_8h">
+<area shape="rect" title=" " alt="" coords="604,5,781,31"/>
+<area shape="rect" href="ComponentData_8h.html" title=" " alt="" coords="417,79,557,104"/>
+<area shape="poly" title=" " alt="" coords="661,33,534,77,533,72,659,28"/>
+<area shape="rect" href="MeshData_8h.html" title=" " alt="" coords="555,152,655,177"/>
+<area shape="poly" title=" " alt="" coords="688,33,621,142,616,139,683,30"/>
+<area shape="rect" title=" " alt="" coords="794,225,869,251"/>
+<area shape="poly" title=" " alt="" coords="697,30,705,64,720,103,741,135,765,166,811,214,807,218,761,169,737,138,716,105,700,65,692,31"/>
+<area shape="rect" title=" " alt="" coords="730,79,821,104"/>
+<area shape="poly" title=" " alt="" coords="708,29,753,67,750,72,704,33"/>
+<area shape="rect" title=" " alt="" coords="845,79,909,104"/>
+<area shape="poly" title=" " alt="" coords="723,28,835,71,833,76,721,33"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="365,225,429,251"/>
+<area shape="poly" title=" " alt="" coords="482,106,413,215,409,212,478,103"/>
+<area shape="rect" title=" " alt="" coords="478,299,555,324"/>
+<area shape="poly" title=" " alt="" coords="492,104,516,285,511,285,486,105"/>
+<area shape="rect" title=" " alt="" coords="727,299,786,324"/>
+<area shape="poly" title=" " alt="" coords="558,91,637,99,727,120,771,137,813,160,851,188,883,224,889,238,888,251,880,263,868,273,836,290,800,302,799,297,834,285,865,269,876,259,883,249,884,239,878,227,848,192,811,164,769,142,725,125,636,104,557,96"/>
+<area shape="rect" title=" " alt="" coords="5,299,68,324"/>
+<area shape="poly" title=" " alt="" coords="417,105,317,123,203,150,150,166,104,185,67,205,44,227,38,240,34,255,35,285,29,285,29,255,33,239,40,224,64,201,101,180,148,161,202,145,316,118,416,100"/>
+<area shape="poly" title=" " alt="" coords="508,102,575,142,572,147,505,106"/>
+<area shape="rect" title=" " alt="" coords="216,225,340,251"/>
+<area shape="poly" title=" " alt="" coords="472,106,308,219,305,215,469,102"/>
+<area shape="rect" href="MeshAdjacency_8h.html" title="网格邻接查询索引——统一边表 + 稳定边 id" alt="" coords="211,152,345,177"/>
+<area shape="poly" title=" " alt="" coords="455,107,326,150,324,145,453,101"/>
+<area shape="rect" title=" " alt="" coords="307,299,363,324"/>
+<area shape="poly" title=" " alt="" coords="389,253,356,290,352,286,385,249"/>
+<area shape="rect" title=" " alt="" coords="387,299,438,324"/>
+<area shape="poly" title=" " alt="" coords="402,250,410,285,405,286,397,252"/>
+<area shape="poly" title=" " alt="" coords="417,248,486,289,484,294,415,253"/>
+<area shape="poly" title=" " alt="" coords="430,243,714,299,713,304,429,248"/>
+<area shape="poly" title=" " alt="" coords="365,250,352,253,82,305,81,300,351,248,364,245"/>
+<area shape="poly" title=" " alt="" coords="572,180,443,224,441,219,570,175"/>
+<area shape="poly" title=" " alt="" coords="584,180,370,295,367,290,582,175"/>
+<area shape="poly" title=" " alt="" coords="600,179,533,288,528,286,595,176"/>
+<area shape="poly" title=" " alt="" coords="652,175,695,193,715,207,733,224,750,253,757,284,752,285,745,255,729,227,712,211,692,198,650,180"/>
+<area shape="poly" title=" " alt="" coords="555,179,344,225,343,220,554,174"/>
+<area shape="rect" title=" " alt="" coords="605,225,719,251"/>
+<area shape="poly" title=" " alt="" coords="616,176,646,213,642,216,612,179"/>
+<area shape="poly" title=" " alt="" coords="642,175,782,219,781,224,640,180"/>
+<area shape="poly" title=" " alt="" coords="298,175,367,216,364,220,296,180"/>
+<area shape="poly" title=" " alt="" coords="256,180,234,193,213,211,202,230,202,239,206,249,223,269,245,283,294,301,293,306,243,288,220,273,201,252,196,240,197,228,209,207,231,189,253,175"/>
+<area shape="poly" title=" " alt="" coords="211,171,173,176,134,187,96,203,64,227,54,240,47,255,40,285,35,284,42,253,50,237,60,223,94,199,132,182,172,171,210,165"/>
+<area shape="poly" title=" " alt="" coords="281,178,281,212,275,212,275,178"/>
+<area shape="poly" title=" " alt="" coords="346,172,781,228,780,233,346,177"/>
+<area shape="rect" title=" " alt="" coords="74,225,141,251"/>
+<area shape="poly" title=" " alt="" coords="252,180,149,222,147,218,250,175"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+此图展示该文件被哪些文件直接或间接地引用了:</div>
+<div class="dyncontent">
+<div class="center"><img src="ObjMeshIO_8h__dep__incl.png" border="0" usemap="#amodel_2ops_2ObjMeshIO_8hdep" loading="lazy" alt=""/></div>
+<map name="amodel_2ops_2ObjMeshIO_8hdep" id="amodel_2ops_2ObjMeshIO_8hdep">
+<area shape="rect" title=" " alt="" coords="125,5,302,31"/>
+<area shape="rect" href="ObjMeshIO_8cpp.html" title=" " alt="" coords="5,86,197,111"/>
+<area shape="poly" title=" " alt="" coords="187,41,119,88,116,84,184,37"/>
+<area shape="rect" href="TestObjMeshIO_8cpp.html" title="ObjMeshIO 组件级读写（ComponentDatas）回环测试" alt="" coords="222,79,429,119"/>
+<area shape="poly" title=" " alt="" coords="243,36,300,76,297,81,240,41"/>
+</map>
+</div>
+</div>
+<p><a href="ObjMeshIO_8h_source.html">浏览该文件的源代码.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:ObjMeshIO" id="r_ObjMeshIO"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classObjMeshIO.html">ObjMeshIO</a></td></tr>
+</table>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

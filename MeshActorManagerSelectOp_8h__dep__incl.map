@@ -1,0 +1,20 @@
+<map id="app/render/MeshActorManagerSelectOp.h" name="app/render/MeshActorManagerSelectOp.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="310,5,533,45"/>
+<area shape="rect" id="Node000002" href="$ComponentSelectorHighlight_8cpp.html" title=" " alt="" coords="5,93,229,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="342,52,185,96,183,91,340,47"/>
+<area shape="rect" id="Node000003" href="$MeshActorManager_8h.html" title=" " alt="" coords="305,101,538,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="424,59,424,100,419,100,419,59"/>
+<area shape="rect" id="Node000005" href="$MeshActorManagerSelectOp_8cpp.html" title=" " alt="" coords="51,181,274,221"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="368,54,294,96,187,183,183,179,290,91,365,49"/>
+<area shape="rect" id="Node000008" href="$MeshSelectManager_8cpp.html" title=" " alt="" coords="562,101,817,126"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="494,47,654,98,653,103,492,52"/>
+<area shape="rect" id="Node000009" href="$SelectManager_8cpp.html" title=" " alt="" coords="841,101,1060,126"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="547,44,881,98,880,103,546,50"/>
+<area shape="rect" id="Node000004" href="$MeshActorManager_8cpp.html" title=" " alt="" coords="297,189,545,214"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="424,140,424,188,419,188,419,140"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="375,133,221,184,219,179,373,128"/>
+<area shape="rect" id="Node000006" href="$QRenderWindow_8cpp.html" title=" " alt="" coords="570,189,801,214"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="471,128,651,186,649,191,469,133"/>
+<area shape="rect" id="Node000007" href="$TestInteractionService_8cpp.html" title="通用视口交互服务的独立测试：拾取转发、标注拉取、结果回调与生命周期" alt="" coords="825,181,1047,221"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="504,126,826,179,825,184,503,131"/>
+</map>

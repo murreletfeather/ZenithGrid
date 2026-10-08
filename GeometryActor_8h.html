@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/render/GeometryActor.h 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_364370753f3c0e27b80c476caf69e0e2.html">render</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle"><div class="title">GeometryActor.h 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="Core_8h_source.html">Core.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeometryDataVtk_8h_source.html">GeometryDataVtk.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeometrySubshapeIndex_8h_source.html">GeometrySubshapeIndex.h</a>&quot;</code><br />
+<code>#include &lt;vtkActor.h&gt;</code><br />
+<code>#include &lt;vtkDataArray.h&gt;</code><br />
+<code>#include &lt;vtkNew.h&gt;</code><br />
+<code>#include &lt;vtkSmartPointer.h&gt;</code><br />
+<code>#include &lt;Standard_Handle.hxx&gt;</code><br />
+<code>#include &lt;IVtkOCC_Shape.hxx&gt;</code><br />
+<code>#include &lt;memory&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+GeometryActor.h 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="GeometryActor_8h__incl.png" border="0" usemap="#aapp_2render_2GeometryActor_8h" loading="lazy" alt=""/></div>
+<map name="aapp_2render_2GeometryActor_8h" id="aapp_2render_2GeometryActor_8h">
+<area shape="rect" title=" " alt="" coords="598,5,805,31"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="183,152,247,177"/>
+<area shape="poly" title=" " alt="" coords="598,27,477,34,347,45,239,61,203,70,185,80,179,94,180,109,197,140,193,142,175,110,173,93,181,77,201,65,238,56,346,40,476,29,598,21"/>
+<area shape="rect" title=" " alt="" coords="5,225,83,251"/>
+<area shape="poly" title=" " alt="" coords="598,24,485,30,361,40,249,56,205,68,172,81,133,110,101,146,76,182,58,214,53,212,71,180,97,142,130,106,169,76,203,63,248,51,360,35,484,24,597,19"/>
+<area shape="rect" href="GeometryDataVtk_8h.html" title=" " alt="" coords="195,79,347,104"/>
+<area shape="poly" title=" " alt="" coords="633,33,354,79,353,74,632,28"/>
+<area shape="rect" href="GeometrySubshapeIndex_8h.html" title=" " alt="" coords="371,79,570,104"/>
+<area shape="poly" title=" " alt="" coords="665,33,522,77,520,72,663,28"/>
+<area shape="rect" title=" " alt="" coords="593,79,681,104"/>
+<area shape="poly" title=" " alt="" coords="693,33,659,70,655,67,689,29"/>
+<area shape="rect" title=" " alt="" coords="706,79,825,104"/>
+<area shape="poly" title=" " alt="" coords="714,29,748,67,744,70,710,33"/>
+<area shape="rect" title=" " alt="" coords="848,79,931,104"/>
+<area shape="poly" title=" " alt="" coords="732,28,847,71,845,76,731,33"/>
+<area shape="rect" title=" " alt="" coords="955,79,1093,104"/>
+<area shape="poly" title=" " alt="" coords="754,28,959,73,958,78,753,33"/>
+<area shape="rect" title=" " alt="" coords="1118,79,1279,104"/>
+<area shape="poly" title=" " alt="" coords="782,28,1106,74,1105,79,781,33"/>
+<area shape="rect" title=" " alt="" coords="1303,79,1454,104"/>
+<area shape="poly" title=" " alt="" coords="805,26,1290,76,1289,81,805,31"/>
+<area shape="rect" title=" " alt="" coords="264,225,320,251"/>
+<area shape="poly" title=" " alt="" coords="229,175,271,214,267,218,225,179"/>
+<area shape="rect" title=" " alt="" coords="189,225,240,251"/>
+<area shape="poly" title=" " alt="" coords="217,178,217,212,212,212,212,178"/>
+<area shape="poly" title=" " alt="" coords="188,180,85,222,83,218,186,175"/>
+<area shape="rect" title=" " alt="" coords="107,225,165,251"/>
+<area shape="poly" title=" " alt="" coords="204,179,161,218,157,214,200,175"/>
+<area shape="rect" title=" " alt="" coords="345,225,407,251"/>
+<area shape="poly" title=" " alt="" coords="242,175,338,217,336,222,240,180"/>
+<area shape="poly" title=" " alt="" coords="430,107,261,153,259,148,429,101"/>
+<area shape="poly" title=" " alt="" coords="441,106,400,126,358,154,329,184,308,215,303,212,325,181,354,150,397,121,439,102"/>
+<area shape="poly" title=" " alt="" coords="434,106,399,125,384,138,372,153,366,167,365,182,370,212,364,212,360,182,361,166,367,151,380,134,396,120,432,102"/>
+<area shape="rect" title=" " alt="" coords="381,152,561,177"/>
+<area shape="poly" title=" " alt="" coords="473,104,473,138,468,138,468,104"/>
+<area shape="rect" title=" " alt="" coords="585,152,796,177"/>
+<area shape="poly" title=" " alt="" coords="507,101,643,145,642,150,505,107"/>
+<area shape="rect" title=" " alt="" coords="819,152,1045,177"/>
+<area shape="poly" title=" " alt="" coords="545,101,845,147,844,153,544,107"/>
+<area shape="rect" title=" " alt="" coords="1069,152,1214,177"/>
+<area shape="poly" title=" " alt="" coords="570,100,582,101,817,124,1055,149,1055,154,816,129,581,107,570,106"/>
+</map>
+</div>
+</div><div class="textblock"><div class="dynheader">
+此图展示该文件被哪些文件直接或间接地引用了:</div>
+<div class="dyncontent">
+<div class="center"><img src="GeometryActor_8h__dep__incl.png" border="0" usemap="#aapp_2render_2GeometryActor_8hdep" loading="lazy" alt=""/></div>
+<map name="aapp_2render_2GeometryActor_8hdep" id="aapp_2render_2GeometryActor_8hdep">
+<area shape="rect" title=" " alt="" coords="299,5,506,31"/>
+<area shape="rect" href="GeometryActor_8cpp.html" title=" " alt="" coords="5,86,227,111"/>
+<area shape="poly" title=" " alt="" coords="349,37,158,89,157,83,347,32"/>
+<area shape="rect" href="GeometryActorManager_8cpp.html" title=" " alt="" coords="28,343,223,383"/>
+<area shape="poly" title=" " alt="" coords="387,43,143,344,139,341,383,40"/>
+<area shape="rect" href="GeometryActorManagerSelectOp_8cpp.html" title=" " alt="" coords="247,343,441,383"/>
+<area shape="poly" title=" " alt="" coords="396,45,368,136,353,195,343,255,343,295,345,342,340,342,337,295,337,254,348,194,363,135,391,43"/>
+<area shape="rect" href="GeometryActorSelectOp_8cpp.html" title=" " alt="" coords="393,167,588,207"/>
+<area shape="poly" title=" " alt="" coords="417,42,483,165,478,168,413,44"/>
+<area shape="rect" href="GeometryActorSelectOp_8h.html" title=" " alt="" coords="856,79,1051,119"/>
+<area shape="poly" title=" " alt="" coords="497,30,856,81,856,86,496,35"/>
+<area shape="rect" href="TestGeometryShapePicker_8cpp.html" title=" " alt="" coords="1209,343,1425,383"/>
+<area shape="poly" title=" " alt="" coords="519,19,634,25,771,35,918,52,1063,76,1143,93,1204,109,1264,131,1338,164,1398,189,1452,216,1472,231,1484,250,1486,271,1476,296,1462,312,1446,326,1409,345,1407,340,1443,321,1458,309,1471,293,1481,270,1479,251,1468,235,1449,220,1396,194,1336,169,1262,136,1203,114,1142,98,1062,81,917,57,770,41,634,30,519,25"/>
+<area shape="poly" title=" " alt="" coords="843,123,589,170,588,165,842,118"/>
+<area shape="rect" href="ComponentSelectorHighlight_8cpp.html" title=" " alt="" coords="352,255,576,295"/>
+<area shape="poly" title=" " alt="" coords="889,126,518,257,516,252,887,121"/>
+<area shape="rect" href="GeometryActorManagerSelectOp_8h.html" title=" " alt="" coords="785,167,980,207"/>
+<area shape="poly" title=" " alt="" coords="931,131,900,168,896,165,927,128"/>
+<area shape="rect" href="GeometrySelectManager_8cpp.html" title=" " alt="" coords="1450,343,1651,383"/>
+<area shape="poly" title=" " alt="" coords="1065,108,1197,128,1269,144,1338,164,1435,194,1474,215,1514,253,1529,275,1540,299,1551,342,1546,343,1535,300,1524,277,1510,256,1470,219,1433,199,1337,169,1267,149,1196,134,1064,113"/>
+<area shape="rect" href="GeometrySelectManager_8h.html" title=" " alt="" coords="1261,255,1462,295"/>
+<area shape="poly" title=" " alt="" coords="1065,108,1202,130,1262,146,1303,164,1324,184,1340,208,1359,254,1354,256,1335,211,1320,188,1300,169,1260,151,1201,135,1064,114"/>
+<area shape="rect" href="GeometrySelectorHighlight_8cpp.html" title=" " alt="" coords="1022,255,1237,295"/>
+<area shape="poly" title=" " alt="" coords="984,127,1112,253,1108,256,981,131"/>
+<area shape="rect" href="GeometrySelectorHighlight_8h.html" title=" " alt="" coords="1075,167,1290,207"/>
+<area shape="poly" title=" " alt="" coords="1017,121,1133,164,1132,169,1015,126"/>
+<area shape="poly" title=" " alt="" coords="773,211,706,230,640,257,625,267,615,277,605,287,589,297,516,327,442,347,441,341,514,322,587,292,601,283,611,273,622,262,637,252,704,225,771,206"/>
+<area shape="poly" title=" " alt="" coords="778,212,556,257,555,252,777,207"/>
+<area shape="rect" href="GeometryActorManager_8h.html" title=" " alt="" coords="651,255,845,295"/>
+<area shape="poly" title=" " alt="" coords="843,217,779,257,776,252,840,212"/>
+<area shape="poly" title=" " alt="" coords="901,217,928,257,946,277,966,292,1054,312,1210,340,1209,345,1053,317,964,297,942,281,924,261,896,220"/>
+<area shape="poly" title=" " alt="" coords="918,213,964,253,986,275,996,284,1010,292,1071,315,1124,328,1172,334,1218,335,1315,332,1372,334,1438,340,1450,342,1450,347,1437,345,1372,339,1315,338,1218,340,1172,339,1123,333,1070,320,1008,297,993,288,983,279,961,257,914,218"/>
+<area shape="rect" href="SelectManager_8cpp.html" title=" " alt="" coords="967,350,1185,375"/>
+<area shape="poly" title=" " alt="" coords="888,220,897,258,905,276,917,293,938,312,964,327,1017,347,1015,352,961,332,935,316,913,296,900,279,892,259,882,221"/>
+<area shape="poly" title=" " alt="" coords="637,292,235,345,223,347,223,342,234,340,636,287"/>
+<area shape="poly" title=" " alt="" coords="647,300,433,345,432,340,645,295"/>
+<area shape="rect" href="QRenderWindow_8cpp.html" title=" " alt="" coords="711,350,942,375"/>
+<area shape="poly" title=" " alt="" coords="777,303,818,348,814,351,773,307"/>
+<area shape="poly" title=" " alt="" coords="860,290,1198,340,1209,342,1208,347,1197,345,859,295"/>
+<area shape="rect" href="TestInteractionService_8cpp.html" title="通用视口交互服务的独立测试：拾取转发、标注拉取、结果回调与生命周期" alt="" coords="465,343,687,383"/>
+<area shape="poly" title=" " alt="" coords="699,303,615,345,612,340,697,298"/>
+<area shape="poly" title=" " alt="" coords="1348,308,1329,344,1325,341,1343,306"/>
+<area shape="poly" title=" " alt="" coords="1416,298,1510,340,1508,345,1414,303"/>
+<area shape="poly" title=" " alt="" coords="1287,301,1115,353,1113,347,1285,296"/>
+<area shape="poly" title=" " alt="" coords="1304,194,1391,214,1435,230,1475,252,1498,272,1518,296,1544,341,1540,344,1514,299,1495,276,1472,257,1432,235,1390,219,1303,199"/>
+<area shape="poly" title=" " alt="" coords="1235,210,1323,252,1321,257,1233,215"/>
+<area shape="poly" title=" " alt="" coords="1166,220,1143,256,1139,253,1161,217"/>
+</map>
+</div>
+</div>
+<p><a href="GeometryActor_8h_source.html">浏览该文件的源代码.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:GeometryActor" id="r_GeometryActor"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGeometryActor.html">GeometryActor</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:acb9d39434207f27c7d476d3606bc60db" id="r_acb9d39434207f27c7d476d3606bc60db"><td class="memItemLeft" align="right" valign="top">typedef&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb9d39434207f27c7d476d3606bc60db">Handle</a> (IVtkOCC_Shape) OccShapeHandle</td></tr>
+</table>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="acb9d39434207f27c7d476d3606bc60db" name="acb9d39434207f27c7d476d3606bc60db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb9d39434207f27c7d476d3606bc60db">&#9670;&#160;</a></span>Handle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Handle </td>
+          <td>(</td>
+          <td class="paramtype">IVtkOCC_Shape</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

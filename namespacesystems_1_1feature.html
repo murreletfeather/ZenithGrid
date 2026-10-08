@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: systems::feature 命名空间参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="namespacesystems.html">systems</a></li><li class="navelem"><a href="namespacesystems_1_1feature.html">feature</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#typedef-members">类型定义</a>  </div>
+  <div class="headertitle"><div class="title">systems::feature 命名空间参考</div></div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:FeatureContext" id="r_FeatureContext"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1FeatureContext.html">FeatureContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能上下文，由 <a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html" title="功能系统：管理功能插件的注册、注销、调用与事件路由">FeatureSystem</a> 装配并在 setup()/activate()/execute() 时传给功能  <a href="structsystems_1_1feature_1_1FeatureContext.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureEventGateway" id="r_FeatureEventGateway"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureEventGateway.html">FeatureEventGateway</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">包装事件订阅：回调只写自己的预览，结束或异常时 flush，不创建操作记录。  <a href="classsystems_1_1feature_1_1FeatureEventGateway.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureHandler" id="r_FeatureHandler"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureHandler.html">FeatureHandler</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能系统的功能接口，插件继承它实现具体功能  <a href="classsystems_1_1feature_1_1FeatureHandler.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureInfo" id="r_FeatureInfo"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1FeatureInfo.html">FeatureInfo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能信息：元数据与 setup() 声明的聚合，供 UI 查询  <a href="structsystems_1_1feature_1_1FeatureInfo.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureParams" id="r_FeatureParams"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureParams.html">FeatureParams</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能的持久参数集：参数类型与当前值一一对应  <a href="classsystems_1_1feature_1_1FeatureParams.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureRegistrar" id="r_FeatureRegistrar"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureRegistrar.html">FeatureRegistrar</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能注册器：功能在 setup() 中通过它声明参数、菜单项与按键绑定  <a href="classsystems_1_1feature_1_1FeatureRegistrar.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureSystem" id="r_FeatureSystem"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureSystem.html">FeatureSystem</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能系统：管理功能插件的注册、注销、调用与事件路由  <a href="classsystems_1_1feature_1_1FeatureSystem.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:FeatureSystemRegister" id="r_FeatureSystemRegister"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1FeatureSystemRegister.html">FeatureSystemRegister</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能系统的注册器，负责注册和注销功能插件  <a href="classsystems_1_1feature_1_1FeatureSystemRegister.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:HandlerMetaData" id="r_HandlerMetaData"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1HandlerMetaData.html">HandlerMetaData</a></td></tr>
+<tr class="memitem:InteractionContext" id="r_InteractionContext"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1InteractionContext.html">InteractionContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">视口交互上下文（FeatureContext 成员）：功能在 setup() 中经它订阅交互回调  <a href="classsystems_1_1feature_1_1InteractionContext.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:KeyBinding" id="r_KeyBinding"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1KeyBinding.html">KeyBinding</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">按键绑定：明确声明正式 execute，或定向预览/非模型 onKeyEvent 回调  <a href="structsystems_1_1feature_1_1KeyBinding.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:KeyEvent" id="r_KeyEvent"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1KeyEvent.html">KeyEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">键盘按键事件  <a href="structsystems_1_1feature_1_1KeyEvent.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:MenuContribution" id="r_MenuContribution"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1MenuContribution.html">MenuContribution</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">菜单贡献项：声明功能要挂到哪个菜单下  <a href="structsystems_1_1feature_1_1MenuContribution.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:ModelEvent" id="r_ModelEvent"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1ModelEvent.html">ModelEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">模型变更事件，由 app 层桥接 <a class="el" href="classModelObserver.html">ModelObserver</a> 通知后发布  <a href="structsystems_1_1feature_1_1ModelEvent.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:ParameterChangedEvent" id="r_ParameterChangedEvent"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1ParameterChangedEvent.html">ParameterChangedEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能参数变更事件，FeatureSystem::setParameter 成功后发布  <a href="structsystems_1_1feature_1_1ParameterChangedEvent.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:QFeatureSystemAdaptor" id="r_QFeatureSystemAdaptor"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html">QFeatureSystemAdaptor</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步  <a href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:ScalarAttributeDisplayRequestedEvent" id="r_ScalarAttributeDisplayRequestedEvent"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structsystems_1_1feature_1_1ScalarAttributeDisplayRequestedEvent.html">ScalarAttributeDisplayRequestedEvent</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">请求界面渲染指定的标量属性（界面在活动操作切换时自行取消渲染，无需空名事件）  <a href="structsystems_1_1feature_1_1ScalarAttributeDisplayRequestedEvent.html#details">更多...</a><br /></td></tr>
+<tr class="memitem:UndoContext" id="r_UndoContext"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classsystems_1_1feature_1_1UndoContext.html">UndoContext</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">临时预览视图：插件控制两次 execute 之间的开层、重试和取消。  <a href="classsystems_1_1feature_1_1UndoContext.html#details">更多...</a><br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-typedef-members" class="groupheader"><a id="typedef-members" name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:a204c7782d880d8656a7395b5ccdb5ce4" id="r_a204c7782d880d8656a7395b5ccdb5ce4"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a204c7782d880d8656a7395b5ccdb5ce4">ComponentJobTaskFn</a> = std::function&lt;void(<a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp; shadow_target, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a> report)&gt;</td></tr>
+<tr class="memitem:afe3fb0fc9522ace98f5731d9c851a562" id="r_afe3fb0fc9522ace98f5731d9c851a562"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afe3fb0fc9522ace98f5731d9c851a562">WritebackFn</a> = std::function&lt;void(<a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp;, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a>)&gt;</td></tr>
+<tr class="memdesc:afe3fb0fc9522ace98f5731d9c851a562"><td class="mdescLeft">&#160;</td><td class="mdescRight">GUI 回写段：框架在发布前校验目标，在持有操作占用的提交段交付就绪写面。  <br /></td></tr>
+<tr class="memitem:abfc90cdc6068ff4727fefe3468812b51" id="r_abfc90cdc6068ff4727fefe3468812b51"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abfc90cdc6068ff4727fefe3468812b51">CaptureJobFn</a> = std::function&lt;<a class="el" href="namespacesystems_1_1job.html#ae2006917203a4b569c4fe083d45939cc">systems::job::JobTaskFn</a>(const <a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp;)&gt;</td></tr>
+<tr class="memdesc:abfc90cdc6068ff4727fefe3468812b51"><td class="mdescLeft">&#160;</td><td class="mdescRight">GUI 准备段：框架持有模型操作占用，按目标只读捕获输入，返回纯计算任务。  <br /></td></tr>
+<tr class="memitem:a32b809d1d2350d1e43401f558ed1c3fc" id="r_a32b809d1d2350d1e43401f558ed1c3fc"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a32b809d1d2350d1e43401f558ed1c3fc">LayerCaptureJobFn</a> = std::function&lt;<a class="el" href="namespacesystems_1_1job.html#ae2006917203a4b569c4fe083d45939cc">systems::job::JobTaskFn</a>(const <a class="el" href="classModelLayer.html">ModelLayer</a>&amp;)&gt;</td></tr>
+<tr class="memdesc:a32b809d1d2350d1e43401f558ed1c3fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">GUI 准备与提交覆盖整个模型层；worker 仍只拿自持输入和结果。  <br /></td></tr>
+<tr class="memitem:add387ae70a9ea20afcbc99ede083dd26" id="r_add387ae70a9ea20afcbc99ede083dd26"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add387ae70a9ea20afcbc99ede083dd26">LayerWritebackFn</a> = std::function&lt;void(<a class="el" href="classModelLayer.html">ModelLayer</a>&amp;, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a>)&gt;</td></tr>
+</table>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">类型定义说明</h2>
+<a id="abfc90cdc6068ff4727fefe3468812b51" name="abfc90cdc6068ff4727fefe3468812b51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfc90cdc6068ff4727fefe3468812b51">&#9670;&#160;</a></span>CaptureJobFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#abfc90cdc6068ff4727fefe3468812b51">systems::feature::CaptureJobFn</a> = std::function&lt;<a class="el" href="namespacesystems_1_1job.html#ae2006917203a4b569c4fe083d45939cc">systems::job::JobTaskFn</a>(const <a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp;)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>GUI 准备段：框架持有模型操作占用，按目标只读捕获输入，返回纯计算任务。 </p>
+
+</div>
+</div>
+<a id="a204c7782d880d8656a7395b5ccdb5ce4" name="a204c7782d880d8656a7395b5ccdb5ce4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a204c7782d880d8656a7395b5ccdb5ce4">&#9670;&#160;</a></span>ComponentJobTaskFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a204c7782d880d8656a7395b5ccdb5ce4">systems::feature::ComponentJobTaskFn</a> = std::function&lt;void(<a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp; shadow_target, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a> report)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>影子组件任务体：写面 = 影子目标组件的操作句柄（scope 限目标组件，无 io、无其他组件访问） report 为心跳（含取消检查）；写入落影子层，由框架在 undo 边界内提交/丢弃 </p>
+
+</div>
+</div>
+<a id="a32b809d1d2350d1e43401f558ed1c3fc" name="a32b809d1d2350d1e43401f558ed1c3fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32b809d1d2350d1e43401f558ed1c3fc">&#9670;&#160;</a></span>LayerCaptureJobFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#a32b809d1d2350d1e43401f558ed1c3fc">systems::feature::LayerCaptureJobFn</a> = std::function&lt;<a class="el" href="namespacesystems_1_1job.html#ae2006917203a4b569c4fe083d45939cc">systems::job::JobTaskFn</a>(const <a class="el" href="classModelLayer.html">ModelLayer</a>&amp;)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>GUI 准备与提交覆盖整个模型层；worker 仍只拿自持输入和结果。 </p>
+
+</div>
+</div>
+<a id="add387ae70a9ea20afcbc99ede083dd26" name="add387ae70a9ea20afcbc99ede083dd26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add387ae70a9ea20afcbc99ede083dd26">&#9670;&#160;</a></span>LayerWritebackFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#add387ae70a9ea20afcbc99ede083dd26">systems::feature::LayerWritebackFn</a> = std::function&lt;void(<a class="el" href="classModelLayer.html">ModelLayer</a>&amp;, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a>)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe3fb0fc9522ace98f5731d9c851a562" name="afe3fb0fc9522ace98f5731d9c851a562"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe3fb0fc9522ace98f5731d9c851a562">&#9670;&#160;</a></span>WritebackFn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#afe3fb0fc9522ace98f5731d9c851a562">systems::feature::WritebackFn</a> = std::function&lt;void(<a class="el" href="classComponentOperator.html">ComponentOperator</a>&amp;, <a class="el" href="namespacesystems_1_1job.html#a68d9b6556b0d0b4d3b1dd89c36e872cd">systems::job::ProgressFn</a>)&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>GUI 回写段：框架在发布前校验目标，在持有操作占用的提交段交付就绪写面。 </p>
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

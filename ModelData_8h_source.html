@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: model/data/ModelData.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_3f14f6767c31cb4a1d22c13c18cc6fc3.html">model</a></li><li class="navelem"><a href="dir_84846e69b963a5367080adb8af90c8fe.html">data</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="headertitle"><div class="title">ModelData.h</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="ModelData_8h.html">浏览该文件的文档.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="preprocessor">#ifndef MODEL_H</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#define MODEL_H</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;<a class="code" href="ComponentData_8h.html">ComponentData.h</a>&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="code" href="Selection_8h.html">Selection.h</a>&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#include &lt;optional&gt;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="preprocessor">#include &lt;variant&gt;</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span> </div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="keyword">struct </span><a class="code hl_struct" href="structMeshData.html">MeshData</a>;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="keyword">struct </span><a class="code hl_struct" href="structGeometryData.html">GeometryData</a>;</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span></div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span></div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="};">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="classModelData.html">   34</a></span><span class="keyword">class </span><a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a> {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno"><a class="line" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">   36</a></span>    <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>();</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno"><a class="line" href="classModelData.html#a8888ea03c5d27446f2f7f93f6fe6cd42">   37</a></span>    <a class="code hl_function" href="classModelData.html#a8888ea03c5d27446f2f7f93f6fe6cd42">~ModelData</a>();</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classModelData.html#aa1e3c6c09490f733d4279b333ed13bcc">   39</a></span>    std::string <a class="code hl_variable" href="classModelData.html#aa1e3c6c09490f733d4279b333ed13bcc">model_name_</a>; </div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keyword">const</span> std::vector&lt;Index&gt;&amp; <a class="code hl_function" href="classModelData.html#aeef3c116a7a66784844d65f43cfa95f5">componentIds</a>() const noexcept;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    std::vector&lt;<a class="code hl_typedef" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt;&amp; <a class="code hl_function" href="classModelData.html#aeef3c116a7a66784844d65f43cfa95f5">componentIds</a>() noexcept;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>    <span class="comment">/* ============ 构造（仅声明） ============ */</span></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span> </div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classModelData.html#a9282e2012da62729a8293a4dd47c0fc7">   46</a></span>    <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>(const <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp; other) = delete;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="classModelData.html#a0b518c5abe3a9144a132ca598f5be92d">   47</a></span>    <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp; operator=(const <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp; other) = delete;</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="classModelData.html#a6f055843c74e202aeeff29dc94cb4631">   48</a></span>    <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>(<a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp;&amp; other) noexcept;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="classModelData.html#a694025dc79899152e09474f6b65270c6">   49</a></span>    <a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp; operator=(<a class="code hl_function" href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData</a>&amp;&amp; other) noexcept;</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span> </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>private:</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno"><a class="line" href="classModelData.html#a88581a1ea3219a43cf87cd3301eb2446">   53</a></span>    std::vector&lt;<a class="code hl_typedef" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; <a class="code hl_variable" href="classModelData.html#a88581a1ea3219a43cf87cd3301eb2446">component_ids_</a>; <span class="comment">// 运行期权威：该 model 拥有哪些 component_id</span></div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    </div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno"><a class="line" href="classModelData.html#ae4a612afabef6e8cfa5397aa9aa88838">   56</a></span>    friend class <a class="code hl_friend" href="classModelData.html#ae4a612afabef6e8cfa5397aa9aa88838">ModelOperator</a>; </div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>};</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span><span class="preprocessor">#endif </span><span class="comment">// MODEL_H</span></div>
+<div class="ttc" id="aComponentData_8h_html"><div class="ttname"><a href="ComponentData_8h.html">ComponentData.h</a></div></div>
+<div class="ttc" id="aCore_8h_html_a1673229bf7fec9388ac2a829a52d69b3"><div class="ttname"><a href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></div><div class="ttdeci">int Index</div><div class="ttdoc">基本索引类型定义</div><div class="ttdef"><b>定义</b> Core.h:57</div></div>
+<div class="ttc" id="aSelection_8h_html"><div class="ttname"><a href="Selection_8h.html">Selection.h</a></div></div>
+<div class="ttc" id="aclassModelData_html_a7412b0ec776c43cd3803b7cc12d99297"><div class="ttname"><a href="classModelData.html#a7412b0ec776c43cd3803b7cc12d99297">ModelData::ModelData</a></div><div class="ttdeci">ModelData()</div></div>
+<div class="ttc" id="aclassModelData_html_a88581a1ea3219a43cf87cd3301eb2446"><div class="ttname"><a href="classModelData.html#a88581a1ea3219a43cf87cd3301eb2446">ModelData::component_ids_</a></div><div class="ttdeci">std::vector&lt; Index &gt; component_ids_</div><div class="ttdef"><b>定义</b> ModelData.h:53</div></div>
+<div class="ttc" id="aclassModelData_html_a8888ea03c5d27446f2f7f93f6fe6cd42"><div class="ttname"><a href="classModelData.html#a8888ea03c5d27446f2f7f93f6fe6cd42">ModelData::~ModelData</a></div><div class="ttdeci">~ModelData()</div></div>
+<div class="ttc" id="aclassModelData_html_aa1e3c6c09490f733d4279b333ed13bcc"><div class="ttname"><a href="classModelData.html#aa1e3c6c09490f733d4279b333ed13bcc">ModelData::model_name_</a></div><div class="ttdeci">std::string model_name_</div><div class="ttdef"><b>定义</b> ModelData.h:39</div></div>
+<div class="ttc" id="aclassModelData_html_ae4a612afabef6e8cfa5397aa9aa88838"><div class="ttname"><a href="classModelData.html#ae4a612afabef6e8cfa5397aa9aa88838">ModelData::ModelOperator</a></div><div class="ttdeci">friend class ModelOperator</div><div class="ttdoc">声明 ModelOperator 为友元，以允许其访问 ModelData 私有数据</div><div class="ttdef"><b>定义</b> ModelData.h:56</div></div>
+<div class="ttc" id="aclassModelData_html_aeef3c116a7a66784844d65f43cfa95f5"><div class="ttname"><a href="classModelData.html#aeef3c116a7a66784844d65f43cfa95f5">ModelData::componentIds</a></div><div class="ttdeci">const std::vector&lt; Index &gt; &amp; componentIds() const noexcept</div><div class="ttdef"><b>定义</b> ModelData.cpp:30</div></div>
+<div class="ttc" id="astructGeometryData_html"><div class="ttname"><a href="structGeometryData.html">GeometryData</a></div><div class="ttdef"><b>定义</b> GeometryData.h:10</div></div>
+<div class="ttc" id="astructMeshData_html"><div class="ttname"><a href="structMeshData.html">MeshData</a></div><div class="ttdef"><b>定义</b> MeshData.h:39</div></div>
+</div><!-- fragment --></div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

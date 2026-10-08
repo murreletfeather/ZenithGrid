@@ -1,0 +1,1888 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: model/ops/test/TestGeometryTopologyEditor.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_3f14f6767c31cb4a1d22c13c18cc6fc3.html">model</a></li><li class="navelem"><a href="dir_f3f991c7b5bf0583e6df7a74afc61832.html">ops</a></li><li class="navelem"><a href="dir_b1c6ebd7ce52cc5375ef042e6a1d0c67.html">test</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle"><div class="title">TestGeometryTopologyEditor.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="GeometryBuilder_8h_source.html">GeometryBuilder.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeometryData_8h_source.html">GeometryData.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="GeometryTopologyEditor_8h_source.html">GeometryTopologyEditor.h</a>&quot;</code><br />
+<code>#include &lt;BRepCheck_Analyzer.hxx&gt;</code><br />
+<code>#include &lt;BRepTools.hxx&gt;</code><br />
+<code>#include &lt;BRepAdaptor_Curve.hxx&gt;</code><br />
+<code>#include &lt;BRepAdaptor_Surface.hxx&gt;</code><br />
+<code>#include &lt;BRepGProp.hxx&gt;</code><br />
+<code>#include &lt;GProp_GProps.hxx&gt;</code><br />
+<code>#include &lt;BRepAlgoAPI_Cut.hxx&gt;</code><br />
+<code>#include &lt;BRep_Builder.hxx&gt;</code><br />
+<code>#include &lt;BRepBuilderAPI_MakeFace.hxx&gt;</code><br />
+<code>#include &lt;TopAbs_ShapeEnum.hxx&gt;</code><br />
+<code>#include &lt;TopExp.hxx&gt;</code><br />
+<code>#include &lt;TopExp_Explorer.hxx&gt;</code><br />
+<code>#include &lt;TopoDS.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Compound.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_CompSolid.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Iterator.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Edge.hxx&gt;</code><br />
+<code>#include &lt;NCollection_IndexedMap.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Face.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Shell.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Solid.hxx&gt;</code><br />
+<code>#include &lt;TopTools_ShapeMapHasher.hxx&gt;</code><br />
+<code>#include &lt;gp_Pnt.hxx&gt;</code><br />
+<code>#include &lt;GeomConvert.hxx&gt;</code><br />
+<code>#include &lt;Geom_BSplineSurface.hxx&gt;</code><br />
+<code>#include &lt;Geom_BezierCurve.hxx&gt;</code><br />
+<code>#include &lt;TColgp_Array1OfPnt.hxx&gt;</code><br />
+<code>#include &lt;Geom_CylindricalSurface.hxx&gt;</code><br />
+<code>#include &lt;Geom_Plane.hxx&gt;</code><br />
+<code>#include &lt;Geom_RectangularTrimmedSurface.hxx&gt;</code><br />
+<code>#include &lt;Geom_Surface.hxx&gt;</code><br />
+<code>#include &lt;gp_Ax3.hxx&gt;</code><br />
+<code>#include &lt;gp_Cylinder.hxx&gt;</code><br />
+<code>#include &lt;gp_Dir.hxx&gt;</code><br />
+<code>#include &lt;gp_Pln.hxx&gt;</code><br />
+<code>#include &lt;BRepBuilderAPI_MakeWire.hxx&gt;</code><br />
+<code>#include &lt;BRepBuilderAPI_MakeEdge.hxx&gt;</code><br />
+<code>#include &lt;BRep_Tool.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Vertex.hxx&gt;</code><br />
+<code>#include &lt;TopoDS_Wire.hxx&gt;</code><br />
+<code>#include &lt;gp_Ax2.hxx&gt;</code><br />
+<code>#include &lt;gp_Circ.hxx&gt;</code><br />
+<code>#include &lt;catch2/catch_approx.hpp&gt;</code><br />
+<code>#include &lt;NCollection_IndexedDataMap.hxx&gt;</code><br />
+<code>#include &lt;NCollection_List.hxx&gt;</code><br />
+<code>#include &lt;catch2/catch_test_macros.hpp&gt;</code><br />
+<code>#include &lt;cmath&gt;</code><br />
+<code>#include &lt;array&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
+<code>#include &lt;stdexcept&gt;</code><br />
+<code>#include &lt;utility&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:aec85e463babc116370d5da4fad4a1e20" id="r_aec85e463babc116370d5da4fad4a1e20"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aec85e463babc116370d5da4fad4a1e20">TEST_CASE</a> (&quot;GeometryTopologyEditor splits a face with an intersecting face&quot;)</td></tr>
+<tr class="memitem:a04b68477b083f98e3eeb1517e0aa9c74" id="r_a04b68477b083f98e3eeb1517e0aa9c74"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04b68477b083f98e3eeb1517e0aa9c74">TEST_CASE</a> (&quot;GeometryTopologyEditor finds and repairs free edge gaps&quot;)</td></tr>
+<tr class="memitem:a37114ae44abff9481b18388f09eacf53" id="r_a37114ae44abff9481b18388f09eacf53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a37114ae44abff9481b18388f09eacf53">TEST_CASE</a> (&quot;GeometryTopologyEditor filters distant boundaries without losing a nearby pair&quot;)</td></tr>
+<tr class="memdesc:a37114ae44abff9481b18388f09eacf53"><td class="mdescLeft">&#160;</td><td class="mdescRight">远处分散边界不得干扰近邻配对，同时提供候选搜索的固定规模性能样本。  <br /></td></tr>
+<tr class="memitem:aa46307c82e7187457a884cab491c84d8" id="r_aa46307c82e7187457a884cab491c84d8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa46307c82e7187457a884cab491c84d8">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches two free boundary edges within tolerance&quot;)</td></tr>
+<tr class="memitem:aefdf3df9c1df1f7d83bf233b8d8dbda4" id="r_aefdf3df9c1df1f7d83bf233b8d8dbda4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aefdf3df9c1df1f7d83bf233b8d8dbda4">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches one long edge to two short edges&quot;)</td></tr>
+<tr class="memitem:afc6e101f6322d493314219075bb00a81" id="r_afc6e101f6322d493314219075bb00a81"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc6e101f6322d493314219075bb00a81">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects boundary edges outside stitch tolerance&quot;)</td></tr>
+<tr class="memitem:a8a1fb74480d10b91b92a1b1318fff2d1" id="r_a8a1fb74480d10b91b92a1b1318fff2d1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8a1fb74480d10b91b92a1b1318fff2d1">TEST_CASE</a> (&quot;GeometryTopologyEditor expands stitchable free chain from a gap seed edge&quot;)</td></tr>
+<tr class="memitem:aa380e29e86f246f7df68de0787c398bd" id="r_aa380e29e86f246f7df68de0787c398bd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa380e29e86f246f7df68de0787c398bd">TEST_CASE</a> (&quot;GeometryTopologyEditor finds the smallest gap partner chain and stitches from seed&quot;)</td></tr>
+<tr class="memitem:a29210dcd50310e66edf82fe6b62e4d9d" id="r_a29210dcd50310e66edf82fe6b62e4d9d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29210dcd50310e66edf82fe6b62e4d9d">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches a long gap seed edge to two short partners&quot;)</td></tr>
+<tr class="memitem:a4d393073e2683c5aaabe4479b0755e26" id="r_a4d393073e2683c5aaabe4479b0755e26"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d393073e2683c5aaabe4479b0755e26">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects a gap seed without a partner within tolerance&quot;)</td></tr>
+<tr class="memitem:ab95627b828171a6070425535c629a40c" id="r_ab95627b828171a6070425535c629a40c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab95627b828171a6070425535c629a40c">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches free edges that share vertices but not topology&quot;)</td></tr>
+<tr class="memitem:a93fabc7b7e64cfb68c5ee5773f0e8ef1" id="r_a93fabc7b7e64cfb68c5ee5773f0e8ef1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93fabc7b7e64cfb68c5ee5773f0e8ef1">TEST_CASE</a> (&quot;GeometryTopologyEditor splits a nested solid face with an on-face edge&quot;)</td></tr>
+<tr class="memitem:ab1f58943652e7d0a014f5654c2670dcc" id="r_ab1f58943652e7d0a014f5654c2670dcc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab1f58943652e7d0a014f5654c2670dcc">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects invalid face split inputs&quot;)</td></tr>
+<tr class="memitem:a0ad8b19254a9f4bff78361b1e8219f16" id="r_a0ad8b19254a9f4bff78361b1e8219f16"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ad8b19254a9f4bff78361b1e8219f16">TEST_CASE</a> (&quot;GeometryTopologyEditor splits an edge by ratio&quot;)</td></tr>
+<tr class="memitem:a7d21cd607805dda7f46a2608bc54eb0e" id="r_a7d21cd607805dda7f46a2608bc54eb0e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7d21cd607805dda7f46a2608bc54eb0e">TEST_CASE</a> (&quot;GeometryTopologyEditor splits a reversed edge along its orientation&quot;)</td></tr>
+<tr class="memdesc:a7d21cd607805dda7f46a2608bc54eb0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">反向边按选择方向分割，同时保持所在线框的端点与拓扑有效性。  <br /></td></tr>
+<tr class="memitem:a094f2621669664187f20c2c1b2e066e5" id="r_a094f2621669664187f20c2c1b2e066e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a094f2621669664187f20c2c1b2e066e5">TEST_CASE</a> (&quot;GeometryTopologyEditor collapses an isolated edge to its midpoint&quot;)</td></tr>
+<tr class="memitem:af9291731fc6f2fc86efe8093b52c97b0" id="r_af9291731fc6f2fc86efe8093b52c97b0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af9291731fc6f2fc86efe8093b52c97b0">TEST_CASE</a> (&quot;GeometryTopologyEditor collapses an edge between two junctions&quot;)</td></tr>
+<tr class="memitem:acbc6460604c0b7cd1f875d307383a861" id="r_acbc6460604c0b7cd1f875d307383a861"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acbc6460604c0b7cd1f875d307383a861">TEST_CASE</a> (&quot;GeometryTopologyEditor preserves curved adjacency and recommends its endpoint&quot;)</td></tr>
+<tr class="memitem:ae08f650997a8049b371a4723d14d9a9f" id="r_ae08f650997a8049b371a4723d14d9a9f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae08f650997a8049b371a4723d14d9a9f">TEST_CASE</a> (&quot;GeometryTopologyEditor merges independent vertices to the first vertex&quot;)</td></tr>
+<tr class="memitem:a7e1a691a446bb242083d80c9ee83c410" id="r_a7e1a691a446bb242083d80c9ee83c410"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e1a691a446bb242083d80c9ee83c410">TEST_CASE</a> (&quot;GeometryTopologyEditor merges endpoints of an isolated edge&quot;)</td></tr>
+<tr class="memdesc:a7e1a691a446bb242083d80c9ee83c410"><td class="mdescLeft">&#160;</td><td class="mdescRight">合并孤立边的端点后保留目标点，兼顾根中仍有其他独立几何的情况。  <br /></td></tr>
+<tr class="memitem:af16e32d12f4a7a6388e76cba6e76dde1" id="r_af16e32d12f4a7a6388e76cba6e76dde1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af16e32d12f4a7a6388e76cba6e76dde1">TEST_CASE</a> (&quot;GeometryTopologyEditor merges selected same-domain faces&quot;)</td></tr>
+<tr class="memitem:a6f7df08778b8b7d378a0db003691bbfd" id="r_a6f7df08778b8b7d378a0db003691bbfd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6f7df08778b8b7d378a0db003691bbfd">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects incomplete face merge inputs&quot;)</td></tr>
+<tr class="memitem:a8ef530f29cdee190337e2663c05fd30b" id="r_a8ef530f29cdee190337e2663c05fd30b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ef530f29cdee190337e2663c05fd30b">TEST_CASE</a> (&quot;GeometryTopologyEditor merges selected same-domain edges&quot;)</td></tr>
+<tr class="memitem:a457083bc936d81cd3ba019e79696a6dc" id="r_a457083bc936d81cd3ba019e79696a6dc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a457083bc936d81cd3ba019e79696a6dc">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects incomplete edge merge inputs&quot;)</td></tr>
+<tr class="memitem:a26aa8adcda163734f7208fa70b12a4db" id="r_a26aa8adcda163734f7208fa70b12a4db"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a26aa8adcda163734f7208fa70b12a4db">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses boundary and isolated edges&quot;)</td></tr>
+<tr class="memitem:ad7cb804974a365956f379b3e225257b3" id="r_ad7cb804974a365956f379b3e225257b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad7cb804974a365956f379b3e225257b3">TEST_CASE</a> (&quot;GeometryTopologyEditor groups geometrically duplicate faces&quot;)</td></tr>
+<tr class="memitem:a761eddc27aba12e9d3b1e1040193d55a" id="r_a761eddc27aba12e9d3b1e1040193d55a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a761eddc27aba12e9d3b1e1040193d55a">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses duplicate faces sharing boundary edges&quot;)</td></tr>
+<tr class="memitem:a0631d7c05bb9f59384441f3c190e0029" id="r_a0631d7c05bb9f59384441f3c190e0029"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0631d7c05bb9f59384441f3c190e0029">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses crossing faces&quot;)</td></tr>
+<tr class="memitem:a1b2f94ff4fbb3f0f07ce7a9993ea7a89" id="r_a1b2f94ff4fbb3f0f07ce7a9993ea7a89"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1b2f94ff4fbb3f0f07ce7a9993ea7a89">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses crossing faces in one solid as self intersections&quot;)</td></tr>
+<tr class="memitem:a20cfd26d93b250b04e10cc9bcbb9a87d" id="r_a20cfd26d93b250b04e10cc9bcbb9a87d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a20cfd26d93b250b04e10cc9bcbb9a87d">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses intersecting curved faces&quot;)</td></tr>
+<tr class="memitem:a45555e75fd48bc3d330e83f5db19e380" id="r_a45555e75fd48bc3d330e83f5db19e380"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a45555e75fd48bc3d330e83f5db19e380">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores independent faces sharing a geometric edge&quot;)</td></tr>
+<tr class="memitem:a6d931f8ba1ffb5104f5c4f0f259ad42a" id="r_a6d931f8ba1ffb5104f5c4f0f259ad42a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6d931f8ba1ffb5104f5c4f0f259ad42a">TEST_CASE</a> (&quot;GeometryTopologyEditor excludes hidden duplicate faces from intersections&quot;)</td></tr>
+<tr class="memitem:a0b7d014015280e28a49d8f21a2b1cc4f" id="r_a0b7d014015280e28a49d8f21a2b1cc4f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0b7d014015280e28a49d8f21a2b1cc4f">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses partially overlapping coplanar faces&quot;)</td></tr>
+<tr class="memitem:a042b043ce6abbbf320b56da12d22d4ec" id="r_a042b043ce6abbbf320b56da12d22d4ec"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a042b043ce6abbbf320b56da12d22d4ec">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores coplanar faces touching at one edge&quot;)</td></tr>
+<tr class="memitem:a9582d0b0a89722e9fce48c60cd023164" id="r_a9582d0b0a89722e9fce48c60cd023164"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9582d0b0a89722e9fce48c60cd023164">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses overlapping planar and B-spline support faces&quot;)</td></tr>
+<tr class="memitem:abef60b98a99633224387e858463a6593" id="r_abef60b98a99633224387e858463a6593"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abef60b98a99633224387e858463a6593">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores disjoint coplanar B-spline support faces&quot;)</td></tr>
+<tr class="memitem:a968c338c3dd683cc1d23161f8d7ca4f7" id="r_a968c338c3dd683cc1d23161f8d7ca4f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a968c338c3dd683cc1d23161f8d7ca4f7">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses overlapping coaxial cylindrical and B-spline faces&quot;)</td></tr>
+<tr class="memitem:aa0fefba5e5ec3e59cc6dfa69dfb811d4" id="r_aa0fefba5e5ec3e59cc6dfa69dfb811d4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0fefba5e5ec3e59cc6dfa69dfb811d4">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores coaxial cylindrical faces with disjoint ranges&quot;)</td></tr>
+<tr class="memitem:a28ea1614171c84d5e06954ad35071027" id="r_a28ea1614171c84d5e06954ad35071027"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a28ea1614171c84d5e06954ad35071027">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses crossing slanted faces far from the origin&quot;)</td></tr>
+<tr class="memitem:af4b693e532740d9a080b23dfc3af0cea" id="r_af4b693e532740d9a080b23dfc3af0cea"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4b693e532740d9a080b23dfc3af0cea">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses a plane crossing a B-spline patch far from the origin&quot;)</td></tr>
+<tr class="memitem:a4bdbb9a0a505103fc2a219e60a112b60" id="r_a4bdbb9a0a505103fc2a219e60a112b60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4bdbb9a0a505103fc2a219e60a112b60">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses intersecting cylinders far from the origin&quot;)</td></tr>
+<tr class="memitem:ac6cb9ce37984d75e19bd66d7a91b50d9" id="r_ac6cb9ce37984d75e19bd66d7a91b50d9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6cb9ce37984d75e19bd66d7a91b50d9">TEST_CASE</a> (&quot;GeometryTopologyEditor reports faces of interpenetrating solids&quot;)</td></tr>
+<tr class="memitem:a44732399e4eec3326e3451b2518e1ca4" id="r_a44732399e4eec3326e3451b2518e1ca4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44732399e4eec3326e3451b2518e1ca4">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores faces of nested solids&quot;)</td></tr>
+<tr class="memitem:ab45363584251b886be25f59fff2cef8f" id="r_ab45363584251b886be25f59fff2cef8f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab45363584251b886be25f59fff2cef8f">TEST_CASE</a> (&quot;GeometryTopologyEditor reports tangent nested solids as interference&quot;)</td></tr>
+<tr class="memitem:aab89578727bc3a64700a1165fc43ac8c" id="r_aab89578727bc3a64700a1165fc43ac8c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab89578727bc3a64700a1165fc43ac8c">TEST_CASE</a> (&quot;GeometryTopologyEditor reports interference when a nested solid pierces the wall&quot;)</td></tr>
+<tr class="memitem:a51d0f35ba90c227ff17c9443819aed4f" id="r_a51d0f35ba90c227ff17c9443819aed4f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51d0f35ba90c227ff17c9443819aed4f">TEST_CASE</a> (&quot;GeometryTopologyEditor ignores regular adjacent box faces&quot;)</td></tr>
+<tr class="memitem:ad82b42539a315266e8920daf389da18d" id="r_ad82b42539a315266e8920daf389da18d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad82b42539a315266e8920daf389da18d">TEST_CASE</a> (&quot;GeometryTopologyEditor diagnoses small edges and small faces independently&quot;)</td></tr>
+<tr class="memitem:a3c224616c1db65a7eed031d4d4f9a133" id="r_a3c224616c1db65a7eed031d4d4f9a133"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3c224616c1db65a7eed031d4d4f9a133">TEST_CASE</a> (&quot;GeometryTopologyEditor does not treat nearby parallel faces as duplicates&quot;)</td></tr>
+<tr class="memitem:a2be5230b41374f29752b4bb0a385bfb9" id="r_a2be5230b41374f29752b4bb0a385bfb9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2be5230b41374f29752b4bb0a385bfb9">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps rectangle boundary when deleting a face&quot;)</td></tr>
+<tr class="memitem:a000471fd4f813a1d1037d63bffb5aa41" id="r_a000471fd4f813a1d1037d63bffb5aa41"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a000471fd4f813a1d1037d63bffb5aa41">TEST_CASE</a> (&quot;GeometryTopologyEditor cascades deletion of an isolated face&quot;)</td></tr>
+<tr class="memitem:a8d5a426c1efd1f0d9768617806f97cce" id="r_a8d5a426c1efd1f0d9768617806f97cce"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8d5a426c1efd1f0d9768617806f97cce">TEST_CASE</a> (&quot;GeometryTopologyEditor preserves other root compound children&quot;)</td></tr>
+<tr class="memitem:a6fbe9bba5951d17c42dd91f4b16ef662" id="r_a6fbe9bba5951d17c42dd91f4b16ef662"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6fbe9bba5951d17c42dd91f4b16ef662">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects a face nested in a solid&quot;)</td></tr>
+<tr class="memitem:adf74d329d431a4cf11e8bc2a2bce1298" id="r_adf74d329d431a4cf11e8bc2a2bce1298"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf74d329d431a4cf11e8bc2a2bce1298">TEST_CASE</a> (&quot;GeometryTopologyEditor removes a nested face from a solid&quot;)</td></tr>
+<tr class="memitem:a43165bbb8862e4c1ca2d9c5e737768c4" id="r_a43165bbb8862e4c1ca2d9c5e737768c4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a43165bbb8862e4c1ca2d9c5e737768c4">TEST_CASE</a> (&quot;GeometryTopologyEditor preserves unaffected compsolids when removing a face&quot;)</td></tr>
+<tr class="memdesc:a43165bbb8862e4c1ca2d9c5e737768c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除局部面只降级受影响的实体组合，保留其他组合的类型、身份和层级。  <br /></td></tr>
+<tr class="memitem:a8efbaf467ec106a56470043e62c72a22" id="r_a8efbaf467ec106a56470043e62c72a22"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8efbaf467ec106a56470043e62c72a22">TEST_CASE</a> (&quot;GeometryTopologyEditor removes a nested face from an open shell&quot;)</td></tr>
+<tr class="memitem:a22a90b46c807c4be1556aa6075a1e4ef" id="r_a22a90b46c807c4be1556aa6075a1e4ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22a90b46c807c4be1556aa6075a1e4ef">TEST_CASE</a> (&quot;GeometryTopologyEditor deletes the only face of a single-face shell&quot;)</td></tr>
+<tr class="memitem:a66b38453a8772ac694c45a4ead24d39a" id="r_a66b38453a8772ac694c45a4ead24d39a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a66b38453a8772ac694c45a4ead24d39a">TEST_CASE</a> (&quot;GeometryTopologyEditor preserves independent geometry after deleting the last face&quot;)</td></tr>
+<tr class="memdesc:a66b38453a8772ac694c45a4ead24d39a"><td class="mdescLeft">&#160;</td><td class="mdescRight">删除最后一个壳面时，根中的独立边与点仍应保留原有身份。  <br /></td></tr>
+<tr class="memitem:a6c1a1a93700db8fcf357e61792f98e40" id="r_a6c1a1a93700db8fcf357e61792f98e40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c1a1a93700db8fcf357e61792f98e40">TEST_CASE</a> (&quot;GeometryTopologyEditor removes a face nested under a compound wrapper in a shell&quot;)</td></tr>
+<tr class="memitem:a3524d3a7a34d09ea226154ca9e74b490" id="r_a3524d3a7a34d09ea226154ca9e74b490"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3524d3a7a34d09ea226154ca9e74b490">TEST_CASE</a> (&quot;GeometryTopologyEditor removes a split face piece from a solid&quot;)</td></tr>
+<tr class="memitem:a07a637191dd86b36c1cc4e9ae91f9c47" id="r_a07a637191dd86b36c1cc4e9ae91f9c47"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a07a637191dd86b36c1cc4e9ae91f9c47">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects deleting a nested edge alone&quot;)</td></tr>
+<tr class="memitem:afc4af6b0c391cd4fd180002d3537e3a4" id="r_afc4af6b0c391cd4fd180002d3537e3a4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc4af6b0c391cd4fd180002d3537e3a4">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps edge vertices&quot;)</td></tr>
+<tr class="memitem:ab98307af5fae934318f59519d0d21f87" id="r_ab98307af5fae934318f59519d0d21f87"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab98307af5fae934318f59519d0d21f87">TEST_CASE</a> (&quot;GeometryTopologyEditor deletes one top-level vertex&quot;)</td></tr>
+<tr class="memitem:aa1ee78a6fbf5b5bd136bec8119cd70ca" id="r_aa1ee78a6fbf5b5bd136bec8119cd70ca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa1ee78a6fbf5b5bd136bec8119cd70ca">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps solid boundary faces&quot;)</td></tr>
+<tr class="memitem:acb4743ecb6bd9b84956b85e7468b85eb" id="r_acb4743ecb6bd9b84956b85e7468b85eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb4743ecb6bd9b84956b85e7468b85eb">TEST_CASE</a> (&quot;GeometryTopologyEditor preserves nested face children when requested&quot;)</td></tr>
+<tr class="memdesc:acb4743ecb6bd9b84956b85e7468b85eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">嵌套面非级联删除应保留独占边，级联删除仍清理独占边且不触碰其他几何。  <br /></td></tr>
+<tr class="memitem:a641a6b6b6d97c159a3ce2d3b4c88a5b4" id="r_a641a6b6b6d97c159a3ce2d3b4c88a5b4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a641a6b6b6d97c159a3ce2d3b4c88a5b4">TEST_CASE</a> (&quot;GeometryTopologyEditor fills a planar hole&quot;)</td></tr>
+<tr class="memdesc:a641a6b6b6d97c159a3ce2d3b4c88a5b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">共面孔洞新增一个面并共享全部边界，原始开口形状不被原地改变。  <br /></td></tr>
+<tr class="memitem:a5f03bf4f055de2370ad00b951830d678" id="r_a5f03bf4f055de2370ad00b951830d678"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f03bf4f055de2370ad00b951830d678">TEST_CASE</a> (&quot;GeometryTopologyEditor fills a nonplanar hole&quot;)</td></tr>
+<tr class="memdesc:a5f03bf4f055de2370ad00b951830d678"><td class="mdescLeft">&#160;</td><td class="mdescRight">四个三角侧面围出非共面孔洞，验证曲面拟合而非平面限定。  <br /></td></tr>
+<tr class="memitem:a68f84139bf588bb8c3a8550f42b8ab01" id="r_a68f84139bf588bb8c3a8550f42b8ab01"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68f84139bf588bb8c3a8550f42b8ab01">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects filling an existing face outline&quot;)</td></tr>
+<tr class="memdesc:a68f84139bf588bb8c3a8550f42b8ab01"><td class="mdescLeft">&#160;</td><td class="mdescRight">拒绝把单个面的外边界当作孔洞补出重叠面，失败不改变输入。  <br /></td></tr>
+<tr class="memitem:a74d6284e992a3e88dce5eb287e465914" id="r_a74d6284e992a3e88dce5eb287e465914"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74d6284e992a3e88dce5eb287e465914">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps exclusive edges of a face in a multi-face shell&quot;)</td></tr>
+<tr class="memdesc:a74d6284e992a3e88dce5eb287e465914"><td class="mdescLeft">&#160;</td><td class="mdescRight">从同一原始 Shell 取出相邻两面，非级联删除只提升独占边，不重复共享边。  <br /></td></tr>
+<tr class="memitem:ac5b48b96a346f4b3015e965d99b07226" id="r_ac5b48b96a346f4b3015e965d99b07226"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac5b48b96a346f4b3015e965d99b07226">TEST_CASE</a> (&quot;GeometryTopologyEditor fills a circular hole&quot;)</td></tr>
+<tr class="memdesc:ac5b48b96a346f4b3015e965d99b07226"><td class="mdescLeft">&#160;</td><td class="mdescRight">整圆只有一条闭合 Edge，不能被误判为无端点或分支边界。  <br /></td></tr>
+<tr class="memitem:a354b9b884629a0f471f1ff49f8ad4b05" id="r_a354b9b884629a0f471f1ff49f8ad4b05"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a354b9b884629a0f471f1ff49f8ad4b05">TEST_CASE</a> (&quot;GeometryTopologyEditor rejects an occupied minimum boundary loop&quot;)</td></tr>
+<tr class="memdesc:a354b9b884629a0f471f1ff49f8ad4b05"><td class="mdescLeft">&#160;</td><td class="mdescRight">分支上找到的最小环若已被现有面覆盖，应拒绝重复盖面。  <br /></td></tr>
+<tr class="memitem:a64479db6c1618eab563a433a5ce96c48" id="r_a64479db6c1618eab563a433a5ce96c48"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64479db6c1618eab563a433a5ce96c48">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches the selected side onto the stationary side&quot;)</td></tr>
+<tr class="memdesc:a64479db6c1618eab563a433a5ce96c48"><td class="mdescLeft">&#160;</td><td class="mdescRight">无论从哪一侧选择，公共边都准确落在对侧；长短边分段不影响方向。  <br /></td></tr>
+<tr class="memitem:ae35e56f6f9df5847446ab108a4aa3797" id="r_ae35e56f6f9df5847446ab108a4aa3797"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae35e56f6f9df5847446ab108a4aa3797">TEST_CASE</a> (&quot;GeometryTopologyEditor fills the shortest length loop through a branched boundary&quot;)</td></tr>
+<tr class="memdesc:ae35e56f6f9df5847446ab108a4aa3797"><td class="mdescLeft">&#160;</td><td class="mdescRight">用多个顶点分段的短路径与边数更少的长路径竞争，按总弧长补最小环。  <br /></td></tr>
+<tr class="memitem:ac494057afe33a545bd4945b401c76190" id="r_ac494057afe33a545bd4945b401c76190"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac494057afe33a545bd4945b401c76190">TEST_CASE</a> (&quot;GeometryTopologyEditor deforms incident lines and curves <a class="el" href="TestComponentModel_8cpp.html#ae97f1c44740297fab404285a4388b17b">for</a> distant merged vertices&quot;)</td></tr>
+<tr class="memdesc:ac494057afe33a545bd4945b401c76190"><td class="mdescLeft">&#160;</td><td class="mdescRight">相距较远的点合并时，边的三维曲线端点随之移动，容差不随位移增大。  <br /></td></tr>
+<tr class="memitem:aed0cb4354425ff85715aa8e2fec7ff8f" id="r_aed0cb4354425ff85715aa8e2fec7ff8f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed0cb4354425ff85715aa8e2fec7ff8f">TEST_CASE</a> (&quot;GeometryTopologyEditor deforms an incident face <a class="el" href="TestComponentModel_8cpp.html#ae97f1c44740297fab404285a4388b17b">for</a> an out of plane vertex merge&quot;)</td></tr>
+<tr class="memdesc:aed0cb4354425ff85715aa8e2fec7ff8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">将面角点合并到平面外的独立点时，允许邻面变为曲面而保持完整边界。  <br /></td></tr>
+<tr class="memitem:ab23b45f7793aa1b912a5cbdfde3f540b" id="r_ab23b45f7793aa1b912a5cbdfde3f540b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab23b45f7793aa1b912a5cbdfde3f540b">TEST_CASE</a> (&quot;GeometryTopologyEditor does not bridge open gaps when filling&quot;)</td></tr>
+<tr class="memdesc:ab23b45f7793aa1b912a5cbdfde3f540b"><td class="mdescLeft">&#160;</td><td class="mdescRight">两片面之间的开放间隙不能凭空加桥接端边，也不能覆盖原面。  <br /></td></tr>
+<tr class="memitem:a924133416960289bf8e0c75fae52b366" id="r_a924133416960289bf8e0c75fae52b366"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a924133416960289bf8e0c75fae52b366">TEST_CASE</a> (&quot;GeometryTopologyEditor deforms all faces around a solid vertex&quot;)</td></tr>
+<tr class="memdesc:a924133416960289bf8e0c75fae52b366"><td class="mdescLeft">&#160;</td><td class="mdescRight">实体角点移动需同时重建三张邻面，维持共享边和实体有效性。  <br /></td></tr>
+<tr class="memitem:a0364d6f92cd550de99819238e26d19b7" id="r_a0364d6f92cd550de99819238e26d19b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0364d6f92cd550de99819238e26d19b7">TEST_CASE</a> (&quot;GeometryTopologyEditor merges adjacent solid vertices with geometric reconstruction&quot;)</td></tr>
+<tr class="memdesc:a0364d6f92cd550de99819238e26d19b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">合并实体上一条边的两端点时移除退化边，仍保留封闭共享拓扑。  <br /></td></tr>
+<tr class="memitem:a9e7d0544b18ba338a48c9ac2c4d9cad1" id="r_a9e7d0544b18ba338a48c9ac2c4d9cad1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9e7d0544b18ba338a48c9ac2c4d9cad1">TEST_CASE</a> (&quot;GeometryTopologyEditor fills isolated planar and nonplanar edge loops&quot;)</td></tr>
+<tr class="memdesc:a9e7d0544b18ba338a48c9ac2c4d9cad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">全部边都未邻接面时，仍可补平面或非共面闭环，并保留无关孤立边。  <br /></td></tr>
+<tr class="memitem:a90011d92a8a7128de5deb3ef69154f77" id="r_a90011d92a8a7128de5deb3ef69154f77"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90011d92a8a7128de5deb3ef69154f77">TEST_CASE</a> (&quot;GeometryTopologyEditor fills mixed isolated and face boundary loops&quot;)</td></tr>
+<tr class="memdesc:a90011d92a8a7128de5deb3ef69154f77"><td class="mdescLeft">&#160;</td><td class="mdescRight">孤立边与单面自由边共同围成的最短闭环，都可作为种子边。  <br /></td></tr>
+<tr class="memitem:ad781b545d504cf80c4c8e6bc90851ee5" id="r_ad781b545d504cf80c4c8e6bc90851ee5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad781b545d504cf80c4c8e6bc90851ee5">TEST_CASE</a> (&quot;GeometryTopologyEditor fills isolated circles and rejects open isolated chains&quot;)</td></tr>
+<tr class="memdesc:ad781b545d504cf80c4c8e6bc90851ee5"><td class="mdescLeft">&#160;</td><td class="mdescRight">只有一条闭合圆边且不属于任何面时也应补面；开放孤立边链仍拒绝。  <br /></td></tr>
+<tr class="memitem:a9bcf26f46eb66e7177e837d85193d043" id="r_a9bcf26f46eb66e7177e837d85193d043"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bcf26f46eb66e7177e837d85193d043">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps the nearest local stitch when the maximum gap grows&quot;)</td></tr>
+<tr class="memdesc:a9bcf26f46eb66e7177e837d85193d043"><td class="mdescLeft">&#160;</td><td class="mdescRight">放宽最大间隙不能把窄面端部的短边吸入已能缝合的种子边链。  <br /></td></tr>
+<tr class="memitem:acc402f13ca693adba0037deb427d4ac1" id="r_acc402f13ca693adba0037deb427d4ac1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc402f13ca693adba0037deb427d4ac1">TEST_CASE</a> (&quot;GeometryTopologyEditor excludes same face boundaries from gap partners&quot;)</td></tr>
+<tr class="memdesc:acc402f13ca693adba0037deb427d4ac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">同一个窄面的其他边不能被识别为对侧，避免放大阈值后与自身缝合。  <br /></td></tr>
+<tr class="memitem:aa5eebc4e6442c86419d9748e38affd94" id="r_aa5eebc4e6442c86419d9748e38affd94"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5eebc4e6442c86419d9748e38affd94">TEST_CASE</a> (&quot;GeometryTopologyEditor searches actual larger gaps without a fixed distance cap&quot;)</td></tr>
+<tr class="memdesc:aa5eebc4e6442c86419d9748e38affd94"><td class="mdescLeft">&#160;</td><td class="mdescRight">最近匹配距离不固定为 0.01，较大真实间隙仍能在用户给定上限内缝合。  <br /></td></tr>
+<tr class="memitem:ad599ff752d5c8310582a80027eaecbb1" id="r_ad599ff752d5c8310582a80027eaecbb1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad599ff752d5c8310582a80027eaecbb1">TEST_CASE</a> (&quot;GeometryTopologyEditor retries the same stitch pair in reverse&quot;)</td></tr>
+<tr class="memdesc:ad599ff752d5c8310582a80027eaecbb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">正向整链移动因中间顶点支路失败时，反向应共享原边而保留支路及输入。  <br /></td></tr>
+<tr class="memitem:af6cc9228ef837a226d63b0a4caef5cfa" id="r_af6cc9228ef837a226d63b0a4caef5cfa"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af6cc9228ef837a226d63b0a4caef5cfa">TEST_CASE</a> (&quot;GeometryTopologyEditor reports both failed stitch directions without changing the input&quot;)</td></tr>
+<tr class="memdesc:af6cc9228ef837a226d63b0a4caef5cfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">两侧都无法整链移动时，合并报告两次失败原因且不修改输入。  <br /></td></tr>
+<tr class="memitem:a62e016949655cb04c3ce649445fb4c8e" id="r_a62e016949655cb04c3ce649445fb4c8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62e016949655cb04c3ce649445fb4c8e">TEST_CASE</a> (&quot;GeometryTopologyEditor keeps the selected direction when it succeeds&quot;)</td></tr>
+<tr class="memdesc:a62e016949655cb04c3ce649445fb4c8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">正向可成功时不反向，输出标志不残留上一次状态。  <br /></td></tr>
+<tr class="memitem:aafb2b073e46262f2afd2a5ef5385161a" id="r_aafb2b073e46262f2afd2a5ef5385161a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aafb2b073e46262f2afd2a5ef5385161a">TEST_CASE</a> (&quot;GeometryTopologyEditor fills a missing half cylinder side&quot;)</td></tr>
+<tr class="memdesc:aafb2b073e46262f2afd2a5ef5385161a"><td class="mdescLeft">&#160;</td><td class="mdescRight">半圆柱侧面缺失时，应恢复贴合两条圆弧与母线的曲面，并连接全部原边。  <br /></td></tr>
+<tr class="memitem:aff6fefceea65c5db31c47abd8d905de9" id="r_aff6fefceea65c5db31c47abd8d905de9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff6fefceea65c5db31c47abd8d905de9">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches a separately created half cylinder patch&quot;)</td></tr>
+<tr class="memdesc:aff6fefceea65c5db31c47abd8d905de9"><td class="mdescLeft">&#160;</td><td class="mdescRight">闭合边生成曲面后，局部缝合应连接新面的独立边，不必重新拟合已有曲面。  <br /></td></tr>
+<tr class="memitem:ac820571a93ad087fdb770c7f71bd333b" id="r_ac820571a93ad087fdb770c7f71bd333b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac820571a93ad087fdb770c7f71bd333b">TEST_CASE</a> (&quot;GeometryTopologyEditor stitches from the original half cylinder rim&quot;)</td></tr>
+<tr class="memdesc:ac820571a93ad087fdb770c7f71bd333b"><td class="mdescLeft">&#160;</td><td class="mdescRight">从原孔洞的边选择局部缝合时，可连接单面边链，不要求源链跨越全部邻面。  <br /></td></tr>
+<tr class="memitem:a87a841458946824901ebe6fd3504c6c6" id="r_a87a841458946824901ebe6fd3504c6c6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a87a841458946824901ebe6fd3504c6c6">TEST_CASE</a> (&quot;GeometryTopologyEditor fills a general bent four edge boundary&quot;)</td></tr>
+<tr class="memdesc:a87a841458946824901ebe6fd3504c6c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">两条非圆曲线与两条直线围成的弯曲四边环，应直接生成连接原边的曲面。  <br /></td></tr>
+<tr class="memitem:acc4e52d313e2ca1af245c7e698778f97" id="r_acc4e52d313e2ca1af245c7e698778f97"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acc4e52d313e2ca1af245c7e698778f97">TEST_CASE</a> (&quot;GeometryTopologyEditor isolates coarse tolerances when choosing a patch surface&quot;)</td></tr>
+<tr class="memdesc:acc4e52d313e2ca1af245c7e698778f97"><td class="mdescLeft">&#160;</td><td class="mdescRight">粗容差既不能污染共面边，也不能把轻微翘曲的四边环误压成平面。  <br /></td></tr>
+</table>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="a000471fd4f813a1d1037d63bffb5aa41" name="a000471fd4f813a1d1037d63bffb5aa41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a000471fd4f813a1d1037d63bffb5aa41">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[1/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor cascades deletion of an isolated face&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af9291731fc6f2fc86efe8093b52c97b0" name="af9291731fc6f2fc86efe8093b52c97b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9291731fc6f2fc86efe8093b52c97b0">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[2/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor collapses an edge between two junctions&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a094f2621669664187f20c2c1b2e066e5" name="a094f2621669664187f20c2c1b2e066e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a094f2621669664187f20c2c1b2e066e5">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[3/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor collapses an isolated edge to its midpoint&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a924133416960289bf8e0c75fae52b366" name="a924133416960289bf8e0c75fae52b366"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a924133416960289bf8e0c75fae52b366">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[4/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor deforms all faces around a solid vertex&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>实体角点移动需同时重建三张邻面，维持共享边和实体有效性。 </p>
+
+</div>
+</div>
+<a id="aed0cb4354425ff85715aa8e2fec7ff8f" name="aed0cb4354425ff85715aa8e2fec7ff8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed0cb4354425ff85715aa8e2fec7ff8f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[5/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor deforms an incident face <a class="el" href="TestComponentModel_8cpp.html#ae97f1c44740297fab404285a4388b17b">for</a> an out of plane vertex merge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>将面角点合并到平面外的独立点时，允许邻面变为曲面而保持完整边界。 </p>
+
+</div>
+</div>
+<a id="ac494057afe33a545bd4945b401c76190" name="ac494057afe33a545bd4945b401c76190"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac494057afe33a545bd4945b401c76190">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[6/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor deforms incident lines and curves <a class="el" href="TestComponentModel_8cpp.html#ae97f1c44740297fab404285a4388b17b">for</a> distant merged vertices&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>相距较远的点合并时，边的三维曲线端点随之移动，容差不随位移增大。 </p>
+
+</div>
+</div>
+<a id="ab98307af5fae934318f59519d0d21f87" name="ab98307af5fae934318f59519d0d21f87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab98307af5fae934318f59519d0d21f87">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[7/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor deletes one top-level vertex&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a22a90b46c807c4be1556aa6075a1e4ef" name="a22a90b46c807c4be1556aa6075a1e4ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22a90b46c807c4be1556aa6075a1e4ef">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[8/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor deletes the only face of a single-face shell&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af4b693e532740d9a080b23dfc3af0cea" name="af4b693e532740d9a080b23dfc3af0cea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4b693e532740d9a080b23dfc3af0cea">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[9/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses a plane crossing a B-spline patch far from the origin&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a26aa8adcda163734f7208fa70b12a4db" name="a26aa8adcda163734f7208fa70b12a4db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26aa8adcda163734f7208fa70b12a4db">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[10/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses boundary and isolated edges&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b2f94ff4fbb3f0f07ce7a9993ea7a89" name="a1b2f94ff4fbb3f0f07ce7a9993ea7a89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b2f94ff4fbb3f0f07ce7a9993ea7a89">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[11/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses crossing faces in one solid as self intersections&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0631d7c05bb9f59384441f3c190e0029" name="a0631d7c05bb9f59384441f3c190e0029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0631d7c05bb9f59384441f3c190e0029">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[12/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses crossing faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a28ea1614171c84d5e06954ad35071027" name="a28ea1614171c84d5e06954ad35071027"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28ea1614171c84d5e06954ad35071027">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[13/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses crossing slanted faces far from the origin&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a761eddc27aba12e9d3b1e1040193d55a" name="a761eddc27aba12e9d3b1e1040193d55a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a761eddc27aba12e9d3b1e1040193d55a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[14/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses duplicate faces sharing boundary edges&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a20cfd26d93b250b04e10cc9bcbb9a87d" name="a20cfd26d93b250b04e10cc9bcbb9a87d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20cfd26d93b250b04e10cc9bcbb9a87d">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[15/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses intersecting curved faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4bdbb9a0a505103fc2a219e60a112b60" name="a4bdbb9a0a505103fc2a219e60a112b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bdbb9a0a505103fc2a219e60a112b60">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[16/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses intersecting cylinders far from the origin&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a968c338c3dd683cc1d23161f8d7ca4f7" name="a968c338c3dd683cc1d23161f8d7ca4f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a968c338c3dd683cc1d23161f8d7ca4f7">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[17/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses overlapping coaxial cylindrical and B-spline faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9582d0b0a89722e9fce48c60cd023164" name="a9582d0b0a89722e9fce48c60cd023164"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9582d0b0a89722e9fce48c60cd023164">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[18/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses overlapping planar and B-spline support faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0b7d014015280e28a49d8f21a2b1cc4f" name="a0b7d014015280e28a49d8f21a2b1cc4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b7d014015280e28a49d8f21a2b1cc4f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[19/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses partially overlapping coplanar faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad82b42539a315266e8920daf389da18d" name="ad82b42539a315266e8920daf389da18d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad82b42539a315266e8920daf389da18d">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[20/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor diagnoses small edges and small faces independently&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab23b45f7793aa1b912a5cbdfde3f540b" name="ab23b45f7793aa1b912a5cbdfde3f540b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab23b45f7793aa1b912a5cbdfde3f540b">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[21/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor does not bridge open gaps when filling&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>两片面之间的开放间隙不能凭空加桥接端边，也不能覆盖原面。 </p>
+
+</div>
+</div>
+<a id="a3c224616c1db65a7eed031d4d4f9a133" name="a3c224616c1db65a7eed031d4d4f9a133"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c224616c1db65a7eed031d4d4f9a133">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[22/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor does not treat nearby parallel faces as duplicates&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6d931f8ba1ffb5104f5c4f0f259ad42a" name="a6d931f8ba1ffb5104f5c4f0f259ad42a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d931f8ba1ffb5104f5c4f0f259ad42a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[23/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor excludes hidden duplicate faces from intersections&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc402f13ca693adba0037deb427d4ac1" name="acc402f13ca693adba0037deb427d4ac1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc402f13ca693adba0037deb427d4ac1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[24/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor excludes same face boundaries from gap partners&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>同一个窄面的其他边不能被识别为对侧，避免放大阈值后与自身缝合。 </p>
+
+</div>
+</div>
+<a id="a8a1fb74480d10b91b92a1b1318fff2d1" name="a8a1fb74480d10b91b92a1b1318fff2d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a1fb74480d10b91b92a1b1318fff2d1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[25/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor expands stitchable free chain from a gap seed edge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac5b48b96a346f4b3015e965d99b07226" name="ac5b48b96a346f4b3015e965d99b07226"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac5b48b96a346f4b3015e965d99b07226">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[26/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills a circular hole&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>整圆只有一条闭合 Edge，不能被误判为无端点或分支边界。 </p>
+
+</div>
+</div>
+<a id="a87a841458946824901ebe6fd3504c6c6" name="a87a841458946824901ebe6fd3504c6c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87a841458946824901ebe6fd3504c6c6">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[27/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills a general bent four edge boundary&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>两条非圆曲线与两条直线围成的弯曲四边环，应直接生成连接原边的曲面。 </p>
+
+</div>
+</div>
+<a id="aafb2b073e46262f2afd2a5ef5385161a" name="aafb2b073e46262f2afd2a5ef5385161a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafb2b073e46262f2afd2a5ef5385161a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[28/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills a missing half cylinder side&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>半圆柱侧面缺失时，应恢复贴合两条圆弧与母线的曲面，并连接全部原边。 </p>
+
+</div>
+</div>
+<a id="a5f03bf4f055de2370ad00b951830d678" name="a5f03bf4f055de2370ad00b951830d678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f03bf4f055de2370ad00b951830d678">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[29/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills a nonplanar hole&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>四个三角侧面围出非共面孔洞，验证曲面拟合而非平面限定。 </p>
+
+</div>
+</div>
+<a id="a641a6b6b6d97c159a3ce2d3b4c88a5b4" name="a641a6b6b6d97c159a3ce2d3b4c88a5b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a641a6b6b6d97c159a3ce2d3b4c88a5b4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[30/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills a planar hole&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>共面孔洞新增一个面并共享全部边界，原始开口形状不被原地改变。 </p>
+
+</div>
+</div>
+<a id="ad781b545d504cf80c4c8e6bc90851ee5" name="ad781b545d504cf80c4c8e6bc90851ee5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad781b545d504cf80c4c8e6bc90851ee5">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[31/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills isolated circles and rejects open isolated chains&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>只有一条闭合圆边且不属于任何面时也应补面；开放孤立边链仍拒绝。 </p>
+
+</div>
+</div>
+<a id="a9e7d0544b18ba338a48c9ac2c4d9cad1" name="a9e7d0544b18ba338a48c9ac2c4d9cad1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e7d0544b18ba338a48c9ac2c4d9cad1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[32/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills isolated planar and nonplanar edge loops&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>全部边都未邻接面时，仍可补平面或非共面闭环，并保留无关孤立边。 </p>
+
+</div>
+</div>
+<a id="a90011d92a8a7128de5deb3ef69154f77" name="a90011d92a8a7128de5deb3ef69154f77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90011d92a8a7128de5deb3ef69154f77">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[33/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills mixed isolated and face boundary loops&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>孤立边与单面自由边共同围成的最短闭环，都可作为种子边。 </p>
+
+</div>
+</div>
+<a id="ae35e56f6f9df5847446ab108a4aa3797" name="ae35e56f6f9df5847446ab108a4aa3797"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae35e56f6f9df5847446ab108a4aa3797">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[34/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor fills the shortest length loop through a branched boundary&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>用多个顶点分段的短路径与边数更少的长路径竞争，按总弧长补最小环。 </p>
+
+</div>
+</div>
+<a id="a37114ae44abff9481b18388f09eacf53" name="a37114ae44abff9481b18388f09eacf53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37114ae44abff9481b18388f09eacf53">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[35/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor filters distant boundaries without losing a nearby pair&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>远处分散边界不得干扰近邻配对，同时提供候选搜索的固定规模性能样本。 </p>
+
+</div>
+</div>
+<a id="a04b68477b083f98e3eeb1517e0aa9c74" name="a04b68477b083f98e3eeb1517e0aa9c74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04b68477b083f98e3eeb1517e0aa9c74">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[36/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor finds and repairs free edge gaps&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa380e29e86f246f7df68de0787c398bd" name="aa380e29e86f246f7df68de0787c398bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa380e29e86f246f7df68de0787c398bd">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[37/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor finds the smallest gap partner chain and stitches from seed&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad7cb804974a365956f379b3e225257b3" name="ad7cb804974a365956f379b3e225257b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7cb804974a365956f379b3e225257b3">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[38/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor groups geometrically duplicate faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa0fefba5e5ec3e59cc6dfa69dfb811d4" name="aa0fefba5e5ec3e59cc6dfa69dfb811d4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0fefba5e5ec3e59cc6dfa69dfb811d4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[39/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores coaxial cylindrical faces with disjoint ranges&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a042b043ce6abbbf320b56da12d22d4ec" name="a042b043ce6abbbf320b56da12d22d4ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a042b043ce6abbbf320b56da12d22d4ec">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[40/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores coplanar faces touching at one edge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abef60b98a99633224387e858463a6593" name="abef60b98a99633224387e858463a6593"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abef60b98a99633224387e858463a6593">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[41/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores disjoint coplanar B-spline support faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a44732399e4eec3326e3451b2518e1ca4" name="a44732399e4eec3326e3451b2518e1ca4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44732399e4eec3326e3451b2518e1ca4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[42/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores faces of nested solids&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a45555e75fd48bc3d330e83f5db19e380" name="a45555e75fd48bc3d330e83f5db19e380"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45555e75fd48bc3d330e83f5db19e380">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[43/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores independent faces sharing a geometric edge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a51d0f35ba90c227ff17c9443819aed4f" name="a51d0f35ba90c227ff17c9443819aed4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51d0f35ba90c227ff17c9443819aed4f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[44/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor ignores regular adjacent box faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acc4e52d313e2ca1af245c7e698778f97" name="acc4e52d313e2ca1af245c7e698778f97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc4e52d313e2ca1af245c7e698778f97">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[45/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor isolates coarse tolerances when choosing a patch surface&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>粗容差既不能污染共面边，也不能把轻微翘曲的四边环误压成平面。 </p>
+
+</div>
+</div>
+<a id="afc4af6b0c391cd4fd180002d3537e3a4" name="afc4af6b0c391cd4fd180002d3537e3a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc4af6b0c391cd4fd180002d3537e3a4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[46/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps edge vertices&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a74d6284e992a3e88dce5eb287e465914" name="a74d6284e992a3e88dce5eb287e465914"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74d6284e992a3e88dce5eb287e465914">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[47/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps exclusive edges of a face in a multi-face shell&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从同一原始 Shell 取出相邻两面，非级联删除只提升独占边，不重复共享边。 </p>
+
+</div>
+</div>
+<a id="a2be5230b41374f29752b4bb0a385bfb9" name="a2be5230b41374f29752b4bb0a385bfb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2be5230b41374f29752b4bb0a385bfb9">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[48/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps rectangle boundary when deleting a face&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa1ee78a6fbf5b5bd136bec8119cd70ca" name="aa1ee78a6fbf5b5bd136bec8119cd70ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1ee78a6fbf5b5bd136bec8119cd70ca">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[49/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps solid boundary faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9bcf26f46eb66e7177e837d85193d043" name="a9bcf26f46eb66e7177e837d85193d043"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bcf26f46eb66e7177e837d85193d043">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[50/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps the nearest local stitch when the maximum gap grows&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>放宽最大间隙不能把窄面端部的短边吸入已能缝合的种子边链。 </p>
+
+</div>
+</div>
+<a id="a62e016949655cb04c3ce649445fb4c8e" name="a62e016949655cb04c3ce649445fb4c8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62e016949655cb04c3ce649445fb4c8e">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[51/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor keeps the selected direction when it succeeds&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>正向可成功时不反向，输出标志不残留上一次状态。 </p>
+
+</div>
+</div>
+<a id="a0364d6f92cd550de99819238e26d19b7" name="a0364d6f92cd550de99819238e26d19b7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0364d6f92cd550de99819238e26d19b7">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[52/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor merges adjacent solid vertices with geometric reconstruction&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>合并实体上一条边的两端点时移除退化边，仍保留封闭共享拓扑。 </p>
+
+</div>
+</div>
+<a id="a7e1a691a446bb242083d80c9ee83c410" name="a7e1a691a446bb242083d80c9ee83c410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e1a691a446bb242083d80c9ee83c410">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[53/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor merges endpoints of an isolated edge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>合并孤立边的端点后保留目标点，兼顾根中仍有其他独立几何的情况。 </p>
+
+</div>
+</div>
+<a id="ae08f650997a8049b371a4723d14d9a9f" name="ae08f650997a8049b371a4723d14d9a9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae08f650997a8049b371a4723d14d9a9f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[54/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor merges independent vertices to the first vertex&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ef530f29cdee190337e2663c05fd30b" name="a8ef530f29cdee190337e2663c05fd30b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ef530f29cdee190337e2663c05fd30b">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[55/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor merges selected same-domain edges&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af16e32d12f4a7a6388e76cba6e76dde1" name="af16e32d12f4a7a6388e76cba6e76dde1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af16e32d12f4a7a6388e76cba6e76dde1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[56/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor merges selected same-domain faces&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acbc6460604c0b7cd1f875d307383a861" name="acbc6460604c0b7cd1f875d307383a861"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbc6460604c0b7cd1f875d307383a861">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[57/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor preserves curved adjacency and recommends its endpoint&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a66b38453a8772ac694c45a4ead24d39a" name="a66b38453a8772ac694c45a4ead24d39a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66b38453a8772ac694c45a4ead24d39a">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[58/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor preserves independent geometry after deleting the last face&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除最后一个壳面时，根中的独立边与点仍应保留原有身份。 </p>
+
+</div>
+</div>
+<a id="acb4743ecb6bd9b84956b85e7468b85eb" name="acb4743ecb6bd9b84956b85e7468b85eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb4743ecb6bd9b84956b85e7468b85eb">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[59/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor preserves nested face children when requested&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>嵌套面非级联删除应保留独占边，级联删除仍清理独占边且不触碰其他几何。 </p>
+
+</div>
+</div>
+<a id="a8d5a426c1efd1f0d9768617806f97cce" name="a8d5a426c1efd1f0d9768617806f97cce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d5a426c1efd1f0d9768617806f97cce">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[60/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor preserves other root compound children&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a43165bbb8862e4c1ca2d9c5e737768c4" name="a43165bbb8862e4c1ca2d9c5e737768c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43165bbb8862e4c1ca2d9c5e737768c4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[61/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor preserves unaffected compsolids when removing a face&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>删除局部面只降级受影响的实体组合，保留其他组合的类型、身份和层级。 </p>
+
+</div>
+</div>
+<a id="a6fbe9bba5951d17c42dd91f4b16ef662" name="a6fbe9bba5951d17c42dd91f4b16ef662"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6fbe9bba5951d17c42dd91f4b16ef662">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[62/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects a face nested in a solid&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4d393073e2683c5aaabe4479b0755e26" name="a4d393073e2683c5aaabe4479b0755e26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d393073e2683c5aaabe4479b0755e26">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[63/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects a gap seed without a partner within tolerance&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a354b9b884629a0f471f1ff49f8ad4b05" name="a354b9b884629a0f471f1ff49f8ad4b05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a354b9b884629a0f471f1ff49f8ad4b05">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[64/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects an occupied minimum boundary loop&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>分支上找到的最小环若已被现有面覆盖，应拒绝重复盖面。 </p>
+
+</div>
+</div>
+<a id="afc6e101f6322d493314219075bb00a81" name="afc6e101f6322d493314219075bb00a81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc6e101f6322d493314219075bb00a81">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[65/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects boundary edges outside stitch tolerance&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a07a637191dd86b36c1cc4e9ae91f9c47" name="a07a637191dd86b36c1cc4e9ae91f9c47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07a637191dd86b36c1cc4e9ae91f9c47">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[66/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects deleting a nested edge alone&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68f84139bf588bb8c3a8550f42b8ab01" name="a68f84139bf588bb8c3a8550f42b8ab01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68f84139bf588bb8c3a8550f42b8ab01">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[67/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects filling an existing face outline&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>拒绝把单个面的外边界当作孔洞补出重叠面，失败不改变输入。 </p>
+
+</div>
+</div>
+<a id="a457083bc936d81cd3ba019e79696a6dc" name="a457083bc936d81cd3ba019e79696a6dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a457083bc936d81cd3ba019e79696a6dc">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[68/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects incomplete edge merge inputs&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f7df08778b8b7d378a0db003691bbfd" name="a6f7df08778b8b7d378a0db003691bbfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f7df08778b8b7d378a0db003691bbfd">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[69/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects incomplete face merge inputs&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab1f58943652e7d0a014f5654c2670dcc" name="ab1f58943652e7d0a014f5654c2670dcc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1f58943652e7d0a014f5654c2670dcc">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[70/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor rejects invalid face split inputs&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6c1a1a93700db8fcf357e61792f98e40" name="a6c1a1a93700db8fcf357e61792f98e40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c1a1a93700db8fcf357e61792f98e40">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[71/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor removes a face nested under a compound wrapper in a shell&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adf74d329d431a4cf11e8bc2a2bce1298" name="adf74d329d431a4cf11e8bc2a2bce1298"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf74d329d431a4cf11e8bc2a2bce1298">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[72/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor removes a nested face from a solid&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8efbaf467ec106a56470043e62c72a22" name="a8efbaf467ec106a56470043e62c72a22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8efbaf467ec106a56470043e62c72a22">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[73/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor removes a nested face from an open shell&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3524d3a7a34d09ea226154ca9e74b490" name="a3524d3a7a34d09ea226154ca9e74b490"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3524d3a7a34d09ea226154ca9e74b490">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[74/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor removes a split face piece from a solid&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6cc9228ef837a226d63b0a4caef5cfa" name="af6cc9228ef837a226d63b0a4caef5cfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6cc9228ef837a226d63b0a4caef5cfa">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[75/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor reports both failed stitch directions without changing the input&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>两侧都无法整链移动时，合并报告两次失败原因且不修改输入。 </p>
+
+</div>
+</div>
+<a id="ac6cb9ce37984d75e19bd66d7a91b50d9" name="ac6cb9ce37984d75e19bd66d7a91b50d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6cb9ce37984d75e19bd66d7a91b50d9">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[76/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor reports faces of interpenetrating solids&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aab89578727bc3a64700a1165fc43ac8c" name="aab89578727bc3a64700a1165fc43ac8c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab89578727bc3a64700a1165fc43ac8c">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[77/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor reports interference when a nested solid pierces the wall&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab45363584251b886be25f59fff2cef8f" name="ab45363584251b886be25f59fff2cef8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab45363584251b886be25f59fff2cef8f">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[78/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor reports tangent nested solids as interference&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad599ff752d5c8310582a80027eaecbb1" name="ad599ff752d5c8310582a80027eaecbb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad599ff752d5c8310582a80027eaecbb1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[79/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor retries the same stitch pair in reverse&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>正向整链移动因中间顶点支路失败时，反向应共享原边而保留支路及输入。 </p>
+
+</div>
+</div>
+<a id="aa5eebc4e6442c86419d9748e38affd94" name="aa5eebc4e6442c86419d9748e38affd94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5eebc4e6442c86419d9748e38affd94">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[80/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor searches actual larger gaps without a fixed distance cap&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>最近匹配距离不固定为 0.01，较大真实间隙仍能在用户给定上限内缝合。 </p>
+
+</div>
+</div>
+<a id="aec85e463babc116370d5da4fad4a1e20" name="aec85e463babc116370d5da4fad4a1e20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec85e463babc116370d5da4fad4a1e20">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[81/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor splits a face with an intersecting face&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a93fabc7b7e64cfb68c5ee5773f0e8ef1" name="a93fabc7b7e64cfb68c5ee5773f0e8ef1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93fabc7b7e64cfb68c5ee5773f0e8ef1">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[82/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor splits a nested solid face with an on-face edge&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7d21cd607805dda7f46a2608bc54eb0e" name="a7d21cd607805dda7f46a2608bc54eb0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d21cd607805dda7f46a2608bc54eb0e">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[83/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor splits a reversed edge along its orientation&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>反向边按选择方向分割，同时保持所在线框的端点与拓扑有效性。 </p>
+
+</div>
+</div>
+<a id="a0ad8b19254a9f4bff78361b1e8219f16" name="a0ad8b19254a9f4bff78361b1e8219f16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ad8b19254a9f4bff78361b1e8219f16">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[84/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor splits an edge by ratio&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a29210dcd50310e66edf82fe6b62e4d9d" name="a29210dcd50310e66edf82fe6b62e4d9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29210dcd50310e66edf82fe6b62e4d9d">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[85/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches a long gap seed edge to two short partners&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff6fefceea65c5db31c47abd8d905de9" name="aff6fefceea65c5db31c47abd8d905de9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff6fefceea65c5db31c47abd8d905de9">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[86/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches a separately created half cylinder patch&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>闭合边生成曲面后，局部缝合应连接新面的独立边，不必重新拟合已有曲面。 </p>
+
+</div>
+</div>
+<a id="ab95627b828171a6070425535c629a40c" name="ab95627b828171a6070425535c629a40c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab95627b828171a6070425535c629a40c">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[87/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches free edges that share vertices but not topology&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac820571a93ad087fdb770c7f71bd333b" name="ac820571a93ad087fdb770c7f71bd333b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac820571a93ad087fdb770c7f71bd333b">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[88/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches from the original half cylinder rim&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从原孔洞的边选择局部缝合时，可连接单面边链，不要求源链跨越全部邻面。 </p>
+
+</div>
+</div>
+<a id="aefdf3df9c1df1f7d83bf233b8d8dbda4" name="aefdf3df9c1df1f7d83bf233b8d8dbda4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefdf3df9c1df1f7d83bf233b8d8dbda4">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[89/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches one long edge to two short edges&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a64479db6c1618eab563a433a5ce96c48" name="a64479db6c1618eab563a433a5ce96c48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64479db6c1618eab563a433a5ce96c48">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[90/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches the selected side onto the stationary side&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>无论从哪一侧选择，公共边都准确落在对侧；长短边分段不影响方向。 </p>
+
+</div>
+</div>
+<a id="aa46307c82e7187457a884cab491c84d8" name="aa46307c82e7187457a884cab491c84d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa46307c82e7187457a884cab491c84d8">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[91/91]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;GeometryTopologyEditor stitches two free boundary edges within tolerance&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

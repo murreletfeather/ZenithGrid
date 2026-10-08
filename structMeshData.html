@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: MeshData结构体 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-attribs">Public 属性</a> &#124;
+<a href="structMeshData-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">MeshData结构体 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="MeshData_8h_source.html">MeshData.h</a>&gt;</code></p>
+<div class="dynheader">
+MeshData 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="structMeshData__coll__graph.png" border="0" usemap="#aMeshData_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aMeshData_coll__map" id="aMeshData_coll__map">
+<area shape="rect" title=" " alt="" coords="867,414,955,439"/>
+<area shape="rect" title=" " alt="" coords="493,23,661,63"/>
+<area shape="poly" title=" " alt="" coords="675,25,719,25,764,31,807,45,845,70,863,97,877,137,897,239,907,342,912,414,906,414,902,343,892,239,872,138,858,99,841,74,805,50,763,36,719,30,675,30"/>
+<area shape="rect" title=" " alt="" coords="193,30,368,55"/>
+<area shape="poly" title=" " alt="" coords="382,40,493,40,493,45,382,45"/>
+<area shape="rect" title=" " alt="" coords="499,321,656,346"/>
+<area shape="poly" title=" " alt="" coords="670,334,756,347,801,358,844,374,874,392,898,412,895,416,871,396,842,378,799,363,755,352,669,340"/>
+<area shape="rect" title=" " alt="" coords="495,371,660,411"/>
+<area shape="poly" title=" " alt="" coords="674,398,867,419,866,425,673,404"/>
+<area shape="rect" title=" " alt="" coords="501,435,654,490"/>
+<area shape="poly" title=" " alt="" coords="668,461,753,457,842,445,874,437,876,442,843,451,753,462,668,466"/>
+<area shape="rect" title=" " alt="" coords="501,514,654,569"/>
+<area shape="poly" title=" " alt="" coords="667,534,754,520,799,506,841,488,874,464,898,438,902,442,877,468,844,493,801,511,755,525,668,540"/>
+<area shape="rect" title=" " alt="" coords="485,621,669,661"/>
+<area shape="poly" title=" " alt="" coords="683,656,724,656,765,651,805,640,841,619,860,600,875,578,895,526,904,477,907,440,912,440,910,477,900,528,880,580,864,604,844,623,807,645,767,657,724,662,683,661"/>
+<area shape="rect" title=" " alt="" coords="237,602,324,627"/>
+<area shape="poly" title=" " alt="" coords="338,617,485,630,485,636,337,622"/>
+<area shape="rect" title=" " alt="" coords="5,595,144,635"/>
+<area shape="poly" title=" " alt="" coords="158,612,237,612,237,617,158,617"/>
+<area shape="rect" title=" " alt="" coords="198,655,363,681"/>
+<area shape="poly" title=" " alt="" coords="377,661,461,655,485,652,486,657,462,660,377,666"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-types" class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:ab794797f8cf5da5098cacf3b99872da6" id="r_ab794797f8cf5da5098cacf3b99872da6"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab794797f8cf5da5098cacf3b99872da6">PatchMap</a> = std::unordered_map&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::unique_ptr&lt;<a class="el" href="structPatch.html">Patch</a>&gt;&gt;</td></tr>
+<tr class="memitem:aff3987502c3ff7826c87d5f0472079e8" id="r_aff3987502c3ff7826c87d5f0472079e8"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff3987502c3ff7826c87d5f0472079e8">BlockMap</a> = std::unordered_map&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::unique_ptr&lt;<a class="el" href="structBlock.html">Block</a>&gt;&gt;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a1fafe843b8ac8aeb6643b3ce4355f96f" id="r_a1fafe843b8ac8aeb6643b3ce4355f96f"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="structMeshData.html">MeshData</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1fafe843b8ac8aeb6643b3ce4355f96f">clone</a> () const</td></tr>
+<tr class="memdesc:a1fafe843b8ac8aeb6643b3ce4355f96f"><td class="mdescLeft">&#160;</td><td class="mdescRight">深拷贝网格数据（坐标/连通性/属性；不含待删的 patches_/blocks_），用于快照/恢复  <br /></td></tr>
+<tr class="memitem:a441899feec76257ac227a6786fe9aea9" id="r_a441899feec76257ac227a6786fe9aea9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a441899feec76257ac227a6786fe9aea9">clear</a> ()</td></tr>
+<tr class="memdesc:a441899feec76257ac227a6786fe9aea9"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除所有数据，即使offset数组起码也要保留一个元素0  <br /></td></tr>
+<tr class="memitem:adf69187de57678fe40d821885a600aa8" id="r_adf69187de57678fe40d821885a600aa8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf69187de57678fe40d821885a600aa8">init</a> ()</td></tr>
+<tr class="memdesc:adf69187de57678fe40d821885a600aa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">初始化 <a class="el" href="structMeshData.html">MeshData</a> 结构，确保 offset 数组至少包含一个初始元素 0。  <br /></td></tr>
+<tr class="memitem:ae1521d1e75a558caeed3d50e066170fc" id="r_ae1521d1e75a558caeed3d50e066170fc"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae1521d1e75a558caeed3d50e066170fc">face_patch_id</a> (int face_id)</td></tr>
+<tr class="memdesc:ae1521d1e75a558caeed3d50e066170fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据给定的面ID，查找其所属的Patch ID  <br /></td></tr>
+<tr class="memitem:aab3f2ea9e3bcb55c8e081c943d0d94f5" id="r_aab3f2ea9e3bcb55c8e081c943d0d94f5"><td class="memItemLeft" align="right" valign="top">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aab3f2ea9e3bcb55c8e081c943d0d94f5">patch_block_id</a> (int patch_id)</td></tr>
+<tr class="memdesc:aab3f2ea9e3bcb55c8e081c943d0d94f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据给定的Patch ID，查找其所属的Block ID  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-attribs" class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public 属性</h2></td></tr>
+<tr class="memitem:a1110b959458b134f4c5e38a2db3cfe71" id="r_a1110b959458b134f4c5e38a2db3cfe71"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::array&lt; double, 3 &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1110b959458b134f4c5e38a2db3cfe71">vertex_positions_</a></td></tr>
+<tr class="memdesc:a1110b959458b134f4c5e38a2db3cfe71"><td class="mdescLeft">&#160;</td><td class="mdescRight">顶点的三维坐标（组件自持）。  <br /></td></tr>
+<tr class="memitem:a02e025c430fa51c3832ffc680145e236" id="r_a02e025c430fa51c3832ffc680145e236"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02e025c430fa51c3832ffc680145e236">vertex_count_</a> { 0 }</td></tr>
+<tr class="memitem:a1905a5d8092320d547eb96be6f527918" id="r_a1905a5d8092320d547eb96be6f527918"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1905a5d8092320d547eb96be6f527918">face_vertices_</a></td></tr>
+<tr class="memdesc:a1905a5d8092320d547eb96be6f527918"><td class="mdescLeft">&#160;</td><td class="mdescRight">面的点索引，存储构成网格面单元的顶点索引。可以表示独立于体单元之外单独定义的面单元。  <br /></td></tr>
+<tr class="memitem:a994686c601707d424a111695960dd678" id="r_a994686c601707d424a111695960dd678"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a994686c601707d424a111695960dd678">face_vertices_offset_</a></td></tr>
+<tr class="memdesc:a994686c601707d424a111695960dd678"><td class="mdescLeft">&#160;</td><td class="mdescRight">面的点索引偏移，存储每个面单元的顶点偏移量数组。可以表示独立于体单元之外单独定义的面。  <br /></td></tr>
+<tr class="memitem:a136ea84f40ad248a6c07043dda96e81c" id="r_a136ea84f40ad248a6c07043dda96e81c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a136ea84f40ad248a6c07043dda96e81c">edge_vertices_</a></td></tr>
+<tr class="memdesc:a136ea84f40ad248a6c07043dda96e81c"><td class="mdescLeft">&#160;</td><td class="mdescRight">边的点索引，边单元的顶点索引数组，可以表示独立于体、面的边单元。每两个顶点索引表示一条边。  <br /></td></tr>
+<tr class="memitem:ae8d8335933110be77b6e91222a56ea71" id="r_ae8d8335933110be77b6e91222a56ea71"><td class="memItemLeft" align="right" valign="top">std::vector&lt; unsigned char &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8d8335933110be77b6e91222a56ea71">solid_types_</a></td></tr>
+<tr class="memdesc:ae8d8335933110be77b6e91222a56ea71"><td class="mdescLeft">&#160;</td><td class="mdescRight">体单元的类型，对应每个体单元的 VTK 类型编号。  <br /></td></tr>
+<tr class="memitem:ab5f1e587332750f98d252f4ed1b30099" id="r_ab5f1e587332750f98d252f4ed1b30099"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab5f1e587332750f98d252f4ed1b30099">solid_vertices_</a></td></tr>
+<tr class="memdesc:ab5f1e587332750f98d252f4ed1b30099"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的点索引，体单元的顶点索引数组，每个体单元的顶点索引连续存储。  <br /></td></tr>
+<tr class="memitem:aaea9d3e989bd31e8f46d25ded9b3d5d6" id="r_aaea9d3e989bd31e8f46d25ded9b3d5d6"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaea9d3e989bd31e8f46d25ded9b3d5d6">solid_vertices_offset_</a> { 0 }</td></tr>
+<tr class="memdesc:aaea9d3e989bd31e8f46d25ded9b3d5d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的点索引偏移，存储每个体单元的顶点偏移量。  <br /></td></tr>
+<tr class="memitem:adee7d6dbdcf8576aabd676d15553c84d" id="r_adee7d6dbdcf8576aabd676d15553c84d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adee7d6dbdcf8576aabd676d15553c84d">solid_faces_vertices_</a></td></tr>
+<tr class="memdesc:adee7d6dbdcf8576aabd676d15553c84d"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的面的点索引，存储构成多面体 vtkPolyhedron 的面的顶点（角点）索引，顺序存储。  <br /></td></tr>
+<tr class="memitem:a57683f0d4db0df4ed8e4baf2363d7ac3" id="r_a57683f0d4db0df4ed8e4baf2363d7ac3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a57683f0d4db0df4ed8e4baf2363d7ac3">solid_faces_vertices_offset_</a> { 0 }</td></tr>
+<tr class="memdesc:a57683f0d4db0df4ed8e4baf2363d7ac3"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的面的点索引偏移，存储构成多面体的面的顶点索引偏移量，同 solid_faces_vertices_ 一起定义了多面体的各个面。  <br /></td></tr>
+<tr class="memitem:ae15cb77405762cfcbdfb94aedc989bf7" id="r_ae15cb77405762cfcbdfb94aedc989bf7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae15cb77405762cfcbdfb94aedc989bf7">solid_faces_</a></td></tr>
+<tr class="memdesc:ae15cb77405762cfcbdfb94aedc989bf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的面索引，存储构成每个多面体的是哪些面。  <br /></td></tr>
+<tr class="memitem:a42e7d0fbfabc2ba7b5c8c02b61ad0c95" id="r_a42e7d0fbfabc2ba7b5c8c02b61ad0c95"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a42e7d0fbfabc2ba7b5c8c02b61ad0c95">solid_faces_offset_</a> { 0 }</td></tr>
+<tr class="memdesc:a42e7d0fbfabc2ba7b5c8c02b61ad0c95"><td class="mdescLeft">&#160;</td><td class="mdescRight">体的面索引的偏移，存储多面体单元的面索引偏移量，同 solid_faces_ 一起定义了多面体的各个面。  <br /></td></tr>
+<tr class="memitem:a59f1e04e2185643cac0cc8ef811e36ad" id="r_a59f1e04e2185643cac0cc8ef811e36ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#ab794797f8cf5da5098cacf3b99872da6">PatchMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a59f1e04e2185643cac0cc8ef811e36ad">patches_</a></td></tr>
+<tr class="memitem:ad5bf8ed9eb3e17cfadf3077b00c2fa2a" id="r_ad5bf8ed9eb3e17cfadf3077b00c2fa2a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="#aff3987502c3ff7826c87d5f0472079e8">BlockMap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad5bf8ed9eb3e17cfadf3077b00c2fa2a">blocks_</a></td></tr>
+<tr class="memitem:af468068e1209762a964a84f6c30a44da" id="r_af468068e1209762a964a84f6c30a44da"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af468068e1209762a964a84f6c30a44da">vertex_attributes_</a></td></tr>
+<tr class="memitem:a186199b50a63ca04d4d055e8061f7317" id="r_a186199b50a63ca04d4d055e8061f7317"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a186199b50a63ca04d4d055e8061f7317">face_attributes_</a></td></tr>
+<tr class="memitem:a74be6d96aaea1509ca703fa8ca1e868d" id="r_a74be6d96aaea1509ca703fa8ca1e868d"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74be6d96aaea1509ca703fa8ca1e868d">edge_attributes_</a></td></tr>
+<tr class="memitem:ab004dfebf0c4360823c3933cf1abdbdf" id="r_ab004dfebf0c4360823c3933cf1abdbdf"><td class="memItemLeft" align="right" valign="top">std::map&lt; std::string, std::vector&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab004dfebf0c4360823c3933cf1abdbdf">solid_attributes_</a></td></tr>
+</table>
+<a name="doc-typedef-members" id="doc-typedef-members"></a><h2 id="header-doc-typedef-members" class="groupheader">成员类型定义说明</h2>
+<a id="aff3987502c3ff7826c87d5f0472079e8" name="aff3987502c3ff7826c87d5f0472079e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff3987502c3ff7826c87d5f0472079e8">&#9670;&#160;</a></span>BlockMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#aff3987502c3ff7826c87d5f0472079e8">MeshData::BlockMap</a> = std::unordered_map&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::unique_ptr&lt;<a class="el" href="structBlock.html">Block</a>&gt;&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab794797f8cf5da5098cacf3b99872da6" name="ab794797f8cf5da5098cacf3b99872da6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab794797f8cf5da5098cacf3b99872da6">&#9670;&#160;</a></span>PatchMap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="#ab794797f8cf5da5098cacf3b99872da6">MeshData::PatchMap</a> = std::unordered_map&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>, std::unique_ptr&lt;<a class="el" href="structPatch.html">Patch</a>&gt;&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="a441899feec76257ac227a6786fe9aea9" name="a441899feec76257ac227a6786fe9aea9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a441899feec76257ac227a6786fe9aea9">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshData::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>清除所有数据，即使offset数组起码也要保留一个元素0 </p>
+
+</div>
+</div>
+<a id="a1fafe843b8ac8aeb6643b3ce4355f96f" name="a1fafe843b8ac8aeb6643b3ce4355f96f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fafe843b8ac8aeb6643b3ce4355f96f">&#9670;&#160;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="structMeshData.html">MeshData</a> &gt; MeshData::clone </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>深拷贝网格数据（坐标/连通性/属性；不含待删的 patches_/blocks_），用于快照/恢复 </p>
+
+</div>
+</div>
+<a id="ae1521d1e75a558caeed3d50e066170fc" name="ae1521d1e75a558caeed3d50e066170fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1521d1e75a558caeed3d50e066170fc">&#9670;&#160;</a></span>face_patch_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; MeshData::face_patch_id </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>face_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据给定的面ID，查找其所属的Patch ID </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">face_id</td><td>面的索引 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>如果找到对应的Patch ID，则返回该ID，否则返回std::nullopt </dd></dl>
+
+</div>
+</div>
+<a id="adf69187de57678fe40d821885a600aa8" name="adf69187de57678fe40d821885a600aa8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adf69187de57678fe40d821885a600aa8">&#9670;&#160;</a></span>init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MeshData::init </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>初始化 <a class="el" href="structMeshData.html">MeshData</a> 结构，确保 offset 数组至少包含一个初始元素 0。 </p>
+
+</div>
+</div>
+<a id="aab3f2ea9e3bcb55c8e081c943d0d94f5" name="aab3f2ea9e3bcb55c8e081c943d0d94f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab3f2ea9e3bcb55c8e081c943d0d94f5">&#9670;&#160;</a></span>patch_block_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::optional&lt; <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt; MeshData::patch_block_id </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>patch_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据给定的Patch ID，查找其所属的Block ID </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">patch_id</td><td>Patch的索引 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>如果找到对应的Block ID，则返回该ID，否则返回std::nullopt </dd></dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="ad5bf8ed9eb3e17cfadf3077b00c2fa2a" name="ad5bf8ed9eb3e17cfadf3077b00c2fa2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5bf8ed9eb3e17cfadf3077b00c2fa2a">&#9670;&#160;</a></span>blocks_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#aff3987502c3ff7826c87d5f0472079e8">BlockMap</a> MeshData::blocks_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a74be6d96aaea1509ca703fa8ca1e868d" name="a74be6d96aaea1509ca703fa8ca1e868d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74be6d96aaea1509ca703fa8ca1e868d">&#9670;&#160;</a></span>edge_attributes_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;std::string, std::vector&lt;double&gt; &gt; MeshData::edge_attributes_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a136ea84f40ad248a6c07043dda96e81c" name="a136ea84f40ad248a6c07043dda96e81c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a136ea84f40ad248a6c07043dda96e81c">&#9670;&#160;</a></span>edge_vertices_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::edge_vertices_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>边的点索引，边单元的顶点索引数组，可以表示独立于体、面的边单元。每两个顶点索引表示一条边。 </p>
+
+</div>
+</div>
+<a id="a186199b50a63ca04d4d055e8061f7317" name="a186199b50a63ca04d4d055e8061f7317"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a186199b50a63ca04d4d055e8061f7317">&#9670;&#160;</a></span>face_attributes_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;std::string, std::vector&lt;double&gt; &gt; MeshData::face_attributes_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1905a5d8092320d547eb96be6f527918" name="a1905a5d8092320d547eb96be6f527918"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1905a5d8092320d547eb96be6f527918">&#9670;&#160;</a></span>face_vertices_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::face_vertices_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>面的点索引，存储构成网格面单元的顶点索引。可以表示独立于体单元之外单独定义的面单元。 </p>
+<p>{0, 1, 2, 2, 3, 0, 3, 2, 6, 6, 7, 3, 4, 0, 3, 3, 7, 4, 7, 6, 5, 5, 4, 7, 4, 5, 1, 1, 0, 4, 1, 5, 6, 6, 2, 1} </p>
+
+</div>
+</div>
+<a id="a994686c601707d424a111695960dd678" name="a994686c601707d424a111695960dd678"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a994686c601707d424a111695960dd678">&#9670;&#160;</a></span>face_vertices_offset_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::face_vertices_offset_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>面的点索引偏移，存储每个面单元的顶点偏移量数组。可以表示独立于体单元之外单独定义的面。 </p>
+<p>{ 0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33 } 表示了 offsets size - 1 = 11个面单元 </p>
+
+</div>
+</div>
+<a id="a59f1e04e2185643cac0cc8ef811e36ad" name="a59f1e04e2185643cac0cc8ef811e36ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59f1e04e2185643cac0cc8ef811e36ad">&#9670;&#160;</a></span>patches_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="#ab794797f8cf5da5098cacf3b99872da6">PatchMap</a> MeshData::patches_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab004dfebf0c4360823c3933cf1abdbdf" name="ab004dfebf0c4360823c3933cf1abdbdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab004dfebf0c4360823c3933cf1abdbdf">&#9670;&#160;</a></span>solid_attributes_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;std::string, std::vector&lt;double&gt; &gt; MeshData::solid_attributes_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae15cb77405762cfcbdfb94aedc989bf7" name="ae15cb77405762cfcbdfb94aedc989bf7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae15cb77405762cfcbdfb94aedc989bf7">&#9670;&#160;</a></span>solid_faces_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_faces_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的面索引，存储构成每个多面体的是哪些面。 </p>
+<p>例如，一个多面体由多个面构成，构成每个多面体的面id顺次存储在该数组中。 </p>
+
+</div>
+</div>
+<a id="a42e7d0fbfabc2ba7b5c8c02b61ad0c95" name="a42e7d0fbfabc2ba7b5c8c02b61ad0c95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a42e7d0fbfabc2ba7b5c8c02b61ad0c95">&#9670;&#160;</a></span>solid_faces_offset_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_faces_offset_ { 0 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的面索引的偏移，存储多面体单元的面索引偏移量，同 solid_faces_ 一起定义了多面体的各个面。 </p>
+<p>例如：{ 0, 6, 12 } 表示 solid_faces_ 中第 [0,6) 面构成第0个多面体，第[6,12)面构成第1个多面体。 注意：如果没有多面体（即所有体单元均为简单类型），该数组最少也要包含一个元素 {0}，表示没有多面体。 </p>
+
+</div>
+</div>
+<a id="adee7d6dbdcf8576aabd676d15553c84d" name="adee7d6dbdcf8576aabd676d15553c84d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adee7d6dbdcf8576aabd676d15553c84d">&#9670;&#160;</a></span>solid_faces_vertices_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_faces_vertices_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的面的点索引，存储构成多面体 vtkPolyhedron 的面的顶点（角点）索引，顺序存储。 </p>
+<p>例如，有很多的面彼此组合成了多面体，每个面的顶点索引顺序存储在该数组中，表示了每个面是由这些顶点顺次连接来的。 注意：vtk 有明确定义体单元类型的不必要存储，只需按照vtk定义的顺序将顶点按序存入 solid_vertices_ 和 solid_vertices_offset_ 即可。此处单纯针对多面体 vtkPolyhedron 的情形，即更为复杂的情形，所以数组可以为空。 </p>
+
+</div>
+</div>
+<a id="a57683f0d4db0df4ed8e4baf2363d7ac3" name="a57683f0d4db0df4ed8e4baf2363d7ac3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57683f0d4db0df4ed8e4baf2363d7ac3">&#9670;&#160;</a></span>solid_faces_vertices_offset_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_faces_vertices_offset_ { 0 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的面的点索引偏移，存储构成多面体的面的顶点索引偏移量，同 solid_faces_vertices_ 一起定义了多面体的各个面。 </p>
+<p>例如：{ 0, 4, 7, 10 } 表示 solid_faces_vertices_ 中第 [0,4) 点构成第0个面，第[4,7)面构成第1个面，第[7,10)面构成第2个面。 注意，offset数组虽然可以留空，但起码要有{0}表示没有face。 </p>
+
+</div>
+</div>
+<a id="ae8d8335933110be77b6e91222a56ea71" name="ae8d8335933110be77b6e91222a56ea71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8d8335933110be77b6e91222a56ea71">&#9670;&#160;</a></span>solid_types_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;unsigned char&gt; MeshData::solid_types_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体单元的类型，对应每个体单元的 VTK 类型编号。 </p>
+<p>例如，六面体 VTK_HEXAHEDRON = 12, 三棱柱 VTK_WEDGE = 13, 任意多面体 VTK_POLYHEDRON = 42 等。参见 <a href="https://vtk.org/doc/nightly/html/vtkCellType_8h.html">https://vtk.org/doc/nightly/html/vtkCellType_8h.html</a> 注意：对于可存储任意形状的多面体 VTK_POLYHEDRON，需要同时使用 solid_faces_vertices_、solid_faces_vertices_offset_、solid_faces_ 和 solid_faces_offset_ 来定义其面的拓扑结构。 </p>
+
+</div>
+</div>
+<a id="ab5f1e587332750f98d252f4ed1b30099" name="ab5f1e587332750f98d252f4ed1b30099"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5f1e587332750f98d252f4ed1b30099">&#9670;&#160;</a></span>solid_vertices_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_vertices_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的点索引，体单元的顶点索引数组，每个体单元的顶点索引连续存储。 </p>
+<p>例如，对于一个六面体（立方体）VTK_HEXAHEDRON，会有8个顶点索引按VTK定义的顺序依次存储，后面接着存放其他体单元的顶点索引。 </p>
+
+</div>
+</div>
+<a id="aaea9d3e989bd31e8f46d25ded9b3d5d6" name="aaea9d3e989bd31e8f46d25ded9b3d5d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaea9d3e989bd31e8f46d25ded9b3d5d6">&#9670;&#160;</a></span>solid_vertices_offset_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; MeshData::solid_vertices_offset_ { 0 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>体的点索引偏移，存储每个体单元的顶点偏移量。 </p>
+<p>例如：{ 0, 8, 14 } 表示两个体单元，第0个体单元由 solid_vertices_ 中的第 [0,8) 个顶点构成，第1个体单元由 solid_vertices_ 中的第 [8,14) 个顶点构成。 注意，offset数组虽然可以留空，但起码要有{0}表示没有cell。 </p>
+
+</div>
+</div>
+<a id="af468068e1209762a964a84f6c30a44da" name="af468068e1209762a964a84f6c30a44da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af468068e1209762a964a84f6c30a44da">&#9670;&#160;</a></span>vertex_attributes_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::map&lt;std::string, std::vector&lt;double&gt; &gt; MeshData::vertex_attributes_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a02e025c430fa51c3832ffc680145e236" name="a02e025c430fa51c3832ffc680145e236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02e025c430fa51c3832ffc680145e236">&#9670;&#160;</a></span>vertex_count_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> MeshData::vertex_count_ { 0 }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1110b959458b134f4c5e38a2db3cfe71" name="a1110b959458b134f4c5e38a2db3cfe71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1110b959458b134f4c5e38a2db3cfe71">&#9670;&#160;</a></span>vertex_positions_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;std::array&lt;double, 3&gt; &gt; MeshData::vertex_positions_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>顶点的三维坐标（组件自持）。 </p>
+<p><a class="el" href="structMeshData.html">MeshData</a> 为自包含数据：坐标常驻本数组，face_vertices_ / edge_vertices_ / solid_vertices_ / solid_faces_vertices_ 等连通性数组均存储本数组的局部下标 （局部点 id），可整体快照/恢复（撤销重做依赖此性质）。</p>
+<p>{ 0.000000, 2.000000, 2.000000 }, { 0.000000, 0.000000, 2.000000 }, { 2.000000, 0.000000, 2.000000 }, { 2.000000, 2.000000, 2.000000 }, { 0.000000, 2.000000, 0.000000 }, { 0.000000, 0.000000, 0.000000 }, { 2.000000, 0.000000, 0.000000 }, { 2.000000, 2.000000, 0.000000 }</p>
+<dl class="section note"><dt>注解</dt><dd>局部点 id 在组件生命周期内保持稳定：只增不改号、不重排、不压实 （MeshAdjacency 持久边身份层以端点对为键，依赖此不变式）； 全局点 id 由 <a class="el" href="structComponentData.html#a3de48b085bbf22ce958762d5aa15354b" title="局部点 id -&gt; 全局点 id（gid 经 ModelLayer::pointIdMap() 分配，-1 = 待分配）">ComponentData::point_global_ids_</a> 经 <a class="el" href="classMeshIDMap.html">MeshIDMap</a> 分配。 </dd></dl>
+
+</div>
+</div>
+<hr/>该结构体的文档由以下文件生成:<ul>
+<li>model/data/<a class="el" href="MeshData_8h_source.html">MeshData.h</a></li>
+<li>model/data/<a class="el" href="MeshData_8cpp.html">MeshData.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

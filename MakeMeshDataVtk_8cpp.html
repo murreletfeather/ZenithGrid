@@ -1,0 +1,248 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/render/test/MakeMeshDataVtk.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_364370753f3c0e27b80c476caf69e0e2.html">render</a></li><li class="navelem"><a href="dir_ea7bf32d4afef5a01f2beaa3de806056.html">test</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle"><div class="title">MakeMeshDataVtk.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><code>#include &quot;<a class="el" href="MakeMeshDataVtk_8h_source.html">MakeMeshDataVtk.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="MakeMeshData_8h_source.html">MakeMeshData.h</a>&quot;</code><br />
+<code>#include &lt;filesystem&gt;</code><br />
+<code>#include &lt;iostream&gt;</code><br />
+<code>#include &lt;numeric&gt;</code><br />
+<code>#include &lt;vtkCell.h&gt;</code><br />
+<code>#include &lt;vtkCellArray.h&gt;</code><br />
+<code>#include &lt;vtkCellType.h&gt;</code><br />
+<code>#include &lt;vtkDataSet.h&gt;</code><br />
+<code>#include &lt;vtkGenericDataObjectReader.h&gt;</code><br />
+<code>#include &lt;vtkPoints.h&gt;</code><br />
+<code>#include &lt;vtkPolyData.h&gt;</code><br />
+<code>#include &lt;vtkSmartPointer.h&gt;</code><br />
+<code>#include &lt;vtkUnstructuredGrid.h&gt;</code><br />
+<code>#include &lt;vtkXMLPolyDataReader.h&gt;</code><br />
+<code>#include &lt;vtkXMLUnstructuredGridReader.h&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+MakeMeshDataVtk.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="MakeMeshDataVtk_8cpp__incl.png" border="0" usemap="#aapp_2render_2test_2MakeMeshDataVtk_8cpp" loading="lazy" alt=""/></div>
+<map name="aapp_2render_2test_2MakeMeshDataVtk_8cpp" id="aapp_2render_2test_2MakeMeshDataVtk_8cpp">
+<area shape="rect" title=" " alt="" coords="2369,5,2564,45"/>
+<area shape="rect" href="MakeMeshDataVtk_8h.html" title=" " alt="" coords="1279,93,1436,119"/>
+<area shape="poly" title=" " alt="" coords="2369,36,1450,101,1450,95,2369,31"/>
+<area shape="rect" title=" " alt="" coords="2307,247,2402,273"/>
+<area shape="poly" title=" " alt="" coords="2369,30,2273,35,2172,45,2125,54,2084,65,2052,79,2030,95,2007,128,2007,135,2016,141,2062,157,2145,189,2306,241,2305,246,2143,195,2061,162,2014,146,2003,138,2001,126,2026,91,2049,74,2082,60,2124,49,2171,40,2273,29,2369,25"/>
+<area shape="rect" title=" " alt="" coords="2427,247,2565,273"/>
+<area shape="poly" title=" " alt="" coords="2369,30,2275,35,2177,46,2092,65,2060,79,2039,95,2035,106,2039,117,2058,130,2094,146,2201,180,2435,242,2434,247,2199,185,2092,150,2055,135,2035,120,2029,106,2035,92,2058,74,2090,60,2176,41,2275,30,2369,25"/>
+<area shape="rect" href="MakeMeshData_8h.html" title=" " alt="" coords="681,93,815,119"/>
+<area shape="poly" title=" " alt="" coords="2369,34,829,104,829,98,2369,28"/>
+<area shape="rect" title=" " alt="" coords="2049,93,2140,119"/>
+<area shape="poly" title=" " alt="" coords="2378,48,2154,95,2153,90,2377,43"/>
+<area shape="rect" title=" " alt="" coords="2164,93,2244,119"/>
+<area shape="poly" title=" " alt="" coords="2405,48,2256,92,2255,87,2403,43"/>
+<area shape="rect" title=" " alt="" coords="2268,93,2343,119"/>
+<area shape="poly" title=" " alt="" coords="2429,48,2343,90,2340,85,2427,43"/>
+<area shape="rect" title=" " alt="" coords="2367,93,2447,119"/>
+<area shape="poly" title=" " alt="" coords="2454,47,2426,84,2422,81,2450,44"/>
+<area shape="rect" title=" " alt="" coords="2471,93,2585,119"/>
+<area shape="poly" title=" " alt="" coords="2484,44,2513,81,2508,84,2479,47"/>
+<area shape="rect" title=" " alt="" coords="2609,93,2719,119"/>
+<area shape="poly" title=" " alt="" coords="2515,43,2623,86,2621,91,2513,48"/>
+<area shape="rect" title=" " alt="" coords="2744,93,2851,119"/>
+<area shape="poly" title=" " alt="" coords="2546,43,2737,88,2735,93,2545,48"/>
+<area shape="rect" title=" " alt="" coords="2875,93,3098,119"/>
+<area shape="poly" title=" " alt="" coords="2565,39,2898,89,2897,94,2564,44"/>
+<area shape="rect" title=" " alt="" coords="3123,93,3237,119"/>
+<area shape="poly" title=" " alt="" coords="2565,32,2808,56,3110,91,3109,96,2808,61,2564,38"/>
+<area shape="rect" title=" " alt="" coords="3262,93,3429,119"/>
+<area shape="poly" title=" " alt="" coords="2565,31,2866,55,3249,91,3248,96,2865,61,2564,37"/>
+<area shape="rect" title=" " alt="" coords="3453,93,3640,119"/>
+<area shape="poly" title=" " alt="" coords="2564,29,2944,53,3440,91,3439,96,2943,58,2564,35"/>
+<area shape="rect" title=" " alt="" coords="3665,93,3903,119"/>
+<area shape="poly" title=" " alt="" coords="2564,29,3028,52,3651,91,3651,96,3028,58,2564,34"/>
+<area shape="rect" href="MeshActor_8h.html" title=" " alt="" coords="1306,167,1409,192"/>
+<area shape="poly" title=" " alt="" coords="1360,119,1360,153,1355,153,1355,119"/>
+<area shape="rect" title=" " alt="" coords="465,328,527,353"/>
+<area shape="poly" title=" " alt="" coords="1279,112,1097,121,872,142,761,159,661,181,579,208,547,224,523,242,511,258,503,276,498,314,493,314,498,275,506,255,519,238,545,220,577,203,659,175,760,153,871,136,1097,115,1278,106"/>
+<area shape="rect" href="MeshData_8h.html" title=" " alt="" coords="258,167,358,192"/>
+<area shape="poly" title=" " alt="" coords="1279,115,372,176,372,171,1278,110"/>
+<area shape="rect" title=" " alt="" coords="1433,167,1530,192"/>
+<area shape="poly" title=" " alt="" coords="1379,116,1451,157,1448,162,1376,121"/>
+<area shape="rect" href="AttributeCommon_8h.html" title=" " alt="" coords="1782,240,1962,280"/>
+<area shape="poly" title=" " alt="" coords="1409,188,1420,189,1592,213,1769,237,1768,243,1592,218,1420,195,1409,193"/>
+<area shape="rect" href="Core_8h.html" title=" " alt="" coords="395,247,459,273"/>
+<area shape="poly" title=" " alt="" coords="1306,185,975,200,750,218,522,243,472,251,472,246,521,237,750,212,975,195,1306,179"/>
+<area shape="rect" href="IAttributeRenderStrategy_8h.html" title=" " alt="" coords="1987,240,2171,280"/>
+<area shape="poly" title=" " alt="" coords="1409,188,1420,189,1573,206,1694,214,1816,221,1973,237,1973,243,1816,226,1694,219,1573,211,1420,195,1409,193"/>
+<area shape="rect" title=" " alt="" coords="533,247,608,273"/>
+<area shape="poly" title=" " alt="" coords="1306,183,1183,184,1012,191,817,209,717,224,621,243,610,245,609,240,619,237,717,218,816,204,1012,186,1183,178,1306,177"/>
+<area shape="rect" title=" " alt="" coords="246,247,370,273"/>
+<area shape="poly" title=" " alt="" coords="1306,183,1149,185,921,193,654,211,517,225,383,243,361,247,360,242,382,237,516,219,654,205,921,187,1149,180,1306,178"/>
+<area shape="rect" title=" " alt="" coords="2195,247,2283,273"/>
+<area shape="poly" title=" " alt="" coords="1409,188,1420,189,1536,200,1635,205,1803,204,1884,204,1970,208,2068,218,2183,237,2197,241,2196,246,2182,243,2068,224,1970,214,1884,210,1803,210,1634,210,1536,206,1420,195,1409,193"/>
+<area shape="rect" title=" " alt="" coords="632,247,864,273"/>
+<area shape="poly" title=" " alt="" coords="1306,189,876,243,838,248,837,243,876,237,1306,184"/>
+<area shape="rect" title=" " alt="" coords="889,247,1029,273"/>
+<area shape="poly" title=" " alt="" coords="1306,192,1042,243,1021,247,1020,242,1041,237,1305,187"/>
+<area shape="rect" title=" " alt="" coords="1053,240,1261,280"/>
+<area shape="poly" title=" " alt="" coords="1329,194,1219,238,1217,233,1327,190"/>
+<area shape="rect" title=" " alt="" coords="1286,247,1429,273"/>
+<area shape="poly" title=" " alt="" coords="1360,192,1360,233,1355,233,1355,192"/>
+<area shape="rect" title=" " alt="" coords="1453,247,1603,273"/>
+<area shape="poly" title=" " alt="" coords="1383,190,1492,239,1490,244,1381,194"/>
+<area shape="poly" title=" " alt="" coords="1409,188,1420,189,1553,202,1666,206,1859,204,1952,204,2051,207,2163,217,2295,237,2311,241,2310,246,2294,243,2163,223,2051,212,1951,209,1859,210,1666,212,1553,207,1420,195,1409,193"/>
+<area shape="rect" title=" " alt="" coords="1627,247,1757,273"/>
+<area shape="poly" title=" " alt="" coords="1408,189,1615,237,1632,241,1631,247,1614,243,1407,195"/>
+<area shape="poly" title=" " alt="" coords="1409,188,1420,189,1571,203,1699,209,1918,209,2023,209,2136,211,2264,220,2415,237,2440,242,2439,247,2414,243,2264,225,2136,217,2023,214,1918,215,1699,215,1571,209,1420,195,1409,193"/>
+<area shape="rect" title=" " alt="" coords="5,328,61,353"/>
+<area shape="poly" title=" " alt="" coords="402,275,382,283,298,303,213,319,76,338,75,333,212,314,297,298,381,277,401,270"/>
+<area shape="rect" title=" " alt="" coords="1267,328,1317,353"/>
+<area shape="poly" title=" " alt="" coords="459,266,522,277,738,302,949,319,1253,335,1253,341,949,324,737,307,521,283,458,271"/>
+<area shape="rect" title=" " alt="" coords="215,328,292,353"/>
+<area shape="poly" title=" " alt="" coords="403,275,292,325,290,320,400,270"/>
+<area shape="rect" title=" " alt="" coords="381,328,440,353"/>
+<area shape="poly" title=" " alt="" coords="427,273,418,315,413,314,422,272"/>
+<area shape="poly" title=" " alt="" coords="439,271,479,316,475,319,435,275"/>
+<area shape="poly" title=" " alt="" coords="1987,281,1974,283,1785,304,1600,321,1331,340,1331,334,1600,316,1785,299,1973,277,1986,276"/>
+<area shape="poly" title=" " alt="" coords="1987,281,1974,283,1744,301,1548,306,1375,302,1214,296,1053,290,880,291,684,303,454,331,453,326,684,298,880,286,1053,285,1214,290,1375,297,1548,300,1743,295,1973,277,1986,276"/>
+<area shape="rect" title=" " alt="" coords="2055,328,2102,353"/>
+<area shape="poly" title=" " alt="" coords="2081,280,2081,314,2076,314,2076,280"/>
+<area shape="poly" title=" " alt="" coords="327,190,399,237,396,242,324,194"/>
+<area shape="poly" title=" " alt="" coords="258,187,196,193,127,204,68,220,46,230,31,242,23,258,21,277,27,314,21,315,15,277,18,256,27,238,43,226,66,215,126,199,195,188,257,181"/>
+<area shape="poly" title=" " alt="" coords="258,187,199,194,136,205,80,221,59,231,46,242,37,260,41,276,55,290,78,302,138,320,201,331,200,336,137,325,76,307,52,294,36,279,32,260,42,238,56,226,78,216,134,200,199,189,258,182"/>
+<area shape="poly" title=" " alt="" coords="286,194,258,214,245,226,236,241,229,261,236,279,263,304,297,321,334,331,368,336,367,341,333,336,295,326,260,309,231,281,224,261,231,239,241,223,254,210,283,190"/>
+<area shape="poly" title=" " alt="" coords="347,189,521,241,520,246,345,195"/>
+<area shape="poly" title=" " alt="" coords="311,192,311,233,305,233,305,192"/>
+<area shape="rect" title=" " alt="" coords="56,247,171,273"/>
+<area shape="poly" title=" " alt="" coords="281,194,155,245,153,240,279,190"/>
+<area shape="poly" title=" " alt="" coords="681,121,372,170,371,165,680,116"/>
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a73ae695c9635bc2b34e9fc47f2ab5c41" id="r_a73ae695c9635bc2b34e9fc47f2ab5c41"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMeshDataVtk.html">MeshDataVtk</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73ae695c9635bc2b34e9fc47f2ab5c41">MakeMeshDataVtk</a> (<a class="el" href="structMeshData.html">MeshData</a> &amp;data)</td></tr>
+<tr class="memitem:a86ea92f96f1c8978335749e494c11898" id="r_a86ea92f96f1c8978335749e494c11898"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structMeshDataVtk.html">MeshDataVtk</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a86ea92f96f1c8978335749e494c11898">MakeMeshDataVtkFromFile</a> (std::string_view file_path, <a class="el" href="structMeshData.html">MeshData</a> &amp;data)</td></tr>
+</table>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="a73ae695c9635bc2b34e9fc47f2ab5c41" name="a73ae695c9635bc2b34e9fc47f2ab5c41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73ae695c9635bc2b34e9fc47f2ab5c41">&#9670;&#160;</a></span>MakeMeshDataVtk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMeshDataVtk.html">MeshDataVtk</a> MakeMeshDataVtk </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structMeshData.html">MeshData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a86ea92f96f1c8978335749e494c11898" name="a86ea92f96f1c8978335749e494c11898"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a86ea92f96f1c8978335749e494c11898">&#9670;&#160;</a></span>MakeMeshDataVtkFromFile()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structMeshDataVtk.html">MeshDataVtk</a> MakeMeshDataVtkFromFile </td>
+          <td>(</td>
+          <td class="paramtype">std::string_view</td>          <td class="paramname"><span class="paramname"><em>file_path</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structMeshData.html">MeshData</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>data</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

@@ -1,0 +1,1819 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: QRenderWindow结构体 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#signals">信号</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#properties">属性</a> &#124;
+<a href="#pri-methods">Private 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="structQRenderWindow-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">QRenderWindow结构体 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="QRenderWindow_8h_source.html">QRenderWindow.h</a>&gt;</code></p>
+<div class="dynheader">
+类 QRenderWindow 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="structQRenderWindow__inherit__graph.png" border="0" usemap="#aQRenderWindow_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="aQRenderWindow_inherit__map" id="aQRenderWindow_inherit__map">
+<area shape="rect" title=" " alt="" coords="5,79,136,104"/>
+<area shape="rect" title=" " alt="" coords="8,5,133,31"/>
+<area shape="poly" title=" " alt="" coords="73,44,73,79,68,79,68,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+QRenderWindow 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="structQRenderWindow__coll__graph.png" border="0" usemap="#aQRenderWindow_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aQRenderWindow_coll__map" id="aQRenderWindow_coll__map">
+<area shape="rect" title=" " alt="" coords="916,1067,1047,1092"/>
+<area shape="rect" title=" " alt="" coords="81,963,207,989"/>
+<area shape="poly" title=" " alt="" coords="180,992,241,1018,313,1040,434,1055,602,1066,916,1075,916,1080,602,1071,434,1061,311,1045,239,1023,178,997"/>
+<area shape="rect" title=" " alt="" coords="1003,651,1173,691"/>
+<area shape="poly" title=" " alt="" coords="1027,698,981,718,955,731,942,748,934,764,931,805,931,977,935,1003,946,1028,973,1065,968,1068,941,1030,930,1005,925,978,925,805,929,763,937,746,952,727,978,713,1025,693"/>
+<area shape="rect" href="structSelection.html" title="存储选择的对象" alt="" coords="1211,436,1293,461"/>
+<area shape="poly" title=" " alt="" coords="1252,476,1237,542,1222,580,1199,614,1173,636,1144,653,1141,648,1170,632,1195,610,1217,577,1232,541,1247,474"/>
+<area shape="rect" title=" " alt="" coords="1255,13,1412,38"/>
+<area shape="poly" title=" " alt="" coords="1318,50,1308,70,1291,123,1278,178,1262,287,1255,378,1254,436,1249,436,1250,378,1256,286,1273,177,1286,122,1303,68,1314,48"/>
+<area shape="rect" href="classComponentSelectorHighlight.html" title=" " alt="" coords="977,436,1186,461"/>
+<area shape="poly" title=" " alt="" coords="1241,34,1150,46,1114,57,1091,71,1076,93,1063,116,1047,167,1041,221,1043,275,1050,327,1060,372,1080,435,1075,437,1055,374,1045,328,1038,276,1036,221,1042,166,1058,114,1071,90,1088,67,1112,52,1149,41,1241,28"/>
+<area shape="rect" href="classModelLayer.html" title="负责管理多个 ModelData 实例的类" alt="" coords="1805,436,1904,461"/>
+<area shape="poly" title=" " alt="" coords="1427,33,1476,46,1523,67,1584,110,1641,160,1693,214,1739,269,1811,369,1851,434,1846,437,1806,372,1735,272,1689,217,1638,163,1581,114,1520,72,1474,51,1425,38"/>
+<area shape="rect" href="structMeshDataVtk.html" title="用于存储网格数据以供 VTK 渲染使用的结构体" alt="" coords="1318,436,1429,461"/>
+<area shape="poly" title=" " alt="" coords="1338,51,1375,436,1370,436,1333,52"/>
+<area shape="rect" title=" " alt="" coords="651,907,898,932"/>
+<area shape="poly" title=" " alt="" coords="776,946,780,971,791,994,818,1020,850,1039,884,1054,917,1064,916,1069,882,1059,848,1044,815,1024,787,998,775,972,771,946"/>
+<area shape="rect" href="classSelectManager.html" title=" " alt="" coords="705,737,823,762"/>
+<area shape="poly" title=" " alt="" coords="768,776,777,906,771,907,763,776"/>
+<area shape="rect" href="classInteractionService.html" title="通用视口交互服务" alt="" coords="263,850,403,875"/>
+<area shape="poly" title=" " alt="" coords="700,768,665,780,631,796,616,808,600,821,551,839,499,851,404,863,404,857,498,846,549,834,597,816,613,804,628,791,663,775,698,763"/>
+<area shape="rect" title=" " alt="" coords="521,572,730,612"/>
+<area shape="poly" title=" " alt="" coords="642,623,666,664,698,703,719,721,741,734,739,739,716,725,694,707,662,667,638,626"/>
+<area shape="rect" href="classMeshSelectManager.html" title=" " alt="" coords="528,436,683,461"/>
+<area shape="poly" title=" " alt="" coords="612,475,625,572,620,572,606,475"/>
+<area shape="rect" href="classIMeshIdQuery.html" title=" " alt="" coords="427,13,539,38"/>
+<area shape="poly" title=" " alt="" coords="504,47,517,68,539,121,557,176,584,285,600,377,607,435,602,436,595,378,579,286,552,178,534,123,512,71,499,50"/>
+<area shape="poly" title=" " alt="" coords="436,45,383,66,318,95,247,132,176,178,111,233,83,263,58,296,37,331,21,367,11,406,8,447,8,750,15,768,34,785,63,800,99,814,183,835,263,849,262,855,181,840,97,819,60,805,31,789,10,771,3,751,3,447,6,405,16,366,32,328,53,293,79,260,107,229,173,174,244,128,315,90,381,61,434,40"/>
+<area shape="rect" title=" " alt="" coords="390,497,575,537"/>
+<area shape="poly" title=" " alt="" coords="485,52,485,496,480,496,480,52"/>
+<area shape="rect" title=" " alt="" coords="754,572,953,612"/>
+<area shape="poly" title=" " alt="" coords="783,621,768,637,758,663,756,690,763,736,758,737,751,690,753,661,763,635,779,618"/>
+<area shape="rect" href="classGeometrySelectManager.html" title=" " alt="" coords="761,436,945,461"/>
+<area shape="poly" title=" " alt="" coords="856,475,856,572,851,572,851,475"/>
+<area shape="rect" title=" " alt="" coords="977,572,1186,612"/>
+<area shape="poly" title=" " alt="" coords="964,616,844,638,834,653,831,669,830,687,821,707,804,725,786,739,782,734,801,721,816,704,824,686,826,668,829,651,841,634,963,611"/>
+<area shape="poly" title=" " alt="" coords="1084,475,1084,572,1079,572,1079,475"/>
+<area shape="rect" title=" " alt="" coords="231,956,435,996"/>
+<area shape="poly" title=" " alt="" coords="322,1009,320,1027,326,1041,349,1048,402,1054,567,1064,916,1074,916,1080,566,1069,402,1059,348,1053,322,1045,315,1028,316,1009"/>
+<area shape="poly" title=" " alt="" coords="336,889,336,956,331,956,331,889"/>
+<area shape="rect" href="structsystems_1_1interaction_1_1InteractionState.html" title="单个功能的视口交互状态：回调订阅（功能写入）+ 标注与结果（渲染层拉取）" alt="" coords="291,729,445,769"/>
+<area shape="poly" title=" " alt="" coords="361,783,340,850,334,849,356,782"/>
+<area shape="rect" title=" " alt="" coords="113,579,266,605"/>
+<area shape="poly" title=" " alt="" coords="202,616,226,660,243,683,263,703,304,727,301,731,260,707,239,687,221,663,197,618"/>
+<area shape="rect" href="structsystems_1_1interaction_1_1AnnotationBatch.html" title="一帧标注集：插件按当前状态回传，渲染层统一绘制" alt="" coords="291,572,445,612"/>
+<area shape="poly" title=" " alt="" coords="371,626,371,729,365,729,365,626"/>
+<area shape="rect" title=" " alt="" coords="42,729,267,769"/>
+<area shape="poly" title=" " alt="" coords="198,774,316,848,314,852,195,779"/>
+<area shape="rect" href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html" title="功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步" alt="" coords="1293,956,1491,996"/>
+<area shape="poly" title=" " alt="" coords="1339,1004,1282,1026,1219,1045,1130,1064,1047,1075,1047,1069,1129,1058,1218,1040,1280,1021,1337,999"/>
+<area shape="rect" title=" " alt="" coords="1355,850,1429,875"/>
+<area shape="poly" title=" " alt="" coords="1395,889,1395,956,1389,956,1389,889"/>
+<area shape="rect" href="classQModelQuery.html" title="ModelQuery 类封装所有网格数据的查询操作（CQRS 查询部分的 QML 适配器）" alt="" coords="1158,963,1269,989"/>
+<area shape="poly" title=" " alt="" coords="1364,885,1285,934,1234,965,1231,961,1283,930,1361,881"/>
+<area shape="rect" href="classsystems_1_1feature_1_1FeatureSystem.html" title="功能系统：管理功能插件的注册、注销、调用与事件路由" alt="" coords="2149,843,2339,883"/>
+<area shape="poly" title=" " alt="" coords="2136,879,1849,912,1503,959,1492,960,1491,955,1502,953,1849,907,2135,873"/>
+<area shape="rect" title=" " alt="" coords="2313,436,2399,461"/>
+<area shape="poly" title=" " alt="" coords="2388,468,2402,484,2438,540,2460,590,2465,615,2465,643,2452,706,2441,732,2425,755,2385,794,2340,824,2296,845,2294,840,2337,819,2382,790,2421,751,2436,729,2447,705,2460,642,2460,616,2455,591,2434,542,2398,487,2384,472"/>
+<area shape="rect" href="classUndoStack.html" title=" " alt="" coords="2031,579,2123,605"/>
+<area shape="poly" title=" " alt="" coords="2300,461,2258,472,2216,488,2178,510,2142,536,2090,581,2087,577,2139,532,2175,505,2214,483,2256,467,2298,456"/>
+<area shape="rect" title=" " alt="" coords="2265,636,2447,705"/>
+<area shape="poly" title=" " alt="" coords="2359,475,2359,636,2353,636,2353,475"/>
+<area shape="rect" title=" " alt="" coords="2287,5,2425,45"/>
+<area shape="poly" title=" " alt="" coords="2359,59,2359,436,2353,436,2353,59"/>
+<area shape="rect" title=" " alt="" coords="2150,579,2317,605"/>
+<area shape="poly" title=" " alt="" coords="2237,618,2246,842,2241,843,2232,619"/>
+<area shape="rect" href="classsystems_1_1job_1_1JobRunner.html" title="所属线程管理一个在飞任务；worker 不等待 GUI。 发布、准备、查询、清理、终态与 stop 均在构造线程。 异步运行须向该线程投递；计算结束后保持槽与模型占用直到 GUI 收尾。" alt="" coords="2017,737,2196,762"/>
+<area shape="poly" title=" " alt="" coords="2194,613,2161,638,2149,654,2143,670,2130,706,2115,738,2110,735,2126,704,2138,668,2144,652,2157,634,2190,609"/>
+<area shape="poly" title=" " alt="" coords="1853,475,1847,549,1847,597,1851,647,1861,698,1880,745,1907,786,1925,802,1945,816,1981,829,2032,839,2150,853,2149,858,2031,845,1979,834,1943,821,1921,806,1903,789,1875,747,1856,699,1846,648,1841,597,1841,549,1848,475"/>
+<area shape="poly" title=" " alt="" coords="1918,461,1969,483,2001,506,2030,532,2070,577,2066,581,2026,536,1998,510,1967,488,1916,466"/>
+<area shape="poly" title=" " alt="" coords="1870,472,1909,536,1963,610,2035,683,2094,735,2091,739,2031,687,1959,614,1905,539,1865,475"/>
+<area shape="rect" href="classsession_1_1SessionQuery.html" title="模型层只读查询（CQRS 查询端，读写分离中的读视图）" alt="" coords="1632,793,1800,819"/>
+<area shape="poly" title=" " alt="" coords="1840,474,1810,518,1781,573,1764,627,1758,671,1752,715,1737,770,1725,794,1721,792,1732,768,1747,714,1753,670,1759,625,1776,571,1805,516,1835,471"/>
+<area shape="rect" href="classcore_1_1EventBus.html" title="类型安全的轻量级事件总线，以事件类型为键分发事件" alt="" coords="2506,737,2625,762"/>
+<area shape="poly" title=" " alt="" coords="2548,775,2521,799,2488,821,2452,836,2414,846,2340,859,2339,854,2413,841,2450,830,2485,816,2518,795,2544,771"/>
+<area shape="poly" title=" " alt="" coords="2053,615,1972,680,1936,711,1918,731,1912,750,1913,759,1918,768,1932,781,1953,793,2011,814,2081,832,2150,845,2149,850,2080,837,2010,819,1951,798,1929,785,1914,771,1908,760,1907,750,1914,728,1932,707,1968,676,2050,611"/>
+<area shape="poly" title=" " alt="" coords="2076,618,2073,659,2080,705,2088,721,2098,735,2094,738,2083,724,2075,706,2068,660,2071,618"/>
+<area shape="poly" title=" " alt="" coords="2342,719,2318,771,2291,811,2263,844,2259,841,2287,808,2314,768,2338,717"/>
+<area shape="poly" title=" " alt="" coords="2116,774,2126,797,2142,817,2159,830,2179,840,2176,845,2156,834,2138,821,2122,799,2111,776"/>
+<area shape="rect" title=" " alt="" coords="2649,729,2836,769"/>
+<area shape="poly" title=" " alt="" coords="2704,779,2662,802,2614,821,2543,839,2471,851,2339,863,2339,857,2470,846,2542,834,2613,816,2660,797,2701,774"/>
+<area shape="rect" href="classMeshActor.html" title="负责管理Model的Actor" alt="" coords="1127,850,1217,875"/>
+<area shape="poly" title=" " alt="" coords="1148,886,1110,919,1071,958,1024,1019,991,1068,986,1065,1019,1016,1067,954,1107,915,1144,882"/>
+<area shape="rect" title=" " alt="" coords="1528,729,1723,769"/>
+<area shape="poly" title=" " alt="" coords="1548,776,1503,796,1485,809,1466,821,1433,832,1403,837,1352,839,1301,838,1236,845,1208,853,1206,847,1236,840,1301,833,1352,834,1403,832,1431,827,1464,816,1482,805,1500,791,1546,771"/>
+<area shape="rect" href="classIAttributeRenderStrategy.html" title="属性渲染策略接口" alt="" coords="1528,579,1712,605"/>
+<area shape="poly" title=" " alt="" coords="1624,619,1627,729,1622,729,1618,619"/>
+<area shape="rect" title=" " alt="" coords="1180,651,1380,691"/>
+<area shape="poly" title=" " alt="" coords="1238,701,1209,731,1193,762,1183,796,1175,850,1170,849,1178,794,1188,760,1204,728,1234,697"/>
+<area shape="poly" title=" " alt="" coords="1361,475,1354,487,1330,529,1309,573,1286,651,1281,650,1304,571,1325,526,1350,484,1357,472"/>
+<area shape="rect" href="classTopologyDiagnosticActor.html" title="把拓扑诊断集合渲染为独立的边、点和面 Actor" alt="" coords="1319,579,1502,605"/>
+<area shape="poly" title=" " alt="" coords="1382,474,1410,578,1405,580,1377,475"/>
+<area shape="rect" title=" " alt="" coords="1312,729,1504,769"/>
+<area shape="poly" title=" " alt="" coords="1354,777,1313,796,1196,852,1194,847,1311,791,1351,773"/>
+<area shape="poly" title=" " alt="" coords="1413,619,1411,729,1406,729,1408,619"/>
+<area shape="rect" href="structFaceAttributeOffsetState.html" title=" " alt="" coords="965,737,1147,762"/>
+<area shape="poly" title=" " alt="" coords="1037,774,1025,796,1023,807,1027,817,1042,828,1067,837,1127,852,1126,857,1065,842,1040,832,1023,820,1018,808,1020,795,1033,771"/>
+<area shape="rect" title=" " alt="" coords="1515,963,1754,989"/>
+<area shape="poly" title=" " alt="" coords="1591,996,1509,1022,1413,1045,1313,1060,1213,1070,1047,1079,1047,1074,1213,1065,1313,1055,1411,1040,1508,1017,1590,991"/>
+<area shape="rect" href="structQRenderWindow_1_1Data.html" title=" " alt="" coords="2716,963,2884,989"/>
+<area shape="poly" title=" " alt="" coords="2702,985,1047,1077,1047,1072,2702,980"/>
+<area shape="rect" title=" " alt="" coords="2705,850,2791,875"/>
+<area shape="poly" title=" " alt="" coords="2761,886,2797,962,2792,964,2757,889"/>
+<area shape="rect" title=" " alt="" coords="2815,843,3017,883"/>
+<area shape="poly" title=" " alt="" coords="2888,894,2814,965,2810,961,2885,890"/>
+<area shape="rect" href="classMeshActorManager.html" title=" " alt="" coords="2861,737,3009,762"/>
+<area shape="poly" title=" " alt="" coords="2933,776,2922,843,2917,842,2928,775"/>
+<area shape="rect" title=" " alt="" coords="3042,843,3241,883"/>
+<area shape="poly" title=" " alt="" coords="3107,893,3071,915,3032,934,2957,956,2885,969,2884,964,2956,951,3030,930,3069,911,3104,889"/>
+<area shape="rect" href="classGeometryActorManager.html" title=" " alt="" coords="3052,737,3231,762"/>
+<area shape="poly" title=" " alt="" coords="3144,776,3144,842,3139,842,3139,776"/>
+<area shape="poly" title=" " alt="" coords="1176,997,1009,1069,1007,1064,1174,992"/>
+<area shape="poly" title=" " alt="" coords="1618,822,1432,827,1333,834,1298,839,1279,845,1252,871,1234,905,1223,938,1218,964,1212,962,1218,936,1230,903,1248,868,1276,840,1297,833,1333,828,1432,822,1618,816"/>
+<area shape="poly" title=" " alt="" coords="485,551,485,669,485,977,488,992,498,1005,512,1017,532,1027,585,1045,649,1057,791,1072,916,1076,916,1081,791,1077,648,1063,583,1050,530,1032,510,1021,494,1009,484,994,480,978,480,669,480,551"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-nested-classes" class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:Data" id="r_Data"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structQRenderWindow_1_1Data.html">Data</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-signals" class="groupheader"><a id="signals" name="signals"></a>
+信号</h2></td></tr>
+<tr class="memitem:a92fc5e6cf8c04dc279caed57b3aa492b" id="r_a92fc5e6cf8c04dc279caed57b3aa492b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a92fc5e6cf8c04dc279caed57b3aa492b">selectedChanged</a> ()</td></tr>
+<tr class="memitem:a50d28f1813a83399cde52d2647059e45" id="r_a50d28f1813a83399cde52d2647059e45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a50d28f1813a83399cde52d2647059e45">selectionRevisionChanged</a> ()</td></tr>
+<tr class="memitem:a1c748e9f8ae2e140e5a1ef31e790cafe" id="r_a1c748e9f8ae2e140e5a1ef31e790cafe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1c748e9f8ae2e140e5a1ef31e790cafe">geometryStyleChanged</a> ()</td></tr>
+<tr class="memitem:ae6fb4f753fa79bb72d26fb25ad0cefc9" id="r_ae6fb4f753fa79bb72d26fb25ad0cefc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae6fb4f753fa79bb72d26fb25ad0cefc9">meshStyleChanged</a> ()</td></tr>
+<tr class="memitem:abc3c5e233da3a03cb681e14438e44f05" id="r_abc3c5e233da3a03cb681e14438e44f05"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abc3c5e233da3a03cb681e14438e44f05">clicked</a> ()</td></tr>
+<tr class="memitem:ad0d60d1889987252b7f0c6612597c780" id="r_ad0d60d1889987252b7f0c6612597c780"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad0d60d1889987252b7f0c6612597c780">rightClicked</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a74f8adff8942153a695cbd56e53e13d2" id="r_a74f8adff8942153a695cbd56e53e13d2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a74f8adff8942153a695cbd56e53e13d2">QRenderWindow</a> ()</td></tr>
+<tr class="memitem:a3cd9c46f8437f830679b856446e52a56" id="r_a3cd9c46f8437f830679b856446e52a56"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3cd9c46f8437f830679b856446e52a56">~QRenderWindow</a> () override</td></tr>
+<tr class="memitem:acb2913ca0e86c8c462e03ad7e3e37bce" id="r_acb2913ca0e86c8c462e03ad7e3e37bce"><td class="memItemLeft" align="right" valign="top">vtkUserData&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb2913ca0e86c8c462e03ad7e3e37bce">initializeVTK</a> (vtkRenderWindow *renderWindow) override</td></tr>
+<tr class="memitem:a8414adc3aee1f2e5f9fd71fb4e961d4b" id="r_a8414adc3aee1f2e5f9fd71fb4e961d4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8414adc3aee1f2e5f9fd71fb4e961d4b">destroyingVTK</a> (vtkRenderWindow *renderWindow, vtkUserData userData) override</td></tr>
+<tr class="memitem:af54ddc70a59f2482559e7d5ee8bfec6a" id="r_af54ddc70a59f2482559e7d5ee8bfec6a"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af54ddc70a59f2482559e7d5ee8bfec6a">resetCamera</a> ()</td></tr>
+<tr class="memitem:a297bb63e5899783f7b67e2d658d73c72" id="r_a297bb63e5899783f7b67e2d658d73c72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQSelection.html">QSelection</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a297bb63e5899783f7b67e2d658d73c72">selectedIDs</a> ()</td></tr>
+<tr class="memitem:a4680d4376a40740c982af256923ccf7a" id="r_a4680d4376a40740c982af256923ccf7a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4680d4376a40740c982af256923ccf7a">selectionRevision</a> () const</td></tr>
+<tr class="memdesc:a4680d4376a40740c982af256923ccf7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">GUI 侧选择参数版本，防止旧渲染结果写入新参数。  <br /></td></tr>
+<tr class="memitem:af23ca63dbfe75a960da1ea2ed4a4ab35" id="r_af23ca63dbfe75a960da1ea2ed4a4ab35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af23ca63dbfe75a960da1ea2ed4a4ab35">setSelectionRevision</a> (int revision)</td></tr>
+<tr class="memitem:a8e5e76e98872e25ddd211f8d160d445c" id="r_a8e5e76e98872e25ddd211f8d160d445c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e5e76e98872e25ddd211f8d160d445c">setModelQuery</a> (<a class="el" href="classQModelQuery.html">QModelQuery</a> *<a class="el" href="#ab9e2e5f1552c568a0ebf7d1d18cb4ecc">query</a>)</td></tr>
+<tr class="memitem:a235f34bbab3ecbc5ba0d14ef007f19e8" id="r_a235f34bbab3ecbc5ba0d14ef007f19e8"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a235f34bbab3ecbc5ba0d14ef007f19e8">setSelectComponent</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memdesc:a235f34bbab3ecbc5ba0d14ef007f19e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">选择模型  <br /></td></tr>
+<tr class="memitem:a80e72521ebcd80c30c80dacf573dd9ac" id="r_a80e72521ebcd80c30c80dacf573dd9ac"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a80e72521ebcd80c30c80dacf573dd9ac">setSelectMode</a> (QString select_mode)</td></tr>
+<tr class="memdesc:a80e72521ebcd80c30c80dacf573dd9ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变选择模式  <br /></td></tr>
+<tr class="memitem:a14a0303febc892a4c7eb6929b535c2c1" id="r_a14a0303febc892a4c7eb6929b535c2c1"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14a0303febc892a4c7eb6929b535c2c1">setFaceSelectionByAngle</a> (bool enabled, double angle_deg)</td></tr>
+<tr class="memdesc:a14a0303febc892a4c7eb6929b535c2c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置面选择的角度扩散参数  <br /></td></tr>
+<tr class="memitem:aff08516b52543d74321c19ce583f329d" id="r_aff08516b52543d74321c19ce583f329d"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aff08516b52543d74321c19ce583f329d">clearSelection</a> ()</td></tr>
+<tr class="memdesc:aff08516b52543d74321c19ce583f329d"><td class="mdescLeft">&#160;</td><td class="mdescRight">清空Selection  <br /></td></tr>
+<tr class="memitem:a40dde41683072e26c63a22cd674bc6db" id="r_a40dde41683072e26c63a22cd674bc6db"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40dde41683072e26c63a22cd674bc6db">setFeatureAdaptor</a> (QObject *adaptor)</td></tr>
+<tr class="memdesc:a40dde41683072e26c63a22cd674bc6db"><td class="mdescLeft">&#160;</td><td class="mdescRight">注入功能系统适配器（交互服务经 FeatureSystem::activeInteraction 获取激活的交互状态）  <br /></td></tr>
+<tr class="memitem:a3e099c2f3a937898f4aa8f85d30e73fa" id="r_a3e099c2f3a937898f4aa8f85d30e73fa"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3e099c2f3a937898f4aa8f85d30e73fa">setScaleBarVisible</a> (bool on)</td></tr>
+<tr class="memdesc:a3e099c2f3a937898f4aa8f85d30e73fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度）  <br /></td></tr>
+<tr class="memitem:ac9e15b5447d2a27cf303ce34def3b236" id="r_ac9e15b5447d2a27cf303ce34def3b236"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac9e15b5447d2a27cf303ce34def3b236">setVisibility</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id, bool visibility)</td></tr>
+<tr class="memdesc:ac9e15b5447d2a27cf303ce34def3b236"><td class="mdescLeft">&#160;</td><td class="mdescRight">改变可见性  <br /></td></tr>
+<tr class="memitem:ab25482d552abcaf311b973a84269e847" id="r_ab25482d552abcaf311b973a84269e847"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab25482d552abcaf311b973a84269e847">setComponentVisibility</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, bool visibility)</td></tr>
+<tr class="memitem:af493fafe14ac08ae010257dc84b8ce69" id="r_af493fafe14ac08ae010257dc84b8ce69"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af493fafe14ac08ae010257dc84b8ce69">setMeshVisibility</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, bool visibility)</td></tr>
+<tr class="memitem:afc0bbcb95a0490b50d08d308c2739101" id="r_afc0bbcb95a0490b50d08d308c2739101"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc0bbcb95a0490b50d08d308c2739101">setGeometryVisibility</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, bool visibility)</td></tr>
+<tr class="memitem:a51411f47cb0bd999f02636fb7bd79113" id="r_a51411f47cb0bd999f02636fb7bd79113"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51411f47cb0bd999f02636fb7bd79113">setGeometryStyle</a> (int style)</td></tr>
+<tr class="memitem:a04f5851cfd61d5fe3a73583da2e7918e" id="r_a04f5851cfd61d5fe3a73583da2e7918e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04f5851cfd61d5fe3a73583da2e7918e">getGeometryStyle</a> ()</td></tr>
+<tr class="memitem:a1e8b252c4dbe398efb9e156acfe6e67a" id="r_a1e8b252c4dbe398efb9e156acfe6e67a"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1e8b252c4dbe398efb9e156acfe6e67a">setMeshStyle</a> (int style)</td></tr>
+<tr class="memitem:abcc6e855d02bd0d854d3cd1073f967d5" id="r_abcc6e855d02bd0d854d3cd1073f967d5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abcc6e855d02bd0d854d3cd1073f967d5">getMeshStyle</a> ()</td></tr>
+<tr class="memitem:ac7bef67fe487932abf700fb03d55c349" id="r_ac7bef67fe487932abf700fb03d55c349"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac7bef67fe487932abf700fb03d55c349">setTopologyDiagnosticCategoryEnabled</a> (int category, bool enabled)</td></tr>
+<tr class="memdesc:ac7bef67fe487932abf700fb03d55c349"><td class="mdescLeft">&#160;</td><td class="mdescRight">启用或停用一种网格拓扑诊断类别  <br /></td></tr>
+<tr class="memitem:a90620d62046ea5a0b7da22909979a595" id="r_a90620d62046ea5a0b7da22909979a595"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a90620d62046ea5a0b7da22909979a595">setDihedralAngleRange</a> (double minimum, double maximum)</td></tr>
+<tr class="memdesc:a90620d62046ea5a0b7da22909979a595"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置二面角诊断边的角度范围，单位为度  <br /></td></tr>
+<tr class="memitem:a9ebdc145d9eb1722307bee55f790c4b3" id="r_a9ebdc145d9eb1722307bee55f790c4b3"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9ebdc145d9eb1722307bee55f790c4b3">setGeometryTopologyDiagnosticCategoryEnabled</a> (int category, bool enabled)</td></tr>
+<tr class="memdesc:a9ebdc145d9eb1722307bee55f790c4b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">启用或停用一种几何拓扑诊断类别。  <br /></td></tr>
+<tr class="memitem:aa499060c266166d5e210c142132d0b96" id="r_aa499060c266166d5e210c142132d0b96"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa499060c266166d5e210c142132d0b96">setGeometryTopologyDiagnosticSmallEdgeLength</a> (double threshold)</td></tr>
+<tr class="memdesc:aa499060c266166d5e210c142132d0b96"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置几何拓扑诊断的细小边长度阈值。  <br /></td></tr>
+<tr class="memitem:ab65d03c76700bbe8b6d09efccf296703" id="r_ab65d03c76700bbe8b6d09efccf296703"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab65d03c76700bbe8b6d09efccf296703">setGeometryTopologyDiagnosticSmallFaceArea</a> (double threshold)</td></tr>
+<tr class="memdesc:ab65d03c76700bbe8b6d09efccf296703"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置几何拓扑诊断的细小面面积阈值。  <br /></td></tr>
+<tr class="memitem:a3af809a7ceb535d3a9f7d465882ddbe9" id="r_a3af809a7ceb535d3a9f7d465882ddbe9"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3af809a7ceb535d3a9f7d465882ddbe9">onModelChanged</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> model_id)</td></tr>
+<tr class="memitem:a2edaddf51ed0098d025ec514a3b23fe0" id="r_a2edaddf51ed0098d025ec514a3b23fe0"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2edaddf51ed0098d025ec514a3b23fe0">onComponentChanged</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:a61e905ae1619f2bcff8f6536c659c047" id="r_a61e905ae1619f2bcff8f6536c659c047"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61e905ae1619f2bcff8f6536c659c047">deleteModel</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> mode_id)</td></tr>
+<tr class="memitem:a96b781bcfcfab4f8191c1b52e2325b41" id="r_a96b781bcfcfab4f8191c1b52e2325b41"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a96b781bcfcfab4f8191c1b52e2325b41">deleteComponent</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memitem:a8ac6aa9516e2af60122d4cf19fd1dda7" id="r_a8ac6aa9516e2af60122d4cf19fd1dda7"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8ac6aa9516e2af60122d4cf19fd1dda7">setMeshClip</a> (bool on)</td></tr>
+<tr class="memdesc:a8ac6aa9516e2af60122d4cf19fd1dda7"><td class="mdescLeft">&#160;</td><td class="mdescRight">对网格对象设置全局裁剪模式  <br /></td></tr>
+<tr class="memitem:a161149b107f8ee29c062a8afd6d4c5b3" id="r_a161149b107f8ee29c062a8afd6d4c5b3"><td class="memItemLeft" align="right" valign="top">Q_SLOT void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a161149b107f8ee29c062a8afd6d4c5b3">setClick</a> ()</td></tr>
+<tr class="memitem:a3f485b7f253ad6e6d02406369a52a924" id="r_a3f485b7f253ad6e6d02406369a52a924"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f485b7f253ad6e6d02406369a52a924">setAttriMode</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id, QString attr_name, int mode, QVariantMap args)</td></tr>
+<tr class="memdesc:a3f485b7f253ad6e6d02406369a52a924"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置属性渲染方式  <br /></td></tr>
+<tr class="memitem:aa69334af80f5adb3103840d94780db49" id="r_aa69334af80f5adb3103840d94780db49"><td class="memItemLeft" align="right" valign="top">Q_INVOKABLE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa69334af80f5adb3103840d94780db49">cancelComponentAttri</a> (<a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> component_id)</td></tr>
+<tr class="memdesc:aa69334af80f5adb3103840d94780db49"><td class="mdescLeft">&#160;</td><td class="mdescRight">取消指定 Component 的属性渲染 在控制台中调用示例： myItem.cancelComponentAttri(App.selection.activeComponentId)  <br /></td></tr>
+<tr class="memitem:acb350e137abe53836f74a1568abec6df" id="r_acb350e137abe53836f74a1568abec6df"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb350e137abe53836f74a1568abec6df">event</a> (QEvent *ev) override</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-properties" class="groupheader"><a id="properties" name="properties"></a>
+属性</h2></td></tr>
+<tr class="memitem:a4c03bb09521541323af430677bf4f0df" id="r_a4c03bb09521541323af430677bf4f0df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQSelection.html">QSelection</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c03bb09521541323af430677bf4f0df">selectedIDs</a></td></tr>
+<tr class="memitem:a067a5efe45f6b4531692157c90bed1d3" id="r_a067a5efe45f6b4531692157c90bed1d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a067a5efe45f6b4531692157c90bed1d3">selectionRevision</a></td></tr>
+<tr class="memitem:ab9e2e5f1552c568a0ebf7d1d18cb4ecc" id="r_ab9e2e5f1552c568a0ebf7d1d18cb4ecc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQModelQuery.html">QModelQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab9e2e5f1552c568a0ebf7d1d18cb4ecc">query</a></td></tr>
+<tr class="memitem:aaac5964235fbcd41a954f36b7a9356a6" id="r_aaac5964235fbcd41a954f36b7a9356a6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaac5964235fbcd41a954f36b7a9356a6">geometryStyle</a></td></tr>
+<tr class="memitem:af5948401ecbf8751b291aac90a900edc" id="r_af5948401ecbf8751b291aac90a900edc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af5948401ecbf8751b291aac90a900edc">meshStyle</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-methods" class="groupheader"><a id="pri-methods" name="pri-methods"></a>
+Private 成员函数</h2></td></tr>
+<tr class="memitem:a29195f8fe8fd14f0298500819ae5e7b5" id="r_a29195f8fe8fd14f0298500819ae5e7b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29195f8fe8fd14f0298500819ae5e7b5">publishSelection</a> ()</td></tr>
+<tr class="memdesc:a29195f8fe8fd14f0298500819ae5e7b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">渲染线程制作选择快照，排队交付 GUI 线程，禁止 QML 直接读取拾取器。  <br /></td></tr>
+<tr class="memitem:a8e5655b1ac1ac24ee4497359a8aa1d2a" id="r_a8e5655b1ac1ac24ee4497359a8aa1d2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8e5655b1ac1ac24ee4497359a8aa1d2a">injectRenderRefreshCallback</a> ()</td></tr>
+<tr class="memdesc:a8e5655b1ac1ac24ee4497359a8aa1d2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">注入渲染刷新回调到 FeatureSystem（initializeVTK 与 setFeatureAdaptor 各调一次，确保初始化顺序无关）  <br /></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:af4c12dd66096d6412f84d2613d68a15a" id="r_af4c12dd66096d6412f84d2613d68a15a"><td class="memItemLeft" align="right" valign="top">QObject&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af4c12dd66096d6412f84d2613d68a15a">selection_dispatcher_</a></td></tr>
+<tr class="memitem:ad08b9e07672f191ff99201808c34ff67" id="r_ad08b9e07672f191ff99201808c34ff67"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; const <a class="el" href="structSelection.html">Selection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad08b9e07672f191ff99201808c34ff67">selection_snapshot_</a></td></tr>
+<tr class="memitem:a9b8aee64db1b9281883d65e0c43c7524" id="r_a9b8aee64db1b9281883d65e0c43c7524"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b8aee64db1b9281883d65e0c43c7524">selection_revision_</a> {}</td></tr>
+<tr class="memitem:a5518d15881f4739d432be1c6f78e8ec6" id="r_a5518d15881f4739d432be1c6f78e8ec6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5518d15881f4739d432be1c6f78e8ec6">render_selection_revision_</a> {}</td></tr>
+<tr class="memitem:a5b2aba519da15f3908650ea037b7bf5d" id="r_a5b2aba519da15f3908650ea037b7bf5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a4b1d429db0e34bdb0fb3ef7ded313ad8">GeometryRenderStyle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5b2aba519da15f3908650ea037b7bf5d">geometry_style_</a> { <a class="el" href="Core_8h.html#a4b1d429db0e34bdb0fb3ef7ded313ad8a6f6dd4a8de7005d9e5848692cd293ef5">GeometryRenderStyle::SurfaceWithEdges</a> }</td></tr>
+<tr class="memitem:ada8b837cac6d6bf73f68ca70de27535d" id="r_ada8b837cac6d6bf73f68ca70de27535d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada8b837cac6d6bf73f68ca70de27535d">mesh_style_</a> { <a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676da27744f658fdd5ba66afc23eb0706ae78">MeshRenderStyle::FaceWithEdges</a> }</td></tr>
+<tr class="memitem:ad81a9c7728bd2939db0b4eb3958c6deb" id="r_ad81a9c7728bd2939db0b4eb3958c6deb"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classSelectManager.html">SelectManager</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad81a9c7728bd2939db0b4eb3958c6deb">select_manager_</a></td></tr>
+<tr class="memitem:a79e1c20d0279833b4171d22c6c90da0d" id="r_a79e1c20d0279833b4171d22c6c90da0d"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classInteractionService.html">InteractionService</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a79e1c20d0279833b4171d22c6c90da0d">interaction_service_</a></td></tr>
+<tr class="memitem:a3696d5929dc64d1b55d6e5bd1322f16b" id="r_a3696d5929dc64d1b55d6e5bd1322f16b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html">systems::feature::QFeatureSystemAdaptor</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3696d5929dc64d1b55d6e5bd1322f16b">feature_adaptor_</a> {}</td></tr>
+<tr class="memitem:a3f810a45cdd8e37d3beb60229f40626a" id="r_a3f810a45cdd8e37d3beb60229f40626a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classMeshActor.html">MeshActor</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3f810a45cdd8e37d3beb60229f40626a">cur_actor_</a> {}</td></tr>
+<tr class="memitem:ab8603fd67111125e7e479b99a965f640" id="r_ab8603fd67111125e7e479b99a965f640"><td class="memItemLeft" align="right" valign="top"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab8603fd67111125e7e479b99a965f640">cur_component_id_</a> { -1 }</td></tr>
+<tr class="memitem:a51af1a11dab47d58481f2d9789ddba70" id="r_a51af1a11dab47d58481f2d9789ddba70"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; QMouseEvent &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51af1a11dab47d58481f2d9789ddba70">_click</a></td></tr>
+<tr class="memitem:af36bc244b299907aa7fd3660c883bc38" id="r_af36bc244b299907aa7fd3660c883bc38"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structQRenderWindow_1_1Data.html">Data</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af36bc244b299907aa7fd3660c883bc38">data_</a> {}</td></tr>
+<tr class="memitem:a61410a93a36079a46b21a4a35388fb06" id="r_a61410a93a36079a46b21a4a35388fb06"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classQModelQuery.html">QModelQuery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61410a93a36079a46b21a4a35388fb06">model_query_</a> {}</td></tr>
+<tr class="memitem:a6ee0eb5fb4fcdd448246ad766455f9d2" id="r_a6ee0eb5fb4fcdd448246ad766455f9d2"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classIMeshIdQuery.html">IMeshIdQuery</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ee0eb5fb4fcdd448246ad766455f9d2">mesh_id_query_</a></td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a74f8adff8942153a695cbd56e53e13d2" name="a74f8adff8942153a695cbd56e53e13d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74f8adff8942153a695cbd56e53e13d2">&#9670;&#160;</a></span>QRenderWindow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QRenderWindow::QRenderWindow </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3cd9c46f8437f830679b856446e52a56" name="a3cd9c46f8437f830679b856446e52a56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cd9c46f8437f830679b856446e52a56">&#9670;&#160;</a></span>~QRenderWindow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QRenderWindow::~QRenderWindow </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel default">default</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="aa69334af80f5adb3103840d94780db49" name="aa69334af80f5adb3103840d94780db49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa69334af80f5adb3103840d94780db49">&#9670;&#160;</a></span>cancelComponentAttri()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::cancelComponentAttri </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>取消指定 Component 的属性渲染 在控制台中调用示例： myItem.cancelComponentAttri(App.selection.activeComponentId) </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">component_id</td><td>目标 Component ID </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aff08516b52543d74321c19ce583f329d" name="aff08516b52543d74321c19ce583f329d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff08516b52543d74321c19ce583f329d">&#9670;&#160;</a></span>clearSelection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::clearSelection </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>清空Selection </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">select_mode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="abc3c5e233da3a03cb681e14438e44f05" name="abc3c5e233da3a03cb681e14438e44f05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc3c5e233da3a03cb681e14438e44f05">&#9670;&#160;</a></span>clicked</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::clicked </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a96b781bcfcfab4f8191c1b52e2325b41" name="a96b781bcfcfab4f8191c1b52e2325b41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96b781bcfcfab4f8191c1b52e2325b41">&#9670;&#160;</a></span>deleteComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::deleteComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a61e905ae1619f2bcff8f6536c659c047" name="a61e905ae1619f2bcff8f6536c659c047"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61e905ae1619f2bcff8f6536c659c047">&#9670;&#160;</a></span>deleteModel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::deleteModel </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>mode_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8414adc3aee1f2e5f9fd71fb4e961d4b" name="a8414adc3aee1f2e5f9fd71fb4e961d4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8414adc3aee1f2e5f9fd71fb4e961d4b">&#9670;&#160;</a></span>destroyingVTK()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::destroyingVTK </td>
+          <td>(</td>
+          <td class="paramtype">vtkRenderWindow *</td>          <td class="paramname"><span class="paramname"><em>renderWindow</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkUserData</td>          <td class="paramname"><span class="paramname"><em>userData</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb350e137abe53836f74a1568abec6df" name="acb350e137abe53836f74a1568abec6df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb350e137abe53836f74a1568abec6df">&#9670;&#160;</a></span>event()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool QRenderWindow::event </td>
+          <td>(</td>
+          <td class="paramtype">QEvent *</td>          <td class="paramname"><span class="paramname"><em>ev</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1c748e9f8ae2e140e5a1ef31e790cafe" name="a1c748e9f8ae2e140e5a1ef31e790cafe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c748e9f8ae2e140e5a1ef31e790cafe">&#9670;&#160;</a></span>geometryStyleChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::geometryStyleChanged </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a04f5851cfd61d5fe3a73583da2e7918e" name="a04f5851cfd61d5fe3a73583da2e7918e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04f5851cfd61d5fe3a73583da2e7918e">&#9670;&#160;</a></span>getGeometryStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::getGeometryStyle </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abcc6e855d02bd0d854d3cd1073f967d5" name="abcc6e855d02bd0d854d3cd1073f967d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abcc6e855d02bd0d854d3cd1073f967d5">&#9670;&#160;</a></span>getMeshStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::getMeshStyle </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb2913ca0e86c8c462e03ad7e3e37bce" name="acb2913ca0e86c8c462e03ad7e3e37bce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb2913ca0e86c8c462e03ad7e3e37bce">&#9670;&#160;</a></span>initializeVTK()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK </td>
+          <td>(</td>
+          <td class="paramtype">vtkRenderWindow *</td>          <td class="paramname"><span class="paramname"><em>renderWindow</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8e5655b1ac1ac24ee4497359a8aa1d2a" name="a8e5655b1ac1ac24ee4497359a8aa1d2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e5655b1ac1ac24ee4497359a8aa1d2a">&#9670;&#160;</a></span>injectRenderRefreshCallback()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::injectRenderRefreshCallback </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>注入渲染刷新回调到 FeatureSystem（initializeVTK 与 setFeatureAdaptor 各调一次，确保初始化顺序无关） </p>
+
+</div>
+</div>
+<a id="ae6fb4f753fa79bb72d26fb25ad0cefc9" name="ae6fb4f753fa79bb72d26fb25ad0cefc9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6fb4f753fa79bb72d26fb25ad0cefc9">&#9670;&#160;</a></span>meshStyleChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::meshStyleChanged </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2edaddf51ed0098d025ec514a3b23fe0" name="a2edaddf51ed0098d025ec514a3b23fe0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2edaddf51ed0098d025ec514a3b23fe0">&#9670;&#160;</a></span>onComponentChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::onComponentChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3af809a7ceb535d3a9f7d465882ddbe9" name="a3af809a7ceb535d3a9f7d465882ddbe9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3af809a7ceb535d3a9f7d465882ddbe9">&#9670;&#160;</a></span>onModelChanged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::onModelChanged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a29195f8fe8fd14f0298500819ae5e7b5" name="a29195f8fe8fd14f0298500819ae5e7b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29195f8fe8fd14f0298500819ae5e7b5">&#9670;&#160;</a></span>publishSelection()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::publishSelection </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>渲染线程制作选择快照，排队交付 GUI 线程，禁止 QML 直接读取拾取器。 </p>
+
+</div>
+</div>
+<a id="af54ddc70a59f2482559e7d5ee8bfec6a" name="af54ddc70a59f2482559e7d5ee8bfec6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af54ddc70a59f2482559e7d5ee8bfec6a">&#9670;&#160;</a></span>resetCamera()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::resetCamera </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad0d60d1889987252b7f0c6612597c780" name="ad0d60d1889987252b7f0c6612597c780"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0d60d1889987252b7f0c6612597c780">&#9670;&#160;</a></span>rightClicked</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::rightClicked </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a92fc5e6cf8c04dc279caed57b3aa492b" name="a92fc5e6cf8c04dc279caed57b3aa492b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92fc5e6cf8c04dc279caed57b3aa492b">&#9670;&#160;</a></span>selectedChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::selectedChanged </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a297bb63e5899783f7b67e2d658d73c72" name="a297bb63e5899783f7b67e2d658d73c72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a297bb63e5899783f7b67e2d658d73c72">&#9670;&#160;</a></span>selectedIDs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classQSelection.html">QSelection</a> * QRenderWindow::selectedIDs </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4680d4376a40740c982af256923ccf7a" name="a4680d4376a40740c982af256923ccf7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4680d4376a40740c982af256923ccf7a">&#9670;&#160;</a></span>selectionRevision()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::selectionRevision </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>GUI 侧选择参数版本，防止旧渲染结果写入新参数。 </p>
+
+</div>
+</div>
+<a id="a50d28f1813a83399cde52d2647059e45" name="a50d28f1813a83399cde52d2647059e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50d28f1813a83399cde52d2647059e45">&#9670;&#160;</a></span>selectionRevisionChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::selectionRevisionChanged </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel signal">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3f485b7f253ad6e6d02406369a52a924" name="a3f485b7f253ad6e6d02406369a52a924"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f485b7f253ad6e6d02406369a52a924">&#9670;&#160;</a></span>setAttriMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setAttriMode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QString</td>          <td class="paramname"><span class="paramname"><em>attr_name</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>mode</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QVariantMap</td>          <td class="paramname"><span class="paramname"><em>args</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置属性渲染方式 </p>
+<p>在控制台中调用示例： QModelManager.query.getComponentAttriInfo(0) App.registry.renderWindow.setAttriMode(0, "f_pressure_1", 1, {}) App.registry.renderWindow.setAttriMode(0, "f_color_3", 0, {}) App.registry.renderWindow.setAttriMode(0, "f_vectors_3", 3, {}) App.registry.renderWindow.setAttriMode(0, "v_vector_3", 3, { "glyph_scale": 0.5 }) App.registry.renderWindow.setAttriMode(0, "v_uv_2", 2, { "texture_path": "E:/MeshProjects/Project_Harmonic/data/texture_checker.bmp" }) App.registry.renderWindow.setAttriMode(0, "v_scalars_1", 1, {}) App.registry.renderWindow.setAttriMode(0, "v_scalars_1", 1, { "scalar_range": [2, 6] }) // blow.vtk 示例： App.registry.renderWindow.setAttriMode(0, "v_displacement9_3", 3, {}) App.registry.renderWindow.setAttriMode(0, "v_displacement9_3", 3, { "glyph_scale": 0.5 }) App.registry.renderWindow.setAttriMode(0, "v_thickness9_1", 1, {}) App.registry.renderWindow.setAttriMode(0, "v_thickness9_1", 1, { "scalar_range": [0, 2] })</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">component_id</td><td>目标 Component ID </td></tr>
+    <tr><td class="paramname">attr_name</td><td>属性名，前缀 v_/e_/f_/s_ 表示点/边/面/体，后缀 _3 表示属性分量为 3 </td></tr>
+    <tr><td class="paramname">mode</td><td>渲染方式 0:RGB 1:SCALAR 2:UV 3:VECTOR </td></tr>
+    <tr><td class="paramname">args</td><td>其他参数（可选），如： "texture_path": 贴图路径（string） "glyph_scale": 箭头缩放比例（double） "scalar_range": 标量范围（长度为2的数组） </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a161149b107f8ee29c062a8afd6d4c5b3" name="a161149b107f8ee29c062a8afd6d4c5b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a161149b107f8ee29c062a8afd6d4c5b3">&#9670;&#160;</a></span>setClick()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setClick </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab25482d552abcaf311b973a84269e847" name="ab25482d552abcaf311b973a84269e847"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab25482d552abcaf311b973a84269e847">&#9670;&#160;</a></span>setComponentVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setComponentVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visibility</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a90620d62046ea5a0b7da22909979a595" name="a90620d62046ea5a0b7da22909979a595"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a90620d62046ea5a0b7da22909979a595">&#9670;&#160;</a></span>setDihedralAngleRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setDihedralAngleRange </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>minimum</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>maximum</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置二面角诊断边的角度范围，单位为度 </p>
+
+</div>
+</div>
+<a id="a14a0303febc892a4c7eb6929b535c2c1" name="a14a0303febc892a4c7eb6929b535c2c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14a0303febc892a4c7eb6929b535c2c1">&#9670;&#160;</a></span>setFaceSelectionByAngle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setFaceSelectionByAngle </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enabled</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>angle_deg</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置面选择的角度扩散参数 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">enabled</td><td>是否启用按角度扩散 </td></tr>
+    <tr><td class="paramname">angle_deg</td><td>相邻面法向夹角阈值，单位为度 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a40dde41683072e26c63a22cd674bc6db" name="a40dde41683072e26c63a22cd674bc6db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40dde41683072e26c63a22cd674bc6db">&#9670;&#160;</a></span>setFeatureAdaptor()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setFeatureAdaptor </td>
+          <td>(</td>
+          <td class="paramtype">QObject *</td>          <td class="paramname"><span class="paramname"><em>adaptor</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>注入功能系统适配器（交互服务经 FeatureSystem::activeInteraction 获取激活的交互状态） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">adaptor</td><td><a class="el" href="classQModelManager.html#aeb6e740e450da642f792481e9a145d56">QModelManager.featureSystem</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a51411f47cb0bd999f02636fb7bd79113" name="a51411f47cb0bd999f02636fb7bd79113"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51411f47cb0bd999f02636fb7bd79113">&#9670;&#160;</a></span>setGeometryStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setGeometryStyle </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>style</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9ebdc145d9eb1722307bee55f790c4b3" name="a9ebdc145d9eb1722307bee55f790c4b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ebdc145d9eb1722307bee55f790c4b3">&#9670;&#160;</a></span>setGeometryTopologyDiagnosticCategoryEnabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setGeometryTopologyDiagnosticCategoryEnabled </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>category</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enabled</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>启用或停用一种几何拓扑诊断类别。 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">category</td><td>类别序号，依次为边界边、孤立边、非流形边、细小边、细小面、重复面、 自相交、几何干涉、无效拓扑。 </td></tr>
+    <tr><td class="paramname">enabled</td><td>是否启用。 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa499060c266166d5e210c142132d0b96" name="aa499060c266166d5e210c142132d0b96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa499060c266166d5e210c142132d0b96">&#9670;&#160;</a></span>setGeometryTopologyDiagnosticSmallEdgeLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setGeometryTopologyDiagnosticSmallEdgeLength </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>threshold</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置几何拓扑诊断的细小边长度阈值。 </p>
+
+</div>
+</div>
+<a id="ab65d03c76700bbe8b6d09efccf296703" name="ab65d03c76700bbe8b6d09efccf296703"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab65d03c76700bbe8b6d09efccf296703">&#9670;&#160;</a></span>setGeometryTopologyDiagnosticSmallFaceArea()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setGeometryTopologyDiagnosticSmallFaceArea </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>threshold</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置几何拓扑诊断的细小面面积阈值。 </p>
+
+</div>
+</div>
+<a id="afc0bbcb95a0490b50d08d308c2739101" name="afc0bbcb95a0490b50d08d308c2739101"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc0bbcb95a0490b50d08d308c2739101">&#9670;&#160;</a></span>setGeometryVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setGeometryVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visibility</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8ac6aa9516e2af60122d4cf19fd1dda7" name="a8ac6aa9516e2af60122d4cf19fd1dda7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ac6aa9516e2af60122d4cf19fd1dda7">&#9670;&#160;</a></span>setMeshClip()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setMeshClip </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>on</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>对网格对象设置全局裁剪模式 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">on</td><td>是否开启 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1e8b252c4dbe398efb9e156acfe6e67a" name="a1e8b252c4dbe398efb9e156acfe6e67a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e8b252c4dbe398efb9e156acfe6e67a">&#9670;&#160;</a></span>setMeshStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setMeshStyle </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>style</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af493fafe14ac08ae010257dc84b8ce69" name="af493fafe14ac08ae010257dc84b8ce69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af493fafe14ac08ae010257dc84b8ce69">&#9670;&#160;</a></span>setMeshVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setMeshVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visibility</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8e5e76e98872e25ddd211f8d160d445c" name="a8e5e76e98872e25ddd211f8d160d445c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e5e76e98872e25ddd211f8d160d445c">&#9670;&#160;</a></span>setModelQuery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setModelQuery </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classQModelQuery.html">QModelQuery</a> *</td>          <td class="paramname"><span class="paramname"><em>query</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3e099c2f3a937898f4aa8f85d30e73fa" name="a3e099c2f3a937898f4aa8f85d30e73fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e099c2f3a937898f4aa8f85d30e73fa">&#9670;&#160;</a></span>setScaleBarVisible()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setScaleBarVisible </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>on</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>显示/隐藏比例尺（测量插件激活时启用，随相机缩放自动更新刻度） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">on</td><td>是否显示 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a235f34bbab3ecbc5ba0d14ef007f19e8" name="a235f34bbab3ecbc5ba0d14ef007f19e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a235f34bbab3ecbc5ba0d14ef007f19e8">&#9670;&#160;</a></span>setSelectComponent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setSelectComponent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>component_id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>选择模型 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">select_mode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af23ca63dbfe75a960da1ea2ed4a4ab35" name="af23ca63dbfe75a960da1ea2ed4a4ab35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af23ca63dbfe75a960da1ea2ed4a4ab35">&#9670;&#160;</a></span>setSelectionRevision()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setSelectionRevision </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>revision</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a80e72521ebcd80c30c80dacf573dd9ac" name="a80e72521ebcd80c30c80dacf573dd9ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80e72521ebcd80c30c80dacf573dd9ac">&#9670;&#160;</a></span>setSelectMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setSelectMode </td>
+          <td>(</td>
+          <td class="paramtype">QString</td>          <td class="paramname"><span class="paramname"><em>select_mode</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>改变选择模式 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">select_mode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac7bef67fe487932abf700fb03d55c349" name="ac7bef67fe487932abf700fb03d55c349"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7bef67fe487932abf700fb03d55c349">&#9670;&#160;</a></span>setTopologyDiagnosticCategoryEnabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setTopologyDiagnosticCategoryEnabled </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>category</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enabled</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>启用或停用一种网格拓扑诊断类别 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">category</td><td>类别序号，依次为边界边、边界面、非流形边、非流形点、孤立边、孤立点、二面角边 </td></tr>
+    <tr><td class="paramname">enabled</td><td>是否启用 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ac9e15b5447d2a27cf303ce34def3b236" name="ac9e15b5447d2a27cf303ce34def3b236"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9e15b5447d2a27cf303ce34def3b236">&#9670;&#160;</a></span>setVisibility()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void QRenderWindow::setVisibility </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a></td>          <td class="paramname"><span class="paramname"><em>model_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>visibility</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>改变可见性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">select_mode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a51af1a11dab47d58481f2d9789ddba70" name="a51af1a11dab47d58481f2d9789ddba70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51af1a11dab47d58481f2d9789ddba70">&#9670;&#160;</a></span>_click</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;QMouseEvent&gt; QRenderWindow::_click</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3f810a45cdd8e37d3beb60229f40626a" name="a3f810a45cdd8e37d3beb60229f40626a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f810a45cdd8e37d3beb60229f40626a">&#9670;&#160;</a></span>cur_actor_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classMeshActor.html">MeshActor</a>* QRenderWindow::cur_actor_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab8603fd67111125e7e479b99a965f640" name="ab8603fd67111125e7e479b99a965f640"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab8603fd67111125e7e479b99a965f640">&#9670;&#160;</a></span>cur_component_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> QRenderWindow::cur_component_id_ { -1 }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af36bc244b299907aa7fd3660c883bc38" name="af36bc244b299907aa7fd3660c883bc38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af36bc244b299907aa7fd3660c883bc38">&#9670;&#160;</a></span>data_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structQRenderWindow_1_1Data.html">Data</a>* QRenderWindow::data_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3696d5929dc64d1b55d6e5bd1322f16b" name="a3696d5929dc64d1b55d6e5bd1322f16b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3696d5929dc64d1b55d6e5bd1322f16b">&#9670;&#160;</a></span>feature_adaptor_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classsystems_1_1feature_1_1QFeatureSystemAdaptor.html">systems::feature::QFeatureSystemAdaptor</a>* QRenderWindow::feature_adaptor_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5b2aba519da15f3908650ea037b7bf5d" name="a5b2aba519da15f3908650ea037b7bf5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b2aba519da15f3908650ea037b7bf5d">&#9670;&#160;</a></span>geometry_style_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a4b1d429db0e34bdb0fb3ef7ded313ad8">GeometryRenderStyle</a> QRenderWindow::geometry_style_ { <a class="el" href="Core_8h.html#a4b1d429db0e34bdb0fb3ef7ded313ad8a6f6dd4a8de7005d9e5848692cd293ef5">GeometryRenderStyle::SurfaceWithEdges</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a79e1c20d0279833b4171d22c6c90da0d" name="a79e1c20d0279833b4171d22c6c90da0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79e1c20d0279833b4171d22c6c90da0d">&#9670;&#160;</a></span>interaction_service_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classInteractionService.html">InteractionService</a>&gt; QRenderWindow::interaction_service_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6ee0eb5fb4fcdd448246ad766455f9d2" name="a6ee0eb5fb4fcdd448246ad766455f9d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ee0eb5fb4fcdd448246ad766455f9d2">&#9670;&#160;</a></span>mesh_id_query_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classIMeshIdQuery.html">IMeshIdQuery</a>&gt; QRenderWindow::mesh_id_query_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ada8b837cac6d6bf73f68ca70de27535d" name="ada8b837cac6d6bf73f68ca70de27535d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada8b837cac6d6bf73f68ca70de27535d">&#9670;&#160;</a></span>mesh_style_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676d">MeshRenderStyle</a> QRenderWindow::mesh_style_ { <a class="el" href="Core_8h.html#a5162a7a03ccc48523246f10d0adb676da27744f658fdd5ba66afc23eb0706ae78">MeshRenderStyle::FaceWithEdges</a> }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a61410a93a36079a46b21a4a35388fb06" name="a61410a93a36079a46b21a4a35388fb06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61410a93a36079a46b21a4a35388fb06">&#9670;&#160;</a></span>model_query_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classQModelQuery.html">QModelQuery</a>* QRenderWindow::model_query_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5518d15881f4739d432be1c6f78e8ec6" name="a5518d15881f4739d432be1c6f78e8ec6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5518d15881f4739d432be1c6f78e8ec6">&#9670;&#160;</a></span>render_selection_revision_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::render_selection_revision_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad81a9c7728bd2939db0b4eb3958c6deb" name="ad81a9c7728bd2939db0b4eb3958c6deb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad81a9c7728bd2939db0b4eb3958c6deb">&#9670;&#160;</a></span>select_manager_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;<a class="el" href="classSelectManager.html">SelectManager</a>&gt; QRenderWindow::select_manager_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af4c12dd66096d6412f84d2613d68a15a" name="af4c12dd66096d6412f84d2613d68a15a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4c12dd66096d6412f84d2613d68a15a">&#9670;&#160;</a></span>selection_dispatcher_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QObject QRenderWindow::selection_dispatcher_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9b8aee64db1b9281883d65e0c43c7524" name="a9b8aee64db1b9281883d65e0c43c7524"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b8aee64db1b9281883d65e0c43c7524">&#9670;&#160;</a></span>selection_revision_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::selection_revision_ {}</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad08b9e07672f191ff99201808c34ff67" name="ad08b9e07672f191ff99201808c34ff67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad08b9e07672f191ff99201808c34ff67">&#9670;&#160;</a></span>selection_snapshot_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;const <a class="el" href="structSelection.html">Selection</a>&gt; QRenderWindow::selection_snapshot_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-property-members" id="doc-property-members"></a><h2 id="header-doc-property-members" class="groupheader">属性说明</h2>
+<a id="aaac5964235fbcd41a954f36b7a9356a6" name="aaac5964235fbcd41a954f36b7a9356a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaac5964235fbcd41a954f36b7a9356a6">&#9670;&#160;</a></span>geometryStyle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::geometryStyle</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span><span class="mlabel write">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5948401ecbf8751b291aac90a900edc" name="af5948401ecbf8751b291aac90a900edc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5948401ecbf8751b291aac90a900edc">&#9670;&#160;</a></span>meshStyle</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::meshStyle</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span><span class="mlabel write">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab9e2e5f1552c568a0ebf7d1d18cb4ecc" name="ab9e2e5f1552c568a0ebf7d1d18cb4ecc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e2e5f1552c568a0ebf7d1d18cb4ecc">&#9670;&#160;</a></span>query</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classQModelQuery.html">QModelQuery</a>* QRenderWindow::query</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel write">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4c03bb09521541323af430677bf4f0df" name="a4c03bb09521541323af430677bf4f0df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4c03bb09521541323af430677bf4f0df">&#9670;&#160;</a></span>selectedIDs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classQSelection.html">QSelection</a> * QRenderWindow::selectedIDs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a067a5efe45f6b4531692157c90bed1d3" name="a067a5efe45f6b4531692157c90bed1d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a067a5efe45f6b4531692157c90bed1d3">&#9670;&#160;</a></span>selectionRevision</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int QRenderWindow::selectionRevision</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel read">read</span><span class="mlabel write">write</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该结构体的文档由以下文件生成:<ul>
+<li>app/render/<a class="el" href="QRenderWindow_8h_source.html">QRenderWindow.h</a></li>
+<li>app/render/<a class="el" href="QRenderWindow_8cpp.html">QRenderWindow.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>

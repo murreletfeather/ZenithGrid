@@ -1,0 +1,551 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: GeometrySolidSelectorHighlight类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
+<a href="#pri-attribs">Private 属性</a> &#124;
+<a href="classGeometrySolidSelectorHighlight-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">GeometrySolidSelectorHighlight类 参考<span class="mlabels"><span class="mlabel final">final</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p><code>#include &lt;<a class="el" href="GeometrySelectorHighlight_8h_source.html">GeometrySelectorHighlight.h</a>&gt;</code></p>
+<div class="dynheader">
+类 GeometrySolidSelectorHighlight 继承关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classGeometrySolidSelectorHighlight__inherit__graph.png" border="0" usemap="#aGeometrySolidSelectorHighlight_inherit__map" loading="lazy" alt="Inheritance graph"/></div>
+<map name="aGeometrySolidSelectorHighlight_inherit__map" id="aGeometrySolidSelectorHighlight_inherit__map">
+<area shape="rect" title=" " alt="" coords="5,79,236,104"/>
+<area shape="rect" href="classGeometrySelectorHighlight.html" title=" " alt="" coords="21,5,220,31"/>
+<area shape="poly" title=" " alt="" coords="123,44,123,79,118,79,118,44"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<div class="dynheader">
+GeometrySolidSelectorHighlight 的协作图:</div>
+<div class="dyncontent">
+<div class="center"><img src="classGeometrySolidSelectorHighlight__coll__graph.png" border="0" usemap="#aGeometrySolidSelectorHighlight_coll__map" loading="lazy" alt="Collaboration graph"/></div>
+<map name="aGeometrySolidSelectorHighlight_coll__map" id="aGeometrySolidSelectorHighlight_coll__map">
+<area shape="rect" title=" " alt="" coords="3739,262,3969,287"/>
+<area shape="rect" href="classGeometrySelectorHighlight.html" title=" " alt="" coords="3343,183,3541,209"/>
+<area shape="poly" title=" " alt="" coords="3556,200,3634,209,3715,224,3773,241,3823,259,3821,264,3771,246,3714,229,3634,215,3555,206"/>
+<area shape="rect" href="classGeometryActorSelectOp.html" title=" " alt="" coords="3353,233,3531,258"/>
+<area shape="poly" title=" " alt="" coords="3545,250,3739,264,3738,269,3545,255"/>
+<area shape="rect" title=" " alt="" coords="2977,225,3176,265"/>
+<area shape="poly" title=" " alt="" coords="3190,243,3352,243,3352,248,3190,248"/>
+<area shape="rect" href="classGeometryActor.html" title=" " alt="" coords="2781,233,2903,258"/>
+<area shape="poly" title=" " alt="" coords="2917,243,2977,243,2977,248,2917,248"/>
+<area shape="rect" href="structGeometrySubshapeIndex.html" title=" " alt="" coords="2387,179,2574,205"/>
+<area shape="poly" title=" " alt="" coords="2581,204,2781,234,2781,239,2580,209"/>
+<area shape="rect" title=" " alt="" coords="1955,5,2177,75"/>
+<area shape="poly" title=" " alt="" coords="2191,47,2275,64,2318,76,2358,92,2393,112,2424,135,2469,177,2466,181,2420,139,2390,116,2356,97,2316,81,2274,69,2190,52"/>
+<area shape="rect" title=" " alt="" coords="1959,99,2173,125"/>
+<area shape="poly" title=" " alt="" coords="2187,117,2272,128,2358,144,2408,160,2452,177,2450,182,2406,165,2357,149,2271,133,2187,123"/>
+<area shape="rect" title=" " alt="" coords="1964,153,2168,178"/>
+<area shape="poly" title=" " alt="" coords="2182,170,2387,183,2387,189,2182,175"/>
+<area shape="rect" title=" " alt="" coords="1965,206,2167,231"/>
+<area shape="poly" title=" " alt="" coords="2180,216,2357,208,2406,202,2406,207,2358,213,2180,221"/>
+<area shape="rect" title=" " alt="" coords="1964,259,2168,285"/>
+<area shape="poly" title=" " alt="" coords="2181,267,2268,259,2357,243,2410,224,2455,202,2457,207,2412,229,2358,248,2269,265,2182,273"/>
+<area shape="rect" title=" " alt="" coords="2381,253,2580,293"/>
+<area shape="poly" title=" " alt="" coords="2594,276,2675,274,2757,267,2804,256,2805,261,2758,272,2675,280,2595,281"/>
+<area shape="rect" href="classGeometryTopologyDiagnosticActor.html" title="计算并显示一个 GeometryActor 对应的 OCC 几何拓扑诊断结果。" alt="" coords="1959,309,2173,349"/>
+<area shape="poly" title=" " alt="" coords="2187,334,2271,333,2357,321,2401,308,2440,291,2443,296,2403,313,2358,327,2271,338,2187,340"/>
+<area shape="rect" title=" " alt="" coords="1461,93,1723,133"/>
+<area shape="poly" title=" " alt="" coords="1736,95,1788,99,1840,109,1890,129,1933,159,1945,176,1950,194,1946,228,1942,263,1946,279,1957,296,1970,307,1967,311,1953,299,1941,281,1937,263,1941,228,1945,194,1940,179,1929,163,1887,133,1839,114,1788,104,1736,100"/>
+<area shape="rect" title=" " alt="" coords="1423,229,1761,283"/>
+<area shape="poly" title=" " alt="" coords="1775,257,1854,266,1932,283,1956,295,1990,307,1988,312,1954,300,1930,288,1853,271,1775,262"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticActor_1_1DiagnosticPipeline.html" title="保存一种诊断类别的独立静态数据、映射器和 Actor。" alt="" coords="1091,183,1305,223"/>
+<area shape="poly" title=" " alt="" coords="1319,196,1399,196,1518,192,1674,187,1752,188,1825,194,1886,207,1912,217,1932,230,1944,246,1946,264,1947,280,1957,296,1973,307,1970,311,1953,299,1942,282,1941,264,1939,248,1929,234,1909,222,1885,213,1824,200,1752,193,1674,192,1519,198,1399,201,1319,201"/>
+<area shape="poly" title=" " alt="" coords="1319,217,1330,219,1423,231,1422,237,1329,224,1318,222"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticActor_1_1SizeMarkerPipeline.html" title="使用固定屏幕点大小标出肉眼难以看到的细小几何。" alt="" coords="1485,308,1699,348"/>
+<area shape="poly" title=" " alt="" coords="1713,326,1958,326,1958,332,1713,331"/>
+<area shape="rect" title=" " alt="" coords="1501,372,1683,412"/>
+<area shape="poly" title=" " alt="" coords="1697,381,1809,369,1930,353,1969,347,1970,352,1931,359,1810,374,1697,386"/>
+<area shape="rect" title=" " alt="" coords="1489,436,1695,476"/>
+<area shape="poly" title=" " alt="" coords="1708,444,1817,428,1874,415,1930,399,1985,374,2033,347,2035,352,1988,379,1932,404,1876,420,1818,433,1709,450"/>
+<area shape="rect" href="structGeometryTopologyDiagnosticResult.html" title="几何拓扑诊断的完整结果。" alt="" coords="1091,433,1305,473"/>
+<area shape="poly" title=" " alt="" coords="1319,451,1489,453,1489,458,1319,457"/>
+<area shape="rect" title=" " alt="" coords="651,328,805,368"/>
+<area shape="poly" title=" " alt="" coords="819,347,938,357,1004,368,1067,384,1121,406,1167,431,1164,436,1119,411,1066,389,1003,374,938,363,819,352"/>
+<area shape="rect" title=" " alt="" coords="5,413,160,453"/>
+<area shape="poly" title=" " alt="" coords="174,422,184,421,228,421,464,417,648,410,832,409,940,415,1067,425,1106,431,1105,436,1066,431,939,420,831,415,648,415,464,423,228,427,184,427,174,427"/>
+<area shape="rect" href="structGeometryDuplicateFaceGroup.html" title="一组在 OCC 数值精度内覆盖相同几何区域的面。" alt="" coords="252,446,469,471"/>
+<area shape="poly" title=" " alt="" coords="174,443,184,444,252,450,251,455,184,449,174,448"/>
+<area shape="rect" title=" " alt="" coords="611,443,845,483"/>
+<area shape="poly" title=" " alt="" coords="858,457,1090,453,1091,458,858,463"/>
+<area shape="poly" title=" " alt="" coords="483,457,611,459,611,464,483,463"/>
+<area shape="rect" title=" " alt="" coords="604,507,852,547"/>
+<area shape="poly" title=" " alt="" coords="866,536,915,535,966,530,1017,520,1065,504,1077,495,1089,483,1115,471,1118,476,1092,488,1081,499,1068,509,1018,525,967,535,915,540,866,541"/>
+<area shape="rect" href="structGeometryIntersectingFacePair.html" title="一对互相穿插的面，自相交与几何干涉共用；单 Face 自交时两个成员相同。" alt="" coords="252,514,469,539"/>
+<area shape="poly" title=" " alt="" coords="483,524,604,524,604,529,483,529"/>
+<area shape="rect" title=" " alt="" coords="651,571,805,611"/>
+<area shape="poly" title=" " alt="" coords="819,607,880,612,945,609,1009,594,1038,581,1065,563,1073,555,1076,546,1077,526,1077,505,1081,494,1089,483,1105,471,1108,475,1093,487,1086,497,1083,506,1082,527,1082,547,1077,558,1068,567,1041,586,1010,600,945,615,879,617,819,612"/>
+<area shape="rect" title=" " alt="" coords="1549,502,1635,527"/>
+<area shape="poly" title=" " alt="" coords="1649,513,1710,511,1782,503,1857,487,1929,459,1967,435,2001,405,2049,348,2053,351,2004,408,1970,439,1932,464,1859,492,1783,508,1710,516,1650,519"/>
+<area shape="rect" title=" " alt="" coords="1129,497,1267,537"/>
+<area shape="poly" title=" " alt="" coords="1281,514,1549,512,1549,518,1281,519"/>
+<area shape="rect" title=" " alt="" coords="3357,283,3527,323"/>
+<area shape="poly" title=" " alt="" coords="3541,302,3626,301,3714,296,3791,285,3792,290,3715,301,3626,307,3541,308"/>
+<area shape="rect" title=" " alt="" coords="3371,347,3513,387"/>
+<area shape="poly" title=" " alt="" coords="3527,359,3618,349,3714,329,3775,308,3826,285,3829,290,3777,313,3715,335,3618,354,3527,364"/>
+</map>
+<center><span class="legend">[<a href="graph_legend.html">图例</a>]</span></center></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a3321d5313c221e070ac5b4f36f38ecb1" id="r_a3321d5313c221e070ac5b4f36f38ecb1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3321d5313c221e070ac5b4f36f38ecb1">GeometrySolidSelectorHighlight</a> (vtkPartitionedDataSet &amp;highlight_data, unsigned int partition_id, <a class="el" href="classGeometryActorSelectOp.html">GeometryActorSelectOp</a> select_op)</td></tr>
+<tr class="memitem:a8564d14ab19d573aea806862ddc0b542" id="r_a8564d14ab19d573aea806862ddc0b542"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8564d14ab19d573aea806862ddc0b542">~GeometrySolidSelectorHighlight</a> () override</td></tr>
+<tr class="memitem:a928623f2ec5cfb4172566ee4d188e8e0" id="r_a928623f2ec5cfb4172566ee4d188e8e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a928623f2ec5cfb4172566ee4d188e8e0">toggleSolid</a> (<a class="el" href="Core_8h.html#a09b977d80717477b28230209e7cc183f">GeomSolidId</a> solidId, const std::vector&lt; IVtk_IdType &gt; &amp;faceSubIds, <a class="el" href="Core_8h.html#a7b4340f86a469a9549b19713fc7c657a">SelectOp</a> op=<a class="el" href="Core_8h.html#a7b4340f86a469a9549b19713fc7c657aaa8875bbe4272c0bdd786cfaaedf77921">SelectOp::Toggle</a>)</td></tr>
+<tr class="memitem:aeba9f62ae3f550b61a022000fcb907e7" id="r_aeba9f62ae3f550b61a022000fcb907e7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeba9f62ae3f550b61a022000fcb907e7">clear</a> () override</td></tr>
+<tr class="memitem:a39ed23e139c64ec7e846680535ad0f14" id="r_a39ed23e139c64ec7e846680535ad0f14"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a39ed23e139c64ec7e846680535ad0f14">disableHighlight</a> () override</td></tr>
+<tr class="memitem:a1cbe3f65429c97d30748f629ea294253" id="r_a1cbe3f65429c97d30748f629ea294253"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1cbe3f65429c97d30748f629ea294253">enableHighlight</a> () override</td></tr>
+<tr class="memitem:a7fe84cbf94c387863fd9b1fa9cd6c78d" id="r_a7fe84cbf94c387863fd9b1fa9cd6c78d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="GeometrySelectorHighlight_8h.html#ac326fa7688042f57d37e2dffc01ddbac">GeometrySelectionVtk</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7fe84cbf94c387863fd9b1fa9cd6c78d">get</a> () const override</td></tr>
+<tr class="inherit_header pub_methods_classGeometrySelectorHighlight"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_classGeometrySelectorHighlight')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public 成员函数 继承自 <a class="el" href="classGeometrySelectorHighlight.html">GeometrySelectorHighlight</a></td></tr>
+<tr class="memitem:aa975fa492a163dfce7f1f27df3c34ff7 inherit pub_methods_classGeometrySelectorHighlight" id="r_aa975fa492a163dfce7f1f27df3c34ff7"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGeometrySelectorHighlight.html#aa975fa492a163dfce7f1f27df3c34ff7">~GeometrySelectorHighlight</a> ()=default</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a8100c03915d6e26d1bb46135496457e6" id="r_a8100c03915d6e26d1bb46135496457e6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8100c03915d6e26d1bb46135496457e6">setupHighlightStyle</a> (vtkActor &amp;actor, vtkMapper &amp;mapper)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pri-attribs" class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
+Private 属性</h2></td></tr>
+<tr class="memitem:a5a9160ed331bd38b73792cf621bfa337" id="r_a5a9160ed331bd38b73792cf621bfa337"><td class="memItemLeft" align="right" valign="top">vtkPartitionedDataSet *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5a9160ed331bd38b73792cf621bfa337">highlight_data_</a></td></tr>
+<tr class="memitem:a1511aa0f3cdc959e022764daa4cd417a" id="r_a1511aa0f3cdc959e022764daa4cd417a"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1511aa0f3cdc959e022764daa4cd417a">partition_id_</a></td></tr>
+<tr class="memitem:a7cd0961cb323be30c582e0340e9af62a" id="r_a7cd0961cb323be30c582e0340e9af62a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGeometryActorSelectOp.html">GeometryActorSelectOp</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7cd0961cb323be30c582e0340e9af62a">select_op_</a></td></tr>
+<tr class="memitem:ac84f7737881790d898c8a9e8902af081" id="r_ac84f7737881790d898c8a9e8902af081"><td class="memItemLeft" align="right" valign="top">vtkSmartPointer&lt; IVtkTools_SubPolyDataFilter &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac84f7737881790d898c8a9e8902af081">hl_filter_</a></td></tr>
+<tr class="memitem:a9196793cc1ab3b8297ab899b7d981e9d" id="r_a9196793cc1ab3b8297ab899b7d981e9d"><td class="memItemLeft" align="right" valign="top">std::unordered_map&lt; IVtk_IdType, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9196793cc1ab3b8297ab899b7d981e9d">selections_</a></td></tr>
+<tr class="memitem:a4725275874c7151ac9b4aa00a16c938e" id="r_a4725275874c7151ac9b4aa00a16c938e"><td class="memItemLeft" align="right" valign="top">std::unordered_set&lt; IVtk_IdType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4725275874c7151ac9b4aa00a16c938e">highlighted_face_ids_</a></td></tr>
+</table>
+<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">构造及析构函数说明</h2>
+<a id="a3321d5313c221e070ac5b4f36f38ecb1" name="a3321d5313c221e070ac5b4f36f38ecb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3321d5313c221e070ac5b4f36f38ecb1">&#9670;&#160;</a></span>GeometrySolidSelectorHighlight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">GeometrySolidSelectorHighlight::GeometrySolidSelectorHighlight </td>
+          <td>(</td>
+          <td class="paramtype">vtkPartitionedDataSet &amp;</td>          <td class="paramname"><span class="paramname"><em>highlight_data</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>partition_id</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classGeometryActorSelectOp.html">GeometryActorSelectOp</a></td>          <td class="paramname"><span class="paramname"><em>select_op</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8564d14ab19d573aea806862ddc0b542" name="a8564d14ab19d573aea806862ddc0b542"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8564d14ab19d573aea806862ddc0b542">&#9670;&#160;</a></span>~GeometrySolidSelectorHighlight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">GeometrySolidSelectorHighlight::~GeometrySolidSelectorHighlight </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">成员函数说明</h2>
+<a id="aeba9f62ae3f550b61a022000fcb907e7" name="aeba9f62ae3f550b61a022000fcb907e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeba9f62ae3f550b61a022000fcb907e7">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometrySolidSelectorHighlight::clear </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>实现了 <a class="el" href="classGeometrySelectorHighlight.html#ab44084c25571a84ed86f7f002dfbad7e">GeometrySelectorHighlight</a>.</p>
+
+</div>
+</div>
+<a id="a39ed23e139c64ec7e846680535ad0f14" name="a39ed23e139c64ec7e846680535ad0f14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39ed23e139c64ec7e846680535ad0f14">&#9670;&#160;</a></span>disableHighlight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometrySolidSelectorHighlight::disableHighlight </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>实现了 <a class="el" href="classGeometrySelectorHighlight.html#a4797536d501153dbd748d7b87589eee8">GeometrySelectorHighlight</a>.</p>
+
+</div>
+</div>
+<a id="a1cbe3f65429c97d30748f629ea294253" name="a1cbe3f65429c97d30748f629ea294253"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cbe3f65429c97d30748f629ea294253">&#9670;&#160;</a></span>enableHighlight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometrySolidSelectorHighlight::enableHighlight </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>实现了 <a class="el" href="classGeometrySelectorHighlight.html#af8aa451807bd5e1bfe1dbbf3bbe0062f">GeometrySelectorHighlight</a>.</p>
+
+</div>
+</div>
+<a id="a7fe84cbf94c387863fd9b1fa9cd6c78d" name="a7fe84cbf94c387863fd9b1fa9cd6c78d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7fe84cbf94c387863fd9b1fa9cd6c78d">&#9670;&#160;</a></span>get()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="GeometrySelectorHighlight_8h.html#ac326fa7688042f57d37e2dffc01ddbac">GeometrySelectionVtk</a> GeometrySolidSelectorHighlight::get </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>实现了 <a class="el" href="classGeometrySelectorHighlight.html#a1eb26625afbd6e0edfb3c4d7267f58ab">GeometrySelectorHighlight</a>.</p>
+
+</div>
+</div>
+<a id="a8100c03915d6e26d1bb46135496457e6" name="a8100c03915d6e26d1bb46135496457e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8100c03915d6e26d1bb46135496457e6">&#9670;&#160;</a></span>setupHighlightStyle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometrySolidSelectorHighlight::setupHighlightStyle </td>
+          <td>(</td>
+          <td class="paramtype">vtkActor &amp;</td>          <td class="paramname"><span class="paramname"><em>actor</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">vtkMapper &amp;</td>          <td class="paramname"><span class="paramname"><em>mapper</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel static">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a928623f2ec5cfb4172566ee4d188e8e0" name="a928623f2ec5cfb4172566ee4d188e8e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a928623f2ec5cfb4172566ee4d188e8e0">&#9670;&#160;</a></span>toggleSolid()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void GeometrySolidSelectorHighlight::toggleSolid </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a09b977d80717477b28230209e7cc183f">GeomSolidId</a></td>          <td class="paramname"><span class="paramname"><em>solidId</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; IVtk_IdType &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>faceSubIds</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="Core_8h.html#a7b4340f86a469a9549b19713fc7c657a">SelectOp</a></td>          <td class="paramname"><span class="paramname"><em>op</em></span><span class="paramdefsep"> = </span><span class="paramdefval"><a class="el" href="Core_8h.html#a7b4340f86a469a9549b19713fc7c657aaa8875bbe4272c0bdd786cfaaedf77921">SelectOp::Toggle</a></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">类成员变量说明</h2>
+<a id="a5a9160ed331bd38b73792cf621bfa337" name="a5a9160ed331bd38b73792cf621bfa337"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a9160ed331bd38b73792cf621bfa337">&#9670;&#160;</a></span>highlight_data_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkPartitionedDataSet* GeometrySolidSelectorHighlight::highlight_data_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4725275874c7151ac9b4aa00a16c938e" name="a4725275874c7151ac9b4aa00a16c938e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4725275874c7151ac9b4aa00a16c938e">&#9670;&#160;</a></span>highlighted_face_ids_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_set&lt;IVtk_IdType&gt; GeometrySolidSelectorHighlight::highlighted_face_ids_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac84f7737881790d898c8a9e8902af081" name="ac84f7737881790d898c8a9e8902af081"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac84f7737881790d898c8a9e8902af081">&#9670;&#160;</a></span>hl_filter_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">vtkSmartPointer&lt;IVtkTools_SubPolyDataFilter&gt; GeometrySolidSelectorHighlight::hl_filter_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1511aa0f3cdc959e022764daa4cd417a" name="a1511aa0f3cdc959e022764daa4cd417a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1511aa0f3cdc959e022764daa4cd417a">&#9670;&#160;</a></span>partition_id_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int GeometrySolidSelectorHighlight::partition_id_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7cd0961cb323be30c582e0340e9af62a" name="a7cd0961cb323be30c582e0340e9af62a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cd0961cb323be30c582e0340e9af62a">&#9670;&#160;</a></span>select_op_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classGeometryActorSelectOp.html">GeometryActorSelectOp</a> GeometrySolidSelectorHighlight::select_op_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9196793cc1ab3b8297ab899b7d981e9d" name="a9196793cc1ab3b8297ab899b7d981e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9196793cc1ab3b8297ab899b7d981e9d">&#9670;&#160;</a></span>selections_</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unordered_map&lt;IVtk_IdType, <a class="el" href="Core_8h.html#a1673229bf7fec9388ac2a829a52d69b3">Index</a>&gt; GeometrySolidSelectorHighlight::selections_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel private">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>app/render/<a class="el" href="GeometrySelectorHighlight_8h_source.html">GeometrySelectorHighlight.h</a></li>
+<li>app/render/<a class="el" href="GeometrySelectorHighlight_8cpp.html">GeometrySelectorHighlight.cpp</a></li>
+</ul>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>
