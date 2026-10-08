@@ -1,6 +1,9 @@
 name: Sync ZenithGrid from Gitee
 
 on:
+  push:
+    branches: [develop]
+    paths: ['.github/workflows/sync-gitee.yml']
   schedule:
     - cron: '7,37 * * * *'
   workflow_dispatch:
