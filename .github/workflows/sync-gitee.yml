@@ -1,0 +1,69 @@
+name: Sync ZenithGrid from Gitee
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-gitee-develop
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout GitHub develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          fetch-depth: 0
+          # 上游修改工作流时，可使用仅授权本仓库的 Contents/Workflows 写入令牌。
+          token: ${{ secrets.MIRROR_TOKEN || github.token }}
+
+      - name: Fetch Gitee develop and tags
+        shell: bash
+        env:
+          GIT_TERMINAL_PROMPT: '0'
+        run: |
+          set -euo pipefail
+          git remote add gitee https://gitee.com/ZenithGrid/ZenithGrid.git
+          git fetch --no-tags gitee \
+            refs/heads/develop:refs/remotes/gitee/develop \
+            'refs/tags/*:refs/tags/*'
+
+      - name: Sync code while preserving this workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # 使用合并保留同步任务；发生冲突时失败，不覆盖 GitHub 上的修改。
+          git merge --no-edit refs/remotes/gitee/develop
+          git diff --exit-code refs/remotes/gitee/develop HEAD -- \
+            . ':(exclude).github/workflows/sync-gitee.yml'
+          git push origin HEAD:refs/heads/develop
+
+      - name: Sync tags
+        shell: bash
+        run: |
+          set -euo pipefail
+          # 不强推、不删除标签；权限或同名标签冲突会明确报错。
+          git push origin 'refs/tags/*:refs/tags/*'
+
+      - name: Record synchronized source
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo '### ZenithGrid synchronization'
+            echo '- Source: https://gitee.com/ZenithGrid/ZenithGrid'
+            echo "- Source commit: $(git rev-parse refs/remotes/gitee/develop)"
+            echo '- Branch: develop; tags synchronized'
+            echo '- Schedule: every 30 minutes (UTC minutes 07 and 37)'
+            echo '- GitHub retains .github/workflows/sync-gitee.yml'
+          } >> "$GITHUB_STEP_SUMMARY"
