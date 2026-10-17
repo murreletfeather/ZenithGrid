@@ -95,6 +95,19 @@ public:
     Q_INVOKABLE void setSelectMode(QString select_mode);
 
     /**
+     * @brief 设置网格框选是否穿透（穿透与非穿透并存，由 UI 开关决定走哪条）
+     * @param enabled true 穿透：框内前层与背面单元一并命中，且能选中体网格内部单元；
+     *                false 非穿透：只命中可见最前一层
+     * @note 仅对网格模式的框选生效；单选恒为非穿透。
+     */
+    Q_INVOKABLE void setPenetrating(bool enabled);
+
+    /**
+     * @brief 网格框选当前是否穿透
+     */
+    Q_INVOKABLE bool penetrating() const;
+
+    /**
      * @brief 设置面选择的角度扩散参数
      * @param enabled 是否启用按角度扩散
      * @param angle_deg 相邻面法向夹角阈值，单位为度
@@ -237,6 +250,7 @@ private:
     systems::feature::QFeatureSystemAdaptor* feature_adaptor_ {};
     MeshActor* cur_actor_ {};
     Index cur_component_id_ { -1 };
+    bool penetrating_ { false };
 
     std::unique_ptr<QMouseEvent> _click;
     const Data* data_ {};

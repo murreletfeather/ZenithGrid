@@ -45,6 +45,18 @@ vtkProp& MeshActorSelectOp::getEdgeActor()
     return *mesh_actor_->edge_actor_;
 }
 
+vtkUnstructuredGrid* MeshActorSelectOp::getSolidData()
+{
+    return mesh_actor_->solid_data_.Get();
+}
+
+vtkPolyData* MeshActorSelectOp::getSolidEdgeData()
+{
+    // 边提取器输入即 solid_data_；取输出前更新一次，保证与当前体网格同步
+    mesh_actor_->solid_edge_extractor_->Update();
+    return mesh_actor_->solid_edge_extractor_->GetOutput();
+}
+
 bool MeshActorSelectOp::isVisible() const
 {
     return mesh_actor_->isVisible();

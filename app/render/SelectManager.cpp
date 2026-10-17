@@ -48,6 +48,18 @@ void SelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp 
         geom_->selectArea(xmin, ymin, xmax, ymax, op);
 }
 
+void SelectManager::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
+    if (mesh_)
+        mesh_->setPenetrating(enabled);
+}
+
+bool SelectManager::isPenetrating() const
+{
+    return penetrating_;
+}
+
 void SelectManager::setSelectMode(const std::string& select_mode)
 {
     SelectMode mode = SelectMode::None;

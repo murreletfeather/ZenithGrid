@@ -592,6 +592,19 @@ void QRenderWindow::setSelectMode(QString select_mode)
     });
 }
 
+void QRenderWindow::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
+    dispatch_async([enabled, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        select_manager_->setPenetrating(enabled);
+    });
+}
+
+bool QRenderWindow::penetrating() const
+{
+    return penetrating_;
+}
+
 void QRenderWindow::setFaceSelectionByAngle(bool enabled, double angle_deg)
 {
     dispatch_async([enabled, angle_deg, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {

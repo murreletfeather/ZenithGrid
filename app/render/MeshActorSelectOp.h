@@ -7,6 +7,7 @@
 class vtkIdTypeArray;
 class vtkProp;
 class vtkPolyData;
+class vtkUnstructuredGrid;
 class vtkExtractSelection;
 class MeshActorSelectOp;
 class MeshActor;
@@ -42,6 +43,24 @@ public:
     vtkProp& getSolidActor();
     vtkProp& getFaceActor();
     vtkProp& getEdgeActor();
+
+    /**
+     * @brief 体网格（体单元）数据集
+     *
+     * cell id 即 solid id（该数据集的 vtkOriginalCellIds 为 identity），点 id 即组件内局部
+     * 点 id（vtkOriginalPointIds 为 identity）。体网格**内部**的体单元与内部节点只能从这里
+     * 选到——face/edge/solid actor 渲染的都是边界表示，不含内部单元。
+     */
+    vtkUnstructuredGrid* getSolidData();
+
+    /**
+     * @brief 体网格的边数据集（vtkExtractEdges 的输出），含体单元之间的**内部边**
+     *
+     * cell 为 VTK_LINE，点数据带 vtkOriginalPointIds（组件内局部点 id）。
+     * Edge 模式靠它选中体网格内部边；内部边不在 MeshData::edge_vertices_ 里，没有模型边 id，
+     * 因此派生出的边其 edge_id 为 -1，按端点对标识（已有兜底路径）。
+     */
+    vtkPolyData* getSolidEdgeData();
 
     bool isVisible() const;
 

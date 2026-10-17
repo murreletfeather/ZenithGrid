@@ -222,7 +222,7 @@ void EdgeSelectorHighlight::setupHighlightStyle(vtkActor& actor, vtkMapper& mapp
 
 void EdgeSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-    int xmin, int ymin, int xmax, int ymax, SelectOp op)
+    int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume)
 {
     // 与点选对齐：从 face/edge/solid 三个 actor 的命中 cell 派生边并合并端点对。
     // face CELLS 主路径健壮（面表面有 z 遮挡）；edge actor 补独立/物化边；solid 表面补体网格表面边。
@@ -310,6 +310,12 @@ void EdgeSelectorHighlight::selectArea(
     if (auto* solid_poly = solid_actor ? vtkPolyData::SafeDownCast(
             vtkPolyDataMapper::SafeDownCast(solid_actor->GetMapper())->GetInput()) : nullptr) {
         derive_edges(solid_actor, solid_poly, hit_of(&select_op_.getSolidActor()));
+    }
+
+    // 4) 体网格内部边：上面三条都是边界表示，体单元之间的内部边只能从体网格边数据派生。
+    if (volume && !volume->edges.empty()) {
+        if (auto* vol_edge_poly = select_op_.getSolidEdgeData())
+            derive_edges(solid_actor, vol_edge_poly, &volume->edges);
     }
 
     spdlog::debug("[EdgeArea] picked_edge_set.size()={}", picked_edge_set.size());
