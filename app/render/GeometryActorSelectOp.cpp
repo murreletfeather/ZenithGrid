@@ -8,6 +8,7 @@
 #include <IVtkOCC_Shape.hxx>
 #include <IVtkTools_ShapePicker.hxx>
 #include <IVtkTools_SubPolyDataFilter.hxx>
+#include <IVtkVTK_ShapeData.hxx>
 #include <IVtk_Types.hxx>
 #include <NCollection_List.hxx>
 #include <TopAbs_ShapeEnum.hxx>
@@ -17,6 +18,7 @@
 #include <TopoDS_Vertex.hxx>
 #include <gp_Pnt.hxx>
 #include <vtkActor.h>
+#include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
@@ -215,6 +217,49 @@ std::vector<std::pair<IVtk_IdType, Index>> GeometryActorSelectOp::resolvePickedS
     return out;
 }
 
+std::optional<IVtk_IdType> GeometryActorSelectOp::subshapeIdOfCell(vtkIdType cell_id)
+{
+    if (!geometry_actor_)
+        return std::nullopt;
+
+    auto* mapper = vtkPolyDataMapper::SafeDownCast(getPolyActor().GetMapper());
+    auto* poly = mapper ? mapper->GetInput() : nullptr;
+    if (!poly || cell_id < 0 || cell_id >= poly->GetNumberOfCells())
+        return std::nullopt;
+
+    auto* cell_data = poly->GetCellData();
+    auto* subshape_ids = cell_data
+        ? cell_data->GetArray(IVtkVTK_ShapeData::ARRNAME_SUBSHAPE_IDS())
+        : nullptr;
+    if (!subshape_ids || cell_id >= subshape_ids->GetNumberOfTuples())
+        return std::nullopt;
+
+    return static_cast<IVtk_IdType>(subshape_ids->GetTuple1(cell_id));
+}
+
+std::optional<Index> GeometryActorSelectOp::resolveSubshapeGeomId(IVtk_IdType sub_id, SelectMode mode) const
+{
+    if (!geometry_actor_)
+        return std::nullopt;
+
+    TopAbs_ShapeEnum wantType;
+    if (mode == SelectMode::GeometryFace)
+        wantType = TopAbs_FACE;
+    else if (mode == SelectMode::GeometryEdge)
+        wantType = TopAbs_EDGE;
+    else if (mode == SelectMode::GeometryVertex)
+        wantType = TopAbs_VERTEX;
+    else
+        return std::nullopt;
+
+    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
+    if (!geomIndex)
+        return std::nullopt;
+
+    ElementEnum::Type elemType = ElementEnum::None;
+    return mapSubshapeToGeomId(geometry_actor_->occ_shape_, *geomIndex, wantType, sub_id, elemType);
+}
+
 std::optional<std::array<double, 3>> GeometryActorSelectOp::vertexPoint(IVtk_IdType sub_id) const
 {
     const OccShapeHandle& occ = geometry_actor_->occ_shape_;
@@ -229,23 +274,12 @@ std::optional<std::array<double, 3>> GeometryActorSelectOp::vertexPoint(IVtk_IdT
     return std::array<double, 3> { p.X(), p.Y(), p.Z() };
 }
 
-bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IVtk_IdType shapeId,
-    GeomSolidId& out_solid_id, std::vector<IVtk_IdType>& out_face_sub_ids) const
+static bool resolveSolidOfSubshapeImpl(const OccShapeHandle& occ,
+    const GeometrySubshapeIndex& geomIndex, IVtk_IdType subId,
+    GeomSolidId& out_solid_id, std::vector<IVtk_IdType>& out_face_sub_ids)
 {
-    if (!picker)
-        return false;
-
-    IVtk_IdType subId = -1;
-    if (!firstId(picker->GetPickedSubShapesIds(shapeId, false), subId))
-        return false;
-
-    const OccShapeHandle& occ = geometry_actor_->occ_shape_;
     const TopoDS_Shape& pickedSub = occ->GetSubShape(subId);
     if (pickedSub.IsNull())
-        return false;
-
-    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
-    if (!geomIndex)
         return false;
 
     const int solidTi = GeometrySubshapeIndex::typeIndex(TopAbs_SOLID);
@@ -254,9 +288,9 @@ bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IV
     if (pickedSub.ShapeType() == TopAbs_SOLID) {
         solidShape = pickedSub;
     } else {
-        const int nSolids = geomIndex->type_maps[solidTi].Extent();
+        const int nSolids = geomIndex.type_maps[solidTi].Extent();
         for (int localId = 1; localId <= nSolids; ++localId) {
-            const TopoDS_Shape& solid = geomIndex->type_maps[solidTi].FindKey(localId);
+            const TopoDS_Shape& solid = geomIndex.type_maps[solidTi].FindKey(localId);
             for (TopExp_Explorer exp(solid, TopAbs_FACE); exp.More(); exp.Next()) {
                 if (exp.Current().IsSame(pickedSub)) {
                     solidShape = solid;
@@ -270,22 +304,54 @@ bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IV
             return false;
     }
 
-    const int localTypeId = geomIndex->type_maps[solidTi].FindIndex(solidShape);
+    const int localTypeId = geomIndex.type_maps[solidTi].FindIndex(solidShape);
     if (localTypeId <= 0)
         return false;
 
-    GeomSolidId gid = geomIndex->solidGlobalId(localTypeId);
+    const GeomSolidId gid = geomIndex.solidGlobalId(localTypeId);
     if (gid == kInvalidGeomSolidId)
         return false;
 
     out_solid_id = gid;
     out_face_sub_ids.clear();
     for (TopExp_Explorer expF(solidShape, TopAbs_FACE); expF.More(); expF.Next()) {
-        IVtk_IdType faceSubId = occ->GetSubShapeId(expF.Current());
+        const IVtk_IdType faceSubId = occ->GetSubShapeId(expF.Current());
         if (faceSubId >= 0)
             out_face_sub_ids.push_back(faceSubId);
     }
     return true;
+}
+
+bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IVtk_IdType shapeId,
+    GeomSolidId& out_solid_id, std::vector<IVtk_IdType>& out_face_sub_ids) const
+{
+    if (!picker || !geometry_actor_)
+        return false;
+
+    IVtk_IdType subId = -1;
+    if (!firstId(picker->GetPickedSubShapesIds(shapeId, false), subId))
+        return false;
+
+    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
+    if (!geomIndex)
+        return false;
+
+    return resolveSolidOfSubshapeImpl(geometry_actor_->occ_shape_, *geomIndex, subId,
+        out_solid_id, out_face_sub_ids);
+}
+
+bool GeometryActorSelectOp::resolveSolidOfSubshape(IVtk_IdType sub_id,
+    GeomSolidId& out_solid_id, std::vector<IVtk_IdType>& out_face_sub_ids) const
+{
+    if (!geometry_actor_)
+        return false;
+
+    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
+    if (!geomIndex)
+        return false;
+
+    return resolveSolidOfSubshapeImpl(geometry_actor_->occ_shape_, *geomIndex, sub_id,
+        out_solid_id, out_face_sub_ids);
 }
 
 vtkSmartPointer<IVtkTools_SubPolyDataFilter> GeometryActorSelectOp::buildHighlight(SelectMode mode)

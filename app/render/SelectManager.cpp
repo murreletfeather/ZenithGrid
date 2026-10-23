@@ -53,6 +53,8 @@ void SelectManager::setPenetrating(bool enabled)
     penetrating_ = enabled;
     if (mesh_)
         mesh_->setPenetrating(enabled);
+    if (geom_)
+        geom_->setPenetrating(enabled);
 }
 
 bool SelectManager::isPenetrating() const

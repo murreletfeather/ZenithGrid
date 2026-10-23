@@ -95,10 +95,14 @@ RowLayout {
             || App.selection.selectMode === "Edge"
             || App.selection.selectMode === "Face"
             || App.selection.selectMode === "Solid"
+            || App.selection.selectMode === "GeometryVertex"
+            || App.selection.selectMode === "GeometryEdge"
+            || App.selection.selectMode === "GeometryFace"
+            || App.selection.selectMode === "GeometrySolid"
         checked: App.selection.penetrating
         onToggled: App.selection.penetrating = checked
         ToolTip.visible: hovered
-        ToolTip.text: qsTr("开启后框选可选中被遮挡的背面单元，以及体网格内部的体单元/节点/边；关闭则只选可见最前一层。单选始终为非穿透。")
+        ToolTip.text: qsTr("开启后框选可选中被遮挡的背面元素（网格模式下还包括体网格内部的体单元/节点/边）；关闭则只选可见最前一层。单选始终为非穿透。")
     }
     CheckBox {
         id: angleSpreadCheckBox

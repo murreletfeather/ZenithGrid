@@ -676,6 +676,7 @@ Page {
 
             Component.onCompleted: {
                 myItem.setFaceSelectionByAngle(root.faceSelectByAngle, root.faceSelectAngle)
+                myItem.setPenetrating(App.selection.penetrating)
             }
 
             Connections {

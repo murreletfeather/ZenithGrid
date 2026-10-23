@@ -2,11 +2,13 @@
 #include "GeometryActorManagerSelectOp.h"
 #include "GeometryActorSelectOp.h"
 #include "GeometrySelectorHighlight.h"
+#include "MeshAreaPick.h"
 #include "Selection.h"
 
 #include <IVtkTools_ShapePicker.hxx>
 #include <NCollection_List.hxx>
 #include <vtkCompositePolyDataMapper.h>
+#include <vtkDataObject.h>
 #include <vtkPartitionedDataSet.h>
 #include <vtkRenderer.h>
 
@@ -89,6 +91,87 @@ void GeometrySelectManager::select(double posx, double posy, SelectOp op)
     }
 }
 
+void GeometrySelectManager::selectAreaNonPenetrating(int xmin, int ymin, int xmax, int ymax, SelectOp op)
+{
+    std::vector<vtkActor*> targets;
+    std::vector<Index> comp_ids;
+    for (Index comp_id : op_->getAllComponentIds()) {
+        auto select_op = op_->getSelectOp(comp_id);
+        if (!select_op || !select_op->isVisible())
+            continue;
+        if (auto* actor = vtkActor::SafeDownCast(&select_op->getPolyActor())) {
+            targets.push_back(actor);
+            comp_ids.push_back(comp_id);
+        }
+    }
+    if (targets.empty())
+        return;
+
+    auto hits = area_pick::executeAreaPicks(renderer_, targets,
+        xmin, ymin, xmax, ymax, vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    if (hits.empty())
+        return;
+
+    for (Index comp_id : comp_ids) {
+        auto select_op = op_->getSelectOp(comp_id);
+        if (!select_op)
+            continue;
+
+        auto it = hits.find(&select_op->getPolyActor());
+        if (it == hits.end() || it->second.empty())
+            continue;
+
+        auto* sel = getOrCreateSelector(comp_id);
+        if (!sel)
+            continue;
+
+        if (select_mode_ == SelectMode::GeometrySolid) {
+            std::set<GeomSolidId> applied;
+            for (vtkIdType cell_id : it->second) {
+                auto subId = select_op->subshapeIdOfCell(cell_id);
+                if (!subId)
+                    continue;
+                GeomSolidId solidId = kInvalidGeomSolidId;
+                std::vector<IVtk_IdType> faceSubIds;
+                if (!select_op->resolveSolidOfSubshape(*subId, solidId, faceSubIds))
+                    continue;
+                if (!applied.insert(solidId).second)
+                    continue; 
+                static_cast<GeometrySolidSelectorHighlight*>(sel)->toggleSolid(solidId, faceSubIds, op);
+            }
+            continue;
+        }
+
+        std::map<IVtk_IdType, Index> picked;
+        for (vtkIdType cell_id : it->second) {
+            auto subId = select_op->subshapeIdOfCell(cell_id);
+            if (!subId)
+                continue;
+            auto geomId = select_op->resolveSubshapeGeomId(*subId, select_mode_);
+            if (!geomId)
+                continue;
+            picked.emplace(*subId, *geomId);
+        }
+
+        switch (select_mode_) {
+        case SelectMode::GeometryFace:
+            for (const auto& [subId, geomId] : picked)
+                static_cast<GeometryFaceSelectorHighlight*>(sel)->toggle(subId, geomId, op);
+            break;
+        case SelectMode::GeometryEdge:
+            for (const auto& [subId, geomId] : picked)
+                static_cast<GeometryEdgeSelectorHighlight*>(sel)->toggle(subId, geomId, op);
+            break;
+        case SelectMode::GeometryVertex:
+            for (const auto& [subId, geomId] : picked)
+                static_cast<GeometryVertexSelectorHighlight*>(sel)->toggle(subId, geomId, op);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 void GeometrySelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp op)
 {
     if (this->select_mode_ == SelectMode::None)
@@ -96,6 +179,11 @@ void GeometrySelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, S
 
     if (!op_->hasRegisteredComponents())
         return;
+
+    if (!penetrating_) {
+        selectAreaNonPenetrating(xmin, ymin, xmax, ymax, op);
+        return;
+    }
 
     picker_->SetAreaSelection(true);
     const int n = picker_->Pick(xmin, ymin, xmax, ymax, renderer_);
@@ -157,6 +245,16 @@ void GeometrySelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, S
             break;
         }
     }
+}
+
+void GeometrySelectManager::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
+}
+
+bool GeometrySelectManager::isPenetrating() const
+{
+    return penetrating_;
 }
 
 void GeometrySelectManager::setSelectMode(SelectMode select_mode)
