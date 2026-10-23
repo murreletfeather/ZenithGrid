@@ -32,6 +32,9 @@ public:
     void refreshHighlight();
     SelectionVtk get() const;
 
+    void setPenetrating(bool enabled);
+    bool isPenetrating() const;
+
 private:
     void updateHighlight();
 
@@ -45,6 +48,7 @@ private:
     vtkSmartPointer<vtkCompositePolyDataMapper> highlight_mapper_;
     vtkSmartPointer<vtkPartitionedDataSet> highlight_data_;
     vtkSmartPointer<vtkHardwarePicker> component_picker_;
+    bool penetrating_ { false }; 
 };
 
 #endif

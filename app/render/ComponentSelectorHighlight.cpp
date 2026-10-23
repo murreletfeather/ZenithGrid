@@ -146,8 +146,10 @@ void ComponentSelectorHighlight::selectArea(int xmin, int ymin, int xmax, int ym
     if (targets.empty())
         return;
 
-    auto hits = area_pick::executeAreaPicks(renderer_, targets,
-        xmin, ymin, xmax, ymax, vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    auto hits = penetrating_
+        ? area_pick::executePenetratingAreaPicks(renderer_, targets, xmin, ymin, xmax, ymax)
+        : area_pick::executeAreaPicks(renderer_, targets,
+            xmin, ymin, xmax, ymax, vtkDataObject::FIELD_ASSOCIATION_CELLS);
 
     std::set<Index> hit_components;
     for (const auto& [prop, ids] : hits) {
@@ -178,6 +180,16 @@ void ComponentSelectorHighlight::selectArea(int xmin, int ymin, int xmax, int ym
     }
 
     updateHighlight();
+}
+
+void ComponentSelectorHighlight::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
+}
+
+bool ComponentSelectorHighlight::isPenetrating() const
+{
+    return penetrating_;
 }
 
 void ComponentSelectorHighlight::updateHighlight()

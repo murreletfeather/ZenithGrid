@@ -99,6 +99,7 @@ RowLayout {
             || App.selection.selectMode === "GeometryEdge"
             || App.selection.selectMode === "GeometryFace"
             || App.selection.selectMode === "GeometrySolid"
+            || App.selection.selectMode === "Component"
         checked: App.selection.penetrating
         onToggled: App.selection.penetrating = checked
         ToolTip.visible: hovered
