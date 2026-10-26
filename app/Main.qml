@@ -31,6 +31,8 @@ ApplicationWindow {
     height: 600
     visibility: Window.Maximized
     title: qsTr("ZenithGrid")
+    // 命令行导入与相机排队完成后，启动门控再等待包含视口的新帧。
+    signal startupFilesReady()
     color: Theme.windowBackground
     flags: Qt.platform.os === "wasm" ? (Qt.Window | Qt.FramelessWindowHint) : Qt.Window
 
@@ -412,18 +414,28 @@ ApplicationWindow {
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
         Qt.callLater(function() {
-            let imported = false
-            for (let i = 0; i < commandLineArgs.length; ++i) {
-                let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
-                if (!ok) {
-                    console.exception("启动打开失败: " + commandLineArgs[i]);
-                } else {
-                    imported = true
+            // 单独加载 Main 的测试宿主可以不提供启动窗口上下文。
+            const hasStartupProgress = typeof startupProgress !== "undefined"
+            try {
+                let imported = false
+                for (let i = 0; i < commandLineArgs.length; ++i) {
+                    if (hasStartupProgress)
+                        startupProgress.reportStage(qsTr("正在打开启动文件（%1/%2）…").arg(i + 1).arg(commandLineArgs.length))
+                    let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
+                    if (!ok) {
+                        console.exception("启动打开失败: " + commandLineArgs[i]);
+                    } else {
+                        imported = true
+                    }
                 }
+                // 导入通知先排队加载 Actor，再重置相机；视口创建时的重置早于启动导入。
+                if (imported && App.registry.renderWindow)
+                    App.registry.renderWindow.resetCamera()
+            } finally {
+                if (hasStartupProgress)
+                    startupProgress.reportStage(qsTr("正在准备三维视图与首帧…"))
+                root.startupFilesReady()
             }
-            // 导入通知先排队加载 Actor，再重置相机；视口创建时的重置早于启动导入。
-            if (imported && App.registry.renderWindow)
-                App.registry.renderWindow.resetCamera()
         })
     }
 }

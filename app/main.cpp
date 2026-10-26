@@ -1,21 +1,33 @@
+#include "Docking.h"
+#include "QFeatureSystemAdaptor.h"
 #include "QLogManager.h"
 #include "QModelManager.h"
-#include "QFeatureSystemAdaptor.h"
-#include "Docking.h"
+#include "QStartupGate.h"
+#include "QStartupProgress.h"
 #include "WallpaperLibrary.h"
+#ifndef __EMSCRIPTEN__
+#include "QStartupSplashWindow.h"
+#include <QPointer>
+#include <QQuickItem>
+#include <QQuickWindow>
+#include <QTimer>
+#endif
 #include <QCoreApplication>
 #include <QIcon>
 #include <QKeyEvent>
+#include <QQuickStyle>
 #include <QQuickVTKItem.h>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
-#include <QQuickStyle>
+#include <exception>
+#include <memory>
 #include <spdlog/cfg/env.h>
+#include <spdlog/spdlog.h>
 #ifdef __EMSCRIPTEN__
+#include "QWasmBridge.h"
 #include <QtGui/QFontDatabase>
 #include <QtQuick/QQuickWindow>
 #include <QtQuick/QSGRendererInterface>
-#include "QWasmBridge.h"
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -74,6 +86,7 @@ int main(int argc, char* argv[])
     // 持久化身份（QSettings 存储位置）：布局快照等依赖明确的应用名/组织名
     QCoreApplication::setOrganizationName(QStringLiteral("PreCess"));
     QCoreApplication::setApplicationName(QStringLiteral("PreCess"));
+    QCoreApplication::setApplicationVersion(QStringLiteral(PRECESS_APP_VERSION));
     // 全平台统一 Fusion 运行时样式：QML 一律用运行时样式选择（裸 import
     // QtQuick.Controls），禁止文件内显式 import 特定样式，避免样式混用。
     // 控件调色板由 Main.qml 的 ApplicationWindow 绑定 Theme 令牌；Fusion 的
@@ -87,43 +100,137 @@ int main(int argc, char* argv[])
         app.setFont(QFont(font_families.first()));
     }
 #endif
-    QLogManager::initialize();
-
-    WASM_GLOBAL QQmlApplicationEngine engine;
-    // 停靠组件：注册 PreCess.Docking 类型、注入 QML 引擎、安装全局鼠标过滤器
-    dock::init(&engine);
-    // 自定义壁纸：注册 image://wallpaper/ 提供者，从托管目录解析用户导入的背景
-    engine.addImageProvider(QStringLiteral("wallpaper"), new WallpaperProvider);
-
-    // 收集命令行参数（跳过第一个参数，它是程序路径）
-    QStringList arguments_str = app.arguments().mid(1);
-    QList<QUrl> arguments;
-    for (auto& argument_str : arguments_str) {
-        arguments << QUrl::fromLocalFile(argument_str);
-    }
-
-    engine.rootContext()->setContextProperty("QLogManager", QLogManager::instance());
-#ifdef __EMSCRIPTEN__
-    engine.rootContext()->setContextProperty("QWasmBridge", new QWasmBridge(&app));
+    // 先在 GUI 线程创建通知桥，三维渲染线程只发布无状态就绪通知。
+    auto& startup_progress = QStartupProgress::instance();
+    QStartupGate startup_gate;
+#ifndef __EMSCRIPTEN__
+    QStartupSplashWindow splash(QCoreApplication::applicationVersion());
+    QPointer<QQuickWindow> main_window;
+    bool frame_armed = false;
+    app.setQuitOnLastWindowClosed(false);
+    QObject::connect(&startup_progress, &QStartupProgress::onStageChange,
+        &splash, &QStartupSplashWindow::setStage);
+    QObject::connect(&startup_progress, &QStartupProgress::onViewportReady,
+        &startup_gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
+    QObject::connect(&splash, &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, &splash, &QWindow::hide);
+    QObject::connect(&startup_gate, &QStartupGate::onReady, &app, [&]() {
+        spdlog::info("startup: main window ready after viewport, startup files and presented frame");
+        splash.hide();
+        app.setQuitOnLastWindowClosed(true);
+        if (main_window)
+            main_window->requestActivate();
+    });
+    QObject::connect(&startup_gate, &QStartupGate::onUpdateRequested, &app, [&]() {
+        if (!main_window || !startup_gate.isPrepared() || frame_armed)
+            return;
+        frame_armed = true;
+        // 两项前置条件完成后才订阅同步点；不接受早先已排队的 frameSwapped。
+        QObject::connect(main_window, &QQuickWindow::afterSynchronizing, &startup_gate, [&]() {
+            if (!main_window)
+                return;
+            QObject::connect(main_window, &QQuickWindow::frameSwapped,
+                &startup_gate, &QStartupGate::markFrameReady,
+                Qt::ConnectionType(Qt::QueuedConnection | Qt::SingleShotConnection));
+            main_window->update(); }, Qt::ConnectionType(Qt::QueuedConnection | Qt::SingleShotConnection));
+        main_window->update();
+    });
 #endif
-    // 将参数列表暴露给QML
-    engine.rootContext()->setContextProperty("commandLineArgs", QVariant::fromValue(arguments));
+    WASM_GLOBAL std::unique_ptr<QQmlApplicationEngine> engine;
+    QObject::connect(&startup_gate, &QStartupGate::onFailed, &app, [&](const QString& message) {
+        spdlog::error("startup: {}", message.toStdString());
+#ifndef __EMSCRIPTEN__
+        splash.setStage(message);
+        splash.hide();
+#endif
+        app.exit(-1);
+    });
 
-    engine.loadFromModule("app", "Main");
-    if (engine.rootObjects().isEmpty())
-        return -1;
+    auto initialize = [&]() -> bool {
+        try {
+            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化日志…"));
+            QLogManager::initialize();
+            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化界面引擎…"));
+            engine = std::make_unique<QQmlApplicationEngine>();
+            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化停靠布局…"));
+            dock::init(engine.get());
+            engine->addImageProvider(QStringLiteral("wallpaper"), new WallpaperProvider);
 
-    // 安装全局按键事件过滤器，将按键事件转发给功能系统
-    if (auto* model_manager = engine.singletonInstance<QModelManager*>("app.model", "QModelManager")) {
-        if (auto* feature_adaptor = model_manager->getFeatureSystemAdaptor()) {
-            app.installEventFilter(new KeyEventForwarder(*feature_adaptor, &app));
+            QList<QUrl> arguments;
+            for (const auto& argument : app.arguments().mid(1))
+                arguments << QUrl::fromLocalFile(argument);
+            engine->rootContext()->setContextProperty("QLogManager", QLogManager::instance());
+            engine->rootContext()->setContextProperty("startupProgress", &startup_progress);
+            engine->rootContext()->setContextProperty("commandLineArgs", QVariant::fromValue(arguments));
+#ifdef __EMSCRIPTEN__
+            engine->rootContext()->setContextProperty("QWasmBridge", new QWasmBridge(&app));
+#endif
+            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在加载主界面…"));
+            engine->loadFromModule("app", "Main");
+            if (engine->rootObjects().isEmpty()) {
+                startup_gate.fail(QCoreApplication::translate("Startup", "主界面加载失败"));
+                return false;
+            }
+
+#ifndef __EMSCRIPTEN__
+            main_window = qobject_cast<QQuickWindow*>(engine->rootObjects().first());
+            if (!main_window) {
+                startup_gate.fail(QCoreApplication::translate("Startup", "未创建主窗口"));
+                return false;
+            }
+            // 停靠中央区同步创建；若失败，不把空主窗口当成启动成功。
+            auto has_viewport = [](auto&& visit, QQuickItem* item) -> bool {
+                if (qobject_cast<QQuickVTKItem*>(item))
+                    return true;
+                for (auto* child : item->childItems()) {
+                    if (visit(visit, child))
+                        return true;
+                }
+                return false;
+            };
+            if (!has_viewport(has_viewport, main_window->contentItem())) {
+                startup_gate.fail(QCoreApplication::translate("Startup", "三维视口加载失败"));
+                return false;
+            }
+            if (!QObject::connect(main_window, SIGNAL(startupFilesReady()),
+                    &startup_gate, SLOT(markStartupFilesReady()))) {
+                startup_gate.fail(QCoreApplication::translate("Startup", "启动文件处理通知未连接"));
+                return false;
+            }
+            QObject::connect(main_window, &QQuickWindow::sceneGraphError, &startup_gate, [&](QQuickWindow::SceneGraphError, const QString& message) { startup_gate.fail(message); }, Qt::QueuedConnection);
+#endif
+            // 安装全局按键事件过滤器，将按键事件转发给功能系统。
+            if (auto* model_manager = engine->singletonInstance<QModelManager*>("app.model", "QModelManager")) {
+                if (auto* feature_adaptor = model_manager->getFeatureSystemAdaptor()) {
+#ifndef __EMSCRIPTEN__
+                    QObject::connect(&startup_gate, &QStartupGate::onReady, &app, [&, feature_adaptor]() {
+                        app.installEventFilter(new KeyEventForwarder(*feature_adaptor, &app));
+                    });
+#else
+                    app.installEventFilter(new KeyEventForwarder(*feature_adaptor, &app));
+#endif
+                }
+            }
+            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在准备三维视图与首帧…"));
+            return true;
+        } catch (const std::exception& error) {
+            startup_gate.fail(QString::fromUtf8(error.what()));
+            return false;
         }
-    }
+    };
 
 #ifdef __EMSCRIPTEN__
-    // wasm 平台由浏览器管理事件循环，main 函数直接返回即可
-    return 0;
+    // wasm 继续由网页壳与浏览器管理启动和事件循环。
+    return initialize() ? 0 : -1;
 #else
+    // 第一张启动画面提交后再排队初始化，全程不在插件构造中泵事件。
+    QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &app, [&]() {
+        QTimer::singleShot(0, &app, [&]() {
+            if (splash.isVisible())
+                initialize();
+        });
+    });
+    splash.show();
     return app.exec();
 #endif
 }

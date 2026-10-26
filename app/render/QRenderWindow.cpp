@@ -10,6 +10,7 @@
 #include "QModelQuery.h"
 #include "QRenderWindowStyle.h"
 #include "QSelection.h"
+#include "QStartupProgress.h"
 #include "SelectManager.h"
 #include "Selection.h"
 #include "ViewportOrientationRepresentation.h"
@@ -345,6 +346,7 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     render_selection_revision_ = selection_revision_;
     vtk->selection_observer_tag_ = vtk->style_->AddObserver(vtkCommand::SelectionChangedEvent, this, &QRenderWindow::publishSelection);
     publishSelection();
+    QStartupProgress::instance().reportViewportReady();
     return vtk;
 }
 
