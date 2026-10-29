@@ -1,6 +1,7 @@
 #include "MeshPipelineData.h"
 #include "FaceHideFilter.h"
 #include "MeshData.h"
+#include "SolidHideFilter.h"
 
 #include <algorithm>
 #include <atomic>
@@ -217,6 +218,8 @@ void MeshPipelineData::loadModelData(const MeshDataVtk& data)
     vtkNew<vtkIdTypeArray> original_point_ids_;
     generation_ = ++next_mesh_generation;
     hidden_face_ids_.clear();
+    hidden_solid_ids_.clear();
+    faces_only_ = false;
     dirty_ = true;
     // 本方法所有 SetArray 均使用 save=1：VTK 借用 vector 缓冲，不负责释放。
     // source_ 与已发布快照共同保活这些缓冲，不能把 save 改为 0。
@@ -379,6 +382,7 @@ void MeshPipelineData::isolateFaces(const std::vector<vtkIdType>& face_ids)
         if (!shown[static_cast<std::size_t>(id)])
             hidden_face_ids_.push_back(id);
     }
+    faces_only_ = true;
     visible_ = true;
     dirty_ = true;
 }
@@ -390,23 +394,85 @@ void MeshPipelineData::showAllFaces()
         hidden_face_ids_.clear();
         dirty_ = true;
     }
+    faces_only_ = false;
+}
+
+void MeshPipelineData::hideSolids(const std::vector<vtkIdType>& solid_ids)
+{
+    assertOwnerThread();
+    if (!solid_data_)
+        return;
+    const auto count = solid_data_->GetNumberOfCells();
+    for (auto id : solid_ids) {
+        if (id >= 0 && id < count)
+            hidden_solid_ids_.push_back(id);
+    }
+    std::sort(hidden_solid_ids_.begin(), hidden_solid_ids_.end());
+    hidden_solid_ids_.erase(std::unique(hidden_solid_ids_.begin(), hidden_solid_ids_.end()), hidden_solid_ids_.end());
+    dirty_ = true;
+}
+
+void MeshPipelineData::showAllSolids()
+{
+    assertOwnerThread();
+    if (!hidden_solid_ids_.empty()) {
+        hidden_solid_ids_.clear();
+        dirty_ = true;
+    }
+}
+
+void MeshPipelineData::isolateSolids(const std::vector<vtkIdType>& solid_ids)
+{
+    assertOwnerThread();
+    if (!solid_data_)
+        return;
+    std::vector<bool> shown(static_cast<std::size_t>(solid_data_->GetNumberOfCells()), false);
+    for (auto id : solid_ids) {
+        if (id >= 0 && id < static_cast<vtkIdType>(shown.size()))
+            shown[static_cast<std::size_t>(id)] = true;
+    }
+    // 仅保留选中体：隐藏集取反为所有未选中体，由 SolidHideFilter 完成过滤。
+    hidden_solid_ids_.clear();
+    for (vtkIdType id = 0; id < static_cast<vtkIdType>(shown.size()); ++id) {
+        if (!shown[static_cast<std::size_t>(id)])
+            hidden_solid_ids_.push_back(id);
+    }
+    // 体隔离需要渲染实体，关闭面隔离的 faces_only 域，并确保整体可见。
+    faces_only_ = false;
+    visible_ = true;
+    dirty_ = true;
 }
 
 bool MeshPipelineData::reverseVisibility()
 {
     assertOwnerThread();
     if (!visible_) {
+        // 状态 A：整体恢复，同时清除面与体的局部隐藏/隔离状态。
         showAllFaces();
+        showAllSolids();
         visible_ = true;
-    } else if (hidden_face_ids_.empty()) {
+    } else if (hidden_face_ids_.empty() && hidden_solid_ids_.empty()) {
+        // 状态 B：无任何局部隐藏，整体关闭。
         visible_ = false;
-    } else if (face_data_) {
-        std::vector<vtkIdType> reversed;
-        for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
-            if (!std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), id))
-                reversed.push_back(id);
+    } else {
+        // 状态 C：对每个非空集合独立取补；空集合保持为空不参与取补，
+        // 避免只隐藏体时面被补成全部隐藏。集合按升序重建，保持二分查找前提。
+        if (!hidden_face_ids_.empty() && face_data_) {
+            std::vector<vtkIdType> reversed;
+            for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
+                if (!std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), id))
+                    reversed.push_back(id);
+            }
+            hidden_face_ids_ = std::move(reversed);
         }
-        hidden_face_ids_ = std::move(reversed);
+        if (!hidden_solid_ids_.empty() && solid_data_) {
+            std::vector<vtkIdType> reversed;
+            for (vtkIdType id = 0; id < solid_data_->GetNumberOfCells(); ++id) {
+                if (!std::binary_search(hidden_solid_ids_.begin(), hidden_solid_ids_.end(), id))
+                    reversed.push_back(id);
+            }
+            hidden_solid_ids_ = std::move(reversed);
+        }
         dirty_ = true;
     }
     return visible_;
@@ -445,6 +511,17 @@ void MeshPipelineData::rebuildOutputs()
     hider->SetHiddenCellIds(hidden_ids);
     hider->Update();
 
+    // 体隐藏过滤器与面隐藏同样每次新建：隐藏后的体从表面与内部线框同时消失，
+    // 且不影响裁剪行为（内部线框取隐藏后、未裁剪的体）。
+    vtkNew<SolidHideFilter> solid_hider;
+    vtkNew<vtkIdTypeArray> hidden_solid_ids;
+    for (auto id : hidden_solid_ids_)
+        hidden_solid_ids->InsertNextValue(id);
+    solid_hider->SetInputData(solid_data_);
+    solid_hider->SetHiddenCellIds(hidden_solid_ids);
+    solid_hider->Update();
+    vtkUnstructuredGrid* visible_solids = solid_hider->GetOutput();
+
     vtkNew<vtkPlane> plane;
     plane->SetOrigin(clip_.origin.data());
     plane->SetNormal(clip_.normal.data());
@@ -453,7 +530,7 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkExtractGeometry> solid_clipper;
     vtkPolyData* faces = hider->GetOutput();
     vtkPolyData* edges = edge_data_;
-    vtkUnstructuredGrid* solids = solid_data_;
+    vtkUnstructuredGrid* solids = visible_solids;
     if (clip_.enabled) {
         face_clipper->SetInputData(faces);
         face_clipper->SetImplicitFunction(plane);
@@ -471,17 +548,10 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkGeometryFilter> surface;
     surface->SetInputData(solids);
     surface->Update();
-    // 内部线框始终来自完整原始体，与裁剪及面隐藏无关；同一源数据只提取一次。
-    // 复用已发布的只读输出，源网格重新加载（含坐标/属性更新）后才重新提边。
-    vtkSmartPointer<vtkPolyData> internal_edges;
-    if (prepared_ && prepared_->source == source_) {
-        internal_edges = prepared_->solid_internal_edges;
-    } else {
-        vtkNew<vtkExtractEdges> extractor;
-        extractor->SetInputData(solid_data_);
-        extractor->Update();
-        internal_edges = publishPolyData(extractor->GetOutput());
-    }
+    vtkNew<vtkExtractEdges> internal_edges;
+    // 内部线框基于隐藏后的体（未裁剪），隐藏体不再参与内部线框。
+    internal_edges->SetInputData(visible_solids);
+    internal_edges->Update();
 
     prepared_ = std::make_shared<MeshDataSnapshot>();
     prepared_->source = source_;
@@ -493,7 +563,7 @@ void MeshPipelineData::rebuildOutputs()
     prepared_->visible_faces = publishPolyData(faces);
     prepared_->visible_edges = publishPolyData(edges);
     prepared_->solid_surface = publishPolyData(surface->GetOutput());
-    prepared_->solid_internal_edges = internal_edges;
+    prepared_->solid_internal_edges = publishPolyData(internal_edges->GetOutput());
     dirty_ = false;
 }
 

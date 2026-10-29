@@ -110,6 +110,13 @@ std::unordered_map<Index, std::vector<vtkIdType>> SelectManager::selectedFaceIds
     return mesh_->selectedFacesByComponent();
 }
 
+std::unordered_map<Index, std::vector<vtkIdType>> SelectManager::selectedSolidsByComponent()
+{
+    if (select_mode_ != SelectMode::Solid)
+        return {};
+    return mesh_->selectedSolidsByComponent();
+}
+
 void SelectManager::setMeshIdQuery(const IMeshIdQuery* id_query)
 {
     mesh_->setMeshIdQuery(id_query);

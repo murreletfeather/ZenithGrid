@@ -523,6 +523,10 @@ void QRenderWindow::showSelectedFaces() { applyFaceOperation(FaceOperation::Show
 void QRenderWindow::isolateSelectedFaces() { applyFaceOperation(FaceOperation::Isolate); }
 void QRenderWindow::showAll() { applyFaceOperation(FaceOperation::ShowScene); }
 
+void QRenderWindow::hideSelectedSolids() { applySolidOperation(SolidOperation::Hide); }
+void QRenderWindow::isolateSelectedSolids() { applySolidOperation(SolidOperation::Isolate); }
+void QRenderWindow::showAllHiddenSolids() { applySolidOperation(SolidOperation::ShowAll); }
+
 void QRenderWindow::reverseComponentVisibility(Index component_id)
 {
     const auto pipeline = mesh_pipeline_data_.find(component_id);
@@ -595,6 +599,7 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
             if (pipeline->generation() == 0)
                 continue;
             pipeline->showAllFaces();
+            pipeline->showAllSolids();
             pipeline->setVisibility(true);
             notifications.push_back(id);
             publish_mesh(id);
@@ -638,6 +643,60 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
             vtk->mesh_actor_manager_->loadMesh(id, snapshot, vtk->renderer_);
         for (const auto& [id, visible] : geometry_updates)
             vtk->geometry_actor_manager_->setVisibility(id, visible);
+        publishSelection();
+    });
+    // 已投递安装命令后同步通知 GUI，后续用户操作不会再被旧渲染回传覆盖。
+    for (auto id : notifications)
+        publishComponentVisibility(id);
+}
+
+void QRenderWindow::applySolidOperation(SolidOperation operation)
+{
+    SelectedSolids valid_solids;
+    for (const auto& [id, solids] : selected_solids_) {
+        const auto pipeline = mesh_pipeline_data_.find(id);
+        const auto generation = selected_solid_generations_.find(id);
+        if (pipeline != mesh_pipeline_data_.end() && generation != selected_solid_generations_.end()
+            && pipeline->second->generation() == generation->second)
+            valid_solids.emplace(id, solids);
+    }
+    if ((operation == SolidOperation::Hide || operation == SolidOperation::Isolate)
+        && valid_solids.empty())
+        return;
+    std::vector<std::pair<Index, std::shared_ptr<const MeshDataSnapshot>>> snapshots;
+    std::vector<Index> notifications;
+    auto publish_mesh = [this, &snapshots](Index id) {
+        if (mesh_pipeline_data_.at(id)->generation() != 0)
+            snapshots.emplace_back(id, prepareMeshSnapshot(id));
+    };
+    if (operation == SolidOperation::Hide) {
+        for (const auto& [id, solids] : valid_solids) {
+            mesh_pipeline_data_.at(id)->hideSolids(solids);
+            publish_mesh(id);
+        }
+    } else if (operation == SolidOperation::Isolate) {
+        for (const auto& [id, solids] : valid_solids) {
+            mesh_pipeline_data_.at(id)->isolateSolids(solids);
+            notifications.push_back(id);
+            publish_mesh(id);
+        }
+    } else {
+        // 全部显示：恢复所有组件的局部隐藏体，不改动面隐藏与几何开关。
+        for (auto& [id, pipeline] : mesh_pipeline_data_) {
+            if (pipeline->generation() == 0)
+                continue;
+            pipeline->showAllSolids();
+            notifications.push_back(id);
+            publish_mesh(id);
+        }
+    }
+    dispatch_async([this, revision = selection_revision_, snapshots = std::move(snapshots)](vtkRenderWindow*, vtkUserData user_data) {
+        auto* vtk = Data::SafeDownCast(user_data);
+        // 体隐藏/隔离后清除选择，避免高亮悬浮在不可拾取的体上。
+        render_selection_revision_ = revision;
+        select_manager_->clearSelection();
+        for (const auto& [id, snapshot] : snapshots)
+            vtk->mesh_actor_manager_->loadMesh(id, snapshot, vtk->renderer_);
         publishSelection();
     });
     // 已投递安装命令后同步通知 GUI，后续用户操作不会再被旧渲染回传覆盖。
@@ -777,25 +836,41 @@ void QRenderWindow::publishSelection()
     if (selection && selection->component_id < 0)
         selection->component_id = cur_component_id_;
     auto faces = select_manager_->selectedFaceIdsByComponent();
-    MeshGenerations generations;
+    auto solids = select_manager_->selectedSolidsByComponent();
+    MeshGenerations face_generations;
     for (const auto& [id, face_ids] : faces) {
         if (auto actor = data_->mesh_actor_manager_->getComponentActor(id))
-            generations[id] = actor->dataGeneration();
+            face_generations[id] = actor->dataGeneration();
+    }
+    MeshGenerations solid_generations;
+    for (const auto& [id, solid_ids] : solids) {
+        if (auto actor = data_->mesh_actor_manager_->getComponentActor(id))
+            solid_generations[id] = actor->dataGeneration();
     }
     std::shared_ptr<const Selection> snapshot = std::move(selection);
     const int revision = render_selection_revision_;
-    QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot, faces = std::move(faces), generations = std::move(generations), revision] {
+    QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot,
+            faces = std::move(faces), face_generations = std::move(face_generations),
+            solids = std::move(solids), solid_generations = std::move(solid_generations),
+            revision] {
             if (revision != selection_revision_)
                 return;
             // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份。
-            for (const auto& [id, generation] : generations) {
+            for (const auto& [id, generation] : face_generations) {
+                const auto pipeline = mesh_pipeline_data_.find(id);
+                if (pipeline == mesh_pipeline_data_.end() || pipeline->second->generation() != generation)
+                    return;
+            }
+            for (const auto& [id, generation] : solid_generations) {
                 const auto pipeline = mesh_pipeline_data_.find(id);
                 if (pipeline == mesh_pipeline_data_.end() || pipeline->second->generation() != generation)
                     return;
             }
             selection_snapshot_ = snapshot;
             selected_faces_ = faces;
-            selected_face_generations_ = generations;
+            selected_face_generations_ = face_generations;
+            selected_solids_ = solids;
+            selected_solid_generations_ = solid_generations;
             emit selectedChanged(); }, Qt::QueuedConnection);
 }
 

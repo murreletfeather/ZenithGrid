@@ -5,6 +5,7 @@ add_library(vtkPart STATIC
     MeshActorSelectOp.cpp
     MeshAreaPick.cpp
     FaceHideFilter.cpp
+    SolidHideFilter.cpp
     GeometryActorSelectOp.cpp
     GeometrySelectorHighlight.cpp
     QRenderWindowStyle.cpp

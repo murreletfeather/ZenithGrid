@@ -763,14 +763,18 @@ Page {
             property var pickedIds: []
             // 面和组件共用所选对象操作；空选择时显示全局显隐操作。
             property bool faceMode: App.selection.selectMode === "Face"
+            property bool solidMode: App.selection.selectMode === "Solid"
             property bool hasFacePicks: false
-            property bool hasPicks: faceMode ? hasFacePicks : pickedIds.length > 0
+            property bool hasSolidPicks: false
+            // 面和体的选择集类型不是 Component，getAsComponentIds 对其返回空，须用 size() 判断。
+            property bool hasPicks: faceMode ? hasFacePicks : solidMode ? hasSolidPicks : pickedIds.length > 0
 
             // 根据选择快照刷新菜单，确保弹出前完成所选对象判断。
             function refreshSelection(sel) {
                 pickedIds = sel ? sel.getAsComponentIds() : []
-                // 选择模式已标识选面；Element 的继承枚举未导出到 QML，不能用于比较。
+                // 选择模式已标识选面/选体；Element 的继承枚举未导出到 QML，不能用于比较。
                 hasFacePicks = faceMode && !!sel && sel.size() > 0
+                hasSolidPicks = solidMode && !!sel && sel.size() > 0
             }
 
             onAboutToShow: refreshSelection(myItem.selectedIDs)
@@ -794,6 +798,8 @@ Page {
                 onTriggered: {
                     if (viewportMenu.faceMode)
                         myItem.hideSelectedFaces()
+                    else if (viewportMenu.solidMode)
+                        myItem.hideSelectedSolids()
                     else {
                         for (let i = 0; i < viewportMenu.pickedIds.length; i++)
                             App.registry.objectTree.hideNode(viewportMenu.pickedIds[i], 1)
@@ -807,6 +813,8 @@ Page {
                 onTriggered: {
                     if (viewportMenu.faceMode)
                         myItem.isolateSelectedFaces()
+                    else if (viewportMenu.solidMode)
+                        myItem.isolateSelectedSolids()
                     else if (viewportMenu.pickedIds.length > 0)
                         App.registry.objectTree.isolateSelection(viewportMenu.pickedIds)
                 }
@@ -814,7 +822,7 @@ Page {
 
             StyledMenuItem {
                 text: "显示"
-                shown: viewportMenu.hasPicks
+                shown: viewportMenu.hasPicks && !viewportMenu.solidMode
                 onTriggered: {
                     if (viewportMenu.faceMode)
                         myItem.showSelectedFaces()

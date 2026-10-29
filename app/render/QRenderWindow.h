@@ -192,6 +192,24 @@ public:
     Q_INVOKABLE void showAll();
 
     /**
+     * @brief 隐藏体选择器当前高亮选中的体（右键菜单"隐藏"）
+     *
+     * 仅体选择模式有效，其余模式为空操作；隐藏为渲染层单元过滤，
+     * 不修改模型数据，被隐藏体不渲染也不可拾取，选择随之清除。
+     */
+    Q_INVOKABLE void hideSelectedSolids();
+
+    /**
+     * @brief 仅显示选中的体，隐藏其余所有体（右键菜单"隔离"）
+     */
+    Q_INVOKABLE void isolateSelectedSolids();
+
+    /**
+     * @brief 恢复全部局部隐藏体（右键菜单"全部显示"）
+     */
+    Q_INVOKABLE void showAllHiddenSolids();
+
+    /**
      * @brief 反转目标组件；几何沿用组件整体开关，网格兼容局部隐藏面
      * @param component_id 目标组件，局部隐藏面的反转规则与场景反转一致
      */
@@ -266,11 +284,18 @@ private:
         Isolate,
         ShowScene,
         Reverse };
+    /** @brief 体命令与面命令共用 GUI 缓存的选择，支持隐藏/隔离/全部显示。 */
+    enum class SolidOperation { Hide,
+        Isolate,
+        ShowAll };
     using SelectedFaces = std::unordered_map<Index, std::vector<vtkIdType>>;
+    using SelectedSolids = std::unordered_map<Index, std::vector<vtkIdType>>;
     using MeshGenerations = std::unordered_map<Index, std::uint64_t>;
     using GeometryVisibility = std::unordered_map<Index, bool>;
     /** @brief 直接使用 GUI 缓存的选择和网格代次计算显隐结果。 */
     void applyFaceOperation(FaceOperation operation, const std::vector<Index>& ids = { });
+    /** @brief 直接使用 GUI 缓存的体选择和网格代次计算体显隐结果。 */
+    void applySolidOperation(SolidOperation operation);
     /** @brief 查询 GUI 记录的有效网格与几何组件并集，供场景反转确定范围。 */
     std::vector<Index> getSceneComponentIds() const;
     /** @brief 发布当前组件结果，缓存用于场景图重建。 */
@@ -296,6 +321,8 @@ private:
     int render_selection_revision_ { }; //> 渲染侧已应用版本
     SelectedFaces selected_faces_; //> 与 QML 选择同批回传的原始面 ID，仅 GUI 访问
     MeshGenerations selected_face_generations_; //> 各选中组件的源网格代次，仅 GUI 访问
+    SelectedSolids selected_solids_; //> 与 QML 选择同批回传的原始体 ID，仅 GUI 访问
+    MeshGenerations selected_solid_generations_; //> 各选中体所属组件的源网格代次，仅 GUI 访问
 
     GeometryRenderStyle geometry_style_ { GeometryRenderStyle::SurfaceWithEdges };
     MeshRenderStyle mesh_style_ { MeshRenderStyle::FaceWithEdges };

@@ -1,6 +1,6 @@
 /**
  * @file MeshPipelineData.h
- * @brief GUI 线程持有的网格基础数据、面隐藏及裁剪管线。
+ * @brief GUI 线程持有的网格基础数据、面/体隐藏及裁剪管线。
  */
 #pragma once
 
@@ -69,7 +69,13 @@ public:
     void isolateFaces(const std::vector<vtkIdType>& face_ids);
     /** @brief 恢复全部人工隐藏面并结束面隔离。 */
     void showAllFaces();
-    /** @brief 沿用当前整体与局部面显隐的反转规则，返回整体开关。 */
+    /** @brief 隐藏有效的原始体 ID，累积并去重；与面隐藏状态相互独立。 */
+    void hideSolids(const std::vector<vtkIdType>& solid_ids);
+    /** @brief 仅保留指定原始体，隐藏其余所有体；与面隔离相互独立。 */
+    void isolateSolids(const std::vector<vtkIdType>& solid_ids);
+    /** @brief 恢复全部人工隐藏体，不影响面隐藏状态。 */
+    void showAllSolids();
+    /** @brief 反转整体与局部面/体显隐：整体关时恢复并清除局部状态，否则反转非空隐藏集合，返回整体开关。 */
     bool reverseVisibility();
     /** @brief 复制调用线程中的裁剪平面参数，nullptr 表示停用。 */
     void setClipPlane(vtkPlane* plane);
@@ -94,8 +100,10 @@ private:
     vtkSmartPointer<vtkUnstructuredGrid> solid_data_;
     std::shared_ptr<MeshDataSnapshot> prepared_;
     std::vector<vtkIdType> hidden_face_ids_;
+    std::vector<vtkIdType> hidden_solid_ids_;
     MeshClipPlane clip_;
     bool visible_ { true };
+    bool faces_only_ { false };
     bool dirty_ { true };
     std::uint64_t generation_ { };
     std::uint64_t revision_ { };
