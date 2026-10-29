@@ -101,9 +101,10 @@ private:
     std::shared_ptr<MeshDataSnapshot> prepared_;
     std::vector<vtkIdType> hidden_face_ids_;
     std::vector<vtkIdType> hidden_solid_ids_;
-    //> 内部线框缓存：提边代价高，仅在源网格或隐藏体集合变化时重算
-    std::shared_ptr<const MeshData> edges_cache_source_;
-    std::vector<vtkIdType> edges_cache_hidden_solid_ids_;
+    //> 可见体网格（未裁剪）与内部线框缓存：仅在源网格或隐藏体集合变化时重算
+    vtkSmartPointer<vtkUnstructuredGrid> visible_solids_cache_;
+    std::shared_ptr<const MeshData> visible_solids_cache_source_;
+    std::vector<vtkIdType> visible_solids_cache_hidden_solid_ids_;
     vtkSmartPointer<vtkPolyData> edges_cache_;
     MeshClipPlane clip_;
     bool visible_ { true };

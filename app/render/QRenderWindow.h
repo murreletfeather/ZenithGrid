@@ -205,11 +205,6 @@ public:
     Q_INVOKABLE void isolateSelectedSolids();
 
     /**
-     * @brief 恢复全部局部隐藏体（右键菜单"全部显示"）
-     */
-    Q_INVOKABLE void showAllHiddenSolids();
-
-    /**
      * @brief 反转目标组件；几何沿用组件整体开关，网格兼容局部隐藏面
      * @param component_id 目标组件，局部隐藏面的反转规则与场景反转一致
      */
@@ -284,10 +279,9 @@ private:
         Isolate,
         ShowScene,
         Reverse };
-    /** @brief 体命令与面命令共用 GUI 缓存的选择，支持隐藏/隔离/全部显示。 */
+    /** @brief 体命令与面命令共用 GUI 缓存的选择，支持隐藏/隔离。 */
     enum class SolidOperation { Hide,
-        Isolate,
-        ShowAll };
+        Isolate };
     using SelectedFaces = std::unordered_map<Index, std::vector<vtkIdType>>;
     using SelectedSolids = std::unordered_map<Index, std::vector<vtkIdType>>;
     using MeshGenerations = std::unordered_map<Index, std::uint64_t>;

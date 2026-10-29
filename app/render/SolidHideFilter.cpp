@@ -3,7 +3,9 @@
 #include <spdlog/spdlog.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCellType.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkGenericCell.h>
 #include <vtkIdList.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
@@ -12,6 +14,7 @@
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkUnsignedCharArray.h>
 
 #include <vector>
 
@@ -106,7 +109,7 @@ int SolidHideFilter::RequestData(
         return 1;
     }
 
-    // kept_count 为真实保留单元数，用作输出预分配容量；全部隐藏时得到空输出。
+    // kept_count 为真实保留单元数；全部隐藏时得到空输出。
     const vtkIdType kept_count = cell_count - hidden_valid_count;
 
     // 点集不压缩：输出共享输入点坐标与点属性，仅重建单元连通性。
@@ -114,34 +117,55 @@ int SolidHideFilter::RequestData(
     output->SetPoints(input->GetPoints());
     output->GetPointData()->ShallowCopy(input->GetPointData());
 
-    // 保留单元的连接点数之和，避免传入输入全量连通性造成过度预分配。
-    vtkIdType kept_connectivity_size = 0;
-    for (vtkIdType cell_id = 0; cell_id < cell_count; ++cell_id) {
-        if (!removed[static_cast<size_t>(cell_id)])
-            kept_connectivity_size += input->GetCellSize(cell_id);
-    }
-
     // COPYTUPLE 只做整元组拷贝，输出数组按输入数组同类型创建（整型不提升为浮点）。
     vtkCellData* in_cell_data = input->GetCellData();
     vtkCellData* out_cell_data = output->GetCellData();
     out_cell_data->CopyAllocate(in_cell_data, kept_count, 0, vtkDataSetAttributes::COPYTUPLE);
 
-    output->AllocateExact(kept_count, kept_connectivity_size);
-
+    // 多面体单元只写连通性会丢掉面拓扑，必须同时重建 faces 与 faceLocations，
+    // 因此先按保留单元重建三套数组，最后一次性交给 SetCells/SetPolyhedralCells。
+    vtkNew<vtkUnsignedCharArray> out_types;
+    vtkNew<vtkCellArray> out_cells;
+    vtkNew<vtkCellArray> out_faces;
+    vtkNew<vtkCellArray> out_face_locations;
+    vtkNew<vtkGenericCell> polyhedron;
+    vtkNew<vtkIdList> face_ids;
     vtkNew<vtkIdList> stream;
+    bool has_polyhedra = false;
     vtkIdType out_cell_id = 0;
     for (vtkIdType cell_id = 0; cell_id < cell_count; ++cell_id) {
         if (removed[static_cast<size_t>(cell_id)])
             continue;
-        // GetFaceStream 对多面体返回 (nFaces, 每面点数, 点id...) 的面流，对普通
-        // 单元返回普通点列表；InsertNextCell(type, ptIds) 按类型解析同一结构，
-        // 多面体的面拓扑在输出中原样保留。
-        input->GetFaceStream(cell_id, stream);
         const int type = input->GetCellType(cell_id);
-        output->InsertNextCell(type, stream);
+        if (type == VTK_POLYHEDRON) {
+            has_polyhedra = true;
+            input->GetCell(cell_id, polyhedron);
+            out_cells->InsertNextCell(polyhedron->GetPointIds());
+            // 每个面的点 id 追加到 faces，并记录本单元拥有的新面 id。
+            face_ids->Initialize();
+            const vtkIdType face_count = polyhedron->GetNumberOfFaces();
+            for (vtkIdType face = 0; face < face_count; ++face) {
+                out_faces->InsertNextCell(polyhedron->GetFace(face)->GetPointIds());
+                face_ids->InsertNextId(out_faces->GetNumberOfCells() - 1);
+            }
+            out_face_locations->InsertNextCell(face_ids);
+        } else {
+            // GetFaceStream 对普通单元返回普通点列表。
+            input->GetFaceStream(cell_id, stream);
+            out_cells->InsertNextCell(stream);
+            // faceLocations 按单元索引，普通单元一律用空条目占位，
+            // 保证多面体单元的面 id 列表与单元下标对齐。
+            out_face_locations->InsertNextCell(0, nullptr);
+        }
+        out_types->InsertNextValue(static_cast<unsigned char>(type));
         out_cell_data->CopyData(in_cell_data, cell_id, out_cell_id);
         ++out_cell_id;
     }
+
+    if (has_polyhedra)
+        output->SetPolyhedralCells(out_types, out_cells, out_face_locations, out_faces);
+    else
+        output->SetCells(out_types, out_cells);
 
     return 1;
 }

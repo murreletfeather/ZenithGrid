@@ -525,7 +525,6 @@ void QRenderWindow::showAll() { applyFaceOperation(FaceOperation::ShowScene); }
 
 void QRenderWindow::hideSelectedSolids() { applySolidOperation(SolidOperation::Hide); }
 void QRenderWindow::isolateSelectedSolids() { applySolidOperation(SolidOperation::Isolate); }
-void QRenderWindow::showAllHiddenSolids() { applySolidOperation(SolidOperation::ShowAll); }
 
 void QRenderWindow::reverseComponentVisibility(Index component_id)
 {
@@ -660,8 +659,7 @@ void QRenderWindow::applySolidOperation(SolidOperation operation)
             && pipeline->second->generation() == generation->second)
             valid_solids.emplace(id, solids);
     }
-    if ((operation == SolidOperation::Hide || operation == SolidOperation::Isolate)
-        && valid_solids.empty())
+    if (valid_solids.empty())
         return;
     std::vector<std::pair<Index, std::shared_ptr<const MeshDataSnapshot>>> snapshots;
     std::vector<Index> notifications;
@@ -674,18 +672,9 @@ void QRenderWindow::applySolidOperation(SolidOperation operation)
             mesh_pipeline_data_.at(id)->hideSolids(solids);
             publish_mesh(id);
         }
-    } else if (operation == SolidOperation::Isolate) {
+    } else {
         for (const auto& [id, solids] : valid_solids) {
             mesh_pipeline_data_.at(id)->isolateSolids(solids);
-            notifications.push_back(id);
-            publish_mesh(id);
-        }
-    } else {
-        // 全部显示：恢复所有组件的局部隐藏体，不改动面隐藏与几何开关。
-        for (auto& [id, pipeline] : mesh_pipeline_data_) {
-            if (pipeline->generation() == 0)
-                continue;
-            pipeline->showAllSolids();
             notifications.push_back(id);
             publish_mesh(id);
         }

@@ -124,3 +124,12 @@ precess_test_link_libraries(TestRenderWindowFaceHiding renderQml vtkPart modelQm
 vtk_module_autoinit(TARGETS TestRenderWindowFaceHiding MODULES
     VTK::GUISupportQtQuick VTK::RenderingOpenGL2 VTK::InteractionStyle
 )
+
+# TestMeshSolidHiding（右键隐藏/隔离选中体：SolidHideFilter 契约、体隐藏集合语义、内外线框缓存回归）
+precess_add_test(TestMeshSolidHiding TestMeshSolidHiding.cpp)
+precess_test_link_libraries(TestMeshSolidHiding vtkPart TestDeps
+    VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::FiltersGeometry VTK::FiltersExtraction VTK::FiltersCore
+)
+vtk_module_autoinit(TARGETS TestMeshSolidHiding MODULES
+    VTK::CommonColor VTK::RenderingCore VTK::RenderingUI VTK::FiltersGeometry VTK::FiltersExtraction VTK::FiltersCore
+)
