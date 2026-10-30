@@ -31,7 +31,8 @@ SolidHideFilter::~SolidHideFilter()
 void SolidHideFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
     this->Superclass::PrintSelf(os, indent);
-    os << indent << "HiddenCellIds: " << this->HiddenCellIds << "\n";
+    os << indent << "HiddenCellIds: "
+       << (this->HiddenCellIds ? this->HiddenCellIds->GetNumberOfValues() : 0) << "\n";
 }
 
 namespace {
@@ -144,6 +145,9 @@ int SolidHideFilter::RequestData(
     vtkNew<vtkGenericCell> polyhedron;
     vtkNew<vtkIdList> face_ids;
     vtkNew<vtkIdList> stream;
+    // faceLocations 只服务 SetPolyhedralCells，输入不含多面体时整列无需构建。
+    vtkCellArray* in_polyhedron_faces = input->GetPolyhedronFaces();
+    const bool input_has_polyhedra = in_polyhedron_faces && in_polyhedron_faces->GetNumberOfCells() > 0;
     bool has_polyhedra = false;
     vtkIdType out_cell_id = 0;
     for (vtkIdType cell_id = 0; cell_id < cell_count; ++cell_id) {
@@ -167,8 +171,9 @@ int SolidHideFilter::RequestData(
             input->GetFaceStream(cell_id, stream);
             out_cells->InsertNextCell(stream);
             // faceLocations 按单元索引，普通单元一律用空条目占位，
-            // 保证多面体单元的面 id 列表与单元下标对齐。
-            out_face_locations->InsertNextCell(0, nullptr);
+            // 保证多面体单元的面 id 列表与单元下标对齐；无多面体时跳过以免无用分配。
+            if (input_has_polyhedra)
+                out_face_locations->InsertNextCell(0, nullptr);
         }
         out_types->InsertNextValue(static_cast<unsigned char>(type));
         out_cell_data->CopyData(in_cell_data, cell_id, out_cell_id);

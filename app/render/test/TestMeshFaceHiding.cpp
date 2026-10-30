@@ -10,6 +10,9 @@
 #include "renderStrategy/AttriRenderStrategyScalar.h"
 #include "renderStrategy/AttriRenderStrategyVector.h"
 #include "renderStrategy/AttributeOperator.h"
+#include <algorithm>
+#include <vector>
+
 #include <catch2/catch_test_macros.hpp>
 #include <vtkActor.h>
 #include <vtkAlgorithmOutput.h>

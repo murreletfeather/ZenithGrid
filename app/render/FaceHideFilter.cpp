@@ -30,7 +30,8 @@ FaceHideFilter::~FaceHideFilter()
 void FaceHideFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
     this->Superclass::PrintSelf(os, indent);
-    os << indent << "HiddenCellIds: " << this->HiddenCellIds << "\n";
+    os << indent << "HiddenCellIds: "
+       << (this->HiddenCellIds ? this->HiddenCellIds->GetNumberOfValues() : 0) << "\n";
 }
 
 namespace {
