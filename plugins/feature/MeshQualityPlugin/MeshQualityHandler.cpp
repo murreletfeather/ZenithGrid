@@ -432,11 +432,11 @@ std::any MeshQualityHandler::execute(FeatureContext& ctx)
     }
 
     const Selection& selection = **selection_ptr;
-    if (selection.type != ElementEnum::Component || selection.ids.size() != 1) {
+    if (selection.type() != ElementEnum::Component || selection.ids().size() != 1) {
         return std::string("只能选择一个 Component");
     }
 
-    const Index component_id = selection.ids.front();
+    const Index component_id = selection.ids().front();
     auto component = ctx.componentOperator(component_id);
     if (!component || !component->mesh()) {
         return std::string("所选 Component 没有网格");

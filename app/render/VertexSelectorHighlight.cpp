@@ -63,13 +63,13 @@ VertexSelectorHighlight::~VertexSelectorHighlight()
 SelectionVtk VertexSelectorHighlight::get()
 {
     SelectionVtk back_selection;
-    back_selection.type = ElementEnum::Vertex;
+    back_selection.setType(ElementEnum::Vertex);
     // 选中状态存局部点 id（高亮提取键空间），出口经 id 查询桥统一换算为全局点 id（跨层身份）
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i) {
         const auto local = static_cast<Index>(selected_ids_->GetValue(i));
         const Index gid = id_query_ ? id_query_->pointGlobalId(component_id_, local) : -1;
         if (gid >= 0)
-            back_selection.ids.push_back(gid);
+            back_selection.ids().push_back(gid);
     }
     return back_selection;
 }

@@ -115,10 +115,10 @@ TEST_CASE("FaceSelectorHighlight maps point area and angle picks after replacing
     REQUIRE(mapper);
     // 使用原面 0 的预拾取结果，随后将它隐藏，使剩余面的渲染下标发生压缩。
     selector.select(0, 0, nullptr, face_actor, 0, -1, SelectOp::Append);
-    REQUIRE(selector.get().ids == std::vector<Index>({ 0 }));
+    REQUIRE(selector.get().ids() == std::vector<Index>({ 0 }));
     selector.clear();
     env.actor->hideFaces({ 0 });
-    CHECK(selector.get().ids.empty());
+    CHECK(selector.get().ids().empty());
     CHECK(partitionCellCount(*highlight_data) == 0);
     mapper->Update();
     auto* poly = mapper->GetInput();
@@ -131,34 +131,34 @@ TEST_CASE("FaceSelectorHighlight maps point area and angle picks after replacing
     SECTION("point toggle")
     {
         selector.select(0, 0, nullptr, face_actor, 0, -1, SelectOp::Toggle);
-        CHECK(selector.get().ids == std::vector<Index>({ picked_id }));
+        CHECK(selector.get().ids() == std::vector<Index>({ picked_id }));
         CHECK(partitionCellCount(*highlight_data) == 1);
         selector.select(0, 0, nullptr, face_actor, 0, -1, SelectOp::Toggle);
-        CHECK(selector.get().ids.empty());
+        CHECK(selector.get().ids().empty());
         CHECK(partitionCellCount(*highlight_data) == 0);
     }
     SECTION("area append and remove")
     {
         std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> hits { { face_actor, { 0 } } };
         selector.selectArea(hits, 0, 0, 1, 1, SelectOp::Append);
-        auto selected = selector.get().ids;
+        auto selected = selector.get().ids();
         std::sort(selected.begin(), selected.end());
         CHECK(selected == std::vector<Index>({ picked_id }));
         CHECK(partitionCellCount(*highlight_data) == 1);
         selector.selectArea(hits, 0, 0, 1, 1, SelectOp::Remove);
-        CHECK(selector.get().ids.empty());
+        CHECK(selector.get().ids().empty());
         CHECK(partitionCellCount(*highlight_data) == 0);
     }
     SECTION("angle spread")
     {
         selector.setSpreadOptions({ true, 30.0 });
         selector.select(0, 0, nullptr, face_actor, 0, -1, SelectOp::Toggle);
-        const auto selected = selector.get().ids;
+        const auto selected = selector.get().ids();
         CHECK(std::find(selected.begin(), selected.end(), 0) == selected.end());
         CHECK(std::find(selected.begin(), selected.end(), picked_id) != selected.end());
         CHECK(partitionCellCount(*highlight_data) == selected.size());
         selector.select(0, 0, nullptr, face_actor, 0, -1, SelectOp::Toggle);
-        CHECK(selector.get().ids.empty());
+        CHECK(selector.get().ids().empty());
         CHECK(partitionCellCount(*highlight_data) == 0);
     }
 }

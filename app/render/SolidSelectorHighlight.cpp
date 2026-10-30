@@ -61,9 +61,9 @@ SolidSelectorHighlight::~SolidSelectorHighlight()
 SelectionVtk SolidSelectorHighlight::get()
 {
     SelectionVtk back_selection;
-    back_selection.type = ElementEnum::Solid;
+    back_selection.setType(ElementEnum::Solid);
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i) {
-        back_selection.ids.push_back(selected_ids_->GetValue(i));
+        back_selection.ids().push_back(selected_ids_->GetValue(i));
     }
     return back_selection;
 }

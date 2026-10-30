@@ -24,7 +24,7 @@ std::any DeleteFaceHandler::execute(ModelLayer& model, Index fallback_component_
         return { };
     }
     auto selection = *selection_p;
-    if (selection->type != ElementEnum::Face || selection->ids.empty()) {
+    if (selection->type() != ElementEnum::Face || selection->ids().empty()) {
         spdlog::error("DeleteFaceHandler::execute: Selection type is not Face or no faces selected.");
         return { };
     }
@@ -40,7 +40,7 @@ std::any DeleteFaceHandler::execute(ModelLayer& model, Index fallback_component_
     }
 
     // 获取所有需要删除的面ID并按降序排序，以便从后往前删除
-    std::vector<Index> face_ids = selection->ids;
+    std::vector<Index> face_ids = selection->ids();
     std::sort(face_ids.begin(), face_ids.end(), std::greater<Index>());
 
     // 验证所有面ID都在有效范围内

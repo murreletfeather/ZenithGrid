@@ -92,9 +92,9 @@ MergeEdgeFixture addMergeableEdges(ModelLayer& model_layer)
 std::shared_ptr<Selection> makeEdgeSelection(const MergeEdgeFixture& fixture)
 {
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometryEdge;
+    selection->setType(ElementEnum::GeometryEdge);
     selection->component_id = fixture.component_id;
-    selection->ids.assign(fixture.edge_ids.begin(), fixture.edge_ids.end());
+    selection->ids().assign(fixture.edge_ids.begin(), fixture.edge_ids.end());
     return selection;
 }
 

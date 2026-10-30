@@ -20,6 +20,14 @@ namespace systems::feature {
 class FeatureParams {
 public:
     explicit FeatureParams(std::vector<core::ArgType> types);
+    /** @brief 复制参数快照，选择值独立持有，避免重注册恢复时共享旧实例的可变选择。 */
+    FeatureParams(const FeatureParams& other);
+    /** @brief 用独立参数快照替换当前参数集。 */
+    FeatureParams& operator=(const FeatureParams& other);
+    /** @brief 转移已独立持有的参数，不重复复制选择值。 */
+    FeatureParams(FeatureParams&&) noexcept = default;
+    /** @brief 转移已独立持有的参数集。 */
+    FeatureParams& operator=(FeatureParams&&) noexcept = default;
 
     const std::vector<core::ArgType>& types() const noexcept { return types_; }
     std::size_t count() const noexcept { return types_.size(); }
@@ -29,7 +37,7 @@ public:
      */
     const core::ArgObject& value(std::size_t index) const;
     /**
-     * @brief 设置参数当前值
+     * @brief 设置参数当前值；Selector 保存独立选择值，不借用调用方的可变对象
      * @throw std::out_of_range 下标越界
      */
     void setValue(std::size_t index, core::ArgObject new_value);

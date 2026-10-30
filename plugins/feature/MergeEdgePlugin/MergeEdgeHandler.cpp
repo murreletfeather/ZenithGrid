@@ -31,17 +31,17 @@ std::any MergeEdgeHandler::execute(FeatureContext& ctx)
 {
     const auto* edge_param = ctx.params.value(0).get<ArgTypeEnum::Selector>();
     if (!edge_param || !*edge_param
-        || (*edge_param)->type != ElementEnum::GeometryEdge
-        || (*edge_param)->ids.size() < 2)
+        || (*edge_param)->type() != ElementEnum::GeometryEdge
+        || (*edge_param)->ids().size() < 2)
         return std::string("请选择两条或多条需要合并的几何边。");
 
     try {
         std::optional<Index> component_id;
         std::vector<TopoDS_Edge> edges;
-        edges.reserve((*edge_param)->ids.size());
+        edges.reserve((*edge_param)->ids().size());
 
         // 从每个全局边 ID 反查组件，选择集必须完全属于同一个组件。
-        for (Index edge_id : (*edge_param)->ids) {
+        for (Index edge_id : (*edge_param)->ids()) {
             const auto edge_component_id =
                 ctx.model.findComponentIdByGeometryShapeId(TopAbs_EDGE, edge_id);
             if (!edge_component_id)

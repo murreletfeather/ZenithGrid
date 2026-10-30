@@ -216,7 +216,7 @@ FaceSelectorHighlight::~FaceSelectorHighlight()
 SelectionVtk FaceSelectorHighlight::get()
 {
     SelectionVtk back_selection;
-    back_selection.type = ElementEnum::Face;
+    back_selection.setType(ElementEnum::Face);
     if (selections_.empty())
         return back_selection;
     auto* face_actor = vtkActor::SafeDownCast(&select_op_.getFaceActor());
@@ -233,7 +233,7 @@ SelectionVtk FaceSelectorHighlight::get()
         if (render_id < 0 || render_id >= poly->GetNumberOfCells()
             || (face_ids && render_id >= face_ids->GetNumberOfTuples()))
             continue;
-        back_selection.ids.push_back(static_cast<Index>(face_ids ? face_ids->GetValue(render_id) : render_id));
+        back_selection.ids().push_back(static_cast<Index>(face_ids ? face_ids->GetValue(render_id) : render_id));
     }
     return back_selection;
 }

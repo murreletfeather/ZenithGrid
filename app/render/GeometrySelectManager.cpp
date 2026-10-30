@@ -251,11 +251,11 @@ std::unique_ptr<Selection> GeometrySelectManager::getSelection()
 
     for (auto& [comp_id, sel] : component_selectors_) {
         auto selection = sel->get();
-        for (const auto& id : selection.ids)
-            result->ids.push_back(id);
-        if (selection.ids.size()) {
+        for (const auto& id : selection.ids())
+            result->ids().push_back(id);
+        if (selection.ids().size()) {
             result->component_id = comp_id;
-            result->type = selection.type;
+            result->setType(selection.type());
         }
     }
 

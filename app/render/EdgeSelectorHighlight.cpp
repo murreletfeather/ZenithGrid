@@ -120,19 +120,19 @@ void EdgeSelectorHighlight::enableHighlight()
 SelectionVtk EdgeSelectorHighlight::get()
 {
     SelectionVtk back_selection;
-    back_selection.type = ElementEnum::Edge;
+    back_selection.setType(ElementEnum::Edge);
 
     // 稳定 id 语义：回传稳定局部边 id（跨拓扑编辑有效）；
     // id 查询缺失（防御路径）时回退为两个端点 id 顺次排列，端点在出口经 id 查询桥统一换算全局点 id。
     for (const auto& edge : selections_) {
         if (edge.edge_id >= 0) {
-            back_selection.ids.push_back(edge.edge_id);
+            back_selection.ids().push_back(edge.edge_id);
         } else {
             const Index gid0 = id_query_ ? id_query_->pointGlobalId(component_id_, static_cast<Index>(edge.endpoints[0])) : -1;
             const Index gid1 = id_query_ ? id_query_->pointGlobalId(component_id_, static_cast<Index>(edge.endpoints[1])) : -1;
             if (gid0 >= 0 && gid1 >= 0) {
-                back_selection.ids.push_back(gid0);
-                back_selection.ids.push_back(gid1);
+                back_selection.ids().push_back(gid0);
+                back_selection.ids().push_back(gid1);
             }
         }
     }

@@ -47,11 +47,11 @@ std::any ExtrudeFaceHandler::execute(FeatureContext& ctx)
     if (!selection_param || !*selection_param)
         return std::string("请选择一个几何面。");
     const std::shared_ptr<Selection>& selected = *selection_param;
-    if (selected->type != ElementEnum::GeometryFace || selected->ids.size() != 1)
+    if (selected->type() != ElementEnum::GeometryFace || selected->ids().size() != 1)
         return std::string("请选择一个几何面。");
 
     // 截面身份决定来源组件，不要求对象树预先选中该组件。
-    const Index face_id = selected->ids.front();
+    const Index face_id = selected->ids().front();
     const auto component_id = selected->component_id >= 0
         ? std::optional<Index> { selected->component_id }
         : ctx.model.findComponentIdByGeometryShapeId(TopAbs_FACE, face_id);
