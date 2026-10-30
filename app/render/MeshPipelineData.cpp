@@ -436,6 +436,7 @@ void MeshPipelineData::isolateSolids(const std::vector<vtkIdType>& solid_ids)
             shown[static_cast<std::size_t>(id)] = true;
     }
     // 仅保留选中体：隐藏集取反为所有未选中体，由 SolidHideFilter 完成过滤。
+    const std::vector<vtkIdType> previous = hidden_solid_ids_;
     hidden_solid_ids_.clear();
     for (vtkIdType id = 0; id < static_cast<vtkIdType>(shown.size()); ++id) {
         if (!shown[static_cast<std::size_t>(id)])
@@ -443,7 +444,9 @@ void MeshPipelineData::isolateSolids(const std::vector<vtkIdType>& solid_ids)
     }
     // 体隔离需要渲染实体，确保整体可见。
     setVisibility(true);
-    dirty_ = true;
+    // 与 hideSolids 一致：隐藏集未变化时不必重跑 O(cells) 重建与提边。
+    if (previous != hidden_solid_ids_)
+        dirty_ = true;
 }
 
 bool MeshPipelineData::reverseVisibility()

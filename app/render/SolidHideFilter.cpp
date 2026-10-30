@@ -55,6 +55,8 @@ void emitPassthrough(vtkUnstructuredGrid* output, vtkUnstructuredGrid* input)
     output->SetPoints(input->GetPoints());
     output->GetPointData()->ShallowCopy(input->GetPointData());
     output->GetCellData()->ShallowCopy(input->GetCellData());
+    // 与单元无关的整体元数据，直接浅拷贝即可，无需逐 tuple 复制。
+    output->GetFieldData()->ShallowCopy(input->GetFieldData());
 
     auto cells = wrapCells(input->GetCells());
     auto faces = wrapCells(input->GetPolyhedronFaces());
@@ -125,6 +127,8 @@ int SolidHideFilter::RequestData(
     // 未被保留单元引用的点仍留在输出中，下游 vtkGeometryFilter/vtkExtractEdges 只读不写。
     output->SetPoints(input->GetPoints());
     output->GetPointData()->ShallowCopy(input->GetPointData());
+    // 与单元无关的整体元数据，直接浅拷贝即可，无需逐 tuple 复制。
+    output->GetFieldData()->ShallowCopy(input->GetFieldData());
 
     // COPYTUPLE 只做整元组拷贝，输出数组按输入数组同类型创建（整型不提升为浮点）。
     vtkCellData* in_cell_data = input->GetCellData();
