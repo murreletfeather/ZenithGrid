@@ -12,7 +12,6 @@
 #include <vtkGenericCell.h>
 #include <vtkIdTypeArray.h>
 #include <vtkNew.h>
-#include <vtkPlane.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
@@ -133,8 +132,9 @@ TEST_CASE("SolidHideFilter ignores invalid ids and yields a valid empty result")
     const auto empty = runFilter(grid, { 0, 1, 2, 3 });
     REQUIRE(empty->GetNumberOfCells() == 0);
     REQUIRE(empty->GetPoints() != nullptr);
-    if (auto* weights = empty->GetCellData()->GetArray("solidWeight"))
-        CHECK(weights->GetNumberOfTuples() == 0);
+    // 属性数组必须存在且为空，直接用 REQUIRE 防止"数组整体丢失"被放过。
+    REQUIRE(empty->GetCellData()->GetArray("solidWeight") != nullptr);
+    CHECK(empty->GetCellData()->GetArray("solidWeight")->GetNumberOfTuples() == 0);
 
     // 后续重建不会改写已取出的旧结果。
     const auto repeated = runFilter(grid, { 1, 3 });
@@ -197,14 +197,15 @@ TEST_CASE("SolidHideFilter preserves polyhedron face topology")
     grid->SetPolyhedralCells(types, cells, face_locations, faces);
     grid->GetCellData()->AddArray(original_ids);
 
-    const auto output = runFilter(grid, { 0 });
-    REQUIRE(output->GetNumberOfCells() == 1);
-    REQUIRE(output->GetCellType(0) == VTK_POLYHEDRON);
-    // 先确认输入夹具本身是合法多面体，否则断言没有意义。
+    // 先确认输入夹具本身是合法多面体，否则后续断言没有意义。
     vtkNew<vtkGenericCell> input_cell;
     grid->GetCell(1, input_cell);
     REQUIRE(input_cell->GetNumberOfFaces() == 6);
     REQUIRE(input_cell->GetNumberOfPoints() == 8);
+
+    const auto output = runFilter(grid, { 0 });
+    REQUIRE(output->GetNumberOfCells() == 1);
+    REQUIRE(output->GetCellType(0) == VTK_POLYHEDRON);
     // 面拓扑必须完整搬移，而不是被压成普通点列表。
     vtkNew<vtkGenericCell> cell;
     output->GetCell(0, cell);
@@ -241,6 +242,35 @@ TEST_CASE("MeshPipelineData hides solids without compressing pick ids")
     CHECK(uniqueSolidIds(restored->solid_surface) == all_ids);
     CHECK(restored->solid_internal_edges->GetNumberOfCells()
         >= hidden->solid_internal_edges->GetNumberOfCells());
+}
+
+TEST_CASE("MeshPipelineData keeps original solid ids after clipping")
+{
+    MeshData mesh;
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+
+    const auto original = data.createSnapshot();
+    const auto all_ids = uniqueSolidIds(original->solid_surface);
+    REQUIRE(all_ids.size() >= 2);
+
+    // 平面贴着模型外沿但不切掉任何体：完整走一遍裁剪管线，验证幸存表面的体身份不变。
+    double bounds[6] = { };
+    original->solid_surface->GetBounds(bounds);
+    MeshClipPlane plane;
+    plane.enabled = true;
+    plane.origin = { bounds[1] + 1.0, 0.0, 0.0 };
+    plane.normal = { 1.0, 0.0, 0.0 };
+    data.setClipPlane(plane);
+
+    const auto clipped = data.createSnapshot();
+    const auto clipped_ids = uniqueSolidIds(clipped->solid_surface);
+    REQUIRE(clipped_ids == all_ids);
+
+    // 从裁剪后的表面取 ID 再隐藏，验证拾取侧与 hideSolids 是同一 ID 空间。
+    const std::vector<vtkIdType> picked { clipped_ids.front() };
+    data.hideSolids(picked);
+    REQUIRE(uniqueSolidIds(data.createSnapshot()->solid_surface) == withoutIds(clipped_ids, picked));
 }
 
 TEST_CASE("MeshPipelineData isolates selected solids and restores them")

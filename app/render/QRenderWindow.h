@@ -196,6 +196,7 @@ public:
      *
      * 仅体选择模式有效，其余模式为空操作；隐藏为渲染层单元过滤，
      * 不修改模型数据，被隐藏体不渲染也不可拾取，选择随之清除。
+     * 恢复入口为 showAll（清除全部人工隐藏体）。
      */
     Q_INVOKABLE void hideSelectedSolids();
 
@@ -280,8 +281,10 @@ private:
         ShowScene,
         Reverse };
     /** @brief 体命令与面命令共用 GUI 缓存的选择，支持隐藏/隔离。 */
-    enum class SolidOperation { Hide,
-        Isolate };
+    enum class SolidOperation {
+        Hide,
+        Isolate
+    };
     using SelectedFaces = std::unordered_map<Index, std::vector<vtkIdType>>;
     using SelectedSolids = std::unordered_map<Index, std::vector<vtkIdType>>;
     using MeshGenerations = std::unordered_map<Index, std::uint64_t>;

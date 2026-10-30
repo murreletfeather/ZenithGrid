@@ -404,13 +404,16 @@ void MeshPipelineData::hideSolids(const std::vector<vtkIdType>& solid_ids)
     if (!solid_data_)
         return;
     const auto count = solid_data_->GetNumberOfCells();
+    const auto previous = hidden_solid_ids_;
     for (auto id : solid_ids) {
         if (id >= 0 && id < count)
             hidden_solid_ids_.push_back(id);
     }
     std::sort(hidden_solid_ids_.begin(), hidden_solid_ids_.end());
     hidden_solid_ids_.erase(std::unique(hidden_solid_ids_.begin(), hidden_solid_ids_.end()), hidden_solid_ids_.end());
-    dirty_ = true;
+    // 集合未变化（重复隐藏同一批或全部越界）时不置脏，避免白跑一次 O(cells) 重建与提边。
+    if (previous != hidden_solid_ids_)
+        dirty_ = true;
 }
 
 void MeshPipelineData::showAllSolids()
@@ -457,6 +460,11 @@ bool MeshPipelineData::reverseVisibility()
     } else {
         // 状态 C：对每个非空集合独立取补；空集合保持为空不参与取补，
         // 避免只隐藏体时面被补成全部隐藏。集合按升序重建，保持二分查找前提。
+        // 两个集合都无可取补对象属半失效状态，直接返回避免用户点反转既无变化又白跑重建。
+        if ((hidden_face_ids_.empty() || !face_data_) && (hidden_solid_ids_.empty() || !solid_data_)) {
+            spdlog::warn("MeshPipelineData::reverseVisibility 无可取补的隐藏集合，跳过");
+            return visible_;
+        }
         if (!hidden_face_ids_.empty() && face_data_) {
             std::vector<vtkIdType> reversed;
             for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
@@ -563,11 +571,12 @@ void MeshPipelineData::rebuildOutputs()
     // 内部线框基于未裁剪的可见体网格。提边为 O(cells+connectivity)，仅在可见体网格
     // 变化时重算；仅裁剪、仅面隐藏、仅整体显隐切换时复用同一已发布结果，
     // 因而快照中的 solid_internal_edges 对象保持一致。
-    if (solids_inputs_changed || !edges_cache_) {
-        vtkNew<vtkExtractEdges> internal_edges;
-        internal_edges->SetInputData(visible_solids);
-        internal_edges->Update();
-        edges_cache_ = publishPolyData(internal_edges->GetOutput());
+    if (solids_inputs_changed) {
+        // 只在可见体网格变化时提边；extractor 仅作过滤器对象，输出由 edges_cache_ 持有。
+        vtkNew<vtkExtractEdges> extractor;
+        extractor->SetInputData(visible_solids);
+        extractor->Update();
+        edges_cache_ = publishPolyData(extractor->GetOutput());
     }
 
     prepared_ = std::make_shared<MeshDataSnapshot>();
