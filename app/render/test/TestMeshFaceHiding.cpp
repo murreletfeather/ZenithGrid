@@ -2,21 +2,24 @@
 #include "MakeMeshData.h"
 
 #include "FaceHideFilter.h"
-#include "TestMeshActorWithData.h"
 #include "MeshActorManager.h"
 #include "MeshActorSelectOp.h"
 #include "MeshPipelineData.h"
-#include "renderStrategy/AttributeOperator.h"
+#include "SolidHideFilter.h"
+#include "TestMeshActorWithData.h"
 #include "renderStrategy/AttriRenderStrategyScalar.h"
 #include "renderStrategy/AttriRenderStrategyVector.h"
+#include "renderStrategy/AttributeOperator.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vtkActor.h>
 #include <vtkAlgorithmOutput.h>
 #include <vtkCamera.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCellType.h>
 #include <vtkDoubleArray.h>
 #include <vtkHardwareSelector.h>
+#include <vtkIdList.h>
 #include <vtkIdTypeArray.h>
 #include <vtkImageData.h>
 #include <vtkNew.h>
@@ -24,8 +27,8 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkPropCollection.h>
+#include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
@@ -698,4 +701,155 @@ TEST_CASE("MeshPipelineData reuses immutable internal edges until source reload"
     edges->GetPoint(0, retained_point);
     CHECK(retained_point[0] == first_point[0]);
     CHECK(edges->GetNumberOfCells() == original_edge_count);
+}
+
+//! @brief 体过滤保留原始身份、属性类型及多面体面流，并支持同一过滤器隐藏后恢复。
+TEST_CASE("SolidHideFilter preserves typed attributes and polyhedron topology across restore")
+{
+    MeshData mesh = MakeMeshData();
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    auto input = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    input->DeepCopy(data.createSnapshot()->original_solids);
+
+    // 添加与六面体重合的多面体，覆盖普通单元与面流单元混合时的复制路径。
+    const vtkIdType vertices[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    const vtkIdType faces[] = { 4, 0, 3, 2, 1, 4, 4, 5, 6, 7,
+        4, 0, 1, 5, 4, 4, 1, 2, 6, 5, 4, 2, 3, 7, 6, 4, 3, 0, 4, 7 };
+    input->InsertNextCell(VTK_POLYHEDRON, 8, vertices, 6, faces);
+    vtkNew<vtkIdTypeArray> original_ids;
+    original_ids->SetName("vtkOriginalCellIds");
+    vtkNew<vtkDoubleArray> values;
+    values->SetName("CellValues");
+    values->SetNumberOfComponents(2);
+    for (vtkIdType id = 0; id < 3; ++id) {
+        original_ids->InsertNextValue(9007199254740993LL + id);
+        values->InsertNextTuple2(static_cast<double>(id), 0.5 + static_cast<double>(id));
+    }
+    input->GetCellData()->AddArray(original_ids);
+    input->GetCellData()->AddArray(values);
+
+    std::vector<vtkIdType> hidden_ids;
+    std::vector<vtkIdType> expected_ids;
+    SECTION("empty hidden set") { expected_ids = { 0, 1, 2 }; }
+    SECTION("invalid hidden IDs")
+    {
+        hidden_ids = { -1, 3 };
+        expected_ids = { 0, 1, 2 };
+    }
+    SECTION("duplicates and one hidden cell")
+    {
+        hidden_ids = { 0, 0, -1, 3 };
+        expected_ids = { 1, 2 };
+    }
+    SECTION("only the polyhedron remains")
+    {
+        hidden_ids = { 0, 1 };
+        expected_ids = { 2 };
+    }
+    SECTION("all cells hidden") { hidden_ids = { 0, 1, 2 }; }
+
+    vtkNew<vtkIdTypeArray> hidden;
+    for (auto id : hidden_ids)
+        hidden->InsertNextValue(id);
+    vtkNew<SolidHideFilter> filter;
+    filter->SetInputData(input);
+    filter->SetHiddenCellIds(hidden);
+    filter->Update();
+    const auto check_output = [&](const std::vector<vtkIdType>& expected) {
+        auto* output = filter->GetOutput();
+        REQUIRE(output->GetNumberOfCells() == static_cast<vtkIdType>(expected.size()));
+        CHECK(output->GetPoints() == input->GetPoints());
+        auto* ids = vtkIdTypeArray::SafeDownCast(output->GetCellData()->GetArray("vtkOriginalCellIds"));
+        auto* attributes = vtkDoubleArray::SafeDownCast(output->GetCellData()->GetArray("CellValues"));
+        REQUIRE(ids != nullptr);
+        REQUIRE(attributes != nullptr);
+        CHECK(ids->GetNumberOfTuples() == static_cast<vtkIdType>(expected.size()));
+        CHECK(attributes->GetNumberOfTuples() == static_cast<vtkIdType>(expected.size()));
+        REQUIRE(attributes->GetNumberOfComponents() == 2);
+        for (vtkIdType id = 0; id < static_cast<vtkIdType>(expected.size()); ++id) {
+            const auto original_id = expected[static_cast<std::size_t>(id)];
+            CHECK(ids->GetValue(id) == original_ids->GetValue(original_id));
+            CHECK(attributes->GetComponent(id, 1) == values->GetComponent(original_id, 1));
+            CHECK(output->GetCellType(id) == input->GetCellType(original_id));
+            vtkNew<vtkIdList> actual_stream;
+            vtkNew<vtkIdList> original_stream;
+            output->GetFaceStream(id, actual_stream);
+            input->GetFaceStream(original_id, original_stream);
+            REQUIRE(actual_stream->GetNumberOfIds() == original_stream->GetNumberOfIds());
+            for (vtkIdType point = 0; point < actual_stream->GetNumberOfIds(); ++point)
+                CHECK(actual_stream->GetId(point) == original_stream->GetId(point));
+        }
+    };
+    check_output(expected_ids);
+
+    hidden->Reset();
+    hidden->Modified();
+    filter->Modified();
+    filter->Update();
+    check_output({ 0, 1, 2 });
+}
+
+//! @brief 体显隐仅改变体输出，内部线框在隐藏集合不变时复用，旧快照保持可读。
+TEST_CASE("MeshPipelineData solid visibility preserves snapshots and reuses unchanged internal edges")
+{
+    MeshData mesh = MakeMeshData();
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    const auto original = data.createSnapshot();
+    const auto solid_ids = [](const MeshDataSnapshot& snapshot) {
+        auto* ids = vtkIdTypeArray::SafeDownCast(snapshot.solid_surface->GetCellData()->GetArray("vtkOriginalCellIds"));
+        REQUIRE(ids != nullptr);
+        std::vector<vtkIdType> result;
+        for (vtkIdType i = 0; i < ids->GetNumberOfTuples(); ++i)
+            result.push_back(ids->GetValue(i));
+        std::sort(result.begin(), result.end());
+        result.erase(std::unique(result.begin(), result.end()), result.end());
+        return result;
+    };
+    REQUIRE(solid_ids(*original) == std::vector<vtkIdType>({ 0, 1 }));
+
+    data.hideSolids({ 0, 0, -1, 2 });
+    const auto hidden = data.createSnapshot();
+    CHECK(solid_ids(*hidden) == std::vector<vtkIdType>({ 1 }));
+    CHECK(faceIdValues(hidden->visible_faces) == faceIdValues(original->visible_faces));
+    CHECK(hidden->solid_internal_edges != original->solid_internal_edges);
+    CHECK(hidden->solid_internal_edges->GetNumberOfCells() < original->solid_internal_edges->GetNumberOfCells());
+    auto* hidden_edges = hidden->solid_internal_edges.GetPointer();
+    data.hideSolids({ 0, -1, 2 });
+    CHECK(data.createSnapshot()->solid_internal_edges == hidden_edges);
+
+    MeshClipPlane plane;
+    plane.enabled = true;
+    plane.origin = { -1.0e6, 0.0, 0.0 };
+    data.setClipPlane(plane);
+    const auto clipped = data.createSnapshot();
+    CHECK(clipped->solid_surface->GetNumberOfCells() == 0);
+    CHECK(clipped->solid_internal_edges == hidden_edges);
+    data.hideFaces({ 0 });
+    CHECK(data.createSnapshot()->solid_internal_edges == hidden_edges);
+    data.setClipPlane(nullptr);
+    data.isolateSolids({ 1 });
+    CHECK(data.createSnapshot()->solid_internal_edges == hidden_edges);
+
+    REQUIRE(data.reverseVisibility());
+    CHECK(solid_ids(*data.createSnapshot()) == std::vector<vtkIdType>({ 0 }));
+    CHECK(data.createSnapshot()->solid_internal_edges != hidden_edges);
+    data.showAllSolids();
+    CHECK(solid_ids(*data.createSnapshot()) == std::vector<vtkIdType>({ 0, 1 }));
+    CHECK(faceIdValues(data.createSnapshot()->visible_faces) == std::vector<vtkIdType>({ 0 }));
+    data.isolateSolids({ 0 });
+    data.hideSolids({ 0 });
+    CHECK(data.createSnapshot()->solid_surface->GetNumberOfCells() == 0);
+    CHECK(data.createSnapshot()->solid_internal_edges->GetNumberOfCells() == 0);
+
+    // 整体恢复与重载都清理局部体状态，已经发布的隐藏快照不被后续操作改写。
+    data.setVisibility(false);
+    REQUIRE(data.reverseVisibility());
+    CHECK(solid_ids(*data.createSnapshot()) == std::vector<vtkIdType>({ 0, 1 }));
+    data.hideSolids({ 1 });
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    CHECK(solid_ids(*data.createSnapshot()) == std::vector<vtkIdType>({ 0, 1 }));
+    CHECK(solid_ids(*hidden) == std::vector<vtkIdType>({ 1 }));
+    CHECK(solid_ids(*original) == std::vector<vtkIdType>({ 0, 1 }));
 }

@@ -39,6 +39,7 @@ namespace {
 //! @brief 用新对象包裹输入数据集的连通性包装，使输出拥有独立 MTime。
 //! 空隐藏集透传时若直接共享 cell array 对象，隐藏→显示切换后下游可能因
 //! MTime 未变化而复用旧缓存（与 FaceHideFilter 同源的拾取缓存问题）。
+//! @return 包装后的连通性；cells 为空时返回 nullptr，调用方必须先判空。
 vtkSmartPointer<vtkCellArray> wrapCells(vtkCellArray* cells)
 {
     if (!cells)
@@ -58,10 +59,18 @@ void emitPassthrough(vtkUnstructuredGrid* output, vtkUnstructuredGrid* input)
     auto cells = wrapCells(input->GetCells());
     auto faces = wrapCells(input->GetPolyhedronFaces());
     auto face_locations = wrapCells(input->GetPolyhedronFaceLocations());
-    if (faces && face_locations)
+    // 透传同样先判空：没有连通性就没有可输出的单元。
+    if (!cells)
+        return;
+    if (faces && face_locations) {
         output->SetPolyhedralCells(input->GetCellTypes(), cells, face_locations, faces);
-    else
+    } else {
+        // 多面体的 faces 与 faceLocations 必须成对存在，只有其一时面拓扑不完整，
+        // 降级为普通单元输出并留下日志便于定位异常输入。
+        if (faces || face_locations)
+            spdlog::warn("SolidHideFilter 透传：多面体面拓扑不完整，降级为普通单元输出");
         output->SetCells(input->GetCellTypes(), cells);
+    }
 }
 
 } // namespace

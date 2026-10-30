@@ -442,7 +442,7 @@ void MeshPipelineData::isolateSolids(const std::vector<vtkIdType>& solid_ids)
             hidden_solid_ids_.push_back(id);
     }
     // 体隔离需要渲染实体，确保整体可见。
-    visible_ = true;
+    setVisibility(true);
     dirty_ = true;
 }
 
