@@ -1,5 +1,7 @@
 #include "GeometryTopologyEditor.h"
 #include "GeometryRepairValidation.h"
+#include "GeometryPointOps.h"
+#include "GeometryRegistry.h"
 
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
@@ -29,6 +31,12 @@
 #include <BRepTools_ReShape.hxx>
 #include <Bnd_Box.hxx>
 #include <GCPnts_AbscissaPoint.hxx>
+#include <GCE2d_MakeSegment.hxx>
+#include <Geom2dAPI_InterCurveCurve.hxx>
+#include <Geom2dInt_GInter.hxx>
+#include <Geom2d_TrimmedCurve.hxx>
+#include <BRepLib.hxx>
+#include <Geom2d_Curve.hxx>
 #include <GeomAPI_ProjectPointOnSurf.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <Geom_BSplineSurface.hxx>
@@ -78,6 +86,7 @@
 #include <gp_Pnt.hxx>
 #include <gp_Vec.hxx>
 #include <gp_Pnt2d.hxx>
+#include <gp_Vec2d.hxx>
 #include <gp_Cylinder.hxx>
 #include <gp_Dir.hxx>
 #include <gp_Lin.hxx>
@@ -98,6 +107,7 @@
 #include <optional>
 #include <queue>
 #include <functional>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -111,6 +121,45 @@ using geometry::repair::BoundaryAudit;
 using geometry::repair::DeviationStatus;
 using geometry::repair::measureCurveDeviation;
 using geometry::repair::PrecisionPolicy;
+
+/** @brief 在拆边前冻结源边的既有表示误差，仅传给该边的新子边。 */
+struct SplitBoundaryBudget {
+    double tolerance = 0.0;
+    std::vector<TopoDS_Face> faces;
+};
+
+/** @brief 从真实祖先面测量源边，避免把平面自动生成的 pcurve 误当作所属关系。 */
+SplitBoundaryBudget captureSplitBoundaryBudget(const TopoDS_Edge& edge,
+    const NCollection_List<TopoDS_Shape>& owners, const BRepBuilderAPI_Copy& copier)
+{
+    SplitBoundaryBudget result;
+    result.tolerance = BRep_Tool::Tolerance(edge);
+    for (const auto& owner : owners) {
+        const auto face = TopoDS::Face(owner);
+        BRepLib_CheckCurveOnSurface check(edge, face);
+        check.Perform();
+        if (!check.IsDone() || !std::isfinite(check.MaxDistance()))
+            throw std::runtime_error("Cannot verify the original boundary curve representation");
+        // 原边可能略低估连续最大误差；只继承实测前像加本地数值底线，不改变新曲线拟合精度。
+        result.tolerance = std::max(result.tolerance,
+            check.MaxDistance() + PrecisionPolicy::fromShape(face).numerical_floor);
+        result.faces.push_back(TopoDS::Face(copier.ModifiedShape(face)));
+    }
+    return result;
+}
+
+/** @brief 验收裁剪后子边没有新增表示误差，再校准该独立副本的继承容差。 */
+void inheritSplitBoundaryBudget(const TopoDS_Edge& child, const SplitBoundaryBudget& budget)
+{
+    for (const auto& face : budget.faces) {
+        BRepLib_CheckCurveOnSurface check(child, face);
+        check.Perform();
+        if (!check.IsDone() || !std::isfinite(check.MaxDistance()) || check.MaxDistance() > budget.tolerance)
+            throw std::runtime_error("Split boundary curve exceeds the original representation budget");
+    }
+    BRep_Builder builder;
+    builder.UpdateEdge(child, budget.tolerance);
+}
 
 // 返回非级联删除时需要保留的直接下级拓扑类型。
 TopAbs_ShapeEnum lowerShapeType(TopAbs_ShapeEnum type)
@@ -1552,12 +1601,19 @@ bool isEdgeOnFace(const TopoDS_Edge& edge, const TopoDS_Face& face)
     const auto precision = PrecisionPolicy::fromShape(edge);
     const double tolerance = std::max({ BRep_Tool::Tolerance(face),
         BRep_Tool::Tolerance(edge), precision.classification });
+    double first_u = 0.0, last_u = 0.0, first_v = 0.0, last_v = 0.0;
+    BRepTools::UVBounds(face, first_u, last_u, first_v, last_v);
     const auto result = measureCurveDeviation(edge, [&](const gp_Pnt& point) {
         GeomAPI_ProjectPointOnSurf projection(point, surface);
         if (projection.NbPoints() == 0)
             return std::numeric_limits<double>::quiet_NaN();
         double u = 0.0, v = 0.0;
         projection.LowerDistanceParameters(u, v);
+        // 投影器返回自然周期分支；先归回实际面的 UV 域，再判断工具是否贴合修剪面。
+        if (surface->IsUPeriodic() && (u < first_u - Precision::PConfusion() || u > last_u + Precision::PConfusion()))
+            u += std::round(((first_u + last_u) * 0.5 - u) / surface->UPeriod()) * surface->UPeriod();
+        if (surface->IsVPeriodic() && (v < first_v - Precision::PConfusion() || v > last_v + Precision::PConfusion()))
+            v += std::round(((first_v + last_v) * 0.5 - v) / surface->VPeriod()) * surface->VPeriod();
         BRepClass_FaceClassifier classifier(face, gp_Pnt2d(u, v), tolerance);
         if (classifier.State() != TopAbs_IN && classifier.State() != TopAbs_ON)
             return tolerance * 2.0;
@@ -2398,7 +2454,6 @@ GeometryTopologyDiagnosticResult GeometryTopologyEditor::diagnoseTopology(
     return session->takeResult();
 }
 
-
 TopoDS_Shape GeometryTopologyEditor::splitEdge(
     const TopoDS_Shape& root,
     const TopoDS_Edge& edge,
@@ -2408,49 +2463,68 @@ TopoDS_Shape GeometryTopologyEditor::splitEdge(
         throw std::invalid_argument("Geometry root and edge must not be null");
     if (!std::isfinite(ratio) || ratio <= 0.0 || ratio >= 1.0)
         throw std::invalid_argument("Split ratio must be between zero and one");
+    double first = 0.0, last = 0.0;
+    if (BRep_Tool::Curve(edge, first, last).IsNull())
+        throw std::invalid_argument("Selected edge has no splittable 3D curve");
+    // 兼容比例输入仍沿选择方向换算；新拾取入口直接保存精确曲线参数。
+    const double curve_ratio = edge.Orientation() == TopAbs_REVERSED ? 1.0 - ratio : ratio;
+    return splitEdgeAtParameter(root, edge, first + (last - first) * curve_ratio);
+}
+
+TopoDS_Shape GeometryTopologyEditor::splitEdgeAtParameter(
+    const TopoDS_Shape& root, const TopoDS_Edge& edge, double parameter)
+{
+    if (root.IsNull() || edge.IsNull())
+        throw std::invalid_argument("Geometry root and edge must not be null");
     requireSubshape(root, edge, TopAbs_EDGE, "Selected edge does not belong to the geometry root");
-
     try {
-        TopoDS_Vertex start;
-        TopoDS_Vertex end;
-        // 构造子边时统一使用曲线正向端点，选择方向仅用于换算分割比例。
-        const TopoDS_Edge forward_edge = TopoDS::Edge(edge.Oriented(TopAbs_FORWARD));
-        TopExp::Vertices(forward_edge, start, end, true);
-        double first = 0.0;
-        double last = 0.0;
-        const occ::handle<Geom_Curve> curve = BRep_Tool::Curve(edge, first, last);
-        if (start.IsNull() || end.IsNull() || curve.IsNull()
-            || !std::isfinite(first) || !std::isfinite(last) || first >= last)
-            throw std::invalid_argument("Selected edge has no splittable 3D curve");
+        double first = 0.0, last = 0.0;
+        const auto original_curve = BRep_Tool::Curve(edge, first, last);
+        if (original_curve.IsNull() || !std::isfinite(first) || !std::isfinite(last)
+            || !std::isfinite(parameter) || parameter <= first + Precision::PConfusion()
+            || parameter >= last - Precision::PConfusion())
+            throw std::invalid_argument("Split parameter must lie strictly inside the edge range");
+        const auto precision = PrecisionPolicy::fromShape(edge);
+        const auto position = original_curve->Value(parameter);
+        if (position.Distance(original_curve->Value(first)) <= precision.numerical_floor
+            || position.Distance(original_curve->Value(last)) <= precision.numerical_floor)
+            throw std::invalid_argument("Split point is too close to an existing endpoint");
 
-        const double curve_ratio = edge.Orientation() == TopAbs_REVERSED ? 1.0 - ratio : ratio;
-        const double parameter = first + (last - first) * curve_ratio;
-        const TopoDS_Vertex middle = BRepBuilderAPI_MakeVertex(curve->Value(parameter));
-        BRepBuilderAPI_MakeEdge first_builder(curve, start, middle, first, parameter);
-        BRepBuilderAPI_MakeEdge second_builder(curve, middle, end, parameter, last);
-        if (!first_builder.IsDone() || !second_builder.IsDone())
-            throw std::runtime_error("OpenCASCADE failed to build split edges");
-
+        // 深复制整模型，随后修复和参数补写均不得触碰 undo 前像的共享 TShape。
+        BRepBuilderAPI_Copy copier(root, true, false);
+        const auto working_edge = TopoDS::Edge(copier.ModifiedShape(edge).Oriented(TopAbs_FORWARD));
+        TopoDS_Vertex start, end;
+        TopExp::Vertices(working_edge, start, end, true);
+        if (start.IsNull() || end.IsNull() || BRep_Tool::Degenerated(working_edge))
+            throw std::invalid_argument("Selected edge has no splittable endpoints");
+        const TopoDS_Vertex middle = BRepBuilderAPI_MakeVertex(position);
+        ShapeBuild_Edge edge_builder;
+        // 复制原边的全部曲线表示，包含共享面的 pcurve 和周期缝边的双 pcurve。
+        const auto first_edge = edge_builder.CopyReplaceVertices(working_edge, start, middle);
+        const auto second_edge = edge_builder.CopyReplaceVertices(working_edge, middle, end);
+        BRep_Builder builder;
+        builder.Range(first_edge, first, parameter);
+        builder.Range(second_edge, parameter, last);
+        builder.UpdateVertex(middle, parameter, first_edge, BRep_Tool::Tolerance(middle));
+        builder.UpdateVertex(middle, parameter, second_edge, BRep_Tool::Tolerance(middle));
         BRepBuilderAPI_MakeWire wire_builder;
-        wire_builder.Add(first_builder.Edge());
-        wire_builder.Add(second_builder.Edge());
+        wire_builder.Add(first_edge);
+        wire_builder.Add(second_edge);
         if (!wire_builder.IsDone())
-            throw std::runtime_error("OpenCASCADE failed to build the split wire");
-
-        const int edge_count = countSubshapes(root, TopAbs_EDGE);
-        const int vertex_count = countSubshapes(root, TopAbs_VERTEX);
-        occ::handle<BRepTools_ReShape> reshaper = new BRepTools_ReShape();
-        reshaper->Replace(forward_edge, wire_builder.Wire());
-        TopoDS_Shape result = fixAndValidate(reshaper->Apply(root), "Splitting the edge");
-        if (countSubshapes(result, TopAbs_EDGE) != edge_count + 1
-            || countSubshapes(result, TopAbs_VERTEX) != vertex_count + 1)
-            throw std::runtime_error("Splitting the edge did not create two connected edges");
+            throw std::runtime_error("OpenCASCADE failed to build split edges");
+        occ::handle<BRepTools_ReShape> reshaper = new BRepTools_ReShape;
+        reshaper->Replace(working_edge, wire_builder.Wire());
+        const auto result = fixAndValidate(reshaper->Apply(copier.Shape()), "Splitting the edge");
+        if (countSubshapes(result, TopAbs_EDGE) != countSubshapes(root, TopAbs_EDGE) + 1
+            || countSubshapes(result, TopAbs_VERTEX) != countSubshapes(root, TopAbs_VERTEX) + 1
+            || countSubshapes(result, TopAbs_FACE) != countSubshapes(root, TopAbs_FACE)
+            || countSubshapes(result, TopAbs_SOLID) != countSubshapes(root, TopAbs_SOLID))
+            throw std::runtime_error("Splitting the edge changed unrelated topology");
         return result;
     } catch (const Standard_Failure& error) {
         const char* detail = error.GetMessageString();
-        throw std::runtime_error(detail
-                ? std::string("OpenCASCADE failed to split the edge: ") + detail
-                : "OpenCASCADE failed to split the edge");
+        throw std::runtime_error(detail ? std::string("OpenCASCADE failed to split the edge: ") + detail
+                                        : "OpenCASCADE failed to split the edge");
     }
 }
 
@@ -2895,19 +2969,48 @@ TopoDS_Shape GeometryTopologyEditor::splitFace(
         BRepFeat_SplitShape splitter(copier.Shape());
         NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> root_shapes;
         TopExp::MapShapes(root, root_shapes);
+        // 整组外部工具一次复制，避免逐边复制把共有的新中间点拆成多个 TShape。
+        BRep_Builder tool_builder;
+        TopoDS_Compound tools;
+        tool_builder.MakeCompound(tools);
+        for (const auto& edge : splitting_edges) {
+            if (!root_shapes.Contains(edge))
+                tool_builder.Add(tools, edge);
+        }
+        BRepBuilderAPI_Copy tool_copy(tools, true, false);
+        occ::handle<BRepTools_ReShape> vertices = new BRepTools_ReShape;
+        for (TopExp_Explorer vertex(tools, TopAbs_VERTEX); vertex.More(); vertex.Next()) {
+            if (root_shapes.Contains(vertex.Current()))
+                vertices->Replace(tool_copy.ModifiedShape(vertex.Current()), copier.ModifiedShape(vertex.Current()));
+        }
         for (const auto& edge : splitting_edges) {
             if (root_shapes.Contains(edge)) {
                 splitter.Add(TopoDS::Edge(copier.ModifiedShape(edge)), working_face);
                 continue;
             }
-            // 外部工具独立复制，但仍须复用其在目标模型内已有的顶点。
-            BRepBuilderAPI_Copy tool_copy(edge, true, false);
-            occ::handle<BRepTools_ReShape> vertices = new BRepTools_ReShape;
-            for (TopExp_Explorer vertex(edge, TopAbs_VERTEX); vertex.More(); vertex.Next()) {
-                if (root_shapes.Contains(vertex.Current()))
-                    vertices->Replace(tool_copy.ModifiedShape(vertex.Current()), copier.ModifiedShape(vertex.Current()));
+            const auto prepared = TopoDS::Edge(vertices->Apply(tool_copy.ModifiedShape(edge)));
+            // 双 pcurve 按存储顺序重绑，不能让输入边或面的反向交换两条缝边分支。
+            const auto pcurve_edge = TopoDS::Edge(edge.Oriented(TopAbs_FORWARD));
+            const auto pcurve_face = TopoDS::Face(target_face.Oriented(TopAbs_FORWARD));
+            double pc_first = 0.0, pc_last = 0.0;
+            const auto original_pcurve = BRep_Tool::CurveOnSurface(pcurve_edge, pcurve_face, pc_first, pc_last);
+            if (!original_pcurve.IsNull()) {
+                // 独立复制工具时不会保留目标面的支撑身份；重新挂接原参数曲线，避免曲面上二次投影换支。
+                const auto pcurve = occ::handle<Geom2d_Curve>::DownCast(original_pcurve->Copy());
+                if (BRep_Tool::IsClosed(edge, target_face)) {
+                    double second_first = 0.0, second_last = 0.0;
+                    const auto second = BRep_Tool::CurveOnSurface(TopoDS::Edge(pcurve_edge.Reversed()),
+                        pcurve_face, second_first, second_last);
+                    if (second.IsNull())
+                        throw std::runtime_error("Splitting seam edge has no second curve on its face");
+                    tool_builder.UpdateEdge(prepared, pcurve,
+                        occ::handle<Geom2d_Curve>::DownCast(second->Copy()), working_face, BRep_Tool::Tolerance(edge));
+                } else {
+                    tool_builder.UpdateEdge(prepared, pcurve, working_face, BRep_Tool::Tolerance(edge));
+                }
+                tool_builder.Range(prepared, working_face, pc_first, pc_last);
             }
-            splitter.Add(TopoDS::Edge(vertices->Apply(tool_copy.Shape())), working_face);
+            splitter.Add(prepared, working_face);
         }
         splitter.Build();
 
@@ -2951,6 +3054,335 @@ TopoDS_Shape GeometryTopologyEditor::splitFace(
         throw std::runtime_error(detail
                 ? std::string("OpenCASCADE failed to split the face: ") + detail
                 : "OpenCASCADE failed to split the face");
+    }
+}
+
+TopoDS_Shape GeometryTopologyEditor::splitFaceByPoints(
+    const TopoDS_Shape& root, const TopoDS_Face& target_face,
+    const std::vector<GeometryPoint>& points, const GeometryRegistry& registry)
+{
+    if (root.IsNull() || target_face.IsNull() || points.size() < 2)
+        throw std::invalid_argument("At least two face points are required");
+    requireSubshape(root, target_face, TopAbs_FACE, "Target face does not belong to the geometry root");
+    try {
+        const auto parameters = GeometryPointOps::resolveSurfacePathParameters(target_face, points);
+        const auto precision = PrecisionPolicy::fromShape(target_face);
+        const double tolerance = std::max(BRep_Tool::Tolerance(target_face), precision.classification);
+        const auto support = BRep_Tool::Surface(target_face);
+        const BRepAdaptor_Surface adaptor(target_face);
+        const double uv_tolerance = std::max(Precision::PConfusion(),
+            std::min(adaptor.UResolution(tolerance), adaptor.VResolution(tolerance)));
+        // 连续展开的 UV 先归回实际修剪域；周期等价坐标不能被当成悬空端点。
+        for (const auto& uv : { parameters.front(), parameters.back() }) {
+            if (!GeometryPointOps::isOnFaceBoundary(target_face, uv))
+                throw std::invalid_argument("Open splitting path must start and end on the face boundary");
+        }
+
+        std::vector<occ::handle<Geom2d_TrimmedCurve>> segments;
+        segments.reserve(parameters.size() - 1);
+        // 线段相交采用二维内核求交；相邻线段只允许唯一的共有端点。
+        for (std::size_t index = 1; index < parameters.size(); ++index) {
+            const gp_Pnt2d first(parameters[index - 1][0], parameters[index - 1][1]);
+            const gp_Pnt2d last(parameters[index][0], parameters[index][1]);
+            segments.push_back(GCE2d_MakeSegment(first, last).Value());
+        }
+        for (std::size_t first_index = 0; first_index < points.size(); ++first_index) {
+            for (std::size_t second_index = first_index + 1; second_index < points.size(); ++second_index) {
+                const auto& first = points[first_index].world_pos;
+                const auto& second = points[second_index].world_pos;
+                if (gp_Pnt(first[0], first[1], first[2]).Distance(gp_Pnt(second[0], second[1], second[2])) <= tolerance)
+                    throw std::invalid_argument("Splitting path contains repeated geometric points");
+            }
+        }
+        for (std::size_t first_index = 0; first_index < segments.size(); ++first_index) {
+            for (std::size_t second_index = first_index + 1; second_index < segments.size(); ++second_index) {
+                // 周期曲面上不同 UV 分支也可能代表同一个交点，比较邻近周期副本。
+                const bool periodic_u = support->IsUPeriodic();
+                const bool periodic_v = support->IsVPeriodic();
+                const double period_u = periodic_u ? support->UPeriod() : 0.0;
+                const double period_v = periodic_v ? support->VPeriod() : 0.0;
+                const auto first_middle = segments[first_index]->Value(
+                    (segments[first_index]->FirstParameter() + segments[first_index]->LastParameter()) * 0.5);
+                const auto second_middle = segments[second_index]->Value(
+                    (segments[second_index]->FirstParameter() + segments[second_index]->LastParameter()) * 0.5);
+                const double offset_u = periodic_u ? std::round((first_middle.X() - second_middle.X()) / period_u) * period_u : 0.0;
+                const double offset_v = periodic_v ? std::round((first_middle.Y() - second_middle.Y()) / period_v) * period_v : 0.0;
+                for (int du = periodic_u ? -1 : 0; du <= (periodic_u ? 1 : 0); ++du) {
+                    for (int dv = periodic_v ? -1 : 0; dv <= (periodic_v ? 1 : 0); ++dv) {
+                        auto shifted = occ::handle<Geom2d_Curve>::DownCast(segments[second_index]->Copy());
+                        shifted->Translate(gp_Vec2d(offset_u + du * period_u, offset_v + dv * period_v));
+                        const Geom2dAPI_InterCurveCurve intersection(segments[first_index], shifted, uv_tolerance);
+                        if (!intersection.Intersector().IsDone())
+                            throw std::runtime_error("Cannot reliably check splitting path intersections");
+                        if (intersection.NbSegments() > 0)
+                            throw std::invalid_argument("Splitting path contains overlapping segments");
+                        for (int point_index = 1; point_index <= intersection.NbPoints(); ++point_index) {
+                            const gp_Pnt2d joint(parameters[first_index + 1][0], parameters[first_index + 1][1]);
+                            if (second_index != first_index + 1 || intersection.Point(point_index).Distance(joint) > uv_tolerance)
+                                throw std::invalid_argument("Splitting path intersects itself");
+                        }
+                    }
+                }
+            }
+        }
+
+        NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> root_vertices, face_edges, face_vertices;
+        TopExp::MapShapes(root, TopAbs_VERTEX, root_vertices);
+        TopExp::MapShapes(target_face, TopAbs_EDGE, face_edges);
+        TopExp::MapShapes(target_face, TopAbs_VERTEX, face_vertices);
+        BRepBuilderAPI_Copy copier(root, true, false);
+        NCollection_IndexedMap<TopoDS_Shape, TopTools_ShapeMapHasher> original_copied_vertices;
+        TopExp::MapShapes(copier.Shape(), TopAbs_VERTEX, original_copied_vertices);
+        TopoDS_Face working_face = TopoDS::Face(copier.ModifiedShape(target_face));
+        std::vector<TopoDS_Vertex> vertices;
+        vertices.reserve(points.size());
+        /** @brief 一条边上的多个新增点共用一次拆分，确保所有邻面引用同一组子边。 */
+        struct BoundarySplits {
+            TopoDS_Edge edge;
+            std::vector<std::pair<double, TopoDS_Vertex>> points;
+        };
+        std::vector<BoundarySplits> boundary_splits;
+        // 解析吸附身份并确认参数与坐标一致，不能把失效 gid 当成自由坐标继续执行。
+        for (const auto& point : points) {
+            const auto* source_face = registry.getFace(point.support_id);
+            if (point.component_id != points.front().component_id || !source_face || !source_face->IsSame(target_face))
+                throw std::invalid_argument("Face point belongs to a different or expired support");
+            const gp_Pnt position(point.world_pos[0], point.world_pos[1], point.world_pos[2]);
+            TopoDS_Vertex vertex;
+            bool connected_boundary_vertex = false;
+            if (point.snap_kind == GeometryPointKind::Vertex) {
+                const auto* shape = registry.getVertex(point.snap_id);
+                if (!shape || shape->ShapeType() != TopAbs_VERTEX || !root_vertices.Contains(*shape)
+                    || BRep_Tool::Pnt(TopoDS::Vertex(*shape)).Distance(position)
+                        > std::max(tolerance, BRep_Tool::Tolerance(TopoDS::Vertex(*shape))))
+                    throw std::invalid_argument("Snapped vertex is invalid or does not agree with the face point");
+                vertex = TopoDS::Vertex(copier.ModifiedShape(*shape));
+                connected_boundary_vertex = face_vertices.Contains(*shape);
+            } else if (point.snap_kind == GeometryPointKind::Edge) {
+                const auto* shape = registry.getEdge(point.snap_id);
+                if (!shape || shape->ShapeType() != TopAbs_EDGE || !face_edges.Contains(*shape))
+                    throw std::invalid_argument("Snapped edge is not a boundary of the target face");
+                const auto edge = TopoDS::Edge(*shape);
+                const double parameter = point.snap_edge_parameter;
+                // 只接纳该边原有容差内的三维/面上表示差；面点仍须和同参数 pcurve 严格一致。
+                const auto boundary_point = GeometryPointOps::projectEdgePointOnFace(target_face,
+                    edge, point.component_id, point.support_id, point.snap_id, parameter);
+                if (!boundary_point || gp_Pnt(boundary_point->world_pos[0], boundary_point->world_pos[1], boundary_point->world_pos[2]).Distance(position) > tolerance)
+                    throw std::invalid_argument("Snapped edge parameter does not agree with the face point");
+                TopoDS_Vertex start, end;
+                TopExp::Vertices(TopoDS::Edge(edge.Oriented(TopAbs_FORWARD)), start, end, true);
+                double first = 0.0, last = 0.0;
+                BRep_Tool::Range(edge, first, last);
+                if (std::abs(parameter - first) <= Precision::PConfusion()
+                    || position.Distance(BRep_Tool::Pnt(start)) <= tolerance)
+                    vertex = TopoDS::Vertex(copier.ModifiedShape(start));
+                else if (std::abs(parameter - last) <= Precision::PConfusion()
+                    || position.Distance(BRep_Tool::Pnt(end)) <= tolerance)
+                    vertex = TopoDS::Vertex(copier.ModifiedShape(end));
+                else {
+                    vertex = BRepBuilderAPI_MakeVertex(position);
+                    // 新顶点连接的是该源边已有的多面曲线表示，只继承这条边的原始误差预算。
+                    BRep_Builder().UpdateVertex(vertex, BRep_Tool::Tolerance(edge));
+                    auto group = std::find_if(boundary_splits.begin(), boundary_splits.end(),
+                        [&](const auto& item) { return item.edge.IsSame(edge); });
+                    if (group == boundary_splits.end()) {
+                        boundary_splits.push_back({ edge, { } });
+                        group = std::prev(boundary_splits.end());
+                    }
+                    group->points.emplace_back(parameter, vertex);
+                }
+                connected_boundary_vertex = true;
+            } else if (point.snap_kind != GeometryPointKind::None && point.snap_kind != GeometryPointKind::Face) {
+                throw std::invalid_argument("Unsupported face point snap kind");
+            }
+            // 没有吸附载荷的边界点也要与既有边界拓扑连接，不能留下 T 接口。
+            if (vertex.IsNull()) {
+                for (int index = 1; index <= face_vertices.Extent(); ++index) {
+                    const auto candidate = TopoDS::Vertex(face_vertices.FindKey(index));
+                    if (position.Distance(BRep_Tool::Pnt(candidate)) <= tolerance) {
+                        vertex = TopoDS::Vertex(copier.ModifiedShape(candidate));
+                        connected_boundary_vertex = true;
+                        break;
+                    }
+                }
+            }
+            if (!connected_boundary_vertex
+                && GeometryPointOps::isOnFaceBoundary(target_face, point.face_uv)) {
+                for (int index = 1; index <= face_edges.Extent(); ++index) {
+                    const auto edge = TopoDS::Edge(face_edges.FindKey(index));
+                    const auto projected = GeometryPointOps::projectOnEdge(edge, point.component_id, -1, point.world_pos);
+                    if (!projected || gp_Pnt(projected->world_pos[0], projected->world_pos[1], projected->world_pos[2]).Distance(position) > tolerance)
+                        continue;
+                    if (vertex.IsNull()) {
+                        vertex = BRepBuilderAPI_MakeVertex(position);
+                        BRep_Builder().UpdateVertex(vertex, BRep_Tool::Tolerance(edge));
+                    }
+                    auto group = std::find_if(boundary_splits.begin(), boundary_splits.end(),
+                        [&](const auto& item) { return item.edge.IsSame(edge); });
+                    if (group == boundary_splits.end()) {
+                        boundary_splits.push_back({ edge, { } });
+                        group = std::prev(boundary_splits.end());
+                    }
+                    group->points.emplace_back(projected->edge_parameter, vertex);
+                    break;
+                }
+                if (vertex.IsNull())
+                    throw std::invalid_argument("Cannot connect face point to its boundary topology");
+            }
+            if (vertex.IsNull())
+                vertex = BRepBuilderAPI_MakeVertex(position);
+            vertices.push_back(vertex);
+        }
+
+        /** @brief 原路径遇到周期缝后拆成实际面的参数域内分段，共享缝交点顶点。 */
+        struct SurfacePart {
+            gp_Pnt2d first;
+            gp_Pnt2d last;
+            TopoDS_Vertex start;
+            TopoDS_Vertex end;
+        };
+        std::vector<SurfacePart> surface_parts;
+        double first_u = 0.0, last_u = 0.0, first_v = 0.0, last_v = 0.0;
+        BRepTools::UVBounds(target_face, first_u, last_u, first_v, last_v);
+        const bool seam_u = support->IsUPeriodic()
+            && std::abs((last_u - first_u) - support->UPeriod()) <= uv_tolerance * 4.0;
+        const bool seam_v = support->IsVPeriodic()
+            && std::abs((last_v - first_v) - support->VPeriod()) <= uv_tolerance * 4.0;
+        // 先加入缝边交点，再统一替换根上的边；边的两个周期分支共用同一个新顶点。
+        for (std::size_t index = 0; index < segments.size(); ++index) {
+            const auto& first = parameters[index];
+            const auto& last = parameters[index + 1];
+            std::vector<double> cuts { 0.0, 1.0 };
+            const auto add_seam_cuts = [&](double begin, double end, double origin, double period, bool enabled) {
+                if (!enabled || std::abs(end - begin) <= uv_tolerance)
+                    return;
+                const double minimum = std::min(begin, end);
+                const double maximum = std::max(begin, end);
+                const int initial = static_cast<int>(std::ceil((minimum - origin) / period));
+                const int final = static_cast<int>(std::floor((maximum - origin) / period));
+                for (int crossing = initial; crossing <= final; ++crossing) {
+                    const double fraction = (origin + crossing * period - begin) / (end - begin);
+                    if (fraction > Precision::PConfusion() && fraction < 1.0 - Precision::PConfusion())
+                        cuts.push_back(fraction);
+                }
+            };
+            add_seam_cuts(first[0], last[0], first_u, seam_u ? support->UPeriod() : 0.0, seam_u);
+            add_seam_cuts(first[1], last[1], first_v, seam_v ? support->VPeriod() : 0.0, seam_v);
+            std::sort(cuts.begin(), cuts.end());
+            cuts.erase(std::unique(cuts.begin(), cuts.end(), [](double first, double second) {
+                return std::abs(first - second) <= Precision::PConfusion();
+            }),
+                cuts.end());
+            TopoDS_Vertex start = vertices[index];
+            for (std::size_t part = 1; part < cuts.size(); ++part) {
+                const auto uv_at = [&](double fraction) {
+                    return gp_Pnt2d(first[0] + (last[0] - first[0]) * fraction,
+                        first[1] + (last[1] - first[1]) * fraction);
+                };
+                gp_Pnt2d first_uv = uv_at(cuts[part - 1]);
+                gp_Pnt2d last_uv = uv_at(cuts[part]);
+                TopoDS_Vertex end = vertices[index + 1];
+                if (part + 1 < cuts.size()) {
+                    const auto position = support->Value(last_uv.X(), last_uv.Y());
+                    end = BRepBuilderAPI_MakeVertex(position);
+                    bool connected = false;
+                    for (int edge_index = 1; edge_index <= face_edges.Extent(); ++edge_index) {
+                        const auto edge = TopoDS::Edge(face_edges.FindKey(edge_index));
+                        if (!BRep_Tool::IsClosed(edge, target_face))
+                            continue;
+                        const auto projected = GeometryPointOps::projectOnEdge(edge, points.front().component_id, -1,
+                            { position.X(), position.Y(), position.Z() });
+                        if (!projected || position.Distance(gp_Pnt(projected->world_pos[0], projected->world_pos[1], projected->world_pos[2])) > tolerance)
+                            continue;
+                        BRep_Builder().UpdateVertex(end, BRep_Tool::Tolerance(edge));
+                        auto group = std::find_if(boundary_splits.begin(), boundary_splits.end(),
+                            [&](const auto& item) { return item.edge.IsSame(edge); });
+                        if (group == boundary_splits.end()) {
+                            boundary_splits.push_back({ edge, { } });
+                            group = std::prev(boundary_splits.end());
+                        }
+                        group->points.emplace_back(projected->edge_parameter, end);
+                        connected = true;
+                        break;
+                    }
+                    if (!connected)
+                        throw std::invalid_argument("Cannot connect the periodic path crossing to a face seam");
+                }
+                const double middle_u = (first_uv.X() + last_uv.X()) * 0.5;
+                const double middle_v = (first_uv.Y() + last_uv.Y()) * 0.5;
+                const double shift_u = seam_u ? std::round(((first_u + last_u) * 0.5 - middle_u) / support->UPeriod()) * support->UPeriod() : 0.0;
+                const double shift_v = seam_v ? std::round(((first_v + last_v) * 0.5 - middle_v) / support->VPeriod()) * support->VPeriod() : 0.0;
+                first_uv.Translate(gp_Vec2d(shift_u, shift_v));
+                last_uv.Translate(gp_Vec2d(shift_u, shift_v));
+                surface_parts.push_back({ first_uv, last_uv, start, end });
+                start = end;
+            }
+        }
+
+        occ::handle<BRepTools_ReShape> boundary_replacements = new BRepTools_ReShape;
+        ShapeBuild_Edge edge_builder;
+        BRep_Builder builder;
+        NCollection_IndexedDataMap<TopoDS_Shape, NCollection_List<TopoDS_Shape>, TopTools_ShapeMapHasher> boundary_owners;
+        TopExp::MapShapesAndUniqueAncestors(root, TopAbs_EDGE, TopAbs_FACE, boundary_owners);
+        // 全模型替换共享边，既有 3D 曲线和所有 pcurve 一起裁剪，邻面不会残留旧长边。
+        for (auto& group : boundary_splits) {
+            const auto budget = captureSplitBoundaryBudget(group.edge, boundary_owners.FindFromKey(group.edge), copier);
+            // 仅新增拆分点继承源边表示预算，已有角点保留复制前的容差。
+            for (const auto& [parameter, vertex] : group.points) {
+                if (!original_copied_vertices.Contains(vertex))
+                    builder.UpdateVertex(vertex, std::max(BRep_Tool::Tolerance(vertex), budget.tolerance));
+            }
+            std::sort(group.points.begin(), group.points.end(), [](const auto& first, const auto& second) { return first.first < second.first; });
+            const auto edge = TopoDS::Edge(copier.ModifiedShape(group.edge).Oriented(TopAbs_FORWARD));
+            double first = 0.0, last = 0.0;
+            BRep_Tool::Range(edge, first, last);
+            TopoDS_Vertex start, end;
+            TopExp::Vertices(edge, start, end, true);
+            std::vector<std::pair<double, TopoDS_Vertex>> split_points { { first, start } };
+            split_points.insert(split_points.end(), group.points.begin(), group.points.end());
+            split_points.emplace_back(last, end);
+            BRepBuilderAPI_MakeWire wire_builder;
+            for (std::size_t index = 1; index < split_points.size(); ++index) {
+                if (split_points[index].first - split_points[index - 1].first <= Precision::PConfusion())
+                    throw std::invalid_argument("Boundary split points are repeated or too close to an endpoint");
+                const auto child = edge_builder.CopyReplaceVertices(edge, split_points[index - 1].second, split_points[index].second);
+                builder.Range(child, split_points[index - 1].first, split_points[index].first);
+                builder.UpdateVertex(split_points[index - 1].second, split_points[index - 1].first, child,
+                    BRep_Tool::Tolerance(split_points[index - 1].second));
+                builder.UpdateVertex(split_points[index].second, split_points[index].first, child,
+                    BRep_Tool::Tolerance(split_points[index].second));
+                inheritSplitBoundaryBudget(child, budget);
+                wire_builder.Add(child);
+            }
+            if (!wire_builder.IsDone())
+                throw std::runtime_error("Cannot rebuild the split boundary edge");
+            boundary_replacements->Replace(edge, wire_builder.Wire());
+        }
+        const auto working_root = boundary_replacements->Apply(copier.Shape());
+        working_face = TopoDS::Face(boundary_replacements->Apply(working_face));
+        const auto world_surface = BRep_Tool::Surface(working_face);
+        std::vector<TopoDS_Edge> splitting_edges;
+        splitting_edges.reserve(surface_parts.size());
+        // UV 线段在曲面上生成真实曲线，各段直接复用同一组拓扑顶点。
+        for (const auto& part : surface_parts) {
+            const auto segment = GCE2d_MakeSegment(part.first, part.last).Value();
+            BRepBuilderAPI_MakeEdge maker(segment, world_surface, part.start, part.end,
+                segment->FirstParameter(), segment->LastParameter());
+            if (!maker.IsDone())
+                throw std::runtime_error("Cannot build the surface splitting edge");
+            const auto edge = maker.Edge();
+            // 使用实际面支撑的 pcurve，兼容带 Location 的曲面。
+            builder.UpdateEdge(edge, segment, working_face, precision.fitting);
+            if (!BRepLib::BuildCurve3d(edge, precision.fitting))
+                throw std::runtime_error("Cannot build the 3D representation of the surface path");
+            BRepLib::SameParameter(edge, precision.fitting);
+            splitting_edges.push_back(edge);
+        }
+        return splitFace(working_root, working_face, splitting_edges);
+    } catch (const Standard_Failure& error) {
+        const char* detail = error.GetMessageString();
+        throw std::runtime_error(detail ? std::string("OpenCASCADE failed to split the face by points: ") + detail
+                                        : "OpenCASCADE failed to split the face by points");
     }
 }
 

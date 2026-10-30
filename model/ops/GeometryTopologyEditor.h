@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GeometryPoint.h"
+
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
@@ -11,6 +13,7 @@
 
 class TopoDS_Vertex;
 class gp_Pnt;
+class GeometryRegistry;
 
 /**
  * @brief 一组在 OCC 数值精度内覆盖相同几何区域的面。
@@ -177,6 +180,14 @@ public:
         double ratio);
 
     /**
+     * @brief 在精确曲线参数处切边，保留所有相邻面上的 pcurve 和共享拓扑。
+     * @param parameter 曲线有效区间内部的参数，不受所选边方向影响。
+     * @note 对工作副本操作，原模型与撤销快照保持不变；端点处拒绝切分。
+     */
+    static TopoDS_Shape splitEdgeAtParameter(
+        const TopoDS_Shape& root, const TopoDS_Edge& edge, double parameter);
+
+    /**
      * @brief 将一条 Edge 压缩到目标位置。
      * @param target_position 压缩后的公共顶点位置。
      */
@@ -255,6 +266,15 @@ public:
         const TopoDS_Shape& root,
         const TopoDS_Face& target_face,
         const std::vector<TopoDS_Edge>& splitting_edges);
+
+    /**
+     * @brief 按有序几何约束点构造贴面的 UV 折线并分割目标面。
+     * @note 开放路径首尾须在边界；点/边吸附复用拓扑，整体深复制保护输入。
+     *       路径越出修剪域、穿孔、自交、重复节点或不能实际切面时抛异常。
+     */
+    static TopoDS_Shape splitFaceByPoints(
+        const TopoDS_Shape& root, const TopoDS_Face& target_face,
+        const std::vector<GeometryPoint>& points, const GeometryRegistry& registry);
 
     /**
      * @brief 使用一个或多个相交 Face 分割目标 Face。

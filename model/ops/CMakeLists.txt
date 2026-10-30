@@ -4,6 +4,7 @@ add_library(DataOps OBJECT
 	UGridModel.cpp
 	GeometryBuilder.cpp
 	GeometryTopologyEditor.cpp
+	GeometryPointOps.cpp
 	GeometryRepairValidation.cpp
 )
 target_include_directories(DataOps PUBLIC
