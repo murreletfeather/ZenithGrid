@@ -16,6 +16,7 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnsignedCharArray.h>
 
+#include <cstddef>
 #include <vector>
 
 vtkStandardNewMacro(SolidHideFilter);
@@ -63,8 +64,10 @@ void emitPassthrough(vtkUnstructuredGrid* output, vtkUnstructuredGrid* input)
     auto faces = wrapCells(input->GetPolyhedronFaces());
     auto face_locations = wrapCells(input->GetPolyhedronFaceLocations());
     // 透传同样先判空：没有连通性就没有可输出的单元。
-    if (!cells)
+    if (!cells) {
+        spdlog::warn("SolidHideFilter 透传：输入缺少连通性，输出为空单元集");
         return;
+    }
     if (faces && face_locations) {
         output->SetPolyhedralCells(input->GetCellTypes(), cells, face_locations, faces);
     } else {

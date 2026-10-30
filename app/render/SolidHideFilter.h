@@ -1,5 +1,4 @@
-#ifndef SOLID_HIDE_FILTER_H
-#define SOLID_HIDE_FILTER_H
+#pragma once
 
 /**
  * @file SolidHideFilter.h
@@ -41,5 +40,3 @@ private:
 
     vtkIdTypeArray* HiddenCellIds {};
 };
-
-#endif // SOLID_HIDE_FILTER_H

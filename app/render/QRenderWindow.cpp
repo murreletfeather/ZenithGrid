@@ -842,20 +842,25 @@ void QRenderWindow::publishSelection()
     QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot,
             faces = std::move(faces), face_generations = std::move(face_generations),
             solids = std::move(solids), solid_generations = std::move(solid_generations),
-            revision] {
+            revision]() mutable {
             if (revision != selection_revision_)
                 return;
-            // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份。
-            for (const auto& [id, generation] : face_generations) {
-                const auto pipeline = mesh_pipeline_data_.find(id);
-                if (pipeline == mesh_pipeline_data_.end() || pipeline->second->generation() != generation)
-                    return;
-            }
-            for (const auto& [id, generation] : solid_generations) {
-                const auto pipeline = mesh_pipeline_data_.find(id);
-                if (pipeline == mesh_pipeline_data_.end() || pipeline->second->generation() != generation)
-                    return;
-            }
+            // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份；
+            // 但只剔除代次失效的条目，避免面/体任一类失效连累另一类有效选择。
+            auto prune = [&](auto& items, const MeshGenerations& generations) {
+                for (auto it = items.begin(); it != items.end();) {
+                    const auto generation = generations.find(it->first);
+                    const auto pipeline = mesh_pipeline_data_.find(it->first);
+                    if (generation != generations.end()
+                        && (pipeline == mesh_pipeline_data_.end()
+                            || pipeline->second->generation() != generation->second))
+                        it = items.erase(it);
+                    else
+                        ++it;
+                }
+            };
+            prune(faces, face_generations);
+            prune(solids, solid_generations);
             selection_snapshot_ = snapshot;
             selected_faces_ = faces;
             selected_face_generations_ = face_generations;

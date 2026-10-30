@@ -538,6 +538,8 @@ void MeshPipelineData::rebuildOutputs()
             solid_hider->SetInputData(solid_data_);
             solid_hider->SetHiddenCellIds(hidden_solid_ids);
             solid_hider->Update();
+            // 输出对象由 vtkSmartPointer 保活，过滤器析构后仍有效；与面/裁剪输出
+            // 不同，这里无需再包一层发布对象，后续只有全新 Filter 才产生新输出。
             visible_solids_cache_ = solid_hider->GetOutput();
         }
         visible_solids_cache_source_ = source_;
