@@ -217,12 +217,12 @@ std::vector<std::pair<IVtk_IdType, Index>> GeometryActorSelectOp::resolvePickedS
     return out;
 }
 
-std::optional<IVtk_IdType> GeometryActorSelectOp::subshapeIdOfCell(vtkIdType cell_id)
+std::optional<IVtk_IdType> GeometryActorSelectOp::subshapeIdOfCell(vtkActor& picked_actor, vtkIdType cell_id)
 {
     if (!geometry_actor_)
         return std::nullopt;
 
-    auto* mapper = vtkPolyDataMapper::SafeDownCast(getPolyActor().GetMapper());
+    auto* mapper = vtkPolyDataMapper::SafeDownCast(picked_actor.GetMapper());
     auto* poly = mapper ? mapper->GetInput() : nullptr;
     if (!poly || cell_id < 0 || cell_id >= poly->GetNumberOfCells())
         return std::nullopt;
@@ -235,6 +235,11 @@ std::optional<IVtk_IdType> GeometryActorSelectOp::subshapeIdOfCell(vtkIdType cel
         return std::nullopt;
 
     return static_cast<IVtk_IdType>(subshape_ids->GetTuple1(cell_id));
+}
+
+std::optional<IVtk_IdType> GeometryActorSelectOp::subshapeIdOfCell(vtkIdType cell_id)
+{
+    return subshapeIdOfCell(getPolyActor(), cell_id);
 }
 
 std::optional<Index> GeometryActorSelectOp::resolveSubshapeGeomId(IVtk_IdType sub_id, SelectMode mode) const
@@ -378,6 +383,11 @@ vtkSmartPointer<IVtkTools_SubPolyDataFilter> GeometryActorSelectOp::buildHighlig
 vtkActor& GeometryActorSelectOp::getPolyActor()
 {
     return *geometry_actor_->poly_actor_;
+}
+
+vtkActor& GeometryActorSelectOp::getLineActor()
+{
+    return *geometry_actor_->line_actor_;
 }
 
 bool GeometryActorSelectOp::isVisible() const

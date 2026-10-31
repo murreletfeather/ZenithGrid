@@ -70,10 +70,12 @@ public:
 
     /**
      * @brief 渲染 cell id → IVtk 子形状 id（非穿透框选用）
-     * @param cell_id 几何 poly actor 所渲染 polydata 的 cell 下标
+     * @param picked_actor 与拾取时一致的 actor（面/体模式传 poly actor，边/顶点模式传 line actor）
+     * @param cell_id 该 actor 所渲染 polydata 的 cell 下标
      * @return 子形状 id；cell 越界或缺少 SUBSHAPE_IDS 数组时返回 std::nullopt
      * @note 该数组由 OCC IVtk 写入（IVtkVTK_ShapeData::ARRNAME_SUBSHAPE_IDS），与渲染数据一一对应，因此无需另行建立映射。
      */
+    std::optional<IVtk_IdType> subshapeIdOfCell(vtkActor& picked_actor, vtkIdType cell_id);
     std::optional<IVtk_IdType> subshapeIdOfCell(vtkIdType cell_id);
 
     /**
@@ -85,6 +87,7 @@ public:
     std::optional<Index> resolveSubshapeGeomId(IVtk_IdType sub_id, SelectMode mode) const;
 
     vtkActor& getPolyActor();
+    vtkActor& getLineActor();
     bool isVisible() const;
 
 private:

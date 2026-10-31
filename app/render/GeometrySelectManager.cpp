@@ -93,15 +93,23 @@ void GeometrySelectManager::select(double posx, double posy, SelectOp op)
 
 void GeometrySelectManager::selectAreaNonPenetrating(int xmin, int ymin, int xmax, int ymax, SelectOp op)
 {
+    const bool pick_lines = (select_mode_ == SelectMode::GeometryEdge || select_mode_ == SelectMode::GeometryVertex);
+
     std::vector<vtkActor*> targets;
-    std::vector<Index> comp_ids;
+    std::map<vtkProp*, Index> pick_prop_to_comp;
     for (Index comp_id : op_->getAllComponentIds()) {
         auto select_op = op_->getSelectOp(comp_id);
         if (!select_op || !select_op->isVisible())
             continue;
-        if (auto* actor = vtkActor::SafeDownCast(&select_op->getPolyActor())) {
-            targets.push_back(actor);
-            comp_ids.push_back(comp_id);
+        vtkActor& poly = select_op->getPolyActor();
+        if (pick_lines) {
+            vtkActor& line = select_op->getLineActor();
+            targets.push_back(&poly); 
+            targets.push_back(&line);
+            pick_prop_to_comp[&line] = comp_id;
+        } else {
+            targets.push_back(&poly);
+            pick_prop_to_comp[&poly] = comp_id;
         }
     }
     if (targets.empty())
@@ -112,13 +120,17 @@ void GeometrySelectManager::selectAreaNonPenetrating(int xmin, int ymin, int xma
     if (hits.empty())
         return;
 
-    for (Index comp_id : comp_ids) {
+    for (const auto& [actor_prop, cell_ids] : hits) {
+        auto it = pick_prop_to_comp.find(actor_prop);
+        if (it == pick_prop_to_comp.end() || cell_ids.empty())
+            continue;
+        const Index comp_id = it->second;
+
         auto select_op = op_->getSelectOp(comp_id);
         if (!select_op)
             continue;
-
-        auto it = hits.find(&select_op->getPolyActor());
-        if (it == hits.end() || it->second.empty())
+        auto* picked = vtkActor::SafeDownCast(actor_prop);
+        if (!picked)
             continue;
 
         auto* sel = getOrCreateSelector(comp_id);
@@ -127,8 +139,8 @@ void GeometrySelectManager::selectAreaNonPenetrating(int xmin, int ymin, int xma
 
         if (select_mode_ == SelectMode::GeometrySolid) {
             std::set<GeomSolidId> applied;
-            for (vtkIdType cell_id : it->second) {
-                auto subId = select_op->subshapeIdOfCell(cell_id);
+            for (vtkIdType cell_id : cell_ids) {
+                auto subId = select_op->subshapeIdOfCell(*picked, cell_id);
                 if (!subId)
                     continue;
                 GeomSolidId solidId = kInvalidGeomSolidId;
@@ -136,34 +148,34 @@ void GeometrySelectManager::selectAreaNonPenetrating(int xmin, int ymin, int xma
                 if (!select_op->resolveSolidOfSubshape(*subId, solidId, faceSubIds))
                     continue;
                 if (!applied.insert(solidId).second)
-                    continue; 
+                    continue;
                 static_cast<GeometrySolidSelectorHighlight*>(sel)->toggleSolid(solidId, faceSubIds, op);
             }
             continue;
         }
 
-        std::map<IVtk_IdType, Index> picked;
-        for (vtkIdType cell_id : it->second) {
-            auto subId = select_op->subshapeIdOfCell(cell_id);
+        std::map<IVtk_IdType, Index> picked_map;
+        for (vtkIdType cell_id : cell_ids) {
+            auto subId = select_op->subshapeIdOfCell(*picked, cell_id);
             if (!subId)
                 continue;
             auto geomId = select_op->resolveSubshapeGeomId(*subId, select_mode_);
             if (!geomId)
                 continue;
-            picked.emplace(*subId, *geomId);
+            picked_map.emplace(*subId, *geomId);
         }
 
         switch (select_mode_) {
         case SelectMode::GeometryFace:
-            for (const auto& [subId, geomId] : picked)
+            for (const auto& [subId, geomId] : picked_map)
                 static_cast<GeometryFaceSelectorHighlight*>(sel)->toggle(subId, geomId, op);
             break;
         case SelectMode::GeometryEdge:
-            for (const auto& [subId, geomId] : picked)
+            for (const auto& [subId, geomId] : picked_map)
                 static_cast<GeometryEdgeSelectorHighlight*>(sel)->toggle(subId, geomId, op);
             break;
         case SelectMode::GeometryVertex:
-            for (const auto& [subId, geomId] : picked)
+            for (const auto& [subId, geomId] : picked_map)
                 static_cast<GeometryVertexSelectorHighlight*>(sel)->toggle(subId, geomId, op);
             break;
         default:
