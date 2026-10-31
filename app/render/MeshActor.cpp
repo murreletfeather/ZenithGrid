@@ -278,6 +278,8 @@ void MeshActor::setClipPlane(vtkPlane* plane)
         solid_clipper_->SetImplicitFunction(plane);
         face_clipper_->SetImplicitFunction(plane);
         edge_clipper_->SetImplicitFunction(plane);
+        solid_edge_clipper_->SetInputConnection(solid_edge_extractor_->GetOutputPort());
+        solid_edge_clipper_->SetImplicitFunction(plane);
     } else {
         solid_filter_->SetInputData(this->solid_data_);
         face_mapper_->SetInputData(this->face_data_);

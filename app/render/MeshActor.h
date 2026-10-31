@@ -93,6 +93,7 @@ private:
 
     vtkNew<vtkGeometryFilter> solid_filter_;
     vtkNew<vtkExtractEdges> solid_edge_extractor_;
+    vtkNew<vtkExtractPolyDataGeometry> solid_edge_clipper_;
 
     vtkNew<vtkPolyDataMapper> edge_mapper_;
     vtkNew<vtkPolyDataMapper> face_mapper_;

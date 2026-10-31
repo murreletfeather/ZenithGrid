@@ -45,7 +45,7 @@ public:
     vtkProp& getEdgeActor();
 
     /**
-     * @brief 体网格（体单元）数据集
+     * @brief 体网格（体单元）数据集（未裁剪）
      *
      * cell id 即 solid id（该数据集的 vtkOriginalCellIds 为 identity），点 id 即组件内局部
      * 点 id（vtkOriginalPointIds 为 identity）。体网格**内部**的体单元与内部节点只能从这里
@@ -54,7 +54,16 @@ public:
     vtkUnstructuredGrid* getSolidData();
 
     /**
-     * @brief 体网格的边数据集（vtkExtractEdges 的输出），含体单元之间的**内部边**
+     * @brief 遵守剖切条件的体网格（体单元）数据集，供穿透框选内部命中使用
+     *
+     * 无剖切时返回 getSolidData()（原始体网格，cell 下标即 solid id）；
+     * 有剖切时返回 solid_clipper_ 的输出（已裁剪的体网格），其 CellData 携带 vtkOriginalCellIds，
+     * 可将裁剪后的 cell 下标还原为原始模型体 id。调用方须对拾取结果做此还原。
+     */
+    vtkUnstructuredGrid* getClippedSolidData();
+
+    /**
+     * @brief 体网格的边数据集（遵守剖切条件的 vtkExtractEdges 输出），含体单元之间的**内部边**
      *
      * cell 为 VTK_LINE，点数据带 vtkOriginalPointIds（组件内局部点 id）。
      * Edge 模式靠它选中体网格内部边；内部边不在 MeshData::edge_vertices_ 里，没有模型边 id，

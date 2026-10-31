@@ -1,6 +1,8 @@
 #include "MeshActorSelectOp.h"
 #include "MeshActor.h"
 
+#include <vtkExtractGeometry.h>
+#include <vtkExtractPolyDataGeometry.h>
 #include <vtkExtractSelection.h>
 #include <vtkLine.h>
 #include <vtkPolyData.h>
@@ -50,9 +52,21 @@ vtkUnstructuredGrid* MeshActorSelectOp::getSolidData()
     return mesh_actor_->solid_data_.Get();
 }
 
+vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData()
+{
+    if (mesh_actor_->clip_plane_) {
+        mesh_actor_->solid_clipper_->Update();
+        return mesh_actor_->solid_clipper_->GetOutput();
+    }
+    return mesh_actor_->solid_data_.Get();
+}
+
 vtkPolyData* MeshActorSelectOp::getSolidEdgeData()
 {
-    // 边提取器输入即 solid_data_；取输出前更新一次，保证与当前体网格同步
+    if (mesh_actor_->clip_plane_) {
+        mesh_actor_->solid_edge_clipper_->Update();
+        return mesh_actor_->solid_edge_clipper_->GetOutput();
+    }
     mesh_actor_->solid_edge_extractor_->Update();
     return mesh_actor_->solid_edge_extractor_->GetOutput();
 }
