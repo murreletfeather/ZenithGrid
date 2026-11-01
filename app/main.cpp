@@ -106,6 +106,7 @@ int main(int argc, char* argv[])
 #ifndef __EMSCRIPTEN__
     QStartupSplashWindow splash(QCoreApplication::applicationVersion());
     QPointer<QQuickWindow> main_window;
+    QMetaObject::Connection startup_error_connection;
     bool frame_armed = false;
     app.setQuitOnLastWindowClosed(false);
     QObject::connect(&startup_progress, &QStartupProgress::onViewportReady,
@@ -113,6 +114,8 @@ int main(int argc, char* argv[])
     QObject::connect(&splash, &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
     QObject::connect(&app, &QCoreApplication::aboutToQuit, &splash, &QWindow::hide);
     QObject::connect(&startup_gate, &QStartupGate::onReady, &app, [&]() {
+        // 启动门控进入终态后，恢复 Qt 对后续场景图初始化错误的默认处理。
+        QObject::disconnect(startup_error_connection);
         spdlog::info("startup: main window ready after viewport, startup files and presented frame");
         splash.hide();
         app.setQuitOnLastWindowClosed(true);
@@ -191,7 +194,7 @@ int main(int argc, char* argv[])
                 startup_gate.fail(QCoreApplication::translate("Startup", "启动文件处理通知未连接"));
                 return false;
             }
-            QObject::connect(main_window, &QQuickWindow::sceneGraphError, &startup_gate, [&](QQuickWindow::SceneGraphError, const QString& message) { startup_gate.fail(message); }, Qt::QueuedConnection);
+            startup_error_connection = QObject::connect(main_window, &QQuickWindow::sceneGraphError, &startup_gate, [&](QQuickWindow::SceneGraphError, const QString& message) { startup_gate.fail(message); }, Qt::QueuedConnection);
 #endif
             // 安装全局按键事件过滤器，将按键事件转发给功能系统。
             if (auto* model_manager = engine->singletonInstance<QModelManager*>("app.model", "QModelManager")) {
