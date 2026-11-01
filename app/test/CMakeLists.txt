@@ -91,7 +91,7 @@ precess_test_link_libraries(TestThemeWindowPalette Qt6::QuickControls2 Qt6::Qml)
 qt_add_resources(TestThemeWindowPalette theme_window
     PREFIX "/theme-window"
     BASE "${CMAKE_CURRENT_SOURCE_DIR}/.."
-    FILES ../Main.qml)
+    FILES ../Main.qml ../Theme.qml)
 
 # 加载实际工具栏，覆盖通用父入口和旧算法列表入口。
 precess_add_test(TestToolbarNavigation TestToolbarNavigation.cpp)
@@ -198,3 +198,15 @@ qt_add_resources(TestWallpaperBackground wallpaper_background
     PREFIX "/wallpaper-bg"
     BASE "${CMAKE_CURRENT_SOURCE_DIR}/.."
     FILES ../WallpaperBackground.qml)
+
+# 原生标题栏：属性切换、原生窗口生命周期和 Windows DWM 颜色。
+precess_add_test(TestNativeTitleBar
+    TestNativeTitleBar.cpp
+    ../QNativeTitleBar.h ../QNativeTitleBar.cpp
+)
+set_target_properties(TestNativeTitleBar PROPERTIES AUTOMOC ON)
+target_include_directories(TestNativeTitleBar PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+precess_test_link_libraries(TestNativeTitleBar Qt6::Gui)
+if(WIN32)
+    target_link_libraries(TestNativeTitleBar PRIVATE dwmapi)
+endif()

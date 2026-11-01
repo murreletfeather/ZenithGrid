@@ -32,6 +32,9 @@ ApplicationWindow {
     visibility: Window.Maximized
     title: qsTr("ZenithGrid")
     color: Theme.windowBackground
+    // 窗口原生标题栏沿用主题色；原生平台适配在宿主层处理。
+    readonly property color nativeTitleBarBackground: Theme.windowBackground
+    readonly property color nativeTitleBarTextColor: Theme.textPrimary
     flags: Qt.platform.os === "wasm" ? (Qt.Window | Qt.FramelessWindowHint) : Qt.Window
 
     // Fusion 控件的默认调色板取自平台主题（Windows 系统色），不读取

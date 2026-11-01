@@ -3,6 +3,8 @@
 #include "QFeatureSystemAdaptor.h"
 #include "Docking.h"
 #include "WallpaperLibrary.h"
+#include "QNativeTitleBar.h"
+#include <QWindow>
 #include <QCoreApplication>
 #include <QIcon>
 #include <QKeyEvent>
@@ -112,6 +114,10 @@ int main(int argc, char* argv[])
     engine.loadFromModule("app", "Main");
     if (engine.rootObjects().isEmpty())
         return -1;
+
+    // 保留系统标题栏，由主窗口主题色驱动其原生颜色。
+    if (auto* main_window = qobject_cast<QWindow*>(engine.rootObjects().first()))
+        new QNativeTitleBar(main_window, main_window);
 
     // 安装全局按键事件过滤器，将按键事件转发给功能系统
     if (auto* model_manager = engine.singletonInstance<QModelManager*>("app.model", "QModelManager")) {
