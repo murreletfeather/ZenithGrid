@@ -13,6 +13,7 @@
 #include <QPixmap>
 #include <QScreen>
 #include <QStringList>
+#include <QTemporaryFile>
 #include <QThread>
 #include <QTimer>
 
@@ -35,6 +36,17 @@ QGuiApplication& ensureApplication()
     static QGuiApplication app(argc, argv);
     app.setQuitOnLastWindowClosed(false);
     return app;
+}
+
+//! @brief 无显示平台不承担窗口曝光契约；构造与门控测试仍可在无头 CI 执行。
+void requireGraphicalPlatform()
+{
+    (void)ensureApplication();
+    const QString platform = QGuiApplication::platformName();
+    if (platform == QStringLiteral("minimal") || platform == QStringLiteral("offscreen")
+        || platform == QStringLiteral("minimalegl")) {
+        SKIP("Requires a graphical platform for native window exposure; current platform: " << platform.toStdString());
+    }
 }
 
 //! @brief 等待实际窗口事件，避免依赖固定启动延时。
@@ -78,8 +90,14 @@ void captureStages(QStartupSplashWindow& splash)
 
 TEST_CASE("Startup splash reports one first frame across redraw and visibility changes")
 {
-    (void)ensureApplication();
-    QStartupSplashWindow splash(QStringLiteral("0.5.0"));
+    requireGraphicalPlatform();
+    QString background_path = QStringLiteral(":/images/splash/ZenithGrid-splash-background@2x.png");
+    SECTION("bundled background") { }
+    SECTION("missing background still presents a frame")
+    {
+        background_path = QStringLiteral(":/missing-startup-background.png");
+    }
+    QStartupSplashWindow splash(QStringLiteral("0.5.0"), background_path);
     int first_frame_count = 0;
     QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &splash, [&first_frame_count] {
         ++first_frame_count;
@@ -101,7 +119,7 @@ TEST_CASE("Startup splash reports one first frame across redraw and visibility c
 
 TEST_CASE("Startup splash stage refresh does not dispatch queued application callbacks")
 {
-    (void)ensureApplication();
+    requireGraphicalPlatform();
     QStartupSplashWindow splash(QStringLiteral("0.5.0"));
     bool first_frame = false;
     QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &splash, [&first_frame] { first_frame = true; });
@@ -120,7 +138,7 @@ TEST_CASE("Startup splash stage refresh does not dispatch queued application cal
 
 TEST_CASE("Hidden startup splash does not produce a delayed first frame")
 {
-    (void)ensureApplication();
+    requireGraphicalPlatform();
     QStartupSplashWindow splash(QStringLiteral("0.5.0"));
     int first_frame_count = 0;
     QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &splash, [&first_frame_count] { ++first_frame_count; });
@@ -138,7 +156,7 @@ TEST_CASE("Hidden startup splash does not produce a delayed first frame")
 
 TEST_CASE("Closing startup splash publishes startup cancellation")
 {
-    (void)ensureApplication();
+    requireGraphicalPlatform();
     QStartupSplashWindow splash(QStringLiteral("0.5.0"));
     bool first_frame = false;
     int cancelled_count = 0;
@@ -150,4 +168,26 @@ TEST_CASE("Closing startup splash publishes startup cancellation")
     CHECK(cancelled_count == 1);
     CHECK_FALSE(splash.isVisible());
     CHECK_FALSE(QGuiApplication::quitOnLastWindowClosed());
+}
+
+TEST_CASE("Startup splash tolerates missing and corrupt background images")
+{
+    (void)ensureApplication();
+    QTemporaryFile corrupt_background;
+    REQUIRE(corrupt_background.open());
+    REQUIRE(corrupt_background.write("invalid image data") > 0);
+    corrupt_background.close();
+    QString background_path;
+    SECTION("missing resource")
+    {
+        background_path = QStringLiteral(":/missing-startup-background.png");
+    }
+    SECTION("invalid image contents")
+    {
+        background_path = corrupt_background.fileName();
+    }
+    QStartupSplashWindow splash(QStringLiteral("0.5.0"), background_path);
+    CHECK_FALSE(splash.isVisible());
+    CHECK_NOTHROW(splash.setStage(QStringLiteral("正在加载插件…")));
+    CHECK(splash.objectName() == QStringLiteral("startupSplash"));
 }

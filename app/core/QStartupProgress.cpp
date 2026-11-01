@@ -21,6 +21,11 @@ void QStartupProgress::reportStage(const QString& stage)
     emit onStageChange(stage);
 }
 
+void QStartupProgress::reportPreparingView()
+{
+    reportStage(tr("正在准备三维视图与首帧…"));
+}
+
 void QStartupProgress::reportViewportReady()
 {
     emit onViewportReady();

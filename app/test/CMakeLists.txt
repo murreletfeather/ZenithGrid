@@ -8,14 +8,15 @@ set_target_properties(TestStartupGate PROPERTIES AUTOMOC ON)
 target_include_directories(TestStartupGate PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../core")
 precess_test_link_libraries(TestStartupGate Qt6::Core)
 
-# 原生启动窗口：首帧、同步阶段刷新不重入事件循环和窗口生命周期。
+# 原生启动窗口：背景失败回退、首帧、同步刷新与窗口生命周期。
+# 显示相关用例需要桌面；无头 CI 设置 QT_QPA_PLATFORM=offscreen 时明确跳过。
 precess_add_test(TestStartupSplashWindow
     TestStartupSplashWindow.cpp
     ../QStartupSplashWindow.h ../QStartupSplashWindow.cpp
 )
 set_target_properties(TestStartupSplashWindow PROPERTIES AUTOMOC ON)
 target_include_directories(TestStartupSplashWindow PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
-precess_test_link_libraries(TestStartupSplashWindow Qt6::Gui)
+precess_test_link_libraries(TestStartupSplashWindow Qt6::Gui spdlog::spdlog)
 qt_add_resources(TestStartupSplashWindow startup_test_images
     PREFIX "/images"
     BASE "${CMAKE_SOURCE_DIR}/resource"

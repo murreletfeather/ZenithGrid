@@ -192,6 +192,7 @@ int main(int argc, char* argv[])
                 startup_gate.fail(QCoreApplication::translate("Startup", "三维视口加载失败"));
                 return false;
             }
+            // startupFilesReady 由 QML 动态声明，没有可用于类型安全连接的 C++ 信号成员。
             if (!QObject::connect(main_window, SIGNAL(startupFilesReady()),
                     &startup_gate, SLOT(markStartupFilesReady()))) {
                 startup_gate.fail(QCoreApplication::translate("Startup", "启动文件处理通知未连接"));
@@ -211,7 +212,7 @@ int main(int argc, char* argv[])
 #endif
                 }
             }
-            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在准备三维视图与首帧…"));
+            startup_progress.reportPreparingView();
             return true;
         } catch (const std::exception& error) {
             startup_gate.fail(QString::fromUtf8(error.what()));

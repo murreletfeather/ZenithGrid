@@ -23,6 +23,9 @@ public:
     //! @brief 通知当前即将执行的真实初始化阶段。
     Q_INVOKABLE void reportStage(const QString& stage);
 
+    //! @brief C++ 与 QML 共用的视口及后续帧等待文案。
+    Q_INVOKABLE void reportPreparingView();
+
     //! @brief 通知中央视口已完成必要的渲染初始化。
     void reportViewportReady();
 

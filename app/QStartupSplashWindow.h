@@ -16,7 +16,9 @@ class QStartupSplashWindow final : public QWindow {
     Q_OBJECT
 
 public:
-    explicit QStartupSplashWindow(const QString& version);
+    //! @brief 背景不可用时沿用同一窗口的纯色绘制；路径可指定替代资源。
+    explicit QStartupSplashWindow(const QString& version,
+        const QString& background_path = QStringLiteral(":/images/splash/ZenithGrid-splash-background@2x.png"));
 
     //! @brief 更新当前真实阶段；单个阶段内部不伪造百分比
     void setStage(const QString& message);
@@ -42,6 +44,6 @@ private:
     QTimer activity_timer_;
     QString version_;
     QString stage_;
-    int activity_phase_ = 26;
+    int activity_phase_;
     bool first_frame_ = false;
 };

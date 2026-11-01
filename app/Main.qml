@@ -433,7 +433,7 @@ ApplicationWindow {
                     App.registry.renderWindow.resetCamera()
             } finally {
                 if (hasStartupProgress)
-                    startupProgress.reportStage(qsTr("正在准备三维视图与首帧…"))
+                    startupProgress.reportPreparingView()
                 root.startupFilesReady()
             }
         })

@@ -215,3 +215,18 @@ TEST_CASE("Startup progress preserves stage text and queues worker notifications
     CHECK(stage_thread == app.thread());
     CHECK(viewport_thread == app.thread());
 }
+
+TEST_CASE("Startup view preparation stage is shared by C++ and meta-object callers")
+{
+    (void)ensureApplication();
+    auto& progress = QStartupProgress::instance();
+    QObject receiver;
+    QStringList stages;
+    QObject::connect(&progress, &QStartupProgress::onStageChange, &receiver,
+        [&stages](const QString& stage) { stages.append(stage); });
+    progress.reportPreparingView();
+    REQUIRE(QMetaObject::invokeMethod(&progress, "reportPreparingView", Qt::DirectConnection));
+    REQUIRE(stages.size() == 2);
+    CHECK_FALSE(stages.first().isEmpty());
+    CHECK(stages.first() == stages.last());
+}
