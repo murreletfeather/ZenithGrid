@@ -61,6 +61,20 @@ bool waitUntil(const std::function<bool()>& condition, int timeout_ms = 3000)
     return condition();
 }
 
+//! @brief 保留真实绘制断言，并在超时时提供远端显示环境与窗口状态。
+void requireFirstFrame(QStartupSplashWindow& splash, const std::function<bool()>& frame_ready)
+{
+    const bool ready = waitUntil(frame_ready);
+    INFO("QPA platform: " << QGuiApplication::platformName().toStdString());
+    INFO("QT_QPA_PLATFORM: " << qEnvironmentVariable("QT_QPA_PLATFORM").toStdString());
+    INFO("SESSIONNAME: " << qEnvironmentVariable("SESSIONNAME").toStdString());
+    INFO("visible=" << splash.isVisible() << ", exposed=" << splash.isExposed()
+                    << ", size=" << splash.width() << "x" << splash.height());
+    INFO("screen=" << (splash.screen() ? splash.screen()->name().toStdString() : "none")
+                   << ", screen count=" << QGuiApplication::screens().size());
+    REQUIRE(ready);
+}
+
 //! @brief 仅测试使用：导出当前原生窗口中的阶段示例，供人工视觉检查。
 void captureStages(QStartupSplashWindow& splash)
 {
@@ -104,7 +118,7 @@ TEST_CASE("Startup splash reports one first frame across redraw and visibility c
     });
     CHECK(first_frame_count == 0);
     splash.show();
-    REQUIRE(waitUntil([&first_frame_count] { return first_frame_count > 0; }));
+    requireFirstFrame(splash, [&first_frame_count] { return first_frame_count > 0; });
     REQUIRE(splash.isExposed());
     splash.setStage(QStringLiteral("正在加载静态插件…"));
     splash.requestUpdate();
@@ -124,7 +138,7 @@ TEST_CASE("Startup splash stage refresh does not dispatch queued application cal
     bool first_frame = false;
     QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &splash, [&first_frame] { first_frame = true; });
     splash.show();
-    REQUIRE(waitUntil([&first_frame] { return first_frame; }));
+    requireFirstFrame(splash, [&first_frame] { return first_frame; });
 
     QObject callback_context;
     bool callback_ran = false;
@@ -163,7 +177,7 @@ TEST_CASE("Closing startup splash publishes startup cancellation")
     QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &splash, [&first_frame] { first_frame = true; });
     QObject::connect(&splash, &QStartupSplashWindow::onCancelled, &splash, [&cancelled_count] { ++cancelled_count; });
     splash.show();
-    REQUIRE(waitUntil([&first_frame] { return first_frame; }));
+    requireFirstFrame(splash, [&first_frame] { return first_frame; });
     REQUIRE(splash.close());
     CHECK(cancelled_count == 1);
     CHECK_FALSE(splash.isVisible());
