@@ -171,7 +171,6 @@ void QStartupSplashWindow::paintContents(QPainter& painter) const
     text(tr("几何与网格前处理"), 168, 485, 16, kStatusTextColor, QFont::Normal, 1);
     text(tr("版本"), 908, 403, 14, kStatusTextColor, QFont::Normal, 1, true);
     text(QStringLiteral("v%1").arg(version_), 910, 442, 30, kStatusTextColor, QFont::Normal, 0.5, true);
-    text(tr("正在启动"), 908, 553, 14, kStatusTextColor, QFont::Normal, 0, true);
 
     QFont status_font = QGuiApplication::font();
     status_font.setPixelSize(16);
