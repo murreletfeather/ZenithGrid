@@ -108,8 +108,6 @@ int main(int argc, char* argv[])
     QPointer<QQuickWindow> main_window;
     bool frame_armed = false;
     app.setQuitOnLastWindowClosed(false);
-    QObject::connect(&startup_progress, &QStartupProgress::onStageChange,
-        &splash, &QStartupSplashWindow::setStage);
     QObject::connect(&startup_progress, &QStartupProgress::onViewportReady,
         &startup_gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
     QObject::connect(&splash, &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
@@ -148,11 +146,8 @@ int main(int argc, char* argv[])
 
     auto initialize = [&]() -> bool {
         try {
-            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化日志…"));
             QLogManager::initialize();
-            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化界面引擎…"));
             engine = std::make_unique<QQmlApplicationEngine>();
-            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在初始化停靠布局…"));
             dock::init(engine.get());
             engine->addImageProvider(QStringLiteral("wallpaper"), new WallpaperProvider);
 
@@ -160,12 +155,10 @@ int main(int argc, char* argv[])
             for (const auto& argument : app.arguments().mid(1))
                 arguments << QUrl::fromLocalFile(argument);
             engine->rootContext()->setContextProperty("QLogManager", QLogManager::instance());
-            engine->rootContext()->setContextProperty("startupProgress", &startup_progress);
             engine->rootContext()->setContextProperty("commandLineArgs", QVariant::fromValue(arguments));
 #ifdef __EMSCRIPTEN__
             engine->rootContext()->setContextProperty("QWasmBridge", new QWasmBridge(&app));
 #endif
-            startup_progress.reportStage(QCoreApplication::translate("Startup", "正在加载主界面…"));
             engine->loadFromModule("app", "Main");
             if (engine->rootObjects().isEmpty()) {
                 startup_gate.fail(QCoreApplication::translate("Startup", "主界面加载失败"));
@@ -212,7 +205,6 @@ int main(int argc, char* argv[])
 #endif
                 }
             }
-            startup_progress.reportPreparingView();
             return true;
         } catch (const std::exception& error) {
             startup_gate.fail(QString::fromUtf8(error.what()));

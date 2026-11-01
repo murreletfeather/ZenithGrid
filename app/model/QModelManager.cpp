@@ -6,7 +6,6 @@
 #include "ModelIOSystem.h"
 #include "ModelLayer.h"
 #include "QModelObserver.h"
-#include "QStartupProgress.h"
 #include "QPythonRuntime.h"
 #include "Session.h"
 #include "SystemPluginManager.h"
@@ -19,7 +18,6 @@
 QModelManager::QModelManager(std::string_view argv0, QObject* parent)
     : QObject(parent)
 {
-    QStartupProgress::instance().reportStage(tr("正在初始化模型会话…"));
     // 1) 会话组合根：模型层 + undo 栈 + 事件总线 + 四系统（内部经转发观察者桥接 ModelEvent）
     observer_ = std::make_unique<QModelObserver>();
     connect(observer_.get(), &QModelObserver::modelRemoved, this, &QModelManager::modelRemoved);
@@ -71,7 +69,6 @@ QModelManager::QModelManager(std::string_view argv0, QObject* parent)
     python_runtime_ = std::make_unique<QPythonRuntime>(session_.get(), this);
 
     // 5) 注册插件：静态插件经适配器注册以同步 QML 插件名列表
-    QStartupProgress::instance().reportStage(tr("正在注册内置插件…"));
     q_plugin_manager_->registerStaticPlugins();
 #ifndef __EMSCRIPTEN__
     using std::filesystem::path;
@@ -82,7 +79,6 @@ QModelManager::QModelManager(std::string_view argv0, QObject* parent)
     }
     if (!std::filesystem::is_directory(plugin_dir)) {
         spdlog::info("QModelManager::QModelManager: 插件目录 {} 不存在，跳过动态插件加载", plugin_dir.string());
-        QStartupProgress::instance().reportStage(tr("正在装配功能界面…"));
         return;
     }
     // 遍历插件目录，加载所有插件（经适配器注册以同步 QML 插件名列表）
@@ -96,11 +92,9 @@ QModelManager::QModelManager(std::string_view argv0, QObject* parent)
             continue;
         }
         QUrl plugin_url = QUrl::fromLocalFile(QString::fromLocal8Bit(entry_path.string()));
-        QStartupProgress::instance().reportStage(tr("正在加载插件：%1").arg(QString::fromStdU16String(entry_path.filename().u16string())));
         q_plugin_manager_->registerPlugin(plugin_url);
     }
 #endif
-    QStartupProgress::instance().reportStage(tr("正在装配功能界面…"));
 }
 
 QModelManager::~QModelManager()

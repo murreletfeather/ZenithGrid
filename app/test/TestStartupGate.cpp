@@ -9,7 +9,6 @@
 #include <QCoreApplication>
 #include <QEvent>
 #include <QString>
-#include <QStringList>
 #include <QThread>
 
 #include <catch2/catch_test_macros.hpp>
@@ -179,54 +178,25 @@ TEST_CASE("Startup gate ignores late failure and synchronous terminal reentry")
     }
 }
 
-TEST_CASE("Startup progress preserves stage text and queues worker notifications to GUI")
+TEST_CASE("Startup viewport readiness is queued from worker to GUI")
 {
     auto& app = ensureApplication();
     auto& progress = QStartupProgress::instance();
     REQUIRE(progress.thread() == app.thread());
     QObject receiver;
-    QStringList stages;
-    QThread* stage_thread = nullptr;
     QThread* viewport_thread = nullptr;
     int viewport_count = 0;
-    QObject::connect(&progress, &QStartupProgress::onStageChange, &receiver, [&](const QString& stage) {
-        stages.append(stage);
-        stage_thread = QThread::currentThread(); }, Qt::QueuedConnection);
     QObject::connect(&progress, &QStartupProgress::onViewportReady, &receiver, [&] {
         ++viewport_count;
         viewport_thread = QThread::currentThread(); }, Qt::QueuedConnection);
 
-    const QString first_stage = QStringLiteral("正在加载插件：网格修复 <A&B>.dll");
-    const QString second_stage = QStringLiteral("正在初始化三维视口…");
     std::thread worker([&] {
-        progress.reportStage(first_stage);
-        progress.reportStage(second_stage);
         progress.reportViewportReady();
     });
     worker.join();
-    // 工作线程发通知不应直接进入 GUI 接收者，也不应把文案当成 HTML 改写。
-    CHECK(stages.isEmpty());
+    // 工作线程只报告就绪，接收方在 GUI 线程消费通知。
     CHECK(viewport_count == 0);
     QCoreApplication::sendPostedEvents(&receiver, QEvent::MetaCall);
-    REQUIRE(stages.size() == 2);
-    CHECK(stages[0] == first_stage);
-    CHECK(stages[1] == second_stage);
     CHECK(viewport_count == 1);
-    CHECK(stage_thread == app.thread());
     CHECK(viewport_thread == app.thread());
-}
-
-TEST_CASE("Startup view preparation stage is shared by C++ and meta-object callers")
-{
-    (void)ensureApplication();
-    auto& progress = QStartupProgress::instance();
-    QObject receiver;
-    QStringList stages;
-    QObject::connect(&progress, &QStartupProgress::onStageChange, &receiver,
-        [&stages](const QString& stage) { stages.append(stage); });
-    progress.reportPreparingView();
-    REQUIRE(QMetaObject::invokeMethod(&progress, "reportPreparingView", Qt::DirectConnection));
-    REQUIRE(stages.size() == 2);
-    CHECK_FALSE(stages.first().isEmpty());
-    CHECK(stages.first() == stages.last());
 }

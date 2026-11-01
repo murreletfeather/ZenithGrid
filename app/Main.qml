@@ -414,13 +414,9 @@ ApplicationWindow {
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
         Qt.callLater(function() {
-            // 单独加载 Main 的测试宿主可以不提供启动窗口上下文。
-            const hasStartupProgress = typeof startupProgress !== "undefined"
             try {
                 let imported = false
                 for (let i = 0; i < commandLineArgs.length; ++i) {
-                    if (hasStartupProgress)
-                        startupProgress.reportStage(qsTr("正在打开启动文件（%1/%2）…").arg(i + 1).arg(commandLineArgs.length))
                     let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
                     if (!ok) {
                         console.exception("启动打开失败: " + commandLineArgs[i]);
@@ -432,8 +428,6 @@ ApplicationWindow {
                 if (imported && App.registry.renderWindow)
                     App.registry.renderWindow.resetCamera()
             } finally {
-                if (hasStartupProgress)
-                    startupProgress.reportPreparingView()
                 root.startupFilesReady()
             }
         })
