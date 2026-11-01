@@ -224,8 +224,9 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
     vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(0.0, 0.0);
 
-    vtk->renderer_->SetBackground(0.5, 0.5, 0.7);
-    vtk->renderer_->SetBackground2(0.7, 0.7, 0.7);
+    // 墨绿渐变保留黑色边线和灰色几何体的辨识度。
+    vtk->renderer_->SetBackground(66.0 / 255.0, 99.0 / 255.0, 95.0 / 255.0);
+    vtk->renderer_->SetBackground2(102.0 / 255.0, 132.0 / 255.0, 126.0 / 255.0);
     vtk->renderer_->SetGradientBackground(true);
 
     vtk->style_->SetDefaultRenderer(vtk->renderer_);
