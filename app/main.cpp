@@ -104,20 +104,22 @@ int main(int argc, char* argv[])
     auto& startup_progress = QStartupProgress::instance();
     QStartupGate startup_gate;
 #ifndef __EMSCRIPTEN__
-    QStartupSplashWindow splash(QCoreApplication::applicationVersion());
+    auto splash = std::make_unique<QStartupSplashWindow>(QCoreApplication::applicationVersion());
     QPointer<QQuickWindow> main_window;
     QMetaObject::Connection startup_error_connection;
     bool frame_armed = false;
     app.setQuitOnLastWindowClosed(false);
     QObject::connect(&startup_progress, &QStartupProgress::onViewportReady,
         &startup_gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
-    QObject::connect(&splash, &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
-    QObject::connect(&app, &QCoreApplication::aboutToQuit, &splash, &QWindow::hide);
+    QObject::connect(splash.get(), &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
+    QObject::connect(&app, &QCoreApplication::aboutToQuit, splash.get(), &QWindow::hide);
     QObject::connect(&startup_gate, &QStartupGate::onReady, &app, [&]() {
         // 启动门控进入终态后，恢复 Qt 对后续场景图初始化错误的默认处理。
         QObject::disconnect(startup_error_connection);
         spdlog::info("startup: main window ready after viewport, startup files and presented frame");
-        splash.hide();
+        // 先隐藏以停止动画，再释放背景、绘制缓冲与封面专属连接。
+        splash->hide();
+        splash.reset();
         app.setQuitOnLastWindowClosed(true);
         if (main_window)
             main_window->requestActivate();
@@ -141,8 +143,8 @@ int main(int argc, char* argv[])
     QObject::connect(&startup_gate, &QStartupGate::onFailed, &app, [&](const QString& message) {
         spdlog::error("startup: {}", message.toStdString());
 #ifndef __EMSCRIPTEN__
-        splash.setStage(message);
-        splash.hide();
+        splash->setStage(message);
+        splash->hide();
 #endif
         app.exit(-1);
     });
@@ -220,13 +222,13 @@ int main(int argc, char* argv[])
     return initialize() ? 0 : -1;
 #else
     // 第一张启动画面提交后再排队初始化，全程不在插件构造中泵事件。
-    QObject::connect(&splash, &QStartupSplashWindow::onFirstFrame, &app, [&]() {
+    QObject::connect(splash.get(), &QStartupSplashWindow::onFirstFrame, &app, [&]() {
         QTimer::singleShot(0, &app, [&]() {
-            if (splash.isVisible())
+            if (splash && splash->isVisible())
                 initialize();
         });
     });
-    splash.show();
+    splash->show();
     return app.exec();
 #endif
 }
