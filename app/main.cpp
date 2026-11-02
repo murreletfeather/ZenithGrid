@@ -3,7 +3,6 @@
 #include "QLogManager.h"
 #include "QModelManager.h"
 #include "QStartupGate.h"
-#include "QStartupProgress.h"
 #include "WallpaperLibrary.h"
 #ifndef __EMSCRIPTEN__
 #include "QStartupSplashWindow.h"
@@ -100,8 +99,7 @@ int main(int argc, char* argv[])
         app.setFont(QFont(font_families.first()));
     }
 #endif
-    // 先在 GUI 线程创建通知桥，三维渲染线程只发布无状态就绪通知。
-    auto& startup_progress = QStartupProgress::instance();
+    // 门控先于 QML 引擎构造，退出时引擎及其渲染回调先结束，门控随后析构。
     QStartupGate startup_gate;
 #ifndef __EMSCRIPTEN__
     auto splash = std::make_unique<QStartupSplashWindow>(QCoreApplication::applicationVersion());
@@ -109,8 +107,6 @@ int main(int argc, char* argv[])
     QMetaObject::Connection startup_error_connection;
     bool frame_armed = false;
     app.setQuitOnLastWindowClosed(false);
-    QObject::connect(&startup_progress, &QStartupProgress::onViewportReady,
-        &startup_gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
     QObject::connect(splash.get(), &QStartupSplashWindow::onCancelled, &app, &QCoreApplication::quit);
     QObject::connect(&app, &QCoreApplication::aboutToQuit, splash.get(), &QWindow::hide);
     QObject::connect(&startup_gate, &QStartupGate::onReady, &app, [&]() {
@@ -177,16 +173,17 @@ int main(int argc, char* argv[])
                 return false;
             }
             // 停靠中央区同步创建；若失败，不把空主窗口当成启动成功。
-            auto has_viewport = [](auto&& visit, QQuickItem* item) -> bool {
-                if (qobject_cast<QQuickVTKItem*>(item))
-                    return true;
+            auto find_viewport = [](auto&& visit, QQuickItem* item) -> QQuickVTKItem* {
+                if (auto* viewport = qobject_cast<QQuickVTKItem*>(item))
+                    return viewport;
                 for (auto* child : item->childItems()) {
-                    if (visit(visit, child))
-                        return true;
+                    if (auto* viewport = visit(visit, child))
+                        return viewport;
                 }
-                return false;
+                return nullptr;
             };
-            if (!has_viewport(has_viewport, main_window->contentItem())) {
+            auto* viewport = find_viewport(find_viewport, main_window->contentItem());
+            if (!viewport) {
                 startup_gate.fail(QCoreApplication::translate("Startup", "三维视口加载失败"));
                 return false;
             }
@@ -197,6 +194,10 @@ int main(int argc, char* argv[])
                 return false;
             }
             startup_error_connection = QObject::connect(main_window, &QQuickWindow::sceneGraphError, &startup_gate, [&](QQuickWindow::SceneGraphError, const QString& message) { startup_gate.fail(message); }, Qt::QueuedConnection);
+            // 队列在视口初始化之后消费；已初始化的视口也会在后续同步中执行。
+            viewport->dispatch_async([&startup_gate](vtkRenderWindow*, QQuickVTKItem::vtkUserData) {
+                QMetaObject::invokeMethod(&startup_gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
+            });
 #endif
             // 安装全局按键事件过滤器，将按键事件转发给功能系统。
             if (auto* model_manager = engine->singletonInstance<QModelManager*>("app.model", "QModelManager")) {

@@ -4,7 +4,6 @@
  */
 
 #include "QStartupGate.h"
-#include "QStartupProgress.h"
 
 #include <QCoreApplication>
 #include <QEvent>
@@ -181,22 +180,30 @@ TEST_CASE("Startup gate ignores late failure and synchronous terminal reentry")
 TEST_CASE("Startup viewport readiness is queued from worker to GUI")
 {
     auto& app = ensureApplication();
-    auto& progress = QStartupProgress::instance();
-    REQUIRE(progress.thread() == app.thread());
-    QObject receiver;
+    GateProbe probe;
+    REQUIRE(probe.gate.thread() == app.thread());
     QThread* viewport_thread = nullptr;
-    int viewport_count = 0;
-    QObject::connect(&progress, &QStartupProgress::onViewportReady, &receiver, [&] {
-        ++viewport_count;
-        viewport_thread = QThread::currentThread(); }, Qt::QueuedConnection);
+    QObject::connect(&probe.gate, &QStartupGate::onUpdateRequested, &probe.gate, [&] {
+        viewport_thread = QThread::currentThread();
+    });
+    probe.gate.markStartupFilesReady();
+    probe.gate.markFrameReady();
+    viewport_thread = nullptr;
 
+    bool notification_queued = false;
     std::thread worker([&] {
-        progress.reportViewportReady();
+        notification_queued = QMetaObject::invokeMethod(&probe.gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
     });
     worker.join();
     // 工作线程只报告就绪，接收方在 GUI 线程消费通知。
-    CHECK(viewport_count == 0);
-    QCoreApplication::sendPostedEvents(&receiver, QEvent::MetaCall);
-    CHECK(viewport_count == 1);
+    REQUIRE(notification_queued);
+    CHECK_FALSE(probe.gate.isPrepared());
+    CHECK(viewport_thread == nullptr);
+    CHECK(probe.ready_count == 0);
+    QCoreApplication::sendPostedEvents(&probe.gate, QEvent::MetaCall);
+    CHECK(probe.gate.isPrepared());
+    CHECK(probe.ready_count == 0);
     CHECK(viewport_thread == app.thread());
+    probe.gate.markFrameReady();
+    CHECK(probe.ready_count == 1);
 }

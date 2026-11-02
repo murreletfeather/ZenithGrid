@@ -2,7 +2,6 @@
 precess_add_test(TestStartupGate
     TestStartupGate.cpp
     ../core/QStartupGate.h ../core/QStartupGate.cpp
-    ../core/QStartupProgress.h ../core/QStartupProgress.cpp
 )
 set_target_properties(TestStartupGate PROPERTIES AUTOMOC ON)
 target_include_directories(TestStartupGate PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../core")
