@@ -594,7 +594,7 @@ void MeshPipelineData::rebuildOutputs()
     } else {
         vtkNew<vtkExtractEdges> extractor;
         extractor->SetInputData(typed_solids);
-        // 线框沿用组件点身份，无需按坐标合并；保留原点编号也能避免大体网格的空间查找瓶颈。
+        // 保留输入点集及身份数组，不按坐标合并；拾取时经身份数组还原组件点 ID。
         extractor->UseAllPointsOn();
         extractor->Update();
         internal_edges = publishPolyData(extractor->GetOutput());

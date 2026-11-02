@@ -2,31 +2,36 @@
 #include "MakeMeshData.h"
 
 #include "FaceHideFilter.h"
-#include "TestMeshActorWithData.h"
 #include "MeshActorManager.h"
 #include "MeshActorSelectOp.h"
+#include "MeshIdQuery.h"
 #include "MeshPipelineData.h"
-#include "renderStrategy/AttributeOperator.h"
+#include "SelectorHighlight.h"
+#include "TestMeshActorWithData.h"
 #include "renderStrategy/AttriRenderStrategyScalar.h"
 #include "renderStrategy/AttriRenderStrategyVector.h"
+#include "renderStrategy/AttributeOperator.h"
 #include <catch2/catch_test_macros.hpp>
 #include <vtkActor.h>
 #include <vtkAlgorithmOutput.h>
 #include <vtkCamera.h>
+#include <vtkCell.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
+#include <vtkHardwarePicker.h>
 #include <vtkHardwareSelector.h>
 #include <vtkIdTypeArray.h>
 #include <vtkImageData.h>
 #include <vtkNew.h>
+#include <vtkPartitionedDataSet.h>
 #include <vtkPlane.h>
 #include <vtkPointData.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkPropCollection.h>
+#include <vtkProperty.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkScalarBarActor.h>
@@ -37,6 +42,7 @@
 #include <vtkWindowToImageFilter.h>
 
 #include <algorithm>
+#include <array>
 #include <memory>
 #include <set>
 #include <string>
@@ -111,7 +117,92 @@ MeshData makeAttributeMesh()
     return mesh;
 }
 
+//! @brief 仅识别原始边 (4,5) 的查询桩，用不同的全局点 ID 暴露错误端点回退。
+class EdgePickIdQuery final : public IMeshIdQuery {
+public:
+    //! @brief 仅在组件和原始端点均正确时返回稳定边 ID。
+    std::optional<Index> findEdgeByEndpoints(Index component_id, Index p0, Index p1) const override
+    {
+        if (component_id == 7 && std::min(p0, p1) == 4 && std::max(p0, p1) == 5)
+            return 42;
+        return std::nullopt;
+    }
+
+    //! @brief 为端点回退提供非恒等的全局点 ID，避免与稳定边 ID 混淆。
+    Index pointGlobalId(Index component_id, Index local_point_id) const override
+    {
+        return component_id == 7 ? 1000 + local_point_id : -1;
+    }
+};
+
 } // namespace
+
+TEST_CASE("EdgeSelectorHighlight preserves point identity after solid type filtering", "[mesh-types]")
+{
+    // 隐藏使用低编号点的四面体，使保留六面体的渲染点编号与原始编号不同。
+    MeshData mesh;
+    mesh.init();
+    mesh.vertex_positions_ = { { -2, 0, 0 }, { -1, 0, 0 }, { -2, 1, 0 }, { -2, 0, 1 },
+        { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 0, 1, 0 },
+        { 0, 0, 1 }, { 1, 0, 1 }, { 1, 1, 1 }, { 0, 1, 1 } };
+    mesh.solid_types_ = { VTK_TETRA, VTK_HEXAHEDRON };
+    mesh.solid_vertices_ = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    mesh.solid_vertices_offset_ = { 0, 4, 12 };
+    mesh.solid_faces_offset_ = { 0, 0, 0 };
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    data.setCellTypeVisibility(3, VTK_TETRA, false);
+    vtkNew<vtkRenderer> renderer;
+    auto actor = std::make_shared<MeshActor>(renderer);
+    actor->applyDataSnapshot(data.createSnapshot());
+    actor->setRenderStyle(MeshRenderStyle::WireframeInternal);
+    MeshActorSelectOp select_op(actor);
+    auto* solid_actor = vtkActor::SafeDownCast(&select_op.getSolidActor());
+    REQUIRE(solid_actor);
+    auto* mapper = vtkPolyDataMapper::SafeDownCast(solid_actor->GetMapper());
+    REQUIRE(mapper);
+    mapper->Update();
+    auto* poly = mapper->GetInput();
+    auto* point_ids = vtkIdTypeArray::SafeDownCast(poly->GetPointData()->GetArray("vtkOriginalPointIds"));
+    REQUIRE(point_ids);
+
+    // 从真实过滤后的内部线框定位原始边 (4,5)，确认测试确实触发了编号压缩。
+    vtkIdType picked_cell_id = -1;
+    for (vtkIdType id = 0; id < poly->GetNumberOfCells(); ++id) {
+        auto* cell = poly->GetCell(id);
+        const auto p0 = point_ids->GetValue(cell->GetPointId(0));
+        const auto p1 = point_ids->GetValue(cell->GetPointId(1));
+        if (std::min(p0, p1) == 4 && std::max(p0, p1) == 5) {
+            picked_cell_id = id;
+            break;
+        }
+    }
+    REQUIRE(picked_cell_id >= 0);
+    auto* picked_cell = poly->GetCell(picked_cell_id);
+    REQUIRE(picked_cell->GetPointId(0) != point_ids->GetValue(picked_cell->GetPointId(0)));
+
+    // 直接注入预拾取结果，覆盖正式单击处理而不依赖屏幕或 GPU 拾取。
+    EdgePickIdQuery id_query;
+    vtkNew<vtkPartitionedDataSet> highlight_data;
+    EdgeSelectorHighlight selector(*renderer, *highlight_data, 0, select_op, 7, &id_query);
+    vtkNew<vtkHardwarePicker> picker;
+    selector.select(0, 0, picker, solid_actor, picked_cell_id, -1, SelectOp::Toggle);
+    CHECK(selector.get().type == ElementEnum::Edge);
+    CHECK(selector.get().ids == std::vector<Index> { 42 });
+    auto* highlight = vtkPolyData::SafeDownCast(highlight_data->GetPartition(0));
+    REQUIRE(highlight);
+    REQUIRE(highlight->GetNumberOfCells() == 1);
+    std::set<std::array<double, 3>> highlighted_points;
+    for (vtkIdType id = 0; id < highlight->GetNumberOfPoints(); ++id) {
+        std::array<double, 3> point;
+        highlight->GetPoint(id, point.data());
+        highlighted_points.insert(point);
+    }
+    CHECK(highlighted_points == std::set<std::array<double, 3>> { mesh.vertex_positions_[4], mesh.vertex_positions_[5] });
+    selector.select(0, 0, picker, solid_actor, picked_cell_id, -1, SelectOp::Toggle);
+    CHECK(selector.get().ids.empty());
+    CHECK(highlight->GetNumberOfCells() == 0);
+}
 
 TEST_CASE("Mesh cell types compose with manual hiding, clipping, IDs and vector display", "[mesh-types]")
 {
