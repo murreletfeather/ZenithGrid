@@ -503,8 +503,12 @@ void QRenderWindow::loadMeshData(Index component_id, const MeshDataVtk& data)
     // 查询结果是借用视图，在当前 GUI 调用内捕获自持数据再发布。
     auto pipeline = std::make_unique<MeshPipelineData>();
     pipeline->loadModelData(data);
-    if (const auto previous = mesh_pipeline_data_.find(component_id); previous != mesh_pipeline_data_.end())
+    if (const auto previous = mesh_pipeline_data_.find(component_id); previous != mesh_pipeline_data_.end()) {
         pipeline->setVisibility(previous->second->isVisibilityEnabled());
+        for (int dimension : { 2, 3 })
+            for (int type : previous->second->hiddenCellTypes(dimension))
+                pipeline->setCellTypeVisibility(dimension, type, false);
+    }
     pipeline->setClipPlane(mesh_clip_);
     mesh_pipeline_data_[component_id] = std::move(pipeline);
     const auto snapshot = prepareMeshSnapshot(component_id);
@@ -596,6 +600,7 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
             if (pipeline->generation() == 0)
                 continue;
             pipeline->showAllFaces();
+            pipeline->showAllCellTypes();
             pipeline->setVisibility(true);
             notifications.push_back(id);
             publish_mesh(id);
@@ -612,10 +617,10 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
             auto* pipeline = found != mesh_pipeline_data_.end() && found->second->generation() != 0
                 ? found->second.get()
                 : nullptr;
-            const bool mesh_enabled = pipeline && pipeline->isVisibilityEnabled();
-            const bool component_visible = mesh_enabled || (geometry_visibility_.contains(id) && geometry_visibility_.at(id));
+            const bool mesh_visible = pipeline && pipeline->isVisible();
+            const bool component_visible = mesh_visible || (geometry_visibility_.contains(id) && geometry_visibility_.at(id));
             if (pipeline) {
-                if (!mesh_enabled && component_visible)
+                if (!mesh_visible && component_visible)
                     pipeline->setVisibility(false);
                 else
                     pipeline->reverseVisibility();
@@ -714,8 +719,10 @@ void QRenderWindow::setMeshVisibility(Index component_id, bool visibility)
     if (!pipeline)
         pipeline = std::make_unique<MeshPipelineData>();
     pipeline->setVisibility(visibility);
-    if (visibility)
+    if (visibility) {
         pipeline->showAllFaces();
+        pipeline->showAllCellTypes();
+    }
     // 未加载时只保存 GUI 意图，由首次有效快照携带，避免旧的无版本命令覆盖新状态。
     if (pipeline->generation() != 0) {
         const auto previous = mesh_snapshots_.at(component_id);
@@ -736,6 +743,35 @@ void QRenderWindow::setMeshVisibility(Index component_id, bool visibility)
                 publishSelection();
         });
     }
+    publishComponentVisibility(component_id);
+}
+
+void QRenderWindow::setMeshCellVisibility(Index component_id, int dimension, int cell_type, bool visible)
+{
+    const auto found = mesh_pipeline_data_.find(component_id);
+    if (found == mesh_pipeline_data_.end() || found->second->generation() == 0
+        || (dimension != 2 && dimension != 3) || cell_type < -1 || cell_type > 255)
+        return;
+    auto& pipeline = *found->second;
+    // 从整体隐藏状态打开子节点时，只恢复指定范围，不能顺带显示其他类型。
+    if (visible && !pipeline.isVisibilityEnabled()) {
+        pipeline.setCellTypeVisibility(2, -1, false);
+        pipeline.setCellTypeVisibility(3, -1, false);
+    }
+    pipeline.setCellTypeVisibility(dimension, cell_type, visible);
+    if (visible)
+        pipeline.setVisibility(true);
+    const auto snapshot = prepareMeshSnapshot(component_id);
+    dispatch_async([this, component_id, snapshot, revision = selection_revision_](vtkRenderWindow*, vtkUserData user_data) {
+        auto* vtk = Data::SafeDownCast(user_data);
+        // 类型过滤也会重排拾取下标，必须与快照安装一起释放旧选择。
+        render_selection_revision_ = revision;
+        select_manager_->clearSelection();
+        vtk->mesh_actor_manager_->loadMesh(component_id, snapshot, vtk->renderer_);
+        select_manager_->setMeshHighlightVisible(component_id, snapshot->visible);
+        select_manager_->refreshComponentHighlight();
+        publishSelection();
+    });
     publishComponentVisibility(component_id);
 }
 
@@ -808,6 +844,14 @@ void QRenderWindow::publishComponentVisibility(Index component_id)
     const auto geometry = geometry_visibility_.find(component_id);
     emit componentVisibilityChanged(component_id, mesh_visible,
         geometry != geometry_visibility_.end() && geometry->second);
+    QVariantList hidden_faces, hidden_solids;
+    if (pipeline != mesh_pipeline_data_.end()) {
+        for (int type : pipeline->second->hiddenCellTypes(2))
+            hidden_faces.push_back(type);
+        for (int type : pipeline->second->hiddenCellTypes(3))
+            hidden_solids.push_back(type);
+    }
+    emit meshCellVisibilityChanged(component_id, hidden_faces, hidden_solids);
 }
 
 void QRenderWindow::setModelQuery(QModelQuery* query)

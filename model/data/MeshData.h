@@ -40,6 +40,13 @@ struct MeshData {
     using PatchMap = std::unordered_map<Index, std::unique_ptr<Patch>>;
     using BlockMap = std::unordered_map<Index, std::unique_ptr<Block>>;
 
+    /** @brief 按现有线性面的角点数返回 VTK 类型号；面数据不保留高阶单元类型。 */
+    static unsigned char faceCellType(Index point_count)
+    {
+        return point_count == 3 ? 5 : point_count == 4 ? 9
+                                                       : 7;
+    }
+
     /**
      * @brief 顶点的三维坐标（组件自持）。
      *

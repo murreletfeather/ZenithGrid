@@ -1,19 +1,20 @@
 #include "AttributeOperator.h"
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <set>
+#include <vector>
 #include <vtkCellCenters.h>
-#include <vtkPolyData.h>
 #include <vtkCellData.h>
 #include <vtkDataSet.h>
 #include <vtkDoubleArray.h>
 #include <vtkMapper.h>
 #include <vtkNew.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
-#include <cassert>
-#include <vtkPointData.h> 
-#include <vtkPoints.h>
-#include <algorithm>
-#include <cmath>
-#include <vector>
 
 namespace {
 constexpr Index kMaxEdgeSamples = 1000;
@@ -30,6 +31,32 @@ vtkPolyData* ensureCellCenters(vtkDataSet& data, vtkSmartPointer<vtkPolyData>& c
         cache = centers->GetOutput();
     }
     return cache.GetPointer();
+}
+
+/** @brief 按单元类型同步筛选中心点与向量元组，保持原始属性的对应关系。 */
+vtkSmartPointer<vtkPolyData> cellGlyphInput(vtkDataSet& data, vtkPolyData& centers,
+    vtkDataArray& array, const std::set<int>& hidden_types)
+{
+    auto input = vtkSmartPointer<vtkPolyData>::New();
+    if (hidden_types.empty()) {
+        input->SetPoints(centers.GetPoints());
+        input->GetPointData()->SetVectors(&array);
+        return input;
+    }
+    vtkNew<vtkPoints> points;
+    points->SetDataType(centers.GetPoints()->GetDataType());
+    auto vectors = vtkSmartPointer<vtkDataArray>::Take(array.NewInstance());
+    vectors->SetName(array.GetName());
+    vectors->SetNumberOfComponents(array.GetNumberOfComponents());
+    for (vtkIdType id = 0; id < data.GetNumberOfCells(); ++id) {
+        if (!hidden_types.contains(data.GetCellType(id))) {
+            points->InsertNextPoint(centers.GetPoint(id));
+            vectors->InsertNextTuple(id, &array);
+        }
+    }
+    input->SetPoints(points);
+    input->GetPointData()->SetVectors(vectors);
+    return input;
 }
 
 double distanceBetweenPoints(vtkPoints& points, Index point_id_a, Index point_id_b)
@@ -247,12 +274,7 @@ vtkSmartPointer<vtkPolyData> AttributeOperator::getFaceGlyphInput(const std::str
     if (!centers || !centers->GetPoints())
         return nullptr;
 
-    // 合并缓存的单元中心点与向量数据，作为 glyph 输入。
-    vtkSmartPointer<vtkPolyData> glyphInput = vtkSmartPointer<vtkPolyData>::New();
-    glyphInput->SetPoints(centers->GetPoints());
-    glyphInput->GetPointData()->SetVectors(array);
-
-    return glyphInput;
+    return cellGlyphInput(*face_data, *centers, *array, mesh_actor_->data_snapshot_->hidden_face_types);
 }
 
 vtkSmartPointer<vtkPolyData> AttributeOperator::getEdgeGlyphInput(const std::string& attr_name)
@@ -331,9 +353,5 @@ vtkSmartPointer<vtkPolyData> AttributeOperator::getSolidGlyphInput(const std::st
     if (!centers || !centers->GetPoints())
         return nullptr;
 
-    vtkSmartPointer<vtkPolyData> glyphInput = vtkSmartPointer<vtkPolyData>::New();
-    glyphInput->SetPoints(centers->GetPoints());
-    glyphInput->GetPointData()->SetVectors(array);
-
-    return glyphInput;
+    return cellGlyphInput(*solid_data, *centers, *array, mesh_actor_->data_snapshot_->hidden_solid_types);
 }

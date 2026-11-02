@@ -20,6 +20,50 @@ Pane {
     TreeModel {
         id: treeModel
         modelQuery: QModelManager.query
+        onVisibilityRequested: (nodeType, objectId, visible) => {
+            const viewport = App.registry.renderWindow
+            if (nodeType === objectTree._nodeTypeModel)
+                viewport.setVisibility(objectId, visible)
+            else if (nodeType === objectTree._nodeTypeComponent)
+                viewport.setComponentVisibility(objectId, visible)
+            else if (nodeType === objectTree._nodeTypeMesh)
+                viewport.setMeshVisibility(objectId, visible)
+            else if (nodeType === objectTree._nodeTypeGeometry)
+                viewport.setGeometryVisibility(objectId, visible)
+        }
+        onMeshCellVisibilityRequested: (componentId, dimension, cellType, visible) => {
+            App.registry.renderWindow.setMeshCellVisibility(componentId, dimension, cellType, visible)
+        }
+    }
+
+    // 语义路径不依赖刷新时生成的临时节点 ID，折叠父节点不会丢失子节点展开偏好。
+    property var expandedKeys: ({})
+    // 保存当前可见节点，保留折叠父节点下不可见子节点的展开偏好。
+    function saveExpansion() {
+        for (let row = 0; row < treeView.rows; ++row) {
+            const key = treeModel.data(treeView.index(row, 0), TreeModel.StableKeyRole)
+            if (treeView.isExpanded(row))
+                expandedKeys[key] = true
+            else
+                delete expandedKeys[key]
+        }
+    }
+    // 按模型层级恢复，避免依赖展开过程中异步更新的视图行数。
+    function restoreExpansion(parentIndex) {
+        const count = parentIndex === undefined ? treeModel.rowCount() : treeModel.rowCount(parentIndex)
+        for (let row = 0; row < count; ++row) {
+            const idx = parentIndex === undefined ? treeModel.index(row, 0) : treeModel.index(row, 0, parentIndex)
+            if (expandedKeys[treeModel.data(idx, TreeModel.StableKeyRole)] && treeModel.rowCount(idx) > 0) {
+                treeView.expandToIndex(treeModel.index(0, 0, idx))
+                restoreExpansion(idx)
+            }
+        }
+    }
+
+    Connections {
+        target: treeModel
+        function onModelAboutToBeReset() { objectTree.saveExpansion() }
+        function onModelReset() { Qt.callLater(objectTree.restoreExpansion) }
     }
 
     // 选择 Model 时默认关联其第一个 Component，二者共同组成当前操作目标。
@@ -28,6 +72,8 @@ Pane {
         return components.length > 0 ? components[0].component_id : -1
     }
 
+    readonly property int _nodeTypeModel: 0
+    readonly property int _nodeTypeComponent: 1
     readonly property int _nodeTypeMesh: 2
     readonly property int _nodeTypeGeometry: 3
 
@@ -56,7 +102,10 @@ Pane {
     Connections {
         target: QModelManager.observer
         function onModelAdded(modelId)   { refreshTimer.restart() }
-        function onModelChanged(modelId) { refreshTimer.restart() }
+        function onModelChanged(modelId) {
+            treeModel.invalidateMeshSummary()
+            refreshTimer.restart()
+        }
         function onModelRemoved(modelId) {
             if (App.selection.activeModelId === modelId) {
                 treeView.selectionModel.clear()
@@ -66,6 +115,7 @@ Pane {
             refreshTimer.restart()
         }
         function onComponentRemoved(componentId) {
+            treeModel.invalidateMeshSummary(componentId)
             if (App.selection.activeComponentId === componentId) {
                 // 实际删除当前组件后保留所属模型，并选择剩余的第一个组件。
                 const ownerModelId = App.selection.activeModelId
@@ -76,7 +126,10 @@ Pane {
             }
             refreshTimer.restart()
         }
-        function onComponentChanged(componentId) { refreshTimer.restart() }
+        function onComponentChanged(componentId) {
+            treeModel.invalidateMeshSummary(componentId)
+            refreshTimer.restart()
+        }
     }
 
     Rectangle {
@@ -149,8 +202,12 @@ Pane {
         property real colWidth: treeView.width
 
         property int toggleExpandRow: -1
-        onExpanded: (row, depth) => toggleExpandRow = row
-        onCollapsed: (row, recursively) => toggleExpandRow = row
+        onExpanded: (row, depth) => {
+            toggleExpandRow = row
+        }
+        onCollapsed: (row, recursively) => {
+            toggleExpandRow = row
+        }
 
         delegate: TreeViewDelegate {
             id: viewDelegate
@@ -254,7 +311,7 @@ Pane {
 
                 Image {
                     id: eyeIcon
-                    visible: viewDelegate.depth <= 2
+                    visible: viewDelegate.model.canToggleVisibility
                     Layout.preferredWidth: 16
                     Layout.preferredHeight: 16
                     source: viewDelegate.model.isVisible
@@ -262,8 +319,19 @@ Pane {
                         : "qrc:/images/modeltree/hide.svg"
                     opacity: treeMouseArea._overEye ? 1.0 : 0.4
 
+                    // 部分显示同时提供形状和文字提示，避免只靠颜色区分。
+                    Text {
+                        anchors.centerIn: parent
+                        visible: viewDelegate.model.visibilityState === Qt.PartiallyChecked
+                        text: "−"
+                        color: Theme.textPrimary
+                        font.bold: true
+                    }
+
                     ToolTip.visible: treeMouseArea._overEye
-                    ToolTip.text: viewDelegate.model.isVisible ? qsTr("隐藏") : qsTr("显示")
+                    ToolTip.text: viewDelegate.model.visibilityState === Qt.PartiallyChecked
+                        ? qsTr("部分显示，点击显示全部")
+                        : viewDelegate.model.isVisible ? qsTr("隐藏") : qsTr("显示")
                     ToolTip.delay: 500
                 }
 
@@ -280,7 +348,7 @@ Pane {
 
                 readonly property bool _overEye:
                     treeMouseArea.containsMouse
-                    && viewDelegate.depth <= 2
+                    && viewDelegate.model.canToggleVisibility
                     && mouseX > treeMouseArea.width - 22
 
                 cursorShape: treeMouseArea._overEye ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -289,15 +357,8 @@ Pane {
                     if (treeMouseArea._overEye) {
                         if (mouse.button === Qt.RightButton) return
                         let idx = treeModel.findIndexByNodeId(viewDelegate.model.nodeId, viewDelegate.depth)
-                        let newVis = !viewDelegate.model.isVisible
-                        treeModel.setVisibility(idx, newVis)
-                        if (viewDelegate.depth === 0)
-                            App.modelVisibilityUpdated(viewDelegate.model.nodeId, newVis)
-                        else if (viewDelegate.depth === 1)
-                            App.componentVisibilityUpdated(viewDelegate.model.nodeId, newVis, newVis)
-                        else if (viewDelegate.depth === 2 && (viewDelegate.model.nodeType === objectTree._nodeTypeMesh
-                            || viewDelegate.model.nodeType === objectTree._nodeTypeGeometry))
-                            objectTree.emitComponentVisibility(viewDelegate.model.componentId, viewDelegate.model.nodeType)
+                        let newVis = viewDelegate.model.visibilityState !== Qt.Checked
+                        treeModel.requestVisibility(idx, newVis)
                         return
                     }
                     if (mouse.button === Qt.RightButton) {
@@ -414,49 +475,15 @@ Pane {
         }
     }
 
-    // 子节点只更新对应对象，避免几何显隐触发网格显示时的面恢复。
-    function emitComponentVisibility(componentId, nodeType) {
-        let compIdx = treeModel.findIndexByNodeId(componentId, 1)
-        if (!compIdx || !compIdx.valid) return
-        let meshVis = false, geomVis = false
-        for (let i = 0; i < treeModel.rowCount(compIdx); i++) {
-            let childIdx = treeModel.index(i, 0, compIdx)
-            let cType = treeModel.data(childIdx, TreeModel.NodeTypeRole)
-            let cVis = treeModel.data(childIdx, TreeModel.IsVisibleRole)
-            if (cType === objectTree._nodeTypeMesh) meshVis = cVis
-            else if (cType === objectTree._nodeTypeGeometry) geomVis = cVis
-        }
-        if (nodeType === objectTree._nodeTypeMesh)
-            App.registry.renderWindow.setMeshVisibility(componentId, meshVis)
-        else if (nodeType === objectTree._nodeTypeGeometry)
-            App.registry.renderWindow.setGeometryVisibility(componentId, geomVis)
-        else
-            App.componentVisibilityUpdated(componentId, meshVis, geomVis)
-    }
-
     function hideNode(nodeId, depth, nodeType, componentId) {
-        let idx = treeModel.findIndexByNodeId(nodeId, depth)
-        if (!idx || !idx.valid) return
-        treeModel.setVisibility(idx, false)
-        if (depth === 0)
-            App.modelVisibilityUpdated(nodeId, false)
-        else if (depth === 1)
-            App.componentVisibilityUpdated(nodeId, false, false)
-        else if (depth === 2 && (nodeType === objectTree._nodeTypeMesh || nodeType === objectTree._nodeTypeGeometry))
-            emitComponentVisibility(componentId, nodeType)
+        const idx = treeModel.findIndexByNodeId(nodeId, depth)
+        treeModel.requestVisibility(idx, false)
     }
 
-    // 显示目标节点时同步恢复范围内的人工隐藏面，保留裁剪及范围外状态。
+    // 显示范围和隐藏面恢复由管线统一决定，对象树只发送请求。
     function showNode(nodeId, depth, nodeType, componentId) {
-        let idx = treeModel.findIndexByNodeId(nodeId, depth)
-        if (!idx || !idx.valid) return
-        treeModel.setVisibility(idx, true)
-        if (depth === 0)
-            App.modelVisibilityUpdated(nodeId, true)
-        else if (depth === 1)
-            App.componentVisibilityUpdated(nodeId, true, true)
-        else if (depth === 2 && (nodeType === objectTree._nodeTypeMesh || nodeType === objectTree._nodeTypeGeometry))
-            emitComponentVisibility(componentId, nodeType)
+        const idx = treeModel.findIndexByNodeId(nodeId, depth)
+        treeModel.requestVisibility(idx, true)
     }
 
     function deleteNode(nodeId, depth, nodeType, componentId) {
@@ -472,12 +499,7 @@ Pane {
     }
 
     function hideAllNodes() {
-        treeModel.setAllVisibility(false)
-        for (let i = 0; i < treeModel.rowCount(); i++) {
-            let idx = treeModel.index(i, 0)
-            App.modelVisibilityUpdated(
-                treeModel.data(idx, TreeModel.NodeIdRole), false)
-        }
+        treeModel.requestAllVisibility(false)
     }
 
     function showAllNodes() {
@@ -495,45 +517,29 @@ Pane {
                 let visible = (cid === nodeId)
                 let idx = treeModel.findIndexByNodeId(cid, 1)
                 if (idx && idx.valid) {
-                    treeModel.setVisibility(idx, visible)
-                    App.componentVisibilityUpdated(cid, visible, visible)
+                    treeModel.requestVisibility(idx, visible)
                 }
             }
         }
     }
 
     function isolateSubNode(nodeId, nodeType, componentId) {
-        let models = QModelManager.query.listModels()
-        for (let i = 0; i < models.length; i++) {
-            let mid = models[i].model_id
-            let comps = QModelManager.query.getComponentsSummary(mid)
-            for (let j = 0; j < comps.length; j++) {
-                let cid = comps[j].component_id
-                let vis = (cid === componentId)
-                let idx = treeModel.findIndexByNodeId(cid, 1)
-                if (idx && idx.valid) {
-                    treeModel.setVisibility(idx, vis)
-                    // 目标组件在下方按最终子节点状态提交，避免先显示网格再隔离几何。
-                    if (!vis)
-                        App.componentVisibilityUpdated(cid, false, false)
+        const models = QModelManager.query.listModels()
+        for (const model of models) {
+            const components = QModelManager.query.getComponentsSummary(model.model_id)
+            for (const component of components) {
+                const idx = treeModel.findIndexByNodeId(component.component_id, 1)
+                if (!idx.valid) continue
+                if (component.component_id !== componentId) {
+                    treeModel.requestVisibility(idx, false)
+                    continue
+                }
+                // 目标组件直接提交最终子节点开关，不先显示整组件再二次隐藏。
+                for (let row = 0; row < treeModel.rowCount(idx); ++row) {
+                    const child = treeModel.index(row, 0, idx)
+                    treeModel.requestVisibility(child, treeModel.data(child, TreeModel.NodeTypeRole) === nodeType)
                 }
             }
-        }
-
-        let compIdx = treeModel.findIndexByNodeId(componentId, 1)
-        if (compIdx && compIdx.valid) {
-            let childCount = treeModel.rowCount(compIdx)
-            for (let ci = 0; ci < childCount; ci++) {
-                let childIdx = treeModel.index(ci, 0, compIdx)
-                let childNodeId = treeModel.data(childIdx, TreeModel.NodeIdRole)
-                let childNodeType = treeModel.data(childIdx, TreeModel.NodeTypeRole)
-                if (childNodeId !== nodeId
-                    && (childNodeType === objectTree._nodeTypeMesh
-                        || childNodeType === objectTree._nodeTypeGeometry)) {
-                    treeModel.setVisibility(childIdx, false)
-                }
-            }
-            emitComponentVisibility(componentId)
         }
     }
 
@@ -544,8 +550,7 @@ Pane {
             let visible = (mid === modelId)
             let idx = treeModel.findIndexByNodeId(mid, 0)
             if (idx && idx.valid) {
-                treeModel.setVisibility(idx, visible)
-                App.modelVisibilityUpdated(mid, visible)
+                treeModel.requestVisibility(idx, visible)
             }
         }
     }
@@ -560,8 +565,7 @@ Pane {
                 let visible = ids.includes(cid)
                 let idx = treeModel.findIndexByNodeId(cid, 1)
                 if (idx && idx.valid) {
-                    treeModel.setVisibility(idx, visible)
-                    App.componentVisibilityUpdated(cid, visible, visible)
+                    treeModel.requestVisibility(idx, visible)
                 }
             }
         }
@@ -569,17 +573,7 @@ Pane {
 
     // 同步渲染层显隐结果，分别保存网格和几何状态，避免再次发送显隐命令。
     function syncComponentVisibility(componentId, meshVisible, geometryVisible) {
-        let compIdx = treeModel.findIndexByNodeId(componentId, 1)
-        if (!compIdx || !compIdx.valid) return
-        treeModel.setVisibility(compIdx, meshVisible || geometryVisible)
-        for (let i = 0; i < treeModel.rowCount(compIdx); i++) {
-            let childIdx = treeModel.index(i, 0, compIdx)
-            let cType = treeModel.data(childIdx, TreeModel.NodeTypeRole)
-            if (cType === objectTree._nodeTypeMesh)
-                treeModel.setVisibility(childIdx, meshVisible)
-            else if (cType === objectTree._nodeTypeGeometry)
-                treeModel.setVisibility(childIdx, geometryVisible)
-        }
+        treeModel.syncComponentVisibility(componentId, meshVisible, geometryVisible)
     }
 
     function reverseDisplayed() {

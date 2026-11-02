@@ -138,6 +138,118 @@ bool waitForRefresh(TreeModel& tree_model)
 
 }
 
+TEST_CASE("Actual QML controls mesh cell types and retains counts, state and expansion", "[QML][visibility][mesh-types]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    auto& mesh = *component->mesh;
+    mesh.vertex_positions_ = { { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 0, 1, 0 },
+        { 0, 0, 1 }, { 1, 0, 1 }, { 1, 1, 1 }, { 0, 1, 1 } };
+    mesh.vertex_count_ = 8;
+    mesh.face_vertices_ = { 0, 1, 2, 0, 1, 2, 3 };
+    mesh.face_vertices_offset_ = { 0, 3, 7 };
+    mesh.solid_types_ = { 12 };
+    mesh.solid_vertices_ = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    mesh.solid_vertices_offset_ = { 0, 8 };
+    mesh.solid_faces_offset_ = { 0, 0 };
+    ComponentDatas components;
+    components.push_back(std::move(component));
+    const auto model_id = model.addModel("mixed types", std::move(components));
+    const auto id = model.modelById(model_id)->componentIds().front();
+    auto* tree = f.tree->findChild<TreeModel*>();
+    auto* viewport = f.viewport->findChild<QRenderWindow*>();
+    REQUIRE(tree);
+    REQUIRE(viewport);
+    REQUIRE(tree->refresh());
+    // 没有管线接收请求时，模型、组件、网格、维度和类型均不能乐观修改自身状态。
+    TreeModel pending_tree;
+    pending_tree.setModelQuery(f.manager->getModelQuery());
+    REQUIRE(pending_tree.refresh());
+    int pending_requests = 0;
+    QObject::connect(&pending_tree, &TreeModel::visibilityRequested, &pending_tree,
+        [&](int, int, bool) { ++pending_requests; });
+    QObject::connect(&pending_tree, &TreeModel::meshCellVisibilityRequested, &pending_tree,
+        [&](int, int, int, bool) { ++pending_requests; });
+    auto pending_index = pending_tree.index(0, 0);
+    for (int depth = 0; depth < 5; ++depth) {
+        REQUIRE(pending_index.isValid());
+        REQUIRE(pending_tree.requestVisibility(pending_index, false));
+        CHECK(pending_tree.data(pending_index, TreeModel::VisibilityStateRole).toInt() == Qt::Checked);
+        pending_index = pending_tree.index(0, 0, pending_index);
+    }
+    pending_tree.requestAllVisibility(false);
+    CHECK(pending_requests == 6);
+    pending_tree.syncComponentVisibility(id, false, false);
+    CHECK_FALSE(pending_tree.data(pending_tree.index(0, 0), TreeModel::IsVisibleRole).toBool());
+    pending_tree.requestAllVisibility(true);
+    CHECK_FALSE(pending_tree.data(pending_tree.index(0, 0), TreeModel::IsVisibleRole).toBool());
+    // 每次用语义层级重新定位，不能跨模型重建继续持有旧 QModelIndex。
+    const auto face_group = [&] { return tree->index(0, 0, tree->index(0, 0, tree->findIndexByNodeId(id, 1))); };
+    auto faces = face_group();
+    REQUIRE(tree->rowCount(faces) == 2);
+    auto triangle = tree->index(0, 0, faces);
+    CHECK(tree->data(triangle, TreeModel::NameRole).toString() == "三角形");
+    CHECK(tree->data(triangle, TreeModel::NumberRole).toString() == "1");
+    CHECK(tree->data(triangle, TreeModel::CanToggleVisibilityRole).toBool());
+    const auto stable_key = tree->data(triangle, TreeModel::StableKeyRole);
+    REQUIRE(tree->requestVisibility(triangle, false));
+    CHECK(tree->data(faces, TreeModel::VisibilityStateRole).toInt() == Qt::PartiallyChecked);
+    CHECK(tree->data(faces, TreeModel::NumberRole).toString() == "2");
+
+    QQuickWindow host;
+    host.resize(360, 600);
+    auto* tree_page = qobject_cast<QQuickItem*>(f.tree.get());
+    tree_page->setParentItem(host.contentItem());
+    tree_page->setSize(QSizeF(360, 600));
+    const auto cleanup = qScopeGuard([&] { host.hide(); tree_page->setParentItem(nullptr); });
+    host.show();
+    QCoreApplication::processEvents();
+    auto* view = f.tree->findChild<QObject*>("objectTreeView");
+    REQUIRE(view);
+    REQUIRE(QMetaObject::invokeMethod(view, "expandRecursively", Q_ARG(int, -1), Q_ARG(int, -1)));
+    REQUIRE(QMetaObject::invokeMethod(view, "forceLayout"));
+    const int rows = view->property("rows").toInt();
+    REQUIRE(rows > 5);
+    REQUIRE(tree->refresh());
+    QCoreApplication::processEvents();
+    REQUIRE(QMetaObject::invokeMethod(view, "forceLayout"));
+    CHECK(view->property("rows").toInt() == rows);
+    faces = face_group();
+    triangle = tree->index(0, 0, faces);
+    CHECK(tree->data(triangle, TreeModel::StableKeyRole) == stable_key);
+    CHECK_FALSE(tree->data(triangle, TreeModel::IsVisibleRole).toBool());
+
+    // 维度批量操作和视口“显示全部”都必须回传正确的叶节点状态。
+    REQUIRE(tree->requestVisibility(faces, false));
+    CHECK(tree->data(faces, TreeModel::VisibilityStateRole).toInt() == Qt::Unchecked);
+    REQUIRE(tree->requestVisibility(triangle, true));
+    CHECK(tree->data(faces, TreeModel::VisibilityStateRole).toInt() == Qt::PartiallyChecked);
+    viewport->showAll();
+    CHECK(tree->data(faces, TreeModel::VisibilityStateRole).toInt() == Qt::Checked);
+    viewport->setMeshVisibility(id, false);
+    REQUIRE(tree->requestVisibility(triangle, true));
+    CHECK(tree->data(faces, TreeModel::VisibilityStateRole).toInt() == Qt::PartiallyChecked);
+    const auto volumes = tree->index(1, 0, tree->parent(faces));
+    CHECK(tree->data(volumes, TreeModel::VisibilityStateRole).toInt() == Qt::Unchecked);
+    viewport->showAll();
+    REQUIRE(tree->requestVisibility(triangle, false));
+    model.markComponentDirty(id);
+    mesh.face_vertices_ = { 0, 1, 2, 3, 0, 1, 2, 3 };
+    mesh.face_vertices_offset_ = { 0, 4, 8 };
+    model.flushNotifications();
+    REQUIRE(waitForRefresh(*tree));
+    faces = face_group();
+    REQUIRE(tree->rowCount(faces) == 1);
+    const auto quad = tree->index(0, 0, faces);
+    CHECK(tree->data(quad, TreeModel::NameRole).toString() == "四边形");
+    CHECK(tree->data(quad, TreeModel::NumberRole).toString() == "2");
+    CHECK(tree->data(quad, TreeModel::IsVisibleRole).toBool());
+}
+
 TEST_CASE("Actual QML synchronizes reversed mesh and geometry visibility across tree refresh", "[QML][visibility]")
 {
     application();
@@ -222,6 +334,7 @@ TEST_CASE("Actual QML visibility entries dispatch to the intended components", "
     QString show_entry;
     bool show_scene = false;
     bool show_model = false;
+    bool isolate = false;
     SECTION("object tree toolbar")
     {
         show_scene = true;
@@ -246,6 +359,19 @@ TEST_CASE("Actual QML visibility entries dispatch to the intended components", "
     {
         show_model = true;
         show_entry = QString("showNode-0-%1").arg(model_id);
+    }
+    SECTION("object tree component isolation")
+    {
+        isolate = true;
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "isolateNode", Q_ARG(QVariant, id)));
+    }
+    SECTION("object tree mesh isolation")
+    {
+        isolate = true;
+        const auto mesh_index = tree->index(0, 0, tree->findIndexByNodeId(id, 1));
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "isolateSubNode",
+            Q_ARG(QVariant, tree->data(mesh_index, TreeModel::NodeIdRole)),
+            Q_ARG(QVariant, static_cast<int>(TreeNode::NodeType::Mesh)), Q_ARG(QVariant, id)));
     }
     if (!show_entry.isEmpty()) {
         // 软件场景图仅布局对象树，保留真实菜单的创建、可见性和触发接线检查。
@@ -289,9 +415,9 @@ TEST_CASE("Actual QML visibility entries dispatch to the intended components", "
     const auto check_visibility = [&](Index component_id, bool expected) {
         const auto index = tree->findIndexByNodeId(component_id, 1);
         CHECK(tree->data(index, TreeModel::IsVisibleRole).toBool() == expected);
-        CHECK(notifications.contains(component_id) == expected);
-        if (expected)
-            CHECK(notifications.at(component_id) == std::make_pair(true, false));
+        CHECK(notifications.contains(component_id) == (expected || isolate));
+        if (expected || isolate)
+            CHECK(notifications.at(component_id) == std::make_pair(expected, false));
     };
     check_visibility(id, true);
     check_visibility(second_id, show_scene || show_model);

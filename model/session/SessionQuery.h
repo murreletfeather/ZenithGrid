@@ -46,6 +46,8 @@ struct MeshSummary {
     Index edge_count { 0 };
     Index face_count { 0 };
     Index solid_count { 0 };
+    std::map<int, Index> face_type_counts; //> 线性面类型号 -> 原始单元数量
+    std::map<int, Index> solid_type_counts; //> VTK 体类型号 -> 原始单元数量
 };
 
 /** @brief 几何拓扑规模摘要（ensureIndexBuilt 后统计） */

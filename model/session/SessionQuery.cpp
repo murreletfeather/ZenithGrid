@@ -273,6 +273,10 @@ MeshSummary SessionQuery::meshSummary(Index component_id) const
     summary.edge_count = static_cast<Index>(md.edge_vertices_.size() / 2);
     summary.face_count = md.face_vertices_offset_.empty() ? 0 : static_cast<Index>(md.face_vertices_offset_.size() - 1);
     summary.solid_count = static_cast<Index>(md.solid_types_.size());
+    for (Index id = 0; id < summary.face_count; ++id)
+        ++summary.face_type_counts[MeshData::faceCellType(md.face_vertices_offset_[id + 1] - md.face_vertices_offset_[id])];
+    for (auto type : md.solid_types_)
+        ++summary.solid_type_counts[type];
     return summary;
 }
 

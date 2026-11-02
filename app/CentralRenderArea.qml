@@ -677,6 +677,9 @@ Page {
             onComponentVisibilityChanged: function(componentId, meshVisible, geometryVisible) {
                 App.registry.objectTree.syncComponentVisibility(componentId, meshVisible, geometryVisible)
             }
+            onMeshCellVisibilityChanged: function(componentId, hiddenFaces, hiddenSolids) {
+                App.registry.treeModel.syncMeshCellVisibility(componentId, hiddenFaces, hiddenSolids)
+            }
 
             Component.onCompleted: {
                 myItem.setFaceSelectionByAngle(root.faceSelectByAngle, root.faceSelectAngle)

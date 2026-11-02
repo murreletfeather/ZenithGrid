@@ -7,6 +7,7 @@
 #include "ComponentData.h"
 #include "GeometryBuilder.h"
 #include "GeometryData.h"
+#include "MeshData.h"
 #include "ModelLayer.h"
 #include "ModelOperator.h"
 
@@ -15,6 +16,31 @@
 #include <string>
 
 using namespace session;
+
+TEST_CASE("SessionQuery counts original linear face and volume types", "[session][query][mesh-types]")
+{
+    ModelLayer layer;
+    SessionQuery query(layer);
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    auto& mesh = *component->mesh;
+    mesh.vertex_positions_.resize(8);
+    mesh.vertex_count_ = 8;
+    mesh.face_vertices_ = { 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4 };
+    mesh.face_vertices_offset_ = { 0, 3, 7, 12 };
+    mesh.solid_types_ = { 10, 12, 13, 14, 10 };
+    mesh.solid_vertices_ = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 0, 1, 2, 4 };
+    mesh.solid_vertices_offset_ = { 0, 4, 12, 18, 23, 27 };
+    ComponentDatas components;
+    components.push_back(std::move(component));
+    const auto model_id = layer.addModel("mixed", std::move(components));
+    const auto id = layer.modelById(model_id)->componentIds().front();
+    const auto summary = query.meshSummary(id);
+    CHECK(summary.face_count == 3);
+    CHECK(summary.solid_count == 5);
+    CHECK(summary.face_type_counts == std::map<int, Index> { { 5, 1 }, { 7, 1 }, { 9, 1 } });
+    CHECK(summary.solid_type_counts == std::map<int, Index> { { 10, 2 }, { 12, 1 }, { 13, 1 }, { 14, 1 } });
+}
 
 namespace {
 // 造一个含单个几何组件（长方体 1x2x3）的模型，返回组件 id

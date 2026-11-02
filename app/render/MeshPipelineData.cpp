@@ -10,6 +10,7 @@
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
+#include <vtkExtractCells.h>
 #include <vtkExtractEdges.h>
 #include <vtkExtractGeometry.h>
 #include <vtkExtractPolyDataGeometry.h>
@@ -326,6 +327,67 @@ void MeshPipelineData::setVisibility(bool visible)
     visible_ = visible;
 }
 
+bool MeshPipelineData::isVisible() const
+{
+    assertOwnerThread();
+    if (!visible_ || !source_)
+        return false;
+    if (!source_->edge_vertices_.empty())
+        return true;
+    for (auto type : source_->solid_types_) {
+        if (!hidden_solid_types_.contains(type))
+            return true;
+    }
+    const auto& offsets = source_->face_vertices_offset_;
+    for (size_t id = 1; id < offsets.size(); ++id) {
+        if (!hidden_face_types_.contains(MeshData::faceCellType(offsets[id] - offsets[id - 1]))
+            && !std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), static_cast<vtkIdType>(id - 1)))
+            return true;
+    }
+    return false;
+}
+
+void MeshPipelineData::setCellTypeVisibility(int dimension, int type, bool visible)
+{
+    assertOwnerThread();
+    if ((dimension != 2 && dimension != 3) || type < -1 || type > 255)
+        return;
+    auto& hidden = dimension == 2 ? hidden_face_types_ : hidden_solid_types_;
+    const auto old_hidden = hidden;
+    const auto set_type = [&](int cell_type) {
+        if (visible)
+            hidden.erase(cell_type);
+        else
+            hidden.insert(cell_type);
+    };
+    if (type >= 0)
+        set_type(type);
+    else if (source_) {
+        if (dimension == 2) {
+            const auto& offsets = source_->face_vertices_offset_;
+            for (size_t id = 1; id < offsets.size(); ++id)
+                set_type(MeshData::faceCellType(offsets[id] - offsets[id - 1]));
+        } else {
+            for (auto cell_type : source_->solid_types_)
+                set_type(cell_type);
+        }
+    }
+    dirty_ |= hidden != old_hidden;
+}
+
+void MeshPipelineData::showAllCellTypes()
+{
+    assertOwnerThread();
+    dirty_ |= !hidden_face_types_.empty() || !hidden_solid_types_.empty();
+    hidden_face_types_.clear();
+    hidden_solid_types_.clear();
+}
+
+const std::set<int>& MeshPipelineData::hiddenCellTypes(int dimension) const
+{
+    return dimension == 2 ? hidden_face_types_ : hidden_solid_types_;
+}
+
 void MeshPipelineData::hideFaces(const std::vector<vtkIdType>& face_ids)
 {
     assertOwnerThread();
@@ -397,16 +459,44 @@ bool MeshPipelineData::reverseVisibility()
     assertOwnerThread();
     if (!visible_) {
         showAllFaces();
+        showAllCellTypes();
         visible_ = true;
-    } else if (hidden_face_ids_.empty()) {
+    } else if (!source_ || (hidden_face_ids_.empty() && hidden_face_types_.empty() && hidden_solid_types_.empty())) {
         visible_ = false;
-    } else if (face_data_) {
-        std::vector<vtkIdType> reversed;
-        for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
-            if (!std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), id))
-                reversed.push_back(id);
+    } else {
+        // 面的有效隐藏是类型过滤与人工隐藏的并集，反转必须对这个并集取补集。
+        // 完全隐藏的类型用类型开关表达，其余仅保留局部隐藏 ID，避免两层状态重叠。
+        if (!hidden_face_ids_.empty() || !hidden_face_types_.empty()) {
+            std::vector<vtkIdType> reversed;
+            std::set<int> all_types, visible_types;
+            const auto& offsets = source_->face_vertices_offset_;
+            for (size_t id = 1; id < offsets.size(); ++id) {
+                const int type = MeshData::faceCellType(offsets[id] - offsets[id - 1]);
+                const auto face_id = static_cast<vtkIdType>(id - 1);
+                all_types.insert(type);
+                if (hidden_face_types_.contains(type)
+                    || std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), face_id))
+                    visible_types.insert(type);
+                else
+                    reversed.push_back(face_id);
+            }
+            hidden_face_types_ = std::move(all_types);
+            for (int type : visible_types)
+                hidden_face_types_.erase(type);
+            std::erase_if(reversed, [&](vtkIdType id) {
+                return hidden_face_types_.contains(MeshData::faceCellType(offsets[id + 1] - offsets[id]));
+            });
+            hidden_face_ids_ = std::move(reversed);
         }
-        hidden_face_ids_ = std::move(reversed);
+        // 体类型只在已有局部体过滤时反转，沿用局部面操作不改变其他维度的规则。
+        if (!hidden_solid_types_.empty()) {
+            std::set<int> reversed;
+            for (auto type : source_->solid_types_) {
+                if (!hidden_solid_types_.contains(type))
+                    reversed.insert(type);
+            }
+            hidden_solid_types_ = std::move(reversed);
+        }
         dirty_ = true;
     }
     return visible_;
@@ -441,6 +531,14 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkIdTypeArray> hidden_ids;
     for (auto id : hidden_face_ids_)
         hidden_ids->InsertNextValue(id);
+    // 类型隐藏与人工面隐藏都使用原始面 ID，避免过滤后的局部下标混入持久状态。
+    const auto& face_offsets = source_->face_vertices_offset_;
+    if (!hidden_face_types_.empty()) {
+        for (size_t id = 1; id < face_offsets.size(); ++id) {
+            if (hidden_face_types_.contains(MeshData::faceCellType(face_offsets[id] - face_offsets[id - 1])))
+                hidden_ids->InsertNextValue(static_cast<vtkIdType>(id - 1));
+        }
+    }
     hider->SetInputData(face_data_);
     hider->SetHiddenCellIds(hidden_ids);
     hider->Update();
@@ -454,6 +552,23 @@ void MeshPipelineData::rebuildOutputs()
     vtkPolyData* faces = hider->GetOutput();
     vtkPolyData* edges = edge_data_;
     vtkUnstructuredGrid* solids = solid_data_;
+    // 在提取外表面前过滤体单元，让保留单元原先被遮住的交界面重新暴露。
+    vtkNew<vtkExtractCells> type_filter;
+    if (!hidden_solid_types_.empty()) {
+        std::vector<vtkIdType> kept_ids;
+        for (size_t id = 0; id < source_->solid_types_.size(); ++id) {
+            if (!hidden_solid_types_.contains(source_->solid_types_[id]))
+                kept_ids.push_back(static_cast<vtkIdType>(id));
+        }
+        type_filter->SetInputData(solids);
+        type_filter->SetCellIds(kept_ids.data(), static_cast<vtkIdType>(kept_ids.size()));
+        type_filter->AssumeSortedAndUniqueIdsOn();
+        // 原始体 ID 已在输入携带，不允许过滤器用重排后的下标覆盖。
+        type_filter->PassThroughCellIdsOff();
+        type_filter->Update();
+        solids = type_filter->GetOutput();
+    }
+    vtkUnstructuredGrid* typed_solids = solids;
     if (clip_.enabled) {
         face_clipper->SetInputData(faces);
         face_clipper->SetImplicitFunction(plane);
@@ -471,14 +586,14 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkGeometryFilter> surface;
     surface->SetInputData(solids);
     surface->Update();
-    // 内部线框始终来自完整原始体，与裁剪及面隐藏无关；同一源数据只提取一次。
-    // 复用已发布的只读输出，源网格重新加载（含坐标/属性更新）后才重新提边。
+    // 内部线框按体类型过滤，仍保持不受裁剪及人工面隐藏影响的既有语义。
+    // 复用已发布的只读输出；仅源数据或体类型过滤改变时重新提边。
     vtkSmartPointer<vtkPolyData> internal_edges;
-    if (prepared_ && prepared_->source == source_) {
+    if (prepared_ && prepared_->source == source_ && prepared_->hidden_solid_types == hidden_solid_types_) {
         internal_edges = prepared_->solid_internal_edges;
     } else {
         vtkNew<vtkExtractEdges> extractor;
-        extractor->SetInputData(solid_data_);
+        extractor->SetInputData(typed_solids);
         // 线框沿用组件点身份，无需按坐标合并；保留原点编号也能避免大体网格的空间查找瓶颈。
         extractor->UseAllPointsOn();
         extractor->Update();
@@ -487,6 +602,8 @@ void MeshPipelineData::rebuildOutputs()
 
     prepared_ = std::make_shared<MeshDataSnapshot>();
     prepared_->source = source_;
+    prepared_->hidden_face_types = hidden_face_types_;
+    prepared_->hidden_solid_types = hidden_solid_types_;
     prepared_->model_data = model_data_;
     prepared_->original_faces = publishPolyData(face_data_);
     prepared_->original_edges = publishPolyData(edge_data_);

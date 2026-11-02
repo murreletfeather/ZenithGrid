@@ -113,6 +113,185 @@ MeshData makeAttributeMesh()
 
 } // namespace
 
+TEST_CASE("Mesh cell types compose with manual hiding, clipping, IDs and vector display", "[mesh-types]")
+{
+    // 六面体和金字塔共享一个四边形面，过滤后必须重新暴露该面。
+    MeshData mesh;
+    mesh.vertex_positions_ = { { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 0, 1, 0 },
+        { 0, 0, 1 }, { 1, 0, 1 }, { 1, 1, 1 }, { 0, 1, 1 }, { 0.5, 0.5, 2 } };
+    mesh.face_vertices_ = { 0, 1, 2, 0, 1, 2, 3, 4, 5, 8 };
+    mesh.face_vertices_offset_ = { 0, 3, 7, 10 };
+    mesh.solid_types_ = { 12, 14 };
+    mesh.solid_vertices_ = { 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8 };
+    mesh.solid_vertices_offset_ = { 0, 8, 13 };
+    mesh.solid_faces_offset_ = { 0, 0, 0 };
+    mesh.solid_attributes_["s_vector_3"] = { 1, 0, 0, 0, 2, 0 };
+    mesh.solid_attributes_["s_scalar_1"] = { 1, 2 };
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    const auto original = data.createSnapshot();
+    REQUIRE(original->solid_surface->GetNumberOfCells() == 9);
+    vtkNew<vtkRenderer> renderer;
+    auto actor = std::make_shared<MeshActor>(renderer);
+    actor->applyDataSnapshot(original);
+    actor->setRenderStrategy(std::make_unique<AttriRenderStrategyVector>());
+    actor->renderAttribute("s_vector_3", { });
+    AttributeOperator attribute(actor.get());
+    attribute.getGlyph3DMapper()->Update();
+    const auto original_glyph_cells = attribute.getGlyph3DMapper()->GetInput()->GetNumberOfCells();
+    REQUIRE(original_glyph_cells > 0);
+
+    data.hideFaces({ 0 });
+    data.setCellTypeVisibility(2, 5, false);
+    data.setCellTypeVisibility(3, 14, false);
+    const auto filtered = data.createSnapshot();
+    CHECK(faceIdValues(filtered->visible_faces) == std::vector<vtkIdType> { 1 });
+    CHECK(filtered->solid_surface->GetNumberOfCells() == 6);
+    CHECK(filtered->solid_internal_edges->GetNumberOfCells() == 12);
+    auto* solid_ids = vtkIdTypeArray::SafeDownCast(filtered->solid_surface->GetCellData()->GetArray("vtkOriginalCellIds"));
+    REQUIRE(solid_ids);
+    for (vtkIdType id = 0; id < solid_ids->GetNumberOfTuples(); ++id)
+        CHECK(solid_ids->GetValue(id) == 0);
+    actor->applyDataSnapshot(filtered);
+    auto glyph_input = attribute.getSolidGlyphInput("s_vector_3");
+    REQUIRE(glyph_input->GetNumberOfPoints() == 1);
+    CHECK(glyph_input->GetPointData()->GetVectors()->GetComponent(0, 0) == 1);
+    attribute.getGlyph3DMapper()->Update();
+    CHECK(attribute.getGlyph3DMapper()->GetInput()->GetNumberOfCells() * 2 == original_glyph_cells);
+
+    data.setCellTypeVisibility(2, 5, true);
+    const auto faces_restored = data.createSnapshot();
+    CHECK(faceIdValues(faces_restored->visible_faces) == std::vector<vtkIdType> { 1, 2 });
+    MeshClipPlane clip;
+    clip.enabled = true;
+    clip.origin = { -1.0e6, 0, 0 };
+    data.setClipPlane(clip);
+    const auto clipped = data.createSnapshot();
+    CHECK(clipped->solid_surface->GetNumberOfCells() == 0);
+    CHECK(clipped->solid_internal_edges == filtered->solid_internal_edges);
+    data.setClipPlane(nullptr);
+    data.setCellTypeVisibility(3, -1, false);
+    const auto empty = data.createSnapshot();
+    CHECK(empty->solid_surface->GetNumberOfCells() == 0);
+    CHECK(empty->solid_internal_edges->GetNumberOfCells() == 0);
+    // 保留后一个体单元，防止提取器把原始体 ID 覆盖为从零开始的新下标。
+    data.setCellTypeVisibility(3, 14, true);
+    const auto pyramid = data.createSnapshot();
+    REQUIRE(pyramid->solid_surface->GetNumberOfCells() == 5);
+    solid_ids = vtkIdTypeArray::SafeDownCast(pyramid->solid_surface->GetCellData()->GetArray("vtkOriginalCellIds"));
+    REQUIRE(solid_ids);
+    for (vtkIdType id = 0; id < solid_ids->GetNumberOfTuples(); ++id)
+        CHECK(solid_ids->GetValue(id) == 1);
+    // 类型过滤只更新可见数据，不能重放标量策略来抢占窗口共享颜色表。
+    vtkNew<vtkScalarBarActor> scalar_bar;
+    actor->setRenderStrategy(std::make_unique<AttriRenderStrategyScalar>(scalar_bar));
+    actor->renderAttribute("s_scalar_1", { });
+    REQUIRE(scalar_bar->GetVisibility());
+    scalar_bar->SetVisibility(false);
+    actor->applyDataSnapshot(pyramid);
+    CHECK_FALSE(scalar_bar->GetVisibility());
+    data.showAllCellTypes();
+    data.showAllFaces();
+    const auto restored = data.createSnapshot();
+    CHECK(restored->solid_surface->GetNumberOfCells() == 9);
+    CHECK(faceIdValues(restored->visible_faces) == std::vector<vtkIdType> { 0, 1, 2 });
+    // 新结果不得改写已发布快照或原始模型数据。
+    CHECK(filtered->solid_surface->GetNumberOfCells() == 6);
+    CHECK(original->original_solids->GetNumberOfCells() == 2);
+    CHECK(mesh.solid_types_ == std::vector<unsigned char> { 12, 14 });
+}
+
+TEST_CASE("Cell vector filtering preserves precision and overall visibility", "[mesh-types]")
+{
+    MeshData mesh = makeAttributeMesh();
+    for (auto& point : mesh.vertex_positions_)
+        point[0] += 10000000.0;
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    vtkNew<vtkRenderer> renderer;
+    auto actor = std::make_shared<MeshActor>(renderer);
+    actor->applyDataSnapshot(data.createSnapshot());
+    actor->setRenderStrategy(std::make_unique<AttriRenderStrategyVector>());
+    actor->renderAttribute("s_isolation_vector_3", { });
+    AttributeOperator attribute(actor.get());
+    const auto original_centers = attribute.getSolidGlyphInput("s_isolation_vector_3");
+    double original_center[3];
+    original_centers->GetPoint(0, original_center);
+    REQUIRE(original_center[0] == 10000000.5);
+    attribute.getGlyph3DMapper()->Update();
+    auto original_glyph = vtkSmartPointer<vtkPolyData>::New();
+    original_glyph->ShallowCopy(attribute.getGlyph3DMapper()->GetInput());
+    REQUIRE(original_glyph->GetNumberOfPoints() > 0);
+
+    // 隐藏样式下更新类型仍需重建箭头，但不得打开绘制开关。
+    actor->setRenderStyle(MeshRenderStyle::Hidden);
+    data.setCellTypeVisibility(3, 13, false);
+    actor->applyDataSnapshot(data.createSnapshot());
+    CHECK_FALSE(attribute.getGlyph3DActor()->GetVisibility());
+    const auto filtered_centers = attribute.getSolidGlyphInput("s_isolation_vector_3");
+    double filtered_center[3];
+    filtered_centers->GetPoint(0, filtered_center);
+    CHECK(filtered_center[0] == original_center[0]);
+    CHECK(filtered_centers->GetPoints()->GetDataType() == original_centers->GetPoints()->GetDataType());
+    attribute.getGlyph3DMapper()->Update();
+    auto* filtered_glyph = attribute.getGlyph3DMapper()->GetInput();
+    REQUIRE(filtered_glyph->GetNumberOfPoints() * 2 == original_glyph->GetNumberOfPoints());
+    // 过滤另一个体时，保留体的整支箭头几何必须保持不变。
+    for (vtkIdType id = 0; id < filtered_glyph->GetNumberOfPoints(); ++id) {
+        double before[3], after[3];
+        original_glyph->GetPoint(id, before);
+        filtered_glyph->GetPoint(id, after);
+        CHECK(std::equal(before, before + 3, after));
+    }
+    actor->setRenderStyle(MeshRenderStyle::Face);
+    CHECK(attribute.getGlyph3DActor()->GetVisibility());
+    data.setVisibility(false);
+    data.showAllCellTypes();
+    actor->applyDataSnapshot(data.createSnapshot());
+    CHECK_FALSE(attribute.getGlyph3DActor()->GetVisibility());
+}
+
+TEST_CASE("Mesh type reversal complements effective local visibility and preserves clipping", "[mesh-types]")
+{
+    MeshData mesh = MakeMeshData();
+    mesh.edge_vertices_.clear();
+    MeshPipelineData data;
+    data.loadModelData(MakeMeshDataVtk(mesh));
+    data.hideFaces({ 0 });
+    data.setCellTypeVisibility(2, 5, false);
+    data.setCellTypeVisibility(3, 13, false);
+    const auto original = data.createSnapshot();
+    REQUIRE(faceIdValues(original->visible_faces) == std::vector<vtkIdType> { 3 });
+    REQUIRE(data.reverseVisibility());
+    const auto reversed = data.createSnapshot();
+    CHECK(faceIdValues(reversed->visible_faces) == std::vector<vtkIdType> { 0, 1, 2, 4 });
+    CHECK(reversed->hidden_solid_types == std::set<int> { 12 });
+    REQUIRE(data.reverseVisibility());
+    CHECK(faceIdValues(data.createSnapshot()->visible_faces) == faceIdValues(original->visible_faces));
+    CHECK(data.hiddenCellTypes(3) == original->hidden_solid_types);
+
+    // 类型全部关闭并不等于总开关关闭；反转应恢复有效单元，继续保留裁剪。
+    data.setCellTypeVisibility(2, -1, false);
+    data.setCellTypeVisibility(3, -1, false);
+    REQUIRE_FALSE(data.isVisible());
+    MeshClipPlane clip;
+    clip.enabled = true;
+    clip.origin = { -1.0e6, 0, 0 };
+    data.setClipPlane(clip);
+    REQUIRE(data.reverseVisibility());
+    CHECK(data.isVisible());
+    const auto clipped = data.createSnapshot();
+    CHECK(clipped->clip.enabled);
+    CHECK(clipped->clip.origin == clip.origin);
+    CHECK(clipped->visible_faces->GetNumberOfCells() == 0);
+    CHECK(clipped->solid_surface->GetNumberOfCells() == 0);
+    data.setClipPlane(nullptr);
+    const auto restored = data.createSnapshot();
+    CHECK(faceIdValues(restored->visible_faces) == std::vector<vtkIdType> { 0, 1, 2, 3, 4 });
+    CHECK(restored->hidden_solid_types.empty());
+    CHECK(restored->solid_surface->GetNumberOfCells() == 11);
+}
+
 TEST_CASE("FaceHideFilter preserves global cell attributes across mixed cell categories")
 {
     vtkNew<vtkPolyData> input;

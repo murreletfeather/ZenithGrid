@@ -13,6 +13,7 @@
 #include "QSelection.h"
 #include <QQuickVTKItem.h>
 #include <QVTKRenderWindowAdapter.h>
+#include <QVariantList>
 #include <unordered_map>
 
 #include <QtQml/QQmlApplicationEngine>
@@ -129,6 +130,8 @@ public:
     Q_INVOKABLE void setComponentVisibility(Index component_id, bool visibility);
     /** @brief 设置网格显隐；显示时恢复人工隐藏面和面隔离，保留几何及裁剪。 */
     Q_INVOKABLE void setMeshVisibility(Index component_id, bool visibility);
+    /** @brief 切换单元类型或整个维度（cell_type=-1），保留裁剪与人工隐藏面。 */
+    Q_INVOKABLE void setMeshCellVisibility(Index component_id, int dimension, int cell_type, bool visible);
     Q_INVOKABLE void setGeometryVisibility(Index component_id, bool visibility);
 
     Q_INVOKABLE void setGeometryStyle(int style);
@@ -251,6 +254,8 @@ signals:
     void rightClicked();
     /** @brief 在 GUI 决定显隐后同步通知对象树，渲染线程只安装结果。 */
     void componentVisibilityChanged(Index component_id, bool mesh_visible, bool geometry_visible);
+    /** @brief 回传 GUI 管线的类型过滤，界面只保存展示副本。 */
+    void meshCellVisibilityChanged(Index component_id, const QVariantList& hidden_faces, const QVariantList& hidden_solids);
 
 protected:
     void itemChange(ItemChange change, const ItemChangeData& value) override;
