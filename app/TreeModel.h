@@ -81,12 +81,11 @@ public:
     Q_INVOKABLE QModelIndex findIndexByNodeId(int nodeId, int depth) const;
     /** @brief 按模型发送全部节点的显隐请求，不提前修改展示副本。 */
     Q_INVOKABLE void requestAllVisibility(bool visible);
-    /** @brief 模型通知使指定组件的规模缓存失效；负值使全部缓存失效。 */
-    Q_INVOKABLE void invalidateMeshSummary(int component_id = -1);
-    /** @brief 同步视口的整体开关，不触发新的渲染命令或重置类型过滤。 */
-    Q_INVOKABLE void syncComponentVisibility(int component_id, bool mesh_visible, bool geometry_visible);
-    /** @brief 同步 GUI 管线持有的类型过滤结果，重建父节点聚合状态。 */
-    Q_INVOKABLE void syncMeshCellVisibility(int component_id, const QVariantList& hidden_faces, const QVariantList& hidden_solids);
+    /** @brief 模型通知使指定组件的类型统计缓存失效；负值使全部缓存失效。 */
+    Q_INVOKABLE void invalidateMeshCellTypeCounts(int component_id = -1);
+    /** @brief 一次同步 GUI 管线的总开关及类型过滤，父节点三态由子节点派生。 */
+    Q_INVOKABLE void syncComponentVisibility(int component_id, bool mesh_visible, bool geometry_visible,
+        const QVariantList& hidden_faces, const QVariantList& hidden_solids);
 
     QObject* getModelQuery() const { return modelQuery_; }
     void setModelQuery(QObject* query);
@@ -101,7 +100,6 @@ private:
     TreeNode* getNode(const QModelIndex& index) const;
     void emitDescendantDataChanged(const QModelIndex& parentIndex);
     void syncSubNodes(TreeNode* node);
-    void propagateUp(TreeNode* node);
     /** @brief 聚合节点的全显、部分显示和全隐状态。 */
     int visibilityState(const TreeNode* node) const;
     /** @brief 返回刷新前后不变的语义路径，用于保留展开状态。 */
@@ -111,8 +109,7 @@ private:
 
     TreeNode* rootNode = nullptr;
     QModelQuery* modelQuery_ = nullptr;
-    std::unordered_map<int, bool> components_visibility_;
-    std::unordered_map<int, std::pair<bool, bool>> sub_visibility_; // first=mesh visible, second=geometry visible
+    std::unordered_map<int, std::pair<bool, bool>> sub_visibility_; //> 管线回传的网格、几何总开关
     std::map<int, std::pair<std::set<int>, std::set<int>>> hidden_cell_types_; //> 组件下隐藏的面/体类型
-    std::map<int, QVariantMap> mesh_summaries_; //> 只在模型通知后重新统计
+    std::map<int, QVariantMap> mesh_cell_type_counts_; //> 只在模型通知后重新统计类型
 };

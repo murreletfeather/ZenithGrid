@@ -252,10 +252,9 @@ signals:
     void meshStyleChanged();
     void clicked();
     void rightClicked();
-    /** @brief 在 GUI 决定显隐后同步通知对象树，渲染线程只安装结果。 */
-    void componentVisibilityChanged(Index component_id, bool mesh_visible, bool geometry_visible);
-    /** @brief 回传 GUI 管线的类型过滤，界面只保存展示副本。 */
-    void meshCellVisibilityChanged(Index component_id, const QVariantList& hidden_faces, const QVariantList& hidden_solids);
+    /** @brief 一次回传 GUI 决定的总开关及类型过滤，渲染线程只安装结果。 */
+    void componentVisibilityChanged(Index component_id, bool mesh_visible, bool geometry_visible,
+        const QVariantList& hidden_faces, const QVariantList& hidden_solids);
 
 protected:
     void itemChange(ItemChange change, const ItemChangeData& value) override;

@@ -842,8 +842,6 @@ void QRenderWindow::publishComponentVisibility(Index component_id)
     const bool mesh_visible = pipeline != mesh_pipeline_data_.end() && pipeline->second->generation() != 0
         && pipeline->second->isVisibilityEnabled();
     const auto geometry = geometry_visibility_.find(component_id);
-    emit componentVisibilityChanged(component_id, mesh_visible,
-        geometry != geometry_visibility_.end() && geometry->second);
     QVariantList hidden_faces, hidden_solids;
     if (pipeline != mesh_pipeline_data_.end()) {
         for (int type : pipeline->second->hiddenCellTypes(2))
@@ -851,7 +849,8 @@ void QRenderWindow::publishComponentVisibility(Index component_id)
         for (int type : pipeline->second->hiddenCellTypes(3))
             hidden_solids.push_back(type);
     }
-    emit meshCellVisibilityChanged(component_id, hidden_faces, hidden_solids);
+    emit componentVisibilityChanged(component_id, mesh_visible,
+        geometry != geometry_visibility_.end() && geometry->second, hidden_faces, hidden_solids);
 }
 
 void QRenderWindow::setModelQuery(QModelQuery* query)

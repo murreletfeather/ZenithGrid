@@ -103,7 +103,7 @@ Pane {
         target: QModelManager.observer
         function onModelAdded(modelId)   { refreshTimer.restart() }
         function onModelChanged(modelId) {
-            treeModel.invalidateMeshSummary()
+            treeModel.invalidateMeshCellTypeCounts()
             refreshTimer.restart()
         }
         function onModelRemoved(modelId) {
@@ -115,7 +115,7 @@ Pane {
             refreshTimer.restart()
         }
         function onComponentRemoved(componentId) {
-            treeModel.invalidateMeshSummary(componentId)
+            treeModel.invalidateMeshCellTypeCounts(componentId)
             if (App.selection.activeComponentId === componentId) {
                 // 实际删除当前组件后保留所属模型，并选择剩余的第一个组件。
                 const ownerModelId = App.selection.activeModelId
@@ -127,7 +127,7 @@ Pane {
             refreshTimer.restart()
         }
         function onComponentChanged(componentId) {
-            treeModel.invalidateMeshSummary(componentId)
+            treeModel.invalidateMeshCellTypeCounts(componentId)
             refreshTimer.restart()
         }
     }
@@ -569,11 +569,6 @@ Pane {
                 }
             }
         }
-    }
-
-    // 同步渲染层显隐结果，分别保存网格和几何状态，避免再次发送显隐命令。
-    function syncComponentVisibility(componentId, meshVisible, geometryVisible) {
-        treeModel.syncComponentVisibility(componentId, meshVisible, geometryVisible)
     }
 
     function reverseDisplayed() {

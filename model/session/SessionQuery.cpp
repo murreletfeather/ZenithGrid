@@ -273,11 +273,24 @@ MeshSummary SessionQuery::meshSummary(Index component_id) const
     summary.edge_count = static_cast<Index>(md.edge_vertices_.size() / 2);
     summary.face_count = md.face_vertices_offset_.empty() ? 0 : static_cast<Index>(md.face_vertices_offset_.size() - 1);
     summary.solid_count = static_cast<Index>(md.solid_types_.size());
-    for (Index id = 0; id < summary.face_count; ++id)
-        ++summary.face_type_counts[MeshData::faceCellType(md.face_vertices_offset_[id + 1] - md.face_vertices_offset_[id])];
-    for (auto type : md.solid_types_)
-        ++summary.solid_type_counts[type];
     return summary;
+}
+
+MeshCellTypeCounts SessionQuery::meshCellTypeCounts(Index component_id) const
+{
+    MeshCellTypeCounts counts;
+    const ComponentData* comp = model_.findComponent(component_id);
+    if (!comp || !comp->mesh)
+        return counts;
+
+    const MeshData& md = *comp->mesh;
+    // 面只保留线性连接表，按角点数分类，与渲染过滤使用同一规则。
+    for (std::size_t id = 1; id < md.face_vertices_offset_.size(); ++id)
+        ++counts.face_type_counts[MeshData::faceCellType(md.face_vertices_offset_[id] - md.face_vertices_offset_[id - 1])];
+    // 体沿用存储类型，不进行质量计算中的折叠单元识别。
+    for (auto type : md.solid_types_)
+        ++counts.solid_type_counts[type];
+    return counts;
 }
 
 GeometrySummary SessionQuery::geometrySummary(Index component_id) const

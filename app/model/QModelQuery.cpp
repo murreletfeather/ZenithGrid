@@ -126,6 +126,12 @@ QVariantMap QModelQuery::getMeshSummary(Index component_id) const
     m["edge_count"] = static_cast<int>(summary.edge_count);
     m["face_count"] = static_cast<int>(summary.face_count);
     m["solid_count"] = static_cast<int>(summary.solid_count);
+    return m;
+}
+
+QVariantMap QModelQuery::getMeshCellTypeCounts(Index component_id) const
+{
+    const auto counts = m_query->meshCellTypeCounts(component_id);
     // 类型列表仅携带身份和数量，展示名称及显隐由对象树负责。
     const auto type_counts = [](const std::map<int, Index>& counts) {
         QVariantList items;
@@ -133,9 +139,8 @@ QVariantMap QModelQuery::getMeshSummary(Index component_id) const
             items.push_back(QVariantMap { { "cell_type", type }, { "count", count } });
         return items;
     };
-    m["face_types"] = type_counts(summary.face_type_counts);
-    m["solid_types"] = type_counts(summary.solid_type_counts);
-    return m;
+    return { { "face_types", type_counts(counts.face_type_counts) },
+        { "solid_types", type_counts(counts.solid_type_counts) } };
 }
 
 QVariantMap QModelQuery::getGeometrySummary(Index component_id) const

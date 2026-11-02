@@ -26,6 +26,7 @@ TEST_CASE("SessionQuery counts original linear face and volume types", "[session
     auto& mesh = *component->mesh;
     mesh.vertex_positions_.resize(8);
     mesh.vertex_count_ = 8;
+    mesh.edge_vertices_ = { 0, 1, 1, 2 };
     mesh.face_vertices_ = { 0, 1, 2, 0, 1, 2, 3, 0, 1, 2, 3, 4 };
     mesh.face_vertices_offset_ = { 0, 3, 7, 12 };
     mesh.solid_types_ = { 10, 12, 13, 14, 10 };
@@ -36,10 +37,37 @@ TEST_CASE("SessionQuery counts original linear face and volume types", "[session
     const auto model_id = layer.addModel("mixed", std::move(components));
     const auto id = layer.modelById(model_id)->componentIds().front();
     const auto summary = query.meshSummary(id);
+    CHECK(summary.has_mesh);
+    CHECK(summary.vertex_count == 8);
+    CHECK(summary.edge_count == 2);
     CHECK(summary.face_count == 3);
     CHECK(summary.solid_count == 5);
-    CHECK(summary.face_type_counts == std::map<int, Index> { { 5, 1 }, { 7, 1 }, { 9, 1 } });
-    CHECK(summary.solid_type_counts == std::map<int, Index> { { 10, 2 }, { 12, 1 }, { 13, 1 }, { 14, 1 } });
+    const auto counts = query.meshCellTypeCounts(id);
+    CHECK(counts.face_type_counts == std::map<int, Index> { { 5, 1 }, { 7, 1 }, { 9, 1 } });
+    CHECK(counts.solid_type_counts == std::map<int, Index> { { 10, 2 }, { 12, 1 }, { 13, 1 }, { 14, 1 } });
+}
+
+TEST_CASE("SessionQuery returns empty mesh type counts without a mesh", "[session][query][mesh-types]")
+{
+    ModelLayer layer;
+    SessionQuery query(layer);
+    ComponentDatas components;
+    components.push_back(std::make_unique<ComponentData>());
+    const auto model_id = layer.addModel("without mesh", std::move(components));
+    const auto id = layer.modelById(model_id)->componentIds().front();
+    // 不存在的组件与存在但无网格的组件都返回空统计。
+    for (Index component_id : { Index { -1 }, id }) {
+        INFO("component_id=" << component_id);
+        const auto summary = query.meshSummary(component_id);
+        CHECK_FALSE(summary.has_mesh);
+        CHECK(summary.vertex_count == 0);
+        CHECK(summary.edge_count == 0);
+        CHECK(summary.face_count == 0);
+        CHECK(summary.solid_count == 0);
+        const auto counts = query.meshCellTypeCounts(component_id);
+        CHECK(counts.face_type_counts.empty());
+        CHECK(counts.solid_type_counts.empty());
+    }
 }
 
 namespace {

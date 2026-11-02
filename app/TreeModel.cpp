@@ -199,9 +199,10 @@ bool TreeModel::refresh()
             cNode->nodeType = TreeNode::NodeType::Component;
 
             if (hasMesh) {
-                if (!mesh_summaries_.contains(cid))
-                    mesh_summaries_[cid] = modelQuery_->getMeshSummary(cid);
-                const QVariantMap& ms = mesh_summaries_.at(cid);
+                const QVariantMap ms = modelQuery_->getMeshSummary(cid);
+                if (!mesh_cell_type_counts_.contains(cid))
+                    mesh_cell_type_counts_[cid] = modelQuery_->getMeshCellTypeCounts(cid);
+                const QVariantMap& type_counts = mesh_cell_type_counts_.at(cid);
                 int fc = ms["face_count"].toInt();
                 int sc = ms["solid_count"].toInt();
 
@@ -219,7 +220,7 @@ bool TreeModel::refresh()
                     group->nodeId = fakeId--;
                     group->nodeType = dimension == 2 ? TreeNode::NodeType::D2 : TreeNode::NodeType::D3;
                     group->dimension = dimension;
-                    for (const auto& entry : ms[dimension == 2 ? "face_types" : "solid_types"].toList()) {
+                    for (const auto& entry : type_counts[dimension == 2 ? "face_types" : "solid_types"].toList()) {
                         const auto item = entry.toMap();
                         const int type = item["cell_type"].toInt();
                         auto* leaf = new TreeNode(cellTypeName(type), item["count"].toString(), group);
@@ -266,51 +267,26 @@ bool TreeModel::refresh()
         }
     }
 
-    // Restore persisted visibility and prune stale entries
-    std::unordered_map<int, bool> freshComp;
+    // 只保留仍存在组件的管线开关，组件和模型的显示状态由子节点聚合。
     std::unordered_map<int, std::pair<bool, bool>> freshSub;
     for (TreeNode* mNode : rootNode->children) {
         for (TreeNode* cNode : mNode->children) {
             int ckey = cNode->nodeId;
-            auto cit = components_visibility_.find(ckey);
-            cNode->isVisible = (cit != components_visibility_.end()) ? cit->second : true;
-            freshComp[ckey] = cNode->isVisible;
-
-            // Restore sub visibility
             auto sit = sub_visibility_.find(ckey);
-            bool def_mesh = true, def_geom = true;
-            if (sit != sub_visibility_.end()) {
-                def_mesh = sit->second.first;
-                def_geom = sit->second.second;
-            }
-            for (TreeNode* child : cNode->children) {
-                if (child->nodeType == TreeNode::NodeType::Mesh) {
-                    child->isVisible = def_mesh;
-                    freshSub[ckey].first = child->isVisible;
-                } else if (child->nodeType == TreeNode::NodeType::Geometry) {
-                    child->isVisible = def_geom;
-                    freshSub[ckey].second = child->isVisible;
-                }
-            }
+            const auto visibility = sit != sub_visibility_.end() ? sit->second : std::pair { true, true };
+            freshSub[ckey] = visibility;
+            // 无子节点的组件仍使用回传开关；有子节点时由 visibilityState 统一聚合。
+            cNode->isVisible = visibility.first || visibility.second;
         }
     }
-    components_visibility_ = std::move(freshComp);
     sub_visibility_ = std::move(freshSub);
     // 删除组件时同时释放其派生统计与显示状态，避免组件身份复用后继承旧数据。
-    std::erase_if(mesh_summaries_, [this](const auto& entry) { return !components_visibility_.contains(entry.first); });
-    std::erase_if(hidden_cell_types_, [this](const auto& entry) { return !components_visibility_.contains(entry.first); });
+    std::erase_if(mesh_cell_type_counts_, [this](const auto& entry) { return !sub_visibility_.contains(entry.first); });
+    std::erase_if(hidden_cell_types_, [this](const auto& entry) { return !sub_visibility_.contains(entry.first); });
 
     for (TreeNode* mNode : rootNode->children) {
         for (TreeNode* cNode : mNode->children) {
             syncSubNodes(cNode);
-        }
-    }
-    for (TreeNode* mNode : rootNode->children) {
-        for (TreeNode* cNode : mNode->children) {
-            for (TreeNode* child : cNode->children) {
-                if (child->nodeType == TreeNode::NodeType::Mesh || child->nodeType == TreeNode::NodeType::Geometry)
-                    propagateUp(child);
-            }
         }
     }
 
@@ -345,9 +321,9 @@ void TreeModel::syncSubNodes(TreeNode* node)
 {
     for (TreeNode* child : node->children) {
         if (child->nodeType == TreeNode::NodeType::Mesh) {
-            child->isVisible = node->isVisible && sub_visibility_[node->nodeId].first;
+            child->isVisible = sub_visibility_.at(node->nodeId).first;
         } else if (child->nodeType == TreeNode::NodeType::Geometry) {
-            child->isVisible = node->isVisible && sub_visibility_[node->nodeId].second;
+            child->isVisible = sub_visibility_.at(node->nodeId).second;
         } else if (child->nodeType == TreeNode::NodeType::CellType) {
             auto* component = node;
             while (component->nodeType != TreeNode::NodeType::Component)
@@ -358,21 +334,6 @@ void TreeModel::syncSubNodes(TreeNode* node)
             child->isVisible = node->isVisible;
         }
         syncSubNodes(child);
-    }
-}
-
-void TreeModel::propagateUp(TreeNode* node) {
-    TreeNode* cur = node->parent;
-    while (cur && cur != rootNode) {
-        bool anyVisible = cur->hasIndependentEdges && cur->isVisible;
-        for (TreeNode* child : cur->children) {
-            if (child->isVisible) {
-                anyVisible = true;
-                break;
-            }
-        }
-        cur->isVisible = anyVisible || cur->children.isEmpty();
-        cur = cur->parent;
     }
 }
 
@@ -407,7 +368,7 @@ QModelIndex TreeModel::findIndexByNodeId(int nodeId, int depth) const
 void TreeModel::setModelQuery(QObject* query)
 {
     modelQuery_ = qobject_cast<QModelQuery*>(query);
-    mesh_summaries_.clear();
+    mesh_cell_type_counts_.clear();
 }
 
 int TreeModel::visibilityState(const TreeNode* node) const
@@ -447,31 +408,19 @@ void TreeModel::notifyVisibility(const QModelIndex& idx)
         emit dataChanged(current, current, { IsVisibleRole, VisibilityStateRole });
 }
 
-void TreeModel::invalidateMeshSummary(int component_id)
+void TreeModel::invalidateMeshCellTypeCounts(int component_id)
 {
     if (component_id < 0)
-        mesh_summaries_.clear();
+        mesh_cell_type_counts_.clear();
     else
-        mesh_summaries_.erase(component_id);
+        mesh_cell_type_counts_.erase(component_id);
 }
 
-void TreeModel::syncComponentVisibility(int component_id, bool mesh_visible, bool geometry_visible)
+void TreeModel::syncComponentVisibility(int component_id, bool mesh_visible, bool geometry_visible,
+    const QVariantList& hidden_faces, const QVariantList& hidden_solids)
 {
-    // 回传可能早于首次建树，先保存管线状态供 refresh 使用。
-    components_visibility_[component_id] = mesh_visible || geometry_visible;
+    // 完整回传可能早于首次建树，先保存总开关和类型过滤，再一次更新展示。
     sub_visibility_[component_id] = { mesh_visible, geometry_visible };
-    const auto idx = findIndexByNodeId(component_id, 1);
-    if (!idx.isValid())
-        return;
-    auto* component = getNode(idx);
-    component->isVisible = mesh_visible || geometry_visible;
-    syncSubNodes(component);
-    propagateUp(component);
-    notifyVisibility(idx);
-}
-
-void TreeModel::syncMeshCellVisibility(int component_id, const QVariantList& hidden_faces, const QVariantList& hidden_solids)
-{
     auto& hidden = hidden_cell_types_[component_id];
     hidden = { };
     for (const auto& type : hidden_faces)
@@ -481,9 +430,8 @@ void TreeModel::syncMeshCellVisibility(int component_id, const QVariantList& hid
     const auto idx = findIndexByNodeId(component_id, 1);
     if (idx.isValid()) {
         auto* component = getNode(idx);
-        component->isVisible = components_visibility_[component_id];
+        component->isVisible = mesh_visible || geometry_visible;
         syncSubNodes(component);
-        propagateUp(component);
         notifyVisibility(idx);
     }
 }

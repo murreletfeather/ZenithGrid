@@ -39,13 +39,17 @@ struct ComponentSummary {
     Index material_id { -1 };
 };
 
-/** @brief 网格规模摘要 */
+/** @brief 网格规模摘要；仅读取存储数量，不遍历单元。 */
 struct MeshSummary {
     bool has_mesh { false };
     Index vertex_count { 0 };
     Index edge_count { 0 };
     Index face_count { 0 };
     Index solid_count { 0 };
+};
+
+/** @brief 原始面、体单元的类型数量；仅在显式查询时遍历网格。 */
+struct MeshCellTypeCounts {
     std::map<int, Index> face_type_counts; //> 线性面类型号 -> 原始单元数量
     std::map<int, Index> solid_type_counts; //> VTK 体类型号 -> 原始单元数量
 };
@@ -107,6 +111,8 @@ public:
     std::vector<ModelSummary> listModels() const;
     std::vector<ComponentSummary> componentSummaries(Index model_id) const;
     MeshSummary meshSummary(Index component_id) const;
+    /** @brief 遍历原始网格统计面、体类型；无组件或无网格时返回空统计。 */
+    MeshCellTypeCounts meshCellTypeCounts(Index component_id) const;
     GeometrySummary geometrySummary(Index component_id) const;
     //! @brief 组件网格的全部属性渲染条目（四张属性表顺序遍历；属性名/类型查询复用本条目）
     std::vector<AttributeInfo> componentAttributeInfos(Index component_id) const;
