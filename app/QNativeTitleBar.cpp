@@ -11,6 +11,7 @@
 #include <QPlatformSurfaceEvent>
 #include <QVariant>
 #include <QWindow>
+#include <spdlog/spdlog.h>
 
 #ifdef Q_OS_WIN
 #ifndef NOMINMAX
@@ -69,14 +70,23 @@ void QNativeTitleBar::refresh()
     constexpr COLORREF system_default = 0xffffffff; // DWMWA_COLOR_DEFAULT
     const auto restore_defaults = [hwnd]() {
         const COLORREF color = system_default;
-        DwmSetWindowAttribute(hwnd, caption_attribute, &color, sizeof(color));
-        DwmSetWindowAttribute(hwnd, text_attribute, &color, sizeof(color));
+        const auto caption_result = DwmSetWindowAttribute(hwnd, caption_attribute, &color, sizeof(color));
+        const auto text_result = DwmSetWindowAttribute(hwnd, text_attribute, &color, sizeof(color));
+        if (FAILED(caption_result) || FAILED(text_result)) {
+            spdlog::debug("Failed to restore native title bar colors: caption HRESULT=0x{:08X}, text HRESULT=0x{:08X}",
+                static_cast<unsigned long>(caption_result), static_cast<unsigned long>(text_result));
+        }
     };
 
     HIGHCONTRASTW contrast {};
     contrast.cbSize = sizeof(contrast);
-    if (!SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0)
-        || (contrast.dwFlags & HCF_HIGHCONTRASTON)) {
+    if (!SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0)) {
+        const auto error = GetLastError();
+        spdlog::warn("Failed to query high contrast state; using system title bar colors: Win32 error={}", error);
+        restore_defaults();
+        return;
+    }
+    if (contrast.dwFlags & HCF_HIGHCONTRASTON) {
         restore_defaults();
         return;
     }
@@ -92,8 +102,12 @@ void QNativeTitleBar::refresh()
     const auto caption_result = DwmSetWindowAttribute(hwnd, caption_attribute, &caption_color, sizeof(caption_color));
     const auto text_result = DwmSetWindowAttribute(hwnd, text_attribute, &text_color, sizeof(text_color));
     // 旧系统可能不支持这些属性；避免只应用了一半的颜色。
-    if (FAILED(caption_result) || FAILED(text_result))
+    if (FAILED(caption_result) || FAILED(text_result)) {
+        // 旧系统不支持标题栏配色属于预期回退，只在调试日志中记录。
+        spdlog::debug("Failed to apply native title bar colors: caption HRESULT=0x{:08X}, text HRESULT=0x{:08X}",
+            static_cast<unsigned long>(caption_result), static_cast<unsigned long>(text_result));
         restore_defaults();
+    }
 #endif
 }
 
