@@ -85,6 +85,19 @@ public:
     void setSelectionRevision(int revision);
     void setModelQuery(QModelQuery* query);
 
+#ifdef PRECESS_RENDER_TESTING
+    /**
+     * @brief 测试专用：按指定网格代次投递一条选择消息，模拟渲染线程的迟到快照。
+     *
+     * 与 publishSelection 走相同的 GUI 队列与整批代次校验；生产代码不得调用。
+     */
+    void enqueueSelectionForTest(std::shared_ptr<const Selection> snapshot,
+        std::unordered_map<Index, std::vector<vtkIdType>> faces,
+        std::unordered_map<Index, std::uint64_t> face_generations,
+        std::unordered_map<Index, std::vector<vtkIdType>> solids,
+        std::unordered_map<Index, std::uint64_t> solid_generations);
+#endif
+
     /**
      * @brief 选择模型
      * @param select_mode
@@ -309,6 +322,13 @@ private:
 
     //! @brief 渲染线程制作选择快照，排队交付 GUI 线程，禁止 QML 直接读取拾取器。
     void publishSelection();
+    //! @brief 把选择消息排队到 GUI 线程，统一执行参数版本与整批网格代次校验。
+    void queueSelection(std::shared_ptr<const Selection> snapshot,
+        SelectedFaces faces,
+        MeshGenerations face_generations,
+        SelectedSolids solids,
+        MeshGenerations solid_generations,
+        int revision);
     /** @brief 在 GUI 线程发布当前显隐结果，对象树只接收最新状态。 */
     void publishComponentVisibility(Index component_id);
     // QQuickVTKItem 会接管事件分发，GUI 排队通知交给独立 QObject。

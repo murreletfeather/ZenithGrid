@@ -839,28 +839,37 @@ void QRenderWindow::publishSelection()
     }
     std::shared_ptr<const Selection> snapshot = std::move(selection);
     const int revision = render_selection_revision_;
+    queueSelection(std::move(snapshot), std::move(faces), std::move(face_generations),
+        std::move(solids), std::move(solid_generations), revision);
+}
+
+void QRenderWindow::queueSelection(std::shared_ptr<const Selection> snapshot,
+    SelectedFaces faces,
+    MeshGenerations face_generations,
+    SelectedSolids solids,
+    MeshGenerations solid_generations,
+    int revision)
+{
     QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot,
             faces = std::move(faces), face_generations = std::move(face_generations),
             solids = std::move(solids), solid_generations = std::move(solid_generations),
-            revision]() mutable {
+            revision] {
             if (revision != selection_revision_)
                 return;
-            // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份；
-            // 但只剔除代次失效的条目，避免面/体任一类失效连累另一类有效选择。
-            auto prune = [&](auto& items, const MeshGenerations& generations) {
-                for (auto it = items.begin(); it != items.end();) {
-                    const auto generation = generations.find(it->first);
-                    const auto pipeline = mesh_pipeline_data_.find(it->first);
-                    if (generation != generations.end()
-                        && (pipeline == mesh_pipeline_data_.end()
-                            || pipeline->second->generation() != generation->second))
-                        it = items.erase(it);
-                    else
-                        ++it;
+            // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份。
+            // 对外快照无法按组件拆分重建，任一代次失效即整批丢弃，
+            // 保证内部缓存、选择快照与 QML 看到的是同一份有效结果。
+            auto generationsMatch = [this](const MeshGenerations& generations) {
+                for (const auto& [id, generation] : generations) {
+                    const auto pipeline = mesh_pipeline_data_.find(id);
+                    if (pipeline == mesh_pipeline_data_.end()
+                        || pipeline->second->generation() != generation)
+                        return false;
                 }
+                return true;
             };
-            prune(faces, face_generations);
-            prune(solids, solid_generations);
+            if (!generationsMatch(face_generations) || !generationsMatch(solid_generations))
+                return;
             selection_snapshot_ = snapshot;
             selected_faces_ = faces;
             selected_face_generations_ = face_generations;
@@ -868,6 +877,18 @@ void QRenderWindow::publishSelection()
             selected_solid_generations_ = solid_generations;
             emit selectedChanged(); }, Qt::QueuedConnection);
 }
+
+#ifdef PRECESS_RENDER_TESTING
+void QRenderWindow::enqueueSelectionForTest(std::shared_ptr<const Selection> snapshot,
+    std::unordered_map<Index, std::vector<vtkIdType>> faces,
+    std::unordered_map<Index, std::uint64_t> face_generations,
+    std::unordered_map<Index, std::vector<vtkIdType>> solids,
+    std::unordered_map<Index, std::uint64_t> solid_generations)
+{
+    queueSelection(std::move(snapshot), std::move(faces), std::move(face_generations),
+        std::move(solids), std::move(solid_generations), selection_revision_);
+}
+#endif
 
 void QRenderWindow::publishComponentVisibility(Index component_id)
 {
