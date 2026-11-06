@@ -580,6 +580,9 @@ void MeshPipelineData::rebuildOutputs()
         // 只在可见体网格变化时提边；extractor 仅作过滤器对象，输出由 edges_cache_ 持有。
         vtkNew<vtkExtractEdges> extractor;
         extractor->SetInputData(visible_solids);
+        // 线框沿用可见体网格的点身份，无需按坐标合并；保留原点编号也能避免大体网格的
+        // 空间查找瓶颈，并让隐藏体过滤后的线框仍映射回原始点编号。
+        extractor->UseAllPointsOn();
         extractor->Update();
         edges_cache_ = publishPolyData(extractor->GetOutput());
     }
