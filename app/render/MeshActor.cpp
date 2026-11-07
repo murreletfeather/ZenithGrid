@@ -90,12 +90,17 @@ void MeshActor::applyDataSnapshot(std::shared_ptr<const MeshDataSnapshot> snapsh
         return;
     const bool reloaded = snapshot->generation != data_generation_;
     const bool display_changed = visibility_ != snapshot->visible;
+    const bool types_changed = data_snapshot_
+        && (data_snapshot_->hidden_face_types != snapshot->hidden_face_types
+            || data_snapshot_->hidden_solid_types != snapshot->hidden_solid_types);
     data_snapshot_ = std::move(snapshot);
     const auto& data = *data_snapshot_;
     data_generation_ = data.generation;
     data_revision_ = data.revision;
     visibility_ = data.visible;
     if (reloaded) {
+        active_attribute_name_.clear();
+        active_attribute_args_.clear();
         // 属性和选择继续读取完整原始数据，但包装独立于 GUI 管线。
         model_data_ = data.model_data;
         face_data_->ShallowCopy(data.original_faces);
@@ -132,6 +137,9 @@ void MeshActor::applyDataSnapshot(std::shared_ptr<const MeshDataSnapshot> snapsh
     solid_mapper_->Modified();
     if (reloaded || display_changed)
         applyStyle();
+    // 已开启的向量属性也必须更新，不能保留隐藏类型的旧箭头几何。
+    if (types_changed && !reloaded && !active_attribute_name_.empty())
+        renderAttribute(active_attribute_name_, active_attribute_args_);
 }
 
 void MeshActor::syncDisplayAttributes()
@@ -277,6 +285,8 @@ TopologyDiagnosticActor& MeshActor::topologyDiagnostics()
 
 void MeshActor::cancelActiveAttribute()
 {
+    active_attribute_name_.clear();
+    active_attribute_args_.clear();
     if (render_strategy_) {
         AttributeOperator op(this);
         render_strategy_->cancelActiveAttribute(op);
@@ -286,6 +296,8 @@ void MeshActor::cancelActiveAttribute()
 
 void MeshActor::setRenderStrategy(std::unique_ptr<IAttributeRenderStrategy> strategy)
 {
+    active_attribute_name_.clear();
+    active_attribute_args_.clear();
     render_strategy_ = std::move(strategy);
 }
 
@@ -296,6 +308,18 @@ void MeshActor::renderAttribute(
     if (render_strategy_) {
         AttributeOperator op(this);
         render_strategy_->render(op, attr_name, args);
+        // 标量、颜色与纹理随可见数据透传，仅箭头需要重新生成几何；
+        // 不重放其他策略，避免类型切换抢占窗口共享的颜色表。
+        if (glyph3D_actor_->GetVisibility()) {
+            active_attribute_name_ = attr_name;
+            active_attribute_args_ = std::move(args);
+        } else {
+            active_attribute_name_.clear();
+            active_attribute_args_.clear();
+        }
         syncDisplayAttributes();
+        // 策略只决定属性的局部表现，不能越过组件总开关或隐藏渲染样式。
+        if (!visibility_ || style_ == MeshRenderStyle::Hidden)
+            glyph3D_actor_->SetVisibility(false);
     }
 }

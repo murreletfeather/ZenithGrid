@@ -23,25 +23,30 @@
 #include <vtkRenderer.h>
 
 namespace {
+//! @brief 从命中的线或面确定边端点，并统一还原为组件内原始点 ID。
 std::array<vtkIdType, 2> _find_selected_edge(vtkHardwarePicker& picker, vtkCell& picked_cell, vtkPolyData& pickedPoly)
 {
-    if (picked_cell.GetCellType() == VTK_LINE)
-        return { picked_cell.GetPointId(0), picked_cell.GetPointId(1) };
-
-    double pPos[3] { };
-    picker.GetPCoords(pPos);
-
-    vtkNew<vtkIdList> cellIds;
-    picked_cell.CellBoundary(0, pPos, cellIds);
-
-    // 边端点的局部点 id
     std::array<vtkIdType, 2> original_id;
-    auto point_id_array = vtkIdTypeArray::SafeDownCast(pickedPoly.GetPointData()->GetArray("vtkOriginalPointIds"));
-    assert(point_id_array);
-    original_id[0] = point_id_array->GetValue(cellIds->GetId(0));
-    original_id[1] = point_id_array->GetValue(cellIds->GetId(1));
+    if (picked_cell.GetCellType() == VTK_LINE) {
+        original_id = { picked_cell.GetPointId(0), picked_cell.GetPointId(1) };
+    } else {
+        double pPos[3] { };
+        picker.GetPCoords(pPos);
 
-    return { original_id[0], original_id[1] };
+        vtkNew<vtkIdList> cellIds;
+        picked_cell.CellBoundary(0, pPos, cellIds);
+        original_id = { cellIds->GetId(0), cellIds->GetId(1) };
+    }
+
+    // 类型过滤与裁剪都可能压缩点编号，线单元同样必须通过身份数组还原端点。
+    // 没有身份数组的原始线数据沿用自身点编号，与框选路径保持一致。
+    auto point_id_array = vtkIdTypeArray::SafeDownCast(pickedPoly.GetPointData()->GetArray("vtkOriginalPointIds"));
+    if (point_id_array) {
+        for (auto& id : original_id)
+            id = point_id_array->GetValue(id);
+    }
+
+    return original_id;
 }
 
 bool _is_selected(std::array<vtkIdType, 2> v_local_id, const std::optional<std::array<vtkIdType, 2>>& selection)

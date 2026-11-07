@@ -674,8 +674,8 @@ Page {
                     App.selection.selectionUpdated(myItem.selectedIDs)
             }
 
-            onComponentVisibilityChanged: function(componentId, meshVisible, geometryVisible) {
-                App.registry.objectTree.syncComponentVisibility(componentId, meshVisible, geometryVisible)
+            onComponentVisibilityChanged: function(componentId, meshVisible, geometryVisible, hiddenFaces, hiddenSolids) {
+                App.registry.treeModel.syncComponentVisibility(componentId, meshVisible, geometryVisible, hiddenFaces, hiddenSolids)
             }
 
             Component.onCompleted: {

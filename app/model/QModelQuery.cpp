@@ -129,6 +129,20 @@ QVariantMap QModelQuery::getMeshSummary(Index component_id) const
     return m;
 }
 
+QVariantMap QModelQuery::getMeshCellTypeCounts(Index component_id) const
+{
+    const auto counts = m_query->meshCellTypeCounts(component_id);
+    // 类型列表仅携带身份和数量，展示名称及显隐由对象树负责。
+    const auto type_counts = [](const std::map<int, Index>& counts) {
+        QVariantList items;
+        for (const auto& [type, count] : counts)
+            items.push_back(QVariantMap { { "cell_type", type }, { "count", count } });
+        return items;
+    };
+    return { { "face_types", type_counts(counts.face_type_counts) },
+        { "solid_types", type_counts(counts.solid_type_counts) } };
+}
+
 QVariantMap QModelQuery::getGeometrySummary(Index component_id) const
 {
     QVariantMap m;

@@ -5,6 +5,7 @@
 #include "renderStrategy/AttributeCommon.h"
 #include "renderStrategy/IAttributeRenderStrategy.h"
 #include <optional>
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include <vtkActor.h>
@@ -83,6 +84,8 @@ private:
     void syncDisplayAttributes();
 
     std::unique_ptr<IAttributeRenderStrategy> render_strategy_;
+    std::string active_attribute_name_; //> 类型切换后需要重新生成的向量属性
+    std::map<std::string, std::any> active_attribute_args_;
     MeshRenderStyle style_ { MeshRenderStyle::FaceWithEdges };
     bool visibility_ { true };
     std::shared_ptr<const MeshDataVtk> model_data_;

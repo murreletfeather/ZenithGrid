@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 #include <memory>
+#include <set>
 #include <thread>
 #include <vector>
 #include <vtkSmartPointer.h>
@@ -34,6 +35,8 @@ struct MeshDataSnapshot {
     std::uint64_t generation { };
     std::uint64_t revision { };
     bool visible { true };
+    std::set<int> hidden_face_types;
+    std::set<int> hidden_solid_types;
     MeshClipPlane clip;
     std::shared_ptr<const MeshData> source;
     std::shared_ptr<const MeshDataVtk> model_data;
@@ -57,10 +60,16 @@ public:
     void loadModelData(const MeshDataVtk& data);
     /** @brief 更新整体网格开关，不改变隐藏集合。 */
     void setVisibility(bool visible);
+    /** @brief 设置面/体类型开关；type=-1 批量控制当前维度，保留人工隐藏和裁剪。 */
+    void setCellTypeVisibility(int dimension, int type, bool visible);
+    /** @brief 恢复所有单元类型，不改变手动面隐藏集合。 */
+    void showAllCellTypes();
+    /** @brief 查询隐藏类型，供界面同步与同组件网格更新时沿用。 */
+    const std::set<int>& hiddenCellTypes(int dimension) const;
     /** @brief 查询数据侧整体网格开关。 */
     bool isVisibilityEnabled() const { return visible_; }
-    /** @brief 查询数据侧整体网格开关，供单线程调用者使用。 */
-    bool isVisible() const { return visible_; }
+    /** @brief 判断开关、类型过滤和人工隐藏之后是否仍有可见单元，不计裁剪与渲染样式。 */
+    bool isVisible() const;
     /** @brief 隐藏有效的原始面 ID，累积并去重。 */
     void hideFaces(const std::vector<vtkIdType>& face_ids);
     /** @brief 恢复指定原始面；整体关闭时仅显示指定面。 */
@@ -69,7 +78,7 @@ public:
     void isolateFaces(const std::vector<vtkIdType>& face_ids);
     /** @brief 恢复全部人工隐藏面并结束面隔离。 */
     void showAllFaces();
-    /** @brief 沿用当前整体与局部面显隐的反转规则，返回整体开关。 */
+    /** @brief 反转局部面/体过滤；整体关闭时恢复全部单元，保留裁剪并返回整体开关。 */
     bool reverseVisibility();
     /** @brief 复制调用线程中的裁剪平面参数，nullptr 表示停用。 */
     void setClipPlane(vtkPlane* plane);
@@ -94,6 +103,8 @@ private:
     vtkSmartPointer<vtkUnstructuredGrid> solid_data_;
     std::shared_ptr<MeshDataSnapshot> prepared_;
     std::vector<vtkIdType> hidden_face_ids_;
+    std::set<int> hidden_face_types_;
+    std::set<int> hidden_solid_types_;
     MeshClipPlane clip_;
     bool visible_ { true };
     bool dirty_ { true };

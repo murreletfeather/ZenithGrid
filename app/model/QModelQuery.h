@@ -97,6 +97,8 @@ QML_ELEMENT // Qt6+: 导出为 QML 可用类型（Qt5 请使用 qmlRegisterType�
     Q_INVOKABLE QVariantList listModels() const;
     Q_INVOKABLE QVariantList getComponentsSummary(Index model_id) const;
     Q_INVOKABLE QVariantMap getMeshSummary(Index component_id) const;
+    /** @brief 显式统计原始面、体类型；返回 face_types/solid_types 列表，无网格时列表为空。 */
+    Q_INVOKABLE QVariantMap getMeshCellTypeCounts(Index component_id) const;
     Q_INVOKABLE QVariantMap getGeometrySummary(Index component_id) const;
 
 private:
