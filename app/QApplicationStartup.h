@@ -33,6 +33,7 @@ public:
 private:
     bool initialize();
     void installKeyEventForwarder();
+    void scheduleStartupFiles();
     void failStartup(const QString& message);
 
 #ifndef __EMSCRIPTEN__

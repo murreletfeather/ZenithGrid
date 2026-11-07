@@ -1,4 +1,4 @@
-# 启动切换门控：三维视口、启动文件与后续呈现帧必须全部就绪。
+# 启动切换门控：三维视口初始化后，继续等待后续呈现帧。
 precess_add_test(TestStartupGate
     TestStartupGate.cpp
     ../core/QStartupGate.h ../core/QStartupGate.cpp

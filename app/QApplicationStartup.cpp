@@ -131,6 +131,7 @@ bool QApplicationStartup::initialize()
 
 #ifdef __EMSCRIPTEN__
         installKeyEventForwarder();
+        scheduleStartupFiles();
         return true;
 #else
         return connectStartupReadiness();
@@ -149,6 +150,13 @@ void QApplicationStartup::installKeyEventForwarder()
             app_.installEventFilter(key_event_forwarder_.get());
         }
     }
+}
+
+void QApplicationStartup::scheduleStartupFiles()
+{
+    // 导入在窗口交接后的事件循环中执行，不再阻塞封面收尾。
+    if (!QMetaObject::invokeMethod(engine_->rootObjects().first(), "openStartupFiles", Qt::QueuedConnection))
+        spdlog::error("startup: failed to schedule command-line file import");
 }
 
 void QApplicationStartup::failStartup(const QString& message)
@@ -174,16 +182,7 @@ bool QApplicationStartup::connectStartupReadiness()
         startup_gate_.fail(QCoreApplication::translate("Startup", "三维视口加载失败"));
         return false;
     }
-    // QML 动态声明的信号没有可用于类型安全连接的 C++ 成员。
-    if (!connect(main_window_, SIGNAL(startupFilesReady()),
-            &startup_gate_, SLOT(markStartupFilesReady()))) {
-        startup_gate_.fail(QCoreApplication::translate("Startup", "启动文件处理通知未连接"));
-        return false;
-    }
-    startup_error_connection_ = connect(main_window_, &QQuickWindow::sceneGraphError, this,
-        [this](QQuickWindow::SceneGraphError, const QString& message) {
-            startup_gate_.fail(message);
-        }, Qt::QueuedConnection);
+    startup_error_connection_ = connect(main_window_, &QQuickWindow::sceneGraphError, this, [this](QQuickWindow::SceneGraphError, const QString& message) { startup_gate_.fail(message); }, Qt::QueuedConnection);
 
     // 队列在视口初始化之后消费；已初始化的视口也会在后续同步中执行。
     viewport->dispatch_async([gate = &startup_gate_](vtkRenderWindow*, QQuickVTKItem::vtkUserData) {
@@ -198,14 +197,13 @@ void QApplicationStartup::waitForPresentedFrame()
         return;
     frame_armed_ = true;
 
-    // 两项前置条件完成后才订阅同步点，避免接受早先已排队的呈现帧。
+    // 视口初始化完成后才订阅同步点，避免接受早先已排队的呈现帧。
     const auto queued_once = Qt::ConnectionType(Qt::QueuedConnection | Qt::SingleShotConnection);
     connect(main_window_, &QQuickWindow::afterSynchronizing, this, [this, queued_once]() {
         if (!main_window_)
             return;
         connect(main_window_, &QQuickWindow::frameSwapped, &startup_gate_, &QStartupGate::markFrameReady, queued_once);
-        main_window_->update();
-    }, queued_once);
+        main_window_->update(); }, queued_once);
     main_window_->update();
 }
 
@@ -213,7 +211,7 @@ void QApplicationStartup::finishStartup()
 {
     // 恢复 Qt 对运行期间场景图错误的默认处理。
     disconnect(startup_error_connection_);
-    spdlog::info("startup: main window ready after viewport, startup files and presented frame");
+    spdlog::info("startup: main window ready after viewport and presented frame");
     // 先停止动画，再释放背景、绘制缓冲和封面专属连接。
     splash_->hide();
     splash_.reset();
@@ -221,5 +219,6 @@ void QApplicationStartup::finishStartup()
     if (main_window_)
         main_window_->requestActivate();
     installKeyEventForwarder();
+    scheduleStartupFiles();
 }
 #endif

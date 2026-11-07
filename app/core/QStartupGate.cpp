@@ -12,7 +12,7 @@ QStartupGate::QStartupGate(QObject* parent)
 
 bool QStartupGate::isPrepared() const
 {
-    return !finished_ && viewport_ready_ && startup_files_ready_;
+    return !finished_ && viewport_ready_;
 }
 
 void QStartupGate::markViewportReady()
@@ -23,17 +23,9 @@ void QStartupGate::markViewportReady()
     emit onUpdateRequested();
 }
 
-void QStartupGate::markStartupFilesReady()
-{
-    if (finished_)
-        return;
-    startup_files_ready_ = true;
-    emit onUpdateRequested();
-}
-
 void QStartupGate::markFrameReady()
 {
-    if (finished_ || !viewport_ready_ || !startup_files_ready_)
+    if (finished_ || !viewport_ready_)
         return;
     // 先进入终态，再发通知，避免接收者同步回调产生第二个终态。
     finished_ = true;
