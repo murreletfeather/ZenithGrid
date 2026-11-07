@@ -1,71 +1,79 @@
 <map id="类继承关系图" name="类继承关系图">
-<area shape="rect" id="Node000000" href="$classElementEnum.html" title=" " alt="" coords="9,5,123,31"/>
-<area shape="rect" id="Node000001" href="$classElement.html" title="Element在QML中暴露了枚举Element::Type，在QML中以Element.Face获取枚举值" alt="" coords="257,5,333,31"/>
-<area shape="poly" id="edge15_Node000000_Node000001" title=" " alt="" coords="136,15,257,15,257,21,136,21"/>
-<area shape="rect" id="Node000026" href="$classdock_1_1LayoutClient.html" title="被布局引擎托管的实体接口" alt="" coords="224,1365,367,1391"/>
-<area shape="rect" id="Node000025" href="$classdock_1_1PanelGroup.html" title="选项卡分组" alt="" coords="470,1056,605,1081"/>
-<area shape="poly" id="edge16_Node000026_Node000025" title=" " alt="" coords="379,1370,398,1362,414,1352,445,1321,470,1285,489,1246,505,1206,524,1132,532,1081,537,1082,529,1133,510,1208,494,1248,474,1288,449,1325,418,1356,400,1367,381,1375"/>
-<area shape="rect" id="Node000010" href="$classModelObserver.html" title=" " alt="" coords="5,1229,127,1255"/>
-<area shape="rect" id="Node000011" href="$structDummyObserver.html" title=" " alt="" coords="229,1201,362,1227"/>
-<area shape="poly" id="edge17_Node000010_Node000011" title=" " alt="" coords="140,1230,228,1219,229,1225,141,1236"/>
-<area shape="rect" id="Node000009" href="$classQModelObserver.html" title="QModelObserver：用于监听模型数据更改并向外通知的观察者类" alt="" coords="230,1152,361,1177"/>
-<area shape="poly" id="edge18_Node000010_Node000009" title=" " alt="" coords="100,1220,135,1202,174,1186,229,1172,230,1177,176,1191,137,1207,102,1225"/>
-<area shape="rect" id="Node000012" href="$classsession_1_1Session_1_1ObserverRelay.html" title="内部转发观察者：宿主观察者（可为 nullptr）照常收到模型层通知， 同时把通知桥接为 ModelEvent 发布到事件总线（与原 app 层 Qt connect 等价）" alt="" coords="197,1251,393,1291"/>
-<area shape="poly" id="edge19_Node000010_Node000012" title=" " alt="" coords="141,1249,197,1256,197,1261,140,1254"/>
-<area shape="rect" id="Node000013" href="$classsystems_1_1job_1_1ShadowComponent.html" title=" " alt="" coords="176,1316,415,1341"/>
-<area shape="poly" id="edge20_Node000010_Node000013" title=" " alt="" coords="98,1260,134,1281,176,1301,217,1313,216,1318,174,1306,132,1286,95,1264"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="29,548,103,573"/>
-<area shape="poly" id="edge21_Node000002_Node000001" title=" " alt="" coords="66,533,76,426,95,278,109,203,127,134,148,78,173,40,192,27,213,18,257,13,258,18,215,23,194,31,177,44,152,81,132,136,115,204,100,279,81,426,72,534"/>
-<area shape="poly" id="edge28_Node000002_Node000009" title=" " alt="" coords="71,587,79,706,97,871,111,956,128,1033,150,1096,163,1120,176,1137,201,1154,230,1162,229,1167,199,1159,173,1141,158,1122,145,1098,123,1034,105,957,91,872,73,706,66,588"/>
-<area shape="rect" id="Node000003" href="$classQAlgorithmInfo.html" title="向Qml暴露的算法信息，Qml据此构造算法按钮、输入框等算法所需参数的UI" alt="" coords="235,55,356,80"/>
-<area shape="poly" id="edge22_Node000002_Node000003" title=" " alt="" coords="67,534,78,436,98,303,113,235,130,174,150,124,173,89,201,72,234,64,235,69,203,77,177,93,154,126,135,175,118,236,104,304,83,437,72,535"/>
-<area shape="rect" id="Node000004" href="$classQArgObject.html" title="QML中使用的参数类型实例对象值，用于参数列表中的model。是对应QArgType描述的参数类型的变量实例，封装了QArgType参数类型和参数值QVariant" alt="" coords="247,104,343,129"/>
-<area shape="poly" id="edge23_Node000002_Node000004" title=" " alt="" coords="68,534,80,445,102,327,133,213,152,169,173,139,189,127,208,119,247,112,248,117,210,124,192,131,177,143,156,171,138,215,107,328,85,446,73,535"/>
-<area shape="rect" id="Node000005" href="$classQEditInfo.html" title="向Qml暴露的编辑操作信息，Qml据此构造操作按钮、输入框等调用参数UI" alt="" coords="254,153,337,179"/>
-<area shape="poly" id="edge24_Node000002_Node000005" title=" " alt="" coords="64,534,66,465,80,371,93,321,112,272,139,227,173,188,191,176,212,167,253,161,254,167,213,173,194,180,176,192,143,230,117,275,98,323,85,372,71,465,69,534"/>
-<area shape="rect" id="Node000006" href="$classQFeatureInfo.html" title="向Qml暴露的功能信息，Qml据此构造功能菜单与参数面板" alt="" coords="242,203,349,228"/>
-<area shape="poly" id="edge25_Node000002_Node000006" title=" " alt="" coords="65,534,70,473,86,392,100,350,118,309,143,270,173,237,206,219,241,212,242,217,207,224,176,241,147,274,123,311,105,352,91,394,76,473,70,534"/>
-<area shape="rect" id="Node000007" href="$classQLogManager.html" title=" " alt="" coords="239,252,351,277"/>
-<area shape="poly" id="edge26_Node000002_Node000007" title=" " alt="" coords="67,534,75,482,93,414,107,379,124,345,146,314,173,287,204,270,239,262,240,267,206,275,176,291,150,317,129,348,112,381,98,416,80,483,72,535"/>
-<area shape="rect" id="Node000008" href="$classQModelManager.html" title=" " alt="" coords="231,301,360,327"/>
-<area shape="poly" id="edge27_Node000002_Node000008" title=" " alt="" coords="70,533,81,490,101,436,131,382,150,357,173,336,200,321,230,313,231,319,202,326,176,340,154,361,135,385,105,438,86,491,75,535"/>
-<area shape="rect" id="Node000014" href="$classQModelQuery.html" title="ModelQuery 类封装所有网格数据的查询操作（CQRS 查询部分的 QML 适配器）" alt="" coords="240,351,351,376"/>
-<area shape="poly" id="edge29_Node000002_Node000014" title=" " alt="" coords="73,534,87,499,108,459,137,419,173,385,205,370,239,362,240,368,207,375,176,390,141,422,113,462,92,502,78,536"/>
-<area shape="rect" id="Node000015" href="$classQPythonRuntime.html" title="app 内嵌 Python 运行环境的 QML 接入层：QPythonRuntime 仅是 python::Runtime（无 Qt 解释器宿主）之上的 QObject 薄壳" alt="" coords="229,400,361,425"/>
-<area shape="poly" id="edge30_Node000002_Node000015" title=" " alt="" coords="80,534,117,483,143,456,173,434,200,422,229,415,230,420,202,427,176,439,147,460,121,486,84,537"/>
-<area shape="rect" id="Node000016" href="$classQSelection.html" title="Selection类的QML交互接口。Selection可以存于QSelection中，就可以在QML代码中进行交互。C++中使用new来创建对象，QML中为只读对象" alt="" coords="249,449,341,475"/>
-<area shape="poly" id="edge31_Node000002_Node000016" title=" " alt="" coords="90,537,128,509,174,484,211,471,249,464,250,469,213,476,176,488,131,513,93,541"/>
-<area shape="rect" id="Node000017" href="$classQTaskStatus.html" title="GUI 展示对象；宿主必须先 stop Runner，再销毁本对象。" alt="" coords="244,499,347,524"/>
-<area shape="poly" id="edge32_Node000002_Node000017" title=" " alt="" coords="116,546,174,533,243,518,245,524,175,538,117,551"/>
-<area shape="rect" id="Node000018" href="$classQUndoStackAdaptor.html" title="undo 栈的 QML 适配器" alt="" coords="219,548,372,573"/>
-<area shape="poly" id="edge33_Node000002_Node000018" title=" " alt="" coords="117,558,218,558,218,563,117,563"/>
-<area shape="rect" id="Node000019" href="$classQWasmBridge.html" title=" " alt="" coords="238,597,353,623"/>
-<area shape="poly" id="edge34_Node000002_Node000019" title=" " alt="" coords="117,569,175,582,238,596,237,601,174,587,116,574"/>
-<area shape="rect" id="Node000020" href="$classdock_1_1DockObject.html" title="控制器基类" alt="" coords="227,647,363,672"/>
-<area shape="poly" id="edge35_Node000002_Node000020" title=" " alt="" coords="94,580,131,607,176,632,228,647,226,652,174,636,128,612,91,584"/>
-<area shape="rect" id="Node000027" href="$classdock_1_1DragSession.html" title="拖拽状态机" alt="" coords="224,696,367,721"/>
-<area shape="poly" id="edge41_Node000002_Node000027" title=" " alt="" coords="84,584,122,634,147,660,176,681,199,692,224,699,223,704,197,697,173,686,144,664,117,637,80,587"/>
-<area shape="rect" id="Node000028" href="$classdock_1_1ui_1_1GlobalMouseRelay.html" title="全局输入事件过滤器" alt="" coords="194,745,397,771"/>
-<area shape="poly" id="edge42_Node000002_Node000028" title=" " alt="" coords="78,585,92,619,113,659,141,698,176,730,200,743,197,748,173,735,137,701,109,662,88,621,73,587"/>
-<area shape="rect" id="Node000029" href="$classsystems_1_1QSystemPluginManager.html" title=" " alt="" coords="175,795,416,820"/>
-<area shape="poly" id="edge43_Node000002_Node000029" title=" " alt="" coords="75,586,86,629,106,682,135,735,154,759,176,780,197,792,195,797,173,784,150,763,131,738,101,684,81,631,70,588"/>
-<area shape="rect" id="Node000030" href="$classsystems_1_1algo_1_1QAlgorithmSystemAdaptor.html" title=" " alt="" coords="198,845,393,885"/>
-<area shape="poly" id="edge44_Node000002_Node000030" title=" " alt="" coords="73,586,82,638,100,704,130,771,151,802,176,829,199,844,196,849,173,833,147,806,126,774,95,705,76,639,67,587"/>
-<area shape="rect" id="Node000031" href="$classsystems_1_1edit_1_1QEditSystemAdaptor.html" title="模型编辑系统的QML适配器，负责C++的编辑系统功能暴露给QML、Qt类型与C++类型的转换" alt="" coords="194,909,397,949"/>
-<area shape="poly" id="edge45_Node000002_Node000031" title=" " alt="" coords="70,587,75,650,91,733,104,777,123,820,147,860,176,895,195,908,192,912,173,899,142,863,118,822,99,779,86,734,70,650,65,587"/>
-<area shape="rect" id="Node000032" href="$classsystems_1_1feature_1_1QFeatureSystemAdaptor.html" title="功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步" alt="" coords="196,973,395,1013"/>
-<area shape="poly" id="edge46_Node000002_Node000032" title=" " alt="" coords="74,586,87,671,109,783,140,890,158,931,177,959,197,974,194,978,173,963,153,934,135,892,104,784,82,672,68,587"/>
-<area shape="rect" id="Node000033" href="$classsystems_1_1io_1_1QModelIOInfo.html" title="向Qml暴露的受支持的文件类型信息，Qml据此提示用户以文件类型、拓展名" alt="" coords="198,1037,393,1063"/>
-<area shape="poly" id="edge47_Node000002_Node000033" title=" " alt="" coords="72,587,84,684,104,815,118,882,135,942,155,990,177,1023,199,1038,196,1042,173,1027,150,993,130,943,113,883,99,816,78,685,67,587"/>
-<area shape="rect" id="Node000034" href="$classsystems_1_1io_1_1QModelIOSystemAdaptor.html" title="向Qml暴露的ModelIOSystem适配器，向界面暴露IO功能：读取模型、写出模型等各种功能操作" alt="" coords="186,1087,405,1127"/>
-<area shape="poly" id="edge48_Node000002_Node000034" title=" " alt="" coords="72,587,82,693,102,839,116,913,133,980,153,1035,177,1072,193,1085,189,1089,173,1076,149,1037,128,982,111,914,97,839,77,693,67,587"/>
-<area shape="poly" id="edge40_Node000020_Node000025" title=" " alt="" coords="378,661,399,669,418,681,440,711,460,754,495,866,522,979,536,1055,531,1056,517,980,490,867,455,756,435,713,414,685,397,673,376,666"/>
-<area shape="rect" id="Node000021" href="$classdock_1_1DockHost.html" title="主停靠窗口" alt="" coords="475,573,599,599"/>
-<area shape="poly" id="edge36_Node000020_Node000021" title=" " alt="" coords="376,643,415,632,439,620,463,608,494,596,495,601,465,612,441,625,417,636,378,648"/>
-<area shape="rect" id="Node000022" href="$classdock_1_1DockPanel.html" title="逻辑停靠面板" alt="" coords="473,623,602,648"/>
-<area shape="poly" id="edge37_Node000020_Node000022" title=" " alt="" coords="377,649,472,639,473,644,377,654"/>
-<area shape="rect" id="Node000023" href="$classdock_1_1DockRegion.html" title="停靠区域" alt="" coords="468,672,607,697"/>
-<area shape="poly" id="edge38_Node000020_Node000023" title=" " alt="" coords="377,665,468,675,467,680,376,670"/>
-<area shape="rect" id="Node000024" href="$classdock_1_1DockWindow.html" title="浮动窗口" alt="" coords="464,721,611,747"/>
-<area shape="poly" id="edge39_Node000020_Node000024" title=" " alt="" coords="378,670,417,681,441,693,465,706,497,719,495,724,463,711,439,698,415,686,376,675"/>
+<area shape="rect" id="Node000000" href="$classElementEnum.html" title=" " alt="" coords="27,5,140,33"/>
+<area shape="rect" id="Node000001" href="$classElement.html" title="Element在QML中暴露了枚举Element::Type，在QML中以Element.Face获取枚举值" alt="" coords="296,5,371,33"/>
+<area shape="poly" id="edge15_Node000000_Node000001" title=" " alt="" coords="154,17,297,17,293,21,157,21"/>
+<area shape="rect" id="Node000027" href="$classdock_1_1LayoutClient.html" title="被布局引擎托管的实体接口" alt="" coords="262,1612,404,1640"/>
+<area shape="rect" id="Node000026" href="$classdock_1_1PanelGroup.html" title="选项卡分组" alt="" coords="510,1207,645,1234"/>
+<area shape="poly" id="edge16_Node000027_Node000026" title=" " alt="" coords="419,1617,438,1609,455,1597,492,1555,521,1506,542,1453,556,1399,571,1301,575,1237,578,1233,576,1301,561,1400,547,1455,525,1508,496,1558,459,1601,441,1614,420,1622"/>
+<area shape="rect" id="Node000011" href="$classModelObserver.html" title=" " alt="" coords="23,1469,144,1497"/>
+<area shape="rect" id="Node000012" href="$structDummyObserver.html" title=" " alt="" coords="267,1440,400,1468"/>
+<area shape="poly" id="edge17_Node000011_Node000012" title=" " alt="" coords="158,1472,269,1460,265,1463,160,1477"/>
+<area shape="rect" id="Node000010" href="$classQModelObserver.html" title="QModelObserver：用于监听模型数据更改并向外通知的观察者类" alt="" coords="268,1388,398,1416"/>
+<area shape="poly" id="edge18_Node000011_Node000010" title=" " alt="" coords="126,1460,209,1426,270,1412,266,1415,211,1431,128,1464"/>
+<area shape="rect" id="Node000013" href="$classsession_1_1Session_1_1ObserverRelay.html" title="内部转发观察者：宿主观察者（可为 nullptr）照常收到模型层通知， 同时把通知桥接为 ModelEvent 发布到事件总线（与原 app 层 Qt connect 等价）" alt="" coords="236,1492,431,1536"/>
+<area shape="poly" id="edge19_Node000011_Node000013" title=" " alt="" coords="159,1490,238,1501,233,1503,160,1495"/>
+<area shape="rect" id="Node000014" href="$classsystems_1_1job_1_1ShadowComponent.html" title=" " alt="" coords="214,1560,452,1588"/>
+<area shape="poly" id="edge20_Node000011_Node000014" title=" " alt="" coords="120,1502,163,1526,211,1546,250,1559,244,1560,209,1551,161,1530,120,1508"/>
+<area shape="rect" id="Node000036" href="$classsystems_1_1PluginBase.html" title="插件对象基类，定义与插件交互的接口。" alt="" coords="5,65,162,93"/>
+<area shape="rect" id="Node000035" href="$classsystems_1_1feature_1_1SetupNavigationTestPlugin.html" title=" " alt="" coords="210,57,457,102"/>
+<area shape="poly" id="edge21_Node000036_Node000035" title=" " alt="" coords="175,77,211,77,207,81,179,81"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="47,672,120,700"/>
+<area shape="poly" id="edge23_Node000002_Node000001" title=" " alt="" coords="84,656,93,525,115,340,131,246,152,161,177,90,192,63,208,43,227,28,250,20,297,15,294,19,251,25,230,33,212,46,196,66,182,93,157,162,136,247,120,341,99,525,89,656"/>
+<area shape="poly" id="edge30_Node000002_Node000010" title=" " alt="" coords="86,713,97,855,117,1053,133,1155,154,1247,180,1323,195,1352,211,1373,238,1391,270,1401,265,1402,235,1395,208,1377,191,1355,175,1325,149,1249,128,1156,112,1054,92,855,86,718"/>
+<area shape="poly" id="edge50_Node000002_Node000035" title=" " alt="" coords="85,656,97,538,121,375,138,292,157,217,181,155,208,112,225,100,223,104,212,116,185,157,162,218,143,294,126,376,102,539,90,656"/>
+<area shape="rect" id="Node000003" href="$classAppPalette.html" title=" " alt="" coords="288,1284,379,1312"/>
+<area shape="poly" id="edge22_Node000002_Node000003" title=" " alt="" coords="87,712,101,836,124,1003,140,1089,160,1166,184,1229,197,1253,212,1271,228,1283,247,1291,290,1299,285,1301,246,1296,225,1287,208,1274,193,1256,179,1231,155,1167,135,1090,119,1004,96,836,87,718"/>
+<area shape="rect" id="Node000004" href="$classQAlgorithmInfo.html" title="向Qml暴露的算法信息，Qml据此构造算法按钮、输入框等算法所需参数的UI" alt="" coords="273,1336,394,1364"/>
+<area shape="poly" id="edge24_Node000002_Node000004" title=" " alt="" coords="87,713,99,845,121,1028,137,1121,157,1206,182,1275,196,1302,211,1321,240,1339,276,1349,271,1351,238,1344,208,1325,192,1304,177,1277,152,1208,132,1122,115,1029,94,846,86,718"/>
+<area shape="rect" id="Node000005" href="$classQArgObject.html" title="QML中使用的参数类型实例对象值，用于参数列表中的model。是对应QArgType描述的参数类型的变量实例，封装了QArgType参数类型和参数值QVariant" alt="" coords="286,125,381,153"/>
+<area shape="poly" id="edge25_Node000002_Node000005" title=" " alt="" coords="85,657,99,548,123,400,140,325,159,257,182,202,208,164,225,151,244,143,287,136,283,140,246,148,228,156,212,168,187,204,164,259,145,327,128,401,104,549,90,657"/>
+<area shape="rect" id="Node000006" href="$classQEditInfo.html" title="向Qml暴露的编辑操作信息，Qml据此构造操作按钮、输入框等调用参数UI" alt="" coords="293,177,374,205"/>
+<area shape="poly" id="edge26_Node000002_Node000006" title=" " alt="" coords="86,656,101,558,127,425,144,359,163,299,184,249,208,216,227,202,249,194,294,188,291,192,250,199,229,207,212,220,189,252,168,301,149,360,132,427,106,558,91,657"/>
+<area shape="rect" id="Node000007" href="$classQFeatureInfo.html" title="向 QML 暴露功能参数、执行身份及关联入口，菜单位置由入口声明。" alt="" coords="281,229,386,257"/>
+<area shape="poly" id="edge27_Node000002_Node000007" title=" " alt="" coords="82,656,85,579,91,528,102,474,117,418,140,363,169,312,208,268,224,256,242,248,282,241,278,245,244,253,227,261,211,272,174,315,144,365,122,419,107,475,97,529,90,579,87,657"/>
+<area shape="rect" id="Node000008" href="$classQLogManager.html" title=" " alt="" coords="278,281,389,309"/>
+<area shape="poly" id="edge28_Node000002_Node000008" title=" " alt="" coords="83,656,90,587,109,496,125,448,146,401,173,358,208,320,241,301,279,294,275,297,243,306,211,324,178,361,151,404,130,450,114,497,95,588,88,657"/>
+<area shape="rect" id="Node000009" href="$classQModelManager.html" title=" " alt="" coords="269,333,398,361"/>
+<area shape="poly" id="edge29_Node000002_Node000009" title=" " alt="" coords="85,656,95,596,116,519,132,478,152,439,177,403,208,372,237,355,271,347,267,351,239,360,211,376,181,407,157,442,137,481,121,521,100,597,90,657"/>
+<area shape="rect" id="Node000015" href="$classQModelQuery.html" title="ModelQuery 类封装所有网格数据的查询操作（CQRS 查询部分的 QML 适配器）" alt="" coords="278,385,388,413"/>
+<area shape="poly" id="edge31_Node000002_Node000015" title=" " alt="" coords="87,656,100,606,123,542,158,478,181,449,208,424,241,406,279,399,276,403,243,411,211,428,185,453,163,481,128,545,106,607,93,657"/>
+<area shape="rect" id="Node000016" href="$classQPythonRuntime.html" title="app 内嵌 Python 运行环境的 QML 接入层：QPythonRuntime 仅是 python::Runtime（无 Qt 解释器宿主）之上的 QObject 薄壳" alt="" coords="268,437,399,465"/>
+<area shape="poly" id="edge32_Node000002_Node000016" title=" " alt="" coords="91,657,107,615,131,566,165,517,185,495,208,476,236,461,269,453,266,457,238,466,211,480,189,499,169,520,136,569,112,618,96,658"/>
+<area shape="rect" id="Node000017" href="$classQSelection.html" title="Selection类的QML交互接口。Selection可以存于QSelection中，就可以在QML代码中进行交互。C++中使用new来创建对象，QML中为只读对象" alt="" coords="288,489,379,517"/>
+<area shape="poly" id="edge33_Node000002_Node000017" title=" " alt="" coords="96,657,140,591,172,556,208,528,247,511,289,504,286,508,249,516,211,532,175,560,145,594,101,659"/>
+<area shape="rect" id="Node000018" href="$classQTaskStatus.html" title="GUI 展示对象；宿主必须先 stop Runner，再销毁本对象。" alt="" coords="283,541,384,569"/>
+<area shape="poly" id="edge34_Node000002_Node000018" title=" " alt="" coords="105,660,151,618,179,597,209,579,245,566,284,559,281,562,247,571,211,584,181,601,154,622,110,662"/>
+<area shape="rect" id="Node000019" href="$classQUndoStackAdaptor.html" title="undo 栈的 QML 适配器" alt="" coords="257,593,410,621"/>
+<area shape="poly" id="edge35_Node000002_Node000019" title=" " alt="" coords="127,663,209,631,259,619,255,623,210,636,131,667"/>
+<area shape="rect" id="Node000020" href="$classQWasmBridge.html" title=" " alt="" coords="277,645,390,673"/>
+<area shape="poly" id="edge36_Node000002_Node000020" title=" " alt="" coords="134,678,278,663,275,667,137,682"/>
+<area shape="rect" id="Node000021" href="$classdock_1_1DockObject.html" title="控制器基类" alt="" coords="266,697,401,725"/>
+<area shape="poly" id="edge37_Node000002_Node000021" title=" " alt="" coords="135,689,267,703,263,706,137,693"/>
+<area shape="rect" id="Node000028" href="$classdock_1_1DragSession.html" title="拖拽状态机" alt="" coords="263,749,404,777"/>
+<area shape="poly" id="edge43_Node000002_Node000028" title=" " alt="" coords="129,704,210,734,264,749,260,752,209,739,131,709"/>
+<area shape="rect" id="Node000029" href="$classdock_1_1ui_1_1DockTheme.html" title="停靠组件主题单例" alt="" coords="254,801,412,829"/>
+<area shape="poly" id="edge44_Node000002_Node000029" title=" " alt="" coords="107,708,154,749,182,769,211,786,256,803,251,805,209,791,179,774,151,753,109,713"/>
+<area shape="rect" id="Node000030" href="$classdock_1_1ui_1_1GlobalMouseRelay.html" title="全局输入事件过滤器" alt="" coords="232,853,434,881"/>
+<area shape="poly" id="edge45_Node000002_Node000030" title=" " alt="" coords="99,711,145,777,175,810,211,838,238,852,233,854,208,843,172,814,141,780,100,716"/>
+<area shape="rect" id="Node000031" href="$classsystems_1_1QSystemPluginManager.html" title=" " alt="" coords="213,905,454,933"/>
+<area shape="poly" id="edge46_Node000002_Node000031" title=" " alt="" coords="93,712,112,754,136,802,169,850,189,872,211,890,235,904,230,906,208,895,185,876,165,854,132,805,107,756,94,717"/>
+<area shape="rect" id="Node000032" href="$classsystems_1_1algo_1_1QAlgorithmSystemAdaptor.html" title=" " alt="" coords="236,957,430,1002"/>
+<area shape="poly" id="edge47_Node000002_Node000032" title=" " alt="" coords="90,712,107,764,130,826,164,889,186,917,211,942,238,960,233,962,208,947,182,921,160,892,125,828,102,766,91,718"/>
+<area shape="rect" id="Node000033" href="$classsystems_1_1edit_1_1QEditSystemAdaptor.html" title="模型编辑系统的QML适配器，负责C++的编辑系统功能暴露给QML、Qt类型与C++类型的转换" alt="" coords="233,1026,434,1071"/>
+<area shape="poly" id="edge48_Node000002_Node000033" title=" " alt="" coords="87,712,99,777,120,857,136,899,156,940,181,978,211,1012,235,1028,230,1030,208,1016,177,982,151,943,131,901,115,858,94,778,87,718"/>
+<area shape="rect" id="Node000034" href="$classsystems_1_1feature_1_1QFeatureSystemAdaptor.html" title="功能系统的QML适配器，负责C++的功能系统功能暴露给QML、Qt类型与C++类型的转换， 并承接UI产生的按键事件与活动模型状态同步" alt="" coords="234,1096,432,1140"/>
+<area shape="poly" id="edge49_Node000002_Node000034" title=" " alt="" coords="85,713,93,789,111,888,127,940,148,991,176,1039,211,1081,236,1099,231,1101,208,1085,172,1042,143,994,122,942,106,889,88,790,85,718"/>
+<area shape="rect" id="Node000037" href="$classsystems_1_1io_1_1QModelIOInfo.html" title="向Qml暴露的受支持的文件类型信息，Qml据此提示用户以文件类型、拓展名" alt="" coords="237,1164,430,1192"/>
+<area shape="poly" id="edge51_Node000002_Node000037" title=" " alt="" coords="89,712,106,813,132,945,149,1011,168,1070,189,1118,211,1151,239,1168,234,1170,208,1154,184,1121,163,1072,143,1012,127,946,101,814,89,717"/>
+<area shape="rect" id="Node000038" href="$classsystems_1_1io_1_1QModelIOSystemAdaptor.html" title="向Qml暴露的ModelIOSystem适配器，向界面暴露IO功能：读取模型、写出模型等各种功能操作" alt="" coords="225,1216,442,1260"/>
+<area shape="poly" id="edge52_Node000002_Node000038" title=" " alt="" coords="88,712,105,823,130,969,146,1043,166,1110,187,1164,212,1201,227,1215,222,1216,208,1205,183,1167,161,1111,141,1044,125,970,99,823,88,718"/>
+<area shape="poly" id="edge42_Node000021_Node000026" title=" " alt="" coords="415,713,439,722,459,736,484,773,507,829,526,897,542,970,566,1112,577,1207,572,1206,560,1113,537,971,521,898,501,831,480,776,455,740,437,727,417,718"/>
+<area shape="rect" id="Node000022" href="$classdock_1_1DockHost.html" title="主停靠窗口" alt="" coords="516,776,639,804"/>
+<area shape="poly" id="edge38_Node000021_Node000022" title=" " alt="" coords="415,723,458,735,482,748,506,761,537,774,532,776,504,766,480,752,456,740,417,728"/>
+<area shape="rect" id="Node000023" href="$classdock_1_1DockPanel.html" title="逻辑停靠面板" alt="" coords="514,620,642,648"/>
+<area shape="poly" id="edge39_Node000021_Node000023" title=" " alt="" coords="415,694,456,682,480,671,504,658,537,647,533,650,506,663,482,675,458,687,418,698"/>
+<area shape="rect" id="Node000024" href="$classdock_1_1DockRegion.html" title="停靠区域" alt="" coords="508,672,647,700"/>
+<area shape="poly" id="edge40_Node000021_Node000024" title=" " alt="" coords="415,700,510,691,506,695,418,705"/>
+<area shape="rect" id="Node000025" href="$classdock_1_1DockWindow.html" title="浮动窗口" alt="" coords="505,724,650,752"/>
+<area shape="poly" id="edge41_Node000021_Node000025" title=" " alt="" coords="415,718,507,728,502,731,418,723"/>
 </map>

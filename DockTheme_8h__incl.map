@@ -1,0 +1,9 @@
+<map id="app/dock/ui/DockTheme.h" name="app/dock/ui/DockTheme.h">
+<area shape="rect" id="Node000001" title="停靠组件主题承载对象：向 dock QML 暴露当前明暗与已解析配色" alt="" coords="36,5,226,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,71,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,33,68,73,65,69,112,34"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="95,81,168,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="133,32,134,66,129,64,130,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="192,81,297,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="152,31,215,72,209,73,151,36"/>
+</map>

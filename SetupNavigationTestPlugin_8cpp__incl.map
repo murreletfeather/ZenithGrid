@@ -1,0 +1,56 @@
+<map id="model/session/test/SetupNavigationTestPlugin.cpp" name="model/session/test/SetupNavigationTestPlugin.cpp">
+<area shape="rect" id="Node000001" title="验证 Feature 导航声明经真实 DLL 边界注册，不安装到产品插件目录。" alt="" coords="604,5,830,50"/>
+<area shape="rect" id="Node000002" href="$FeatureHandler_8h.html" title="功能系统的功能接口" alt="" coords="5,174,138,201"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="601,42,454,65,372,81,292,101,195,134,114,169,111,164,193,129,291,95,371,76,453,60,606,39"/>
+<area shape="rect" id="Node000004" href="$FeatureRegistrar_8h.html" title="功能声明的收集器" alt="" coords="755,98,895,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="746,48,798,88,793,88,745,53"/>
+<area shape="rect" id="Node000015" href="$HandlerCreatorDestroyerFactory_8h.html" title=" " alt="" coords="490,98,731,126"/>
+<area shape="poly" id="edge19_Node000001_Node000015" title=" " alt="" coords="691,49,641,90,638,86,686,52"/>
+<area shape="rect" id="Node000020" href="$PluginBase_8h.html" title=" " alt="" coords="304,98,410,126"/>
+<area shape="poly" id="edge25_Node000001_Node000020" title=" " alt="" coords="619,52,425,98,424,93,624,49"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="919,98,992,126"/>
+<area shape="poly" id="edge30_Node000001_Node000022" title=" " alt="" coords="780,48,907,93,901,93,780,53"/>
+<area shape="rect" id="Node000023" title=" " alt="" coords="1016,98,1244,126"/>
+<area shape="poly" id="edge31_Node000001_Node000023" title=" " alt="" coords="827,48,1052,94,1047,95,826,53"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="153,249,198,277"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,199,147,239,143,241,90,205"/>
+<area shape="rect" id="Node000005" href="$FeatureInfo_8h.html" title="功能的描述信息与注册声明（菜单、按键）" alt="" coords="979,174,1086,201"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="862,124,984,168,979,168,862,129"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="867,325,926,353"/>
+<area shape="poly" id="edge17_Node000004_Node000013" title=" " alt="" coords="831,124,890,311,886,309,827,128"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="780,325,843,353"/>
+<area shape="poly" id="edge18_Node000004_Node000014" title=" " alt="" coords="826,124,815,311,811,308,822,128"/>
+<area shape="rect" id="Node000006" href="$ArgType_8h.html" title="用于模型层描述功能参数类型" alt="" coords="1232,249,1317,277"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1076,199,1219,244,1214,244,1076,205"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="1134,325,1193,353"/>
+<area shape="poly" id="edge15_Node000005_Node000008" title=" " alt="" coords="1060,199,1093,220,1124,248,1144,278,1157,312,1153,309,1139,281,1120,251,1090,224,1059,204"/>
+<area shape="rect" id="Node000010" href="$FeatureNavigation_8h.html" title="Feature 的统一导航入口声明。" alt="" coords="956,249,1110,277"/>
+<area shape="poly" id="edge9_Node000005_Node000010" title=" " alt="" coords="1035,200,1035,235,1031,232,1031,204"/>
+<area shape="poly" id="edge16_Node000005_Node000014" title=" " alt="" coords="1016,201,845,318,842,314,1011,202"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="1416,325,1506,353"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="1308,275,1416,319,1411,319,1307,280"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="1257,277,1196,319,1195,314,1252,278"/>
+<area shape="rect" id="Node000009" href="$private__ArgTypeEnum_8h.html" title="参数类型枚举类定义，只被ArgType.h和QArgType.h.in使用。" alt="" coords="1217,325,1392,353"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="1281,275,1296,312,1291,309,1278,280"/>
+<area shape="poly" id="edge12_Node000010_Node000008" title=" " alt="" coords="1057,275,1130,318,1124,317,1056,280"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1025,325,1110,353"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="1040,275,1057,312,1053,310,1038,280"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="950,325,1001,353"/>
+<area shape="poly" id="edge11_Node000010_Node000012" title=" " alt="" coords="1025,276,996,315,994,310,1020,279"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="1011,277,935,320,934,315,1006,278"/>
+<area shape="poly" id="edge14_Node000010_Node000014" title=" " alt="" coords="996,277,858,325,857,320,991,278"/>
+<area shape="rect" id="Node000016" href="$HandlerCreatorDestroyer_8h.html" title=" " alt="" coords="212,174,408,201"/>
+<area shape="poly" id="edge20_Node000015_Node000016" title=" " alt="" coords="554,127,380,172,378,167,559,125"/>
+<area shape="rect" id="Node000018" title=" " alt="" coords="525,249,602,277"/>
+<area shape="poly" id="edge23_Node000015_Node000018" title=" " alt="" coords="611,124,607,161,597,202,581,238,577,234,592,200,602,160,607,128"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="656,174,780,201"/>
+<area shape="poly" id="edge24_Node000015_Node000019" title=" " alt="" coords="630,124,689,165,684,165,629,129"/>
+<area shape="poly" id="edge21_Node000016_Node000003" title=" " alt="" coords="288,201,213,245,210,240,284,203"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="267,249,353,277"/>
+<area shape="poly" id="edge22_Node000016_Node000017" title=" " alt="" coords="312,200,312,235,308,232,309,204"/>
+<area shape="poly" id="edge29_Node000020_Node000003" title=" " alt="" coords="301,123,251,142,225,156,203,175,187,204,179,235,175,232,182,202,199,172,222,152,248,137,306,120"/>
+<area shape="poly" id="edge26_Node000020_Node000016" title=" " alt="" coords="350,124,328,162,325,159,347,128"/>
+<area shape="rect" id="Node000021" href="$SystemHandlerPtr_8h.html" title=" " alt="" coords="432,174,583,201"/>
+<area shape="poly" id="edge27_Node000020_Node000021" title=" " alt="" coords="384,124,470,166,464,167,384,129"/>
+<area shape="poly" id="edge28_Node000021_Node000018" title=" " alt="" coords="519,199,547,238,542,236,517,204"/>
+</map>

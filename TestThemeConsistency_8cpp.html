@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.14.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>PreCess: app/test/TestThemeConsistency.cpp 文件参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="ZenithGrid.ico"/></td>
+  <td id="projectalign">
+   <div id="projectname">PreCess
+   </div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.14.0 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+</script>
+<script type="text/javascript">
+$(function() { codefold.init(); });
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+$(function() {
+  initMenu('',true,false,'search.php','搜索',false);
+  $(function() { init_search(); });
+});
+</script>
+<div id="main-nav"></div>
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a href="dir_d422163b96683743ed3963d4aac17747.html">app</a></li><li class="navelem"><a href="dir_effe5c348e70d16252aa6de5fa9356c9.html">test</a></li>  </ul>
+</div>
+</div><!-- top -->
+<div id="doc-content">
+<div class="header">
+  <div class="summary">
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle"><div class="title">TestThemeConsistency.cpp 文件参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>主题色跨文件一致性：ThemePalette（应用调色板）与 DockTheme（停靠配色）  
+<a href="#details">更多...</a></p>
+<div class="textblock"><code>#include &quot;<a class="el" href="ThemePalette_8h_source.html">core/ThemePalette.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="DockTheme_8h_source.html">ui/DockTheme.h</a>&quot;</code><br />
+<code>#include &lt;catch2/catch_test_macros.hpp&gt;</code><br />
+<code>#include &lt;QColor&gt;</code><br />
+<code>#include &lt;QPalette&gt;</code><br />
+<code>#include &lt;QVariantMap&gt;</code><br />
+</div><div class="textblock"><div class="dynheader">
+TestThemeConsistency.cpp 的引用(Include)关系图:</div>
+<div class="dyncontent">
+<div class="center"><img src="TestThemeConsistency_8cpp__incl.png" border="0" usemap="#aapp_2test_2TestThemeConsistency_8cpp" loading="lazy" alt=""/></div>
+<map name="aapp_2test_2TestThemeConsistency_8cpp" id="aapp_2test_2TestThemeConsistency_8cpp">
+<area shape="rect" title="主题色跨文件一致性：ThemePalette（应用调色板）与 DockTheme（停靠配色）" alt="" coords="140,5,393,33"/>
+<area shape="rect" href="ThemePalette_8h.html" title="主题应用调色板构造：纯函数，不依赖 QML 与应用实例，便于单测" alt="" coords="23,81,179,109"/>
+<area shape="poly" title=" " alt="" coords="235,35,145,77,143,72,239,32"/>
+<area shape="rect" title=" " alt="" coords="68,157,134,184"/>
+<area shape="poly" title=" " alt="" coords="151,36,67,55,34,68,14,83,9,91,8,100,17,117,35,133,59,148,55,151,32,137,13,120,3,101,4,90,10,79,32,63,66,50,154,31"/>
+<area shape="rect" title=" " alt="" coords="163,157,239,184"/>
+<area shape="poly" title=" " alt="" coords="263,32,215,144,211,141,258,34"/>
+<area shape="rect" href="DockTheme_8h.html" title="停靠组件主题承载对象：向 dock QML 暴露当前明暗与已解析配色" alt="" coords="253,81,381,109"/>
+<area shape="poly" title=" " alt="" coords="276,31,302,68,297,68,274,36"/>
+<area shape="rect" title=" " alt="" coords="366,157,471,184"/>
+<area shape="poly" title=" " alt="" coords="317,31,358,50,378,63,395,79,411,110,419,143,414,140,406,111,391,83,375,67,356,54,316,36"/>
+<area shape="rect" title=" " alt="" coords="456,81,674,109"/>
+<area shape="poly" title=" " alt="" coords="320,31,499,76,494,78,320,36"/>
+<area shape="poly" title=" " alt="" coords="103,107,103,142,98,140,99,111"/>
+<area shape="poly" title=" " alt="" coords="120,107,174,147,169,148,118,112"/>
+<area shape="poly" title=" " alt="" coords="281,110,149,156,148,151,276,109"/>
+<area shape="rect" title=" " alt="" coords="268,157,342,184"/>
+<area shape="poly" title=" " alt="" coords="317,107,312,143,308,140,313,111"/>
+<area shape="poly" title=" " alt="" coords="336,107,391,148,385,147,334,112"/>
+</map>
+</div>
+</div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:a3a84052ee66609b52eafa5a38482d907" id="r_a3a84052ee66609b52eafa5a38482d907"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3a84052ee66609b52eafa5a38482d907">TEST_CASE</a> (&quot;Theme consistency: light&quot;, &quot;[ThemeConsistency]&quot;)</td></tr>
+<tr class="memitem:aecbb280b1ec3a138170962bb7d5a95d3" id="r_aecbb280b1ec3a138170962bb7d5a95d3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aecbb280b1ec3a138170962bb7d5a95d3">TEST_CASE</a> (&quot;Theme consistency: dark&quot;, &quot;[ThemeConsistency]&quot;)</td></tr>
+</table>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">详细描述</h2>
+<div class="textblock"><p>主题色跨文件一致性：ThemePalette（应用调色板）与 DockTheme（停靠配色） </p>
+<p>两处 C++ 各自维护浅/深色对，此测试断言重叠语义完全相等，防止手动同步漂移。 （app/Theme.qml 为第三份，属 QML 侧，不在本测试范围内。） </p>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">函数说明</h2>
+<a id="aecbb280b1ec3a138170962bb7d5a95d3" name="aecbb280b1ec3a138170962bb7d5a95d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecbb280b1ec3a138170962bb7d5a95d3">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Theme consistency: dark&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[ThemeConsistency]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3a84052ee66609b52eafa5a38482d907" name="a3a84052ee66609b52eafa5a38482d907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a84052ee66609b52eafa5a38482d907">&#9670;&#160;</a></span>TEST_CASE() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEST_CASE </td>
+          <td>(</td>
+          <td class="paramtype">&quot;Theme consistency: light&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&quot;&quot;</td>          <td class="paramname"><span class="paramname"><em></em></span>[ThemeConsistency]&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+</div><!-- contents -->
+<!-- start footer part -->
+<hr class="footer"/><address class="footer"><small>
+制作者&#160;<a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.14.0
+</small></address>
+</div><!-- doc-content -->
+</body>
+</html>
