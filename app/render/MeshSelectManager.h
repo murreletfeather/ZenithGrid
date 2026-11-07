@@ -52,14 +52,20 @@ public:
     void setMeshIdQuery(const IMeshIdQuery* id_query);
     std::unique_ptr<Selection> getSelection();
     /**
-     * @brief 导出各组件当前选中的原始模型面 ID
+     * @brief 导出各组件保留的原始模型面 ID，包含已隐藏的选择
      *
-     * 仅供面选择模式：FaceSelectorHighlight 内部保存当前渲染面下标，
-     * 导出时通过 PrecessFaceIds 转换为原模型面 ID。
-     * 外部更新可能改变面下标的数据前，负责在渲染线程清空选择。
+     * 仅供面选择模式：FaceSelectorHighlight 在拾取时通过 PrecessFaceIds
+     * 转换并保存原模型面 ID，裁剪或隐藏后的渲染下标不会外泄。
      * @return component_id → 原模型面 id 列表；非面选择模式返回空表
      */
     std::unordered_map<Index, std::vector<vtkIdType>> selectedFacesByComponent();
+    /**
+     * @brief 导出体选择：组件 id → 原始体 id；仅在体选择模式下有内容
+     *
+     * 返回值是 solid_data_ 的原始单元 id，与 MeshPipelineData::hideSolids 同一 ID 空间；
+     * 体表面经 vtkGeometryFilter/vtkExtractGeometry 后仍以 vtkOriginalCellIds 保留该 id。
+     */
+    std::unordered_map<Index, std::vector<vtkIdType>> selectedSolidsByComponent();
     void setHighlightVisible(bool visible);
     void setHighlightVisible(Index component_id, bool visible);
 

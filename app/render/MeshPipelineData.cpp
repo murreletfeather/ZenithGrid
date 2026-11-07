@@ -1,6 +1,7 @@
 #include "MeshPipelineData.h"
 #include "FaceHideFilter.h"
 #include "MeshData.h"
+#include "SolidHideFilter.h"
 
 #include <algorithm>
 #include <atomic>
@@ -217,6 +218,11 @@ void MeshPipelineData::loadModelData(const MeshDataVtk& data)
     vtkNew<vtkIdTypeArray> original_point_ids_;
     generation_ = ++next_mesh_generation;
     hidden_face_ids_.clear();
+    hidden_solid_ids_.clear();
+    visible_solids_cache_ = vtkSmartPointer<vtkUnstructuredGrid>();
+    visible_solids_cache_source_.reset();
+    visible_solids_cache_hidden_solid_ids_.clear();
+    edges_cache_ = vtkSmartPointer<vtkPolyData>();
     dirty_ = true;
     // 本方法所有 SetArray 均使用 save=1：VTK 借用 vector 缓冲，不负责释放。
     // source_ 与已发布快照共同保活这些缓冲，不能把 save 改为 0。
@@ -392,21 +398,92 @@ void MeshPipelineData::showAllFaces()
     }
 }
 
+void MeshPipelineData::hideSolids(const std::vector<vtkIdType>& solid_ids)
+{
+    assertOwnerThread();
+    if (!solid_data_)
+        return;
+    const auto count = solid_data_->GetNumberOfCells();
+    const auto previous = hidden_solid_ids_;
+    for (auto id : solid_ids) {
+        if (id >= 0 && id < count)
+            hidden_solid_ids_.push_back(id);
+    }
+    std::sort(hidden_solid_ids_.begin(), hidden_solid_ids_.end());
+    hidden_solid_ids_.erase(std::unique(hidden_solid_ids_.begin(), hidden_solid_ids_.end()), hidden_solid_ids_.end());
+    // 集合未变化（重复隐藏同一批或全部越界）时不置脏，避免白跑一次 O(cells) 重建与提边。
+    if (previous != hidden_solid_ids_)
+        dirty_ = true;
+}
+
+void MeshPipelineData::showAllSolids()
+{
+    assertOwnerThread();
+    if (!hidden_solid_ids_.empty()) {
+        hidden_solid_ids_.clear();
+        dirty_ = true;
+    }
+}
+
+void MeshPipelineData::isolateSolids(const std::vector<vtkIdType>& solid_ids)
+{
+    assertOwnerThread();
+    if (!solid_data_)
+        return;
+    std::vector<bool> shown(static_cast<std::size_t>(solid_data_->GetNumberOfCells()), false);
+    for (auto id : solid_ids) {
+        if (id >= 0 && id < static_cast<vtkIdType>(shown.size()))
+            shown[static_cast<std::size_t>(id)] = true;
+    }
+    // 仅保留选中体：隐藏集取反为所有未选中体，由 SolidHideFilter 完成过滤。
+    const std::vector<vtkIdType> previous = hidden_solid_ids_;
+    hidden_solid_ids_.clear();
+    for (vtkIdType id = 0; id < static_cast<vtkIdType>(shown.size()); ++id) {
+        if (!shown[static_cast<std::size_t>(id)])
+            hidden_solid_ids_.push_back(id);
+    }
+    // 体隔离需要渲染实体，确保整体可见。
+    setVisibility(true);
+    // 与 hideSolids 一致：隐藏集未变化时不必重跑 O(cells) 重建与提边。
+    if (previous != hidden_solid_ids_)
+        dirty_ = true;
+}
+
 bool MeshPipelineData::reverseVisibility()
 {
     assertOwnerThread();
     if (!visible_) {
+        // 状态 A：整体恢复，同时清除面与体的局部隐藏/隔离状态。
         showAllFaces();
+        showAllSolids();
         visible_ = true;
-    } else if (hidden_face_ids_.empty()) {
+    } else if (hidden_face_ids_.empty() && hidden_solid_ids_.empty()) {
+        // 状态 B：无任何局部隐藏，整体关闭。
         visible_ = false;
-    } else if (face_data_) {
-        std::vector<vtkIdType> reversed;
-        for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
-            if (!std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), id))
-                reversed.push_back(id);
+    } else {
+        // 状态 C：对每个非空集合独立取补；空集合保持为空不参与取补，
+        // 避免只隐藏体时面被补成全部隐藏。集合按升序重建，保持二分查找前提。
+        // 两个集合都无可取补对象属半失效状态，直接返回避免用户点反转既无变化又白跑重建。
+        if ((hidden_face_ids_.empty() || !face_data_) && (hidden_solid_ids_.empty() || !solid_data_)) {
+            spdlog::warn("MeshPipelineData::reverseVisibility 无可取补的隐藏集合，跳过");
+            return visible_;
         }
-        hidden_face_ids_ = std::move(reversed);
+        if (!hidden_face_ids_.empty() && face_data_) {
+            std::vector<vtkIdType> reversed;
+            for (vtkIdType id = 0; id < face_data_->GetNumberOfCells(); ++id) {
+                if (!std::binary_search(hidden_face_ids_.begin(), hidden_face_ids_.end(), id))
+                    reversed.push_back(id);
+            }
+            hidden_face_ids_ = std::move(reversed);
+        }
+        if (!hidden_solid_ids_.empty() && solid_data_) {
+            std::vector<vtkIdType> reversed;
+            for (vtkIdType id = 0; id < solid_data_->GetNumberOfCells(); ++id) {
+                if (!std::binary_search(hidden_solid_ids_.begin(), hidden_solid_ids_.end(), id))
+                    reversed.push_back(id);
+            }
+            hidden_solid_ids_ = std::move(reversed);
+        }
         dirty_ = true;
     }
     return visible_;
@@ -445,6 +522,31 @@ void MeshPipelineData::rebuildOutputs()
     hider->SetHiddenCellIds(hidden_ids);
     hider->Update();
 
+    // 可见体网格（未裁剪）缓存：过滤为 O(cells)，仅在源网格或隐藏体集合变化时重算；
+    // 无隐藏体时直接复用原始体网格，跳过过滤器。
+    const bool solids_inputs_changed = !visible_solids_cache_ || visible_solids_cache_source_ != source_
+        || visible_solids_cache_hidden_solid_ids_ != hidden_solid_ids_;
+    if (solids_inputs_changed) {
+        if (hidden_solid_ids_.empty()) {
+            visible_solids_cache_ = solid_data_;
+        } else {
+            // 每次重建使用新的 Filter，下一次 Update 不会改写已发布快照引用的输出数组。
+            vtkNew<SolidHideFilter> solid_hider;
+            vtkNew<vtkIdTypeArray> hidden_solid_ids;
+            for (auto id : hidden_solid_ids_)
+                hidden_solid_ids->InsertNextValue(id);
+            solid_hider->SetInputData(solid_data_);
+            solid_hider->SetHiddenCellIds(hidden_solid_ids);
+            solid_hider->Update();
+            // 输出对象由 vtkSmartPointer 保活，过滤器析构后仍有效；与面/裁剪输出
+            // 不同，这里无需再包一层发布对象，后续只有全新 Filter 才产生新输出。
+            visible_solids_cache_ = solid_hider->GetOutput();
+        }
+        visible_solids_cache_source_ = source_;
+        visible_solids_cache_hidden_solid_ids_ = hidden_solid_ids_;
+    }
+    vtkUnstructuredGrid* visible_solids = visible_solids_cache_;
+
     vtkNew<vtkPlane> plane;
     plane->SetOrigin(clip_.origin.data());
     plane->SetNormal(clip_.normal.data());
@@ -453,7 +555,7 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkExtractGeometry> solid_clipper;
     vtkPolyData* faces = hider->GetOutput();
     vtkPolyData* edges = edge_data_;
-    vtkUnstructuredGrid* solids = solid_data_;
+    vtkUnstructuredGrid* solids = visible_solids;
     if (clip_.enabled) {
         face_clipper->SetInputData(faces);
         face_clipper->SetImplicitFunction(plane);
@@ -471,18 +573,18 @@ void MeshPipelineData::rebuildOutputs()
     vtkNew<vtkGeometryFilter> surface;
     surface->SetInputData(solids);
     surface->Update();
-    // 内部线框始终来自完整原始体，与裁剪及面隐藏无关；同一源数据只提取一次。
-    // 复用已发布的只读输出，源网格重新加载（含坐标/属性更新）后才重新提边。
-    vtkSmartPointer<vtkPolyData> internal_edges;
-    if (prepared_ && prepared_->source == source_) {
-        internal_edges = prepared_->solid_internal_edges;
-    } else {
+    // 内部线框基于未裁剪的可见体网格。提边为 O(cells+connectivity)，仅在可见体网格
+    // 变化时重算；仅裁剪、仅面隐藏、仅整体显隐切换时复用同一已发布结果，
+    // 因而快照中的 solid_internal_edges 对象保持一致。
+    if (solids_inputs_changed) {
+        // 只在可见体网格变化时提边；extractor 仅作过滤器对象，输出由 edges_cache_ 持有。
         vtkNew<vtkExtractEdges> extractor;
-        extractor->SetInputData(solid_data_);
-        // 线框沿用组件点身份，无需按坐标合并；保留原点编号也能避免大体网格的空间查找瓶颈。
+        extractor->SetInputData(visible_solids);
+        // 线框沿用可见体网格的点身份，无需按坐标合并；保留原点编号也能避免大体网格的
+        // 空间查找瓶颈，并让隐藏体过滤后的线框仍映射回原始点编号。
         extractor->UseAllPointsOn();
         extractor->Update();
-        internal_edges = publishPolyData(extractor->GetOutput());
+        edges_cache_ = publishPolyData(extractor->GetOutput());
     }
 
     prepared_ = std::make_shared<MeshDataSnapshot>();
@@ -495,7 +597,7 @@ void MeshPipelineData::rebuildOutputs()
     prepared_->visible_faces = publishPolyData(faces);
     prepared_->visible_edges = publishPolyData(edges);
     prepared_->solid_surface = publishPolyData(surface->GetOutput());
-    prepared_->solid_internal_edges = internal_edges;
+    prepared_->solid_internal_edges = edges_cache_;
     dirty_ = false;
 }
 

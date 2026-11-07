@@ -50,6 +50,11 @@ public:
      * @return component_id → 原模型面 id 列表；非面选择模式返回空表
      */
     std::unordered_map<Index, std::vector<vtkIdType>> selectedFaceIdsByComponent();
+    /**
+     * @brief 导出各组件保留的原始体 ID（仅体选择模式有效）
+     * @return component_id → 原始体 id 列表；非体选择模式返回空表
+     */
+    std::unordered_map<Index, std::vector<vtkIdType>> selectedSolidsByComponent();
     //! @brief 注入模型层 id 查询接口，供选择器解析单元 id（如边端点对 -> 边 id）
     void setMeshIdQuery(const IMeshIdQuery* id_query);
     void refreshComponentHighlight();

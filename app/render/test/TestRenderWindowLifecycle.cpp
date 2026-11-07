@@ -2,6 +2,8 @@
  * @file TestRenderWindowLifecycle.cpp
  * @brief 视口场景图销毁与重建的资源生命周期回归测试
  */
+#include "MakeMeshData.h"
+#include "MakeMeshDataVtk.h"
 #include "QRenderWindow.h"
 #include "QRenderWindowStyle.h"
 #include "ViewportOrientationRepresentation.h"
@@ -28,6 +30,7 @@
 #include <vtkWeakPointer.h>
 
 #include <cmath>
+#include <limits>
 
 namespace {
 class CountingTexture : public vtkOpenGLTexture {
@@ -468,4 +471,66 @@ TEST_CASE("Viewport orientation uploads its persistent texture only when pixels 
     orientation->ReleaseGraphicsResources(window);
     window->Render();
     CHECK(texture->uploads == 5);
+}
+
+TEST_CASE("QRenderWindow discards stale selection snapshots after mesh reload")
+{
+    testApplication();
+    QRenderWindow item;
+    int updates = 0;
+    QObject::connect(&item, &QRenderWindow::selectedChanged, &item, [&updates] { ++updates; });
+
+    vtkNew<vtkRenderWindow> window;
+    vtkNew<vtkRenderWindowInteractor> interactor;
+    interactor->SetRenderWindow(window);
+    auto user_data = item.initializeVTK(window);
+    auto* data = QRenderWindow::Data::SafeDownCast(user_data);
+    REQUIRE(data != nullptr);
+
+    MeshData mesh = MakeMeshData();
+    MeshDataVtk model_data = MakeMeshDataVtk(mesh);
+    item.loadMeshData(7, model_data);
+    // 重载本身也会回传一次空选择，先消费掉再记录基线。
+    QCoreApplication::processEvents();
+    const int baseline = updates;
+
+    // 先发布一条有效选择，作为后续迟到消息不得覆盖的对外快照。
+    auto accepted = std::make_shared<Selection>();
+    accepted->type = ElementEnum::Face;
+    accepted->component_id = 7;
+    accepted->ids = { 0, 1 };
+    item.enqueueSelectionForTest(accepted, { }, { }, { }, { });
+    QCoreApplication::processEvents();
+    REQUIRE(updates == baseline + 1);
+    auto* published = item.selectedIDs();
+    REQUIRE(published != nullptr);
+    CHECK(published->size() == 2);
+
+    // 网格换代后旧代次的选择消息晚到：整批丢弃，内部缓存和对外快照都不能更新。
+    auto stale = std::make_shared<Selection>();
+    stale->type = ElementEnum::Face;
+    stale->component_id = 7;
+    stale->ids = { 5 };
+    item.enqueueSelectionForTest(stale,
+        { { 7, { 5 } } }, { { 7, std::numeric_limits<std::uint64_t>::max() } }, { }, { });
+    QCoreApplication::processEvents();
+    CHECK(updates == baseline + 1);
+    published = item.selectedIDs();
+    REQUIRE(published != nullptr);
+    CHECK(published->size() == 2);
+    CHECK(published->ids(0) == 0);
+    CHECK(published->ids(1) == 1);
+
+    // 组件已不在当前管线中同样整批拒绝，空快照也不能把已有选择清掉。
+    item.enqueueSelectionForTest(nullptr, { { 8, { 6 } } }, { { 8, 1 } }, { }, { });
+    QCoreApplication::processEvents();
+    CHECK(updates == baseline + 1);
+    published = item.selectedIDs();
+    REQUIRE(published != nullptr);
+    CHECK(published->size() == 2);
+
+    item.destroyingVTK(window, user_data);
+    window->RemoveRenderer(data->overlay_renderer_);
+    window->RemoveRenderer(data->renderer_);
+    user_data = nullptr;
 }

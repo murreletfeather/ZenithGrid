@@ -5,6 +5,7 @@ add_library(vtkPart STATIC
     MeshActorSelectOp.cpp
     MeshAreaPick.cpp
     FaceHideFilter.cpp
+    SolidHideFilter.cpp
     GeometryActorSelectOp.cpp
     GeometrySelectorHighlight.cpp
     QRenderWindowStyle.cpp
@@ -68,5 +69,7 @@ vtk_module_autoinit(TARGETS renderQml MODULES
     VTK::GUISupportQtQuick VTK::CommonColor VTK::RenderingAnnotation
 )
 if(BUILD_TESTING)
-add_subdirectory(test)
+    # 测试构建开放选择消息注入点，用于验证迟到快照的代次校验。
+    target_compile_definitions(renderQml PUBLIC PRECESS_RENDER_TESTING)
+    add_subdirectory(test)
 endif()
