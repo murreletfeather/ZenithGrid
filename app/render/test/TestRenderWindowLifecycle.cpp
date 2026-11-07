@@ -75,6 +75,15 @@ TEST_CASE("QRenderWindow keeps overlay logical sizes across DPR and VTK DPI chan
             interactor->SetRenderWindow(window);
             auto user_data = item.initializeVTK(window);
             auto* data = QRenderWindow::Data::SafeDownCast(user_data);
+            CHECK(data->renderer_->GetGradientBackground());
+            const auto* lower = data->renderer_->GetBackground();
+            const auto* upper = data->renderer_->GetBackground2();
+            CHECK(std::abs(lower[0] - 66.0 / 255.0) < 1e-6);
+            CHECK(std::abs(lower[1] - 99.0 / 255.0) < 1e-6);
+            CHECK(std::abs(lower[2] - 95.0 / 255.0) < 1e-6);
+            CHECK(std::abs(upper[0] - 102.0 / 255.0) < 1e-6);
+            CHECK(std::abs(upper[1] - 132.0 / 255.0) < 1e-6);
+            CHECK(std::abs(upper[2] - 126.0 / 255.0) < 1e-6);
             auto* orientation = ViewportOrientationRepresentation::SafeDownCast(data->orientationWidget->GetRepresentation());
             REQUIRE(orientation != nullptr);
             const int expected_size = static_cast<int>(std::lround(120 * ratio));
