@@ -3,7 +3,7 @@ set_source_files_properties(App.qml
 qt_add_qml_module(coreQml 
     URI app.core 
     STATIC 
-    SOURCES QSelection.h AppPalette.h ThemePalette.h WallpaperLibrary.h WallpaperLibrary.cpp
+    SOURCES QStartupGate.h QStartupGate.cpp QSelection.h AppPalette.h ThemePalette.h WallpaperLibrary.h WallpaperLibrary.cpp
     QML_FILES App.qml
 )
 target_include_directories(coreQml PUBLIC

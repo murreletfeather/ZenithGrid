@@ -1,3 +1,12 @@
+# 启动切换门控：三维视口初始化后，继续等待后续呈现帧。
+precess_add_test(TestStartupGate
+    TestStartupGate.cpp
+    ../core/QStartupGate.h ../core/QStartupGate.cpp
+)
+set_target_properties(TestStartupGate PROPERTIES AUTOMOC ON)
+target_include_directories(TestStartupGate PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../core")
+precess_test_link_libraries(TestStartupGate Qt6::Core)
+
 # QLogManager Qt/QML 消息桥接测试
 # app 层无库目标（QLogManager 仅编入 PreCess 可执行目标，测试无法链接），
 # 故直接编译源文件并启用 AUTOMOC
