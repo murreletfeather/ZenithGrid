@@ -313,8 +313,13 @@ bool TreeModel::requestVisibility(const QModelIndex& idx, bool visible)
 
 void TreeModel::requestAllVisibility(bool visible)
 {
-    for (int row = 0; row < rowCount(); ++row)
-        requestVisibility(index(row, 0), visible);
+    if (!modelQuery_)
+        return;
+
+    // 全局操作以模型查询为准，尚未进入展示树的模型也必须收到请求。
+    const auto models = modelQuery_->listModels();
+    for (const auto& model : models)
+        emit visibilityRequested(static_cast<int>(TreeNode::NodeType::Model), model.toMap()["model_id"].toInt(), visible);
 }
 
 void TreeModel::syncSubNodes(TreeNode* node)
@@ -328,8 +333,10 @@ void TreeModel::syncSubNodes(TreeNode* node)
             auto* component = node;
             while (component->nodeType != TreeNode::NodeType::Component)
                 component = component->parent;
-            const auto& hidden = child->dimension == 2 ? hidden_cell_types_[component->nodeId].first : hidden_cell_types_[component->nodeId].second;
-            child->isVisible = node->isVisible && !hidden.contains(child->cellType);
+            const auto it = hidden_cell_types_.find(component->nodeId);
+            const bool hidden = it != hidden_cell_types_.end()
+                && (child->dimension == 2 ? it->second.first : it->second.second).contains(child->cellType);
+            child->isVisible = node->isVisible && !hidden;
         } else {
             child->isVisible = node->isVisible;
         }
@@ -367,7 +374,14 @@ QModelIndex TreeModel::findIndexByNodeId(int nodeId, int depth) const
 
 void TreeModel::setModelQuery(QObject* query)
 {
-    modelQuery_ = qobject_cast<QModelQuery*>(query);
+    auto* next = qobject_cast<QModelQuery*>(query);
+    if (next == modelQuery_)
+        return;
+
+    // 组件身份仅在所属查询内有效，更换查询不能继承旧组件的回传和统计。
+    modelQuery_ = next;
+    sub_visibility_.clear();
+    hidden_cell_types_.clear();
     mesh_cell_type_counts_.clear();
 }
 

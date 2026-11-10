@@ -128,7 +128,7 @@ public:
      */
     Q_INVOKABLE void setVisibility(Index model_id, bool visibility);
     Q_INVOKABLE void setComponentVisibility(Index component_id, bool visibility);
-    /** @brief 设置网格显隐；显示时恢复人工隐藏面和面隔离，保留几何及裁剪。 */
+    /** @brief 设置网格显隐；显示时恢复类型过滤、人工隐藏面和面隔离，保留几何及裁剪。 */
     Q_INVOKABLE void setMeshVisibility(Index component_id, bool visibility);
     /** @brief 切换单元类型或整个维度（cell_type=-1），保留裁剪与人工隐藏面。 */
     Q_INVOKABLE void setMeshCellVisibility(Index component_id, int dimension, int cell_type, bool visible);
@@ -291,6 +291,9 @@ private:
 
     //! @brief 渲染线程制作选择快照，排队交付 GUI 线程，禁止 QML 直接读取拾取器。
     void publishSelection();
+    //! @brief 只应用网格/几何显隐，不触发回传；由组件级操作合并后统一通知。
+    void applyMeshVisibility(Index component_id, bool visibility);
+    void applyGeometryVisibility(Index component_id, bool visibility);
     /** @brief 在 GUI 线程发布当前显隐结果，对象树只接收最新状态。 */
     void publishComponentVisibility(Index component_id);
     // QQuickVTKItem 会接管事件分发，GUI 排队通知交给独立 QObject。

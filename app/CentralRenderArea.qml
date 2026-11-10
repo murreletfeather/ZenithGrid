@@ -718,15 +718,6 @@ Page {
             }
 
             Connections {
-                target: App
-                function onModelVisibilityUpdated(modelId, visible) { myItem.setVisibility(modelId, visible) }
-                function onComponentVisibilityUpdated(componentId, meshVisible, geometryVisible) {
-                    myItem.setMeshVisibility(componentId, meshVisible)
-                    myItem.setGeometryVisibility(componentId, geometryVisible)
-                }
-            }
-
-            Connections {
                 target: QModelManager.undoStack
                 // undo/redo 应用后统一清空选择集（Selection 持有的 gid/稳定 id 不作跨 undo 保证）
                 function onApplied() {
@@ -840,7 +831,7 @@ Page {
             StyledMenuItem {
                 text: "全部显示"
                 shown: !viewportMenu.hasPicks
-                onTriggered: myItem.showAll()
+                onTriggered: App.registry.objectTree.showAllNodes()
             }
 
             StyledMenuItem {

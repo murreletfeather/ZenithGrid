@@ -79,7 +79,7 @@ public:
     /** @brief 只发送节点显隐意图；展示状态由管线回传后更新。 */
     Q_INVOKABLE bool requestVisibility(const QModelIndex& idx, bool visible);
     Q_INVOKABLE QModelIndex findIndexByNodeId(int nodeId, int depth) const;
-    /** @brief 按模型发送全部节点的显隐请求，不提前修改展示副本。 */
+    /** @brief 向查询中的全部模型发送显隐请求，不依赖展示树刷新或提前修改展示副本。 */
     Q_INVOKABLE void requestAllVisibility(bool visible);
     /** @brief 模型通知使指定组件的类型统计缓存失效；负值使全部缓存失效。 */
     Q_INVOKABLE void invalidateMeshCellTypeCounts(int component_id = -1);
@@ -88,6 +88,7 @@ public:
         const QVariantList& hidden_faces, const QVariantList& hidden_solids);
 
     QObject* getModelQuery() const { return modelQuery_; }
+    /** @brief 更换查询源时清理该查询所属的统计与显隐副本；重复绑定保留原状态。 */
     void setModelQuery(QObject* query);
 
 signals:

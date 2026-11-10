@@ -103,7 +103,8 @@ Pane {
         target: QModelManager.observer
         function onModelAdded(modelId)   { refreshTimer.restart() }
         function onModelChanged(modelId) {
-            treeModel.invalidateMeshCellTypeCounts()
+            for (const component of QModelManager.query.getComponentsSummary(modelId))
+                treeModel.invalidateMeshCellTypeCounts(component.component_id)
             refreshTimer.restart()
         }
         function onModelRemoved(modelId) {
