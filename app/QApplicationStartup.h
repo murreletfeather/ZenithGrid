@@ -5,21 +5,15 @@
 
 #pragma once
 
-#include "QStartupGate.h"
-
 #include <QObject>
-#ifndef __EMSCRIPTEN__
 #include <QPointer>
-#endif
 
 #include <memory>
 
 class QGuiApplication;
 class QQmlApplicationEngine;
-#ifndef __EMSCRIPTEN__
 class QQuickWindow;
 class QStartupSplashWindow;
-#endif
 
 //! @brief 由主程序持有的启动协调对象，生命周期覆盖 QML 引擎。
 class QApplicationStartup final : public QObject {
@@ -33,7 +27,6 @@ public:
 private:
     bool initialize();
     void installKeyEventForwarder();
-    void scheduleStartupFiles();
     void failStartup(const QString& message);
 
 #ifndef __EMSCRIPTEN__
@@ -43,13 +36,12 @@ private:
 #endif
 
     QGuiApplication& app_;
-    // 渲染回调可能在引擎拆解时仍需投递就绪通知，门控必须晚于引擎析构。
-    QStartupGate startup_gate_;
+    // 引擎拆解时仍可能投递渲染通知，终态及 QObject 上下文须晚于引擎析构。
+    bool startup_finished_ { false };
 #ifndef __EMSCRIPTEN__
     std::unique_ptr<QStartupSplashWindow> splash_;
     QPointer<QQuickWindow> main_window_;
     QMetaObject::Connection startup_error_connection_;
-    bool frame_armed_ { false };
 #endif
     std::unique_ptr<QQmlApplicationEngine> engine_;
     // 过滤器引用引擎中的功能适配器，须先于引擎析构。

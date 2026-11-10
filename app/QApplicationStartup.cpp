@@ -1,6 +1,6 @@
 /**
  * @file QApplicationStartup.cpp
- * @brief 管理主界面加载、启动门控和窗口交接。
+ * @brief 管理主界面加载、启动顺序和窗口交接。
  */
 
 #include "QApplicationStartup.h"
@@ -12,12 +12,12 @@
 #include "WallpaperLibrary.h"
 #ifdef __EMSCRIPTEN__
 #include "QWasmBridge.h"
+#include <QFontDatabase>
 #else
 #include "QStartupSplashWindow.h"
 #include <QQuickItem>
 #include <QQuickVTKItem.h>
 #include <QQuickWindow>
-#include <QTimer>
 #endif
 
 #include <QGuiApplication>
@@ -82,26 +82,37 @@ QApplicationStartup::~QApplicationStartup() = default;
 
 int QApplicationStartup::run()
 {
-    connect(&startup_gate_, &QStartupGate::onFailed, this, &QApplicationStartup::failStartup);
-
 #ifdef __EMSCRIPTEN__
+    // Web 平台需在加载 QML 前手动加载捆绑字体，以显示中文。
+    const int font_id = QFontDatabase::addApplicationFont(":/fonts/appfont.bin");
+    const QStringList font_families = QFontDatabase::applicationFontFamilies(font_id);
+    if (!font_families.isEmpty())
+        app_.setFont(QFont(font_families.first()));
+
     // 浏览器管理事件循环，启动对象及其引擎由 main 持久保留。
-    return initialize() ? 0 : -1;
+    if (!initialize())
+        return -1;
+    installKeyEventForwarder();
+    startup_finished_ = true;
+    return 0;
 #else
     splash_ = std::make_unique<QStartupSplashWindow>(QCoreApplication::applicationVersion());
     app_.setQuitOnLastWindowClosed(false);
-    connect(splash_.get(), &QStartupSplashWindow::onCancelled, this, &QCoreApplication::quit);
+    connect(splash_.get(), &QStartupSplashWindow::onCancelled, this, [this]() {
+        if (startup_finished_)
+            return;
+        startup_finished_ = true;
+        app_.quit();
+    });
+    connect(&app_, &QCoreApplication::aboutToQuit, this, [this]() { startup_finished_ = true; });
     connect(&app_, &QCoreApplication::aboutToQuit, splash_.get(), &QWindow::hide);
-    connect(&startup_gate_, &QStartupGate::onReady, this, &QApplicationStartup::finishStartup);
-    connect(&startup_gate_, &QStartupGate::onUpdateRequested, this, &QApplicationStartup::waitForPresentedFrame);
 
     // 先提交启动封面，再排队初始化，避免在插件构造中重入事件循环。
     connect(splash_.get(), &QStartupSplashWindow::onFirstFrame, this, [this]() {
-        QTimer::singleShot(0, this, [this]() {
-            if (splash_ && splash_->isVisible())
-                initialize();
-        });
-    });
+        if (startup_finished_ || !splash_ || !splash_->isVisible())
+            return;
+        if (initialize())
+            connectStartupReadiness(); }, Qt::QueuedConnection);
     splash_->show();
     return app_.exec();
 #endif
@@ -125,19 +136,13 @@ bool QApplicationStartup::initialize()
 #endif
         engine_->loadFromModule("app", "Main");
         if (engine_->rootObjects().isEmpty()) {
-            startup_gate_.fail(QCoreApplication::translate("Startup", "主界面加载失败"));
+            failStartup(QCoreApplication::translate("Startup", "主界面加载失败"));
             return false;
         }
 
-#ifdef __EMSCRIPTEN__
-        installKeyEventForwarder();
-        scheduleStartupFiles();
         return true;
-#else
-        return connectStartupReadiness();
-#endif
     } catch (const std::exception& error) {
-        startup_gate_.fail(QString::fromUtf8(error.what()));
+        failStartup(QString::fromUtf8(error.what()));
         return false;
     }
 }
@@ -152,20 +157,12 @@ void QApplicationStartup::installKeyEventForwarder()
     }
 }
 
-void QApplicationStartup::scheduleStartupFiles()
-{
-    // 导入在窗口交接后的事件循环中执行，不再阻塞封面收尾。
-    if (!QMetaObject::invokeMethod(engine_->rootObjects().first(), "openStartupFiles", Qt::QueuedConnection))
-        spdlog::error("startup: failed to schedule command-line file import");
-}
-
 void QApplicationStartup::failStartup(const QString& message)
 {
+    if (startup_finished_)
+        return;
+    startup_finished_ = true;
     spdlog::error("startup: {}", message.toStdString());
-#ifndef __EMSCRIPTEN__
-    splash_->setStage(message);
-    splash_->hide();
-#endif
     app_.exit(-1);
 }
 
@@ -174,41 +171,39 @@ bool QApplicationStartup::connectStartupReadiness()
 {
     main_window_ = qobject_cast<QQuickWindow*>(engine_->rootObjects().first());
     if (!main_window_) {
-        startup_gate_.fail(QCoreApplication::translate("Startup", "未创建主窗口"));
+        failStartup(QCoreApplication::translate("Startup", "未创建主窗口"));
         return false;
     }
     auto* viewport = findViewport(main_window_->contentItem());
     if (!viewport) {
-        startup_gate_.fail(QCoreApplication::translate("Startup", "三维视口加载失败"));
+        failStartup(QCoreApplication::translate("Startup", "三维视口加载失败"));
         return false;
     }
-    startup_error_connection_ = connect(main_window_, &QQuickWindow::sceneGraphError, this, [this](QQuickWindow::SceneGraphError, const QString& message) { startup_gate_.fail(message); }, Qt::QueuedConnection);
+    startup_error_connection_ = connect(main_window_, &QQuickWindow::sceneGraphError, this, [this](QQuickWindow::SceneGraphError, const QString& message) { failStartup(message); }, Qt::QueuedConnection);
 
     // 队列在视口初始化之后消费；已初始化的视口也会在后续同步中执行。
-    viewport->dispatch_async([gate = &startup_gate_](vtkRenderWindow*, QQuickVTKItem::vtkUserData) {
-        QMetaObject::invokeMethod(gate, &QStartupGate::markViewportReady, Qt::QueuedConnection);
+    viewport->dispatch_async([this](vtkRenderWindow*, QQuickVTKItem::vtkUserData) {
+        QMetaObject::invokeMethod(this, &QApplicationStartup::waitForPresentedFrame, Qt::QueuedConnection);
     });
     return true;
 }
 
 void QApplicationStartup::waitForPresentedFrame()
 {
-    if (!main_window_ || !startup_gate_.isPrepared() || frame_armed_)
+    if (startup_finished_ || !main_window_)
         return;
-    frame_armed_ = true;
 
-    // 视口初始化完成后才订阅同步点，避免接受早先已排队的呈现帧。
+    // VTK 就绪后在 GUI 线程安装一次性呈现通知，再请求主窗口更新。
     const auto queued_once = Qt::ConnectionType(Qt::QueuedConnection | Qt::SingleShotConnection);
-    connect(main_window_, &QQuickWindow::afterSynchronizing, this, [this, queued_once]() {
-        if (!main_window_)
-            return;
-        connect(main_window_, &QQuickWindow::frameSwapped, &startup_gate_, &QStartupGate::markFrameReady, queued_once);
-        main_window_->update(); }, queued_once);
+    connect(main_window_, &QQuickWindow::frameSwapped, this, &QApplicationStartup::finishStartup, queued_once);
     main_window_->update();
 }
 
 void QApplicationStartup::finishStartup()
 {
+    if (startup_finished_)
+        return;
+    startup_finished_ = true;
     // 恢复 Qt 对运行期间场景图错误的默认处理。
     disconnect(startup_error_connection_);
     spdlog::info("startup: main window ready after viewport and presented frame");
@@ -219,6 +214,5 @@ void QApplicationStartup::finishStartup()
     if (main_window_)
         main_window_->requestActivate();
     installKeyEventForwarder();
-    scheduleStartupFiles();
 }
 #endif

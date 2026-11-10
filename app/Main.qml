@@ -403,22 +403,6 @@ ApplicationWindow {
         }
     }
 
-    //! @brief 由宿主在主界面交接后排队调用，文件失败不再参与启动门控。
-    function openStartupFiles() {
-        let imported = false
-        for (let i = 0; i < commandLineArgs.length; ++i) {
-            let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
-            if (!ok) {
-                console.exception("启动打开失败: " + commandLineArgs[i]);
-            } else {
-                imported = true
-            }
-        }
-        // 导入通知先排队加载 Actor，再重置相机；视口创建时的重置早于启动导入。
-        if (imported && App.registry.renderWindow)
-            App.registry.renderWindow.resetCamera()
-    }
-
     Component.onCompleted: {
         // 启动校验自定义壁纸：仅当持久化 id 对应文件仍存在时保留，否则清理残留并回退纯色
         Theme.setWallpaper(Wallpaper.reconcile(Theme.wallpaper))
@@ -426,5 +410,20 @@ ApplicationWindow {
         // 同步当前活动模型/组件到功能系统（功能菜单由 AppToolbar 自行构建）
         QModelManager.featureSystem.setActiveModel(App.selection.activeModelId)
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
+
+        Qt.callLater(function() {
+            let imported = false
+            for (let i = 0; i < commandLineArgs.length; ++i) {
+                let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
+                if (!ok) {
+                    console.exception("启动打开失败: " + commandLineArgs[i]);
+                } else {
+                    imported = true
+                }
+            }
+            // 导入通知先排队加载 Actor，再重置相机。
+            if (imported && App.registry.renderWindow)
+                App.registry.renderWindow.resetCamera()
+        })
     }
 }

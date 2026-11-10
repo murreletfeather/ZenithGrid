@@ -4,9 +4,7 @@
 #include <QGuiApplication>
 #include <QIcon>
 #include <QQuickStyle>
-#ifdef __EMSCRIPTEN__
-#include <QFontDatabase>
-#else
+#ifndef __EMSCRIPTEN__
 #include <QQuickVTKItem.h>
 #endif
 #include <spdlog/cfg/env.h>
@@ -38,14 +36,6 @@ int main(int argc, char* argv[])
     // 控件调色板由 Main.qml 的 ApplicationWindow 绑定 Theme 令牌；Fusion 的
     // 默认控件调色板取自平台主题，应用调色板只覆盖 ToolTip 等弹窗。
     QQuickStyle::setStyle("Fusion");
-#ifdef __EMSCRIPTEN__
-    // wasm 平台需手动加载捆绑的字体，否则无法显示中文
-    int font_id = QFontDatabase::addApplicationFont(":/fonts/appfont.bin");
-    QStringList font_families = QFontDatabase::applicationFontFamilies(font_id);
-    if (!font_families.isEmpty()) {
-        app.setFont(QFont(font_families.first()));
-    }
-#endif
 
     WASM_GLOBAL QApplicationStartup startup(app);
     return startup.run();

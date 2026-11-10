@@ -11,7 +11,7 @@
 
 class QPainter;
 
-//! @brief 同步初始化期间直接刷新真实阶段，不在插件构造中重入事件循环
+//! @brief 独立绘制启动封面与活动动画，不在插件构造中重入事件循环
 class QStartupSplashWindow final : public QWindow {
     Q_OBJECT
 
@@ -19,9 +19,6 @@ public:
     //! @brief 背景不可用时沿用同一窗口的纯色绘制；路径可指定替代资源。
     explicit QStartupSplashWindow(const QString& version,
         const QString& background_path = QStringLiteral(":/images/splash/ZenithGrid-splash-background@2x.png"));
-
-    //! @brief 更新当前真实阶段；单个阶段内部不伪造百分比
-    void setStage(const QString& message);
 
 signals:
     //! @brief 启动页第一次绘制并提交后，允许排队开始主程序初始化
@@ -43,7 +40,6 @@ private:
     QImage background_;
     QTimer activity_timer_;
     QString version_;
-    QString stage_;
     int activity_phase_;
     bool first_frame_ = false;
 };

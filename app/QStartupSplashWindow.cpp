@@ -47,7 +47,6 @@ QStartupSplashWindow::QStartupSplashWindow(const QString& version, const QString
     : backing_store_(this)
     , background_(background_path)
     , version_(version)
-    , stage_(tr("正在启动…"))
     , activity_phase_(kActivityInitialPhase)
 {
     // 封面早于应用日志面板初始化；先通过 spdlog 默认 sink 记录资源告警。
@@ -85,13 +84,6 @@ QStartupSplashWindow::QStartupSplashWindow(const QString& version, const QString
         else
             activity_timer_.stop();
     });
-}
-
-void QStartupSplashWindow::setStage(const QString& message)
-{
-    stage_ = message;
-    // QBackingStore 直接 flush，不在构造未完成的 QML/插件中调用 processEvents。
-    renderNow();
 }
 
 bool QStartupSplashWindow::event(QEvent* event)
@@ -176,7 +168,7 @@ void QStartupSplashWindow::paintContents(QPainter& painter) const
     status_font.setPixelSize(16);
     painter.setFont(status_font);
     painter.setPen(kStatusTextColor);
-    const QString elided = QFontMetricsF(status_font).elidedText(stage_, Qt::ElideMiddle, kStatusTextWidth);
+    const QString elided = QFontMetricsF(status_font).elidedText(tr("正在启动…"), Qt::ElideMiddle, kStatusTextWidth);
     painter.drawText(QPointF(80, 554), elided);
     painter.setPen(QPen(kPrimaryTextColor, kIndicatorStrokeWidth));
     painter.setBrush(Qt::NoBrush);
