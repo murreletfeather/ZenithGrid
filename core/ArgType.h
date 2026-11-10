@@ -6,13 +6,12 @@
 #ifndef ARG_TYPE_H
 #define ARG_TYPE_H
 #include <filesystem>
-#include <memory>
 #include <string>
 
 // 参数类型枚举
 #include "private_ArgTypeEnum.h"
 
-class Selection;
+struct Selection;
 
 namespace core {
 /**

@@ -91,8 +91,8 @@ HandlerMetaData qualityMetaData()
 std::shared_ptr<Selection> makeComponentSelection(Index component_id)
 {
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::Component);
-    selection->ids() = { component_id };
+    selection->type = ElementEnum::Component;
+    selection->ids = { component_id };
     return selection;
 }
 
@@ -289,7 +289,7 @@ TEST_CASE("MeshQuality requires exactly one selected component", "[MeshQualityPl
     REQUIRE(std::any_cast<const std::string&>(empty_result).find("请选择一个 Component") != std::string::npos);
 
     auto multiple_selection = makeComponentSelection(component_id);
-    multiple_selection->ids().push_back(component_id);
+    multiple_selection->ids.push_back(component_id);
     REQUIRE(feature_system.setParameter(
         "MeshQuality", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(std::move(multiple_selection))));

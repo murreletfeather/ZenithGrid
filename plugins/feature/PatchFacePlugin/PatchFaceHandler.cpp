@@ -37,12 +37,12 @@ void PatchFaceHandler::setup(FeatureRegistrar& reg, FeatureContext& /*ctx*/)
 std::any PatchFaceHandler::execute(FeatureContext& ctx)
 {
     const auto* seed_param = ctx.params.value(kSeedEdgeParam).get<ArgTypeEnum::Selector>();
-    if (!seed_param || !*seed_param || (*seed_param)->type() != ElementEnum::GeometryEdge
-        || (*seed_param)->ids().size() != 1)
+    if (!seed_param || !*seed_param || (*seed_param)->type != ElementEnum::GeometryEdge
+        || (*seed_param)->ids.size() != 1)
         return std::string("请选择一条待补孔洞上的几何边。");
 
     try {
-        const Index edge_id = (*seed_param)->ids().front();
+        const Index edge_id = (*seed_param)->ids.front();
         const auto component_id = ctx.model.findComponentIdByGeometryShapeId(TopAbs_EDGE, edge_id);
         if (!component_id)
             return std::string("所选几何边不属于任何组件。");

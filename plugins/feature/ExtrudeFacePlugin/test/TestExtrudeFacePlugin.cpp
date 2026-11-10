@@ -74,8 +74,8 @@ TEST_CASE("ExtrudeFace execute appends extruded solid to source component", "[Ex
     const auto& face_ids = component->geometry->index.face_local_to_global;
     REQUIRE(face_ids.size() == 6 + 1); // 局部 id 从 1 起，0 号为保留槽
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::GeometryFace);
-    selection->ids() = { face_ids[1] }; // 下标从 1 起，0 号为保留槽
+    selection->type = ElementEnum::GeometryFace;
+    selection->ids = { face_ids[1] }; // 下标从 1 起，0 号为保留槽
     selection->component_id = component_id;
     SECTION("explicit component identity") { }
     SECTION("global face identity without component hint") { selection->component_id = -1; }
@@ -154,8 +154,8 @@ TEST_CASE("ExtrudeFace cancellation and compute failure discard the result", "[E
     REQUIRE(system.registerHandler(handlerMetaData(), FeatureSystem::SystemHandlerPtr { new ExtrudeFaceHandler }));
     const auto face_ids = model.findComponent(target)->geometry->index.face_local_to_global;
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::GeometryFace);
-    selection->ids() = { face_ids[1] }; // 未携带组件、对象树也未选中，按全局几何身份解析。
+    selection->type = ElementEnum::GeometryFace;
+    selection->ids = { face_ids[1] }; // 未携带组件、对象树也未选中，按全局几何身份解析。
     REQUIRE(system.setParameter("ExtrudeFace", 0, core::ArgObject::create<ArgTypeEnum::Selector>(selection)));
     bool invalid_length = false;
     bool early_cancel = false;

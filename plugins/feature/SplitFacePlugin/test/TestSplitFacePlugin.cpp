@@ -171,9 +171,9 @@ std::shared_ptr<Selection> makeSelection(
     Index shape_id)
 {
     auto selection = std::make_shared<Selection>();
-    selection->setType(type);
+    selection->type = type;
     selection->component_id = component_id;
-    selection->ids() = { shape_id };
+    selection->ids = { shape_id };
     return selection;
 }
 

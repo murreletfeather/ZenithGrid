@@ -1,12 +1,17 @@
-#ifndef Q_SELECTION_H
-#define Q_SELECTION_H
-#include "QElement.h"
-#include "Selection.h"
-#include <QJSEngine>
+#ifndef  Q_SELECTION_H
+#define Q_SELECTION_H 
 #include <QObject>
 #include <QVariantList>
-#include <QVariantMap>
 #include <qqmlintegration.h>
+#include "Selection.h"
+
+//! @brief Element在QML中暴露了枚举Element::Type，在QML中以Element.Face获取枚举值
+class Element : public QObject, public ElementEnum {
+    Q_OBJECT
+    QML_ELEMENT
+public:
+    Q_ENUM(Type)
+};
 
 /**
  * @brief Selection类的QML交互接口。Selection可以存于QSelection中，就可以在QML代码中进行交互。C++中使用new来创建对象，QML中为只读对象
@@ -26,7 +31,7 @@ public:
      * 存入
      * @param data 待存入的数据
      */
-    void set(std::shared_ptr<Selection> data) { data_ = data ? std::make_shared<Selection>(*data) : nullptr; }
+    void set(std::shared_ptr<Selection> data) { data_ = std::move(data); }
     /**
      * 取出
      * @return 存储的Selection对象
@@ -40,7 +45,7 @@ public:
     Q_INVOKABLE size_t size()
     {
         if (data_) {
-            return data_->size();
+            return data_->ids.size();
         }
         return 0;
     }
@@ -48,16 +53,16 @@ public:
      * @brief 获取选中数据的类型枚举值
      * @return 类型枚举值
      */
-    Q_INVOKABLE Element::Type type() { return static_cast<Element::Type>(data_ ? data_->type() : ElementEnum::None); }
+    Q_INVOKABLE Element::Type type() { return data_->type; }
     /**
      * @brief 初始化一个Selection数据
      */
     Q_INVOKABLE void initialize()
     {
         std::unique_ptr<Selection> temp = std::make_unique<Selection>();
-        temp->setType(ElementEnum::Face);
+        temp->type = ElementEnum::Face;
         for (int i = 1; i < 2; i++) {
-            temp->ids().push_back(i);
+            temp->ids.push_back(i);
         }
         data_ = std::move(temp);
     }
@@ -68,7 +73,7 @@ public:
      */
     Q_INVOKABLE int ids(int i)
     {
-        return data_ && data_->type() != ElementEnum::GeometryPoint && i >= 0 && static_cast<size_t>(i) < data_->size() ? data_->ids()[i] : -1;
+        return data_->ids[i];
     }
     /**
      * @brief 返回选中对象的模型 ID
@@ -76,41 +81,18 @@ public:
      */
     Q_INVOKABLE Index getComponentId()
     {
-        return data_ ? data_->component_id : -1;
+        return data_->component_id;
     }
     Q_INVOKABLE QVariantList getAsComponentIds()
     {
         QVariantList list;
         if (!data_)
             return list;
-        if (data_->type() == ElementEnum::Component) {
-            for (auto id : data_->ids())
+        if (data_->type == ElementEnum::Component) {
+            for (auto id : data_->ids)
                 list.append(id);
         }
         return list;
-    }
-
-    /** @brief 按顺序查询一个点的支撑和吸附来源，越界时返回空映射。 */
-    Q_INVOKABLE QVariantMap point(int index) const
-    {
-        if (!data_ || index < 0 || static_cast<std::size_t>(index) >= data_->size())
-            return { };
-        const auto* points = data_->get<ElementEnum::GeometryPoint>();
-        if (!points)
-            return { };
-        const auto& point = (*points)[index];
-        return {
-            { "componentId", point.component_id },
-            { "supportKind", static_cast<int>(point.support_kind) },
-            { "supportId", point.support_id },
-            { "worldPosition", QVariantList { point.world_pos[0], point.world_pos[1], point.world_pos[2] } },
-            { "edgeParameter", point.edge_parameter },
-            { "faceUV", QVariantList { point.face_uv[0], point.face_uv[1] } },
-            { "snapKind", static_cast<int>(point.snap_kind) },
-            { "snapId", point.snap_id },
-            { "snapEdgeParameter", point.snap_edge_parameter },
-            { "valid", point.valid },
-        };
     }
 
 private:

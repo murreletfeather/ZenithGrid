@@ -328,10 +328,10 @@ TEST_CASE("Actual QML aligns face and component visibility menu entries", "[QML]
         for (bool has_picks : { false, true }) {
             // 传入真实 QSelection，覆盖 C++ 选择快照到 QML 菜单的判断路径。
             auto data = std::make_unique<Selection>();
-            data->setType(mode == "Face" ? ElementEnum::Face : ElementEnum::Component);
+            data->type = mode == "Face" ? ElementEnum::Face : ElementEnum::Component;
             data->component_id = 7;
             if (has_picks)
-                data->ids() = { 0, 1 };
+                data->ids = { 0, 1 };
             QSelection selection(std::move(data));
             REQUIRE(QMetaObject::invokeMethod(menu, "refreshSelection",
                 Q_ARG(QVariant, QVariant::fromValue(&selection))));
@@ -445,8 +445,8 @@ TEST_CASE("Actual undo clears offscreen selectors only after successful restorat
     active.setProperty("info", f.engine.newQObject(info));
     app->setProperty("activeOperation", QVariant::fromValue(active));
     QSelection selection(std::make_unique<Selection>());
-    selection.get()->ids() = { 123 };
-    selection.get()->setType(ElementEnum::Face);
+    selection.get()->ids = { 123 };
+    selection.get()->type = ElementEnum::Face;
     for (int i = 0; i < 50; ++i)
         REQUIRE(manager->getFeatureSystemAdaptor()->setParameter("ManySelectors", i, QVariant::fromValue(&selection)));
     selection_state->setProperty("listeningSelectorIndex", 49);

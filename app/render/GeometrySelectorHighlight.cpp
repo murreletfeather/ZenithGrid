@@ -99,10 +99,10 @@ void GeometryFaceSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryFaceSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.setType(ElementEnum::GeometryFace);
+    s.type = ElementEnum::GeometryFace;
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids().push_back(geomId);
+        s.ids.push_back(geomId);
     return s;
 }
 
@@ -174,10 +174,10 @@ void GeometryEdgeSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryEdgeSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.setType(ElementEnum::GeometryEdge);
+    s.type = ElementEnum::GeometryEdge;
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids().push_back(geomId);
+        s.ids.push_back(geomId);
     return s;
 }
 
@@ -249,10 +249,10 @@ void GeometryVertexSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryVertexSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.setType(ElementEnum::GeometryVertex);
+    s.type = ElementEnum::GeometryVertex;
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids().push_back(geomId);
+        s.ids.push_back(geomId);
     return s;
 }
 
@@ -325,10 +325,10 @@ void GeometrySolidSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometrySolidSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.setType(ElementEnum::GeometrySolid);
+    s.type = ElementEnum::GeometrySolid;
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids().push_back(geomId);
+        s.ids.push_back(geomId);
     return s;
 }
 

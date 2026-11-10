@@ -88,9 +88,9 @@ std::shared_ptr<Selection> makeVertexSelection(
     Index vertex_id)
 {
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::GeometryVertex);
+    selection->type = ElementEnum::GeometryVertex;
     selection->component_id = fixture.component_id;
-    selection->ids() = { vertex_id };
+    selection->ids = { vertex_id };
     return selection;
 }
 

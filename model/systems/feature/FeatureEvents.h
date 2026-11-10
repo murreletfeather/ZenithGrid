@@ -28,19 +28,16 @@ struct KeyEvent {
  * @brief 功能参数变更事件，FeatureSystem::setParameter 成功后发布
  */
 struct ParameterChangedEvent {
-    /** @brief 同时携带写入前后的参数值，依赖规则不再另存历史身份。 */
-    ParameterChangedEvent(std::string feature_name, std::size_t index, core::ArgObject new_value, core::ArgObject old_value = { })
+    ParameterChangedEvent(std::string feature_name, std::size_t index, core::ArgObject new_value)
         : feature(std::move(feature_name))
         , param_index(index)
         , value(std::move(new_value))
-        , previous_value(std::move(old_value))
     {
     }
 
     std::string feature; //> 功能唯一名称
     std::size_t param_index { 0 }; //> 参数在参数列表中的下标
     core::ArgObject value; //> 新参数值
-    core::ArgObject previous_value; //> 本次写入前的值，沿用参数载荷的值语义
 };
 
 /**

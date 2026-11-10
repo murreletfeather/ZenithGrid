@@ -130,9 +130,9 @@ FillGapFixture addGapPair(ModelLayer& model_layer, bool reverse_retry = false)
 std::shared_ptr<Selection> makeEdgeSelection(const FillGapFixture& fixture)
 {
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::GeometryEdge);
+    selection->type = ElementEnum::GeometryEdge;
     selection->component_id = fixture.component_id;
-    selection->ids() = { fixture.seed_edge_id };
+    selection->ids = { fixture.seed_edge_id };
     return selection;
 }
 

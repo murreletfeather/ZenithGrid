@@ -140,9 +140,9 @@ MergeFaceFixture addMergeableFaces(ModelLayer& model_layer)
 std::shared_ptr<Selection> makeFaceSelection(const MergeFaceFixture& fixture)
 {
     auto selection = std::make_shared<Selection>();
-    selection->setType(ElementEnum::GeometryFace);
+    selection->type = ElementEnum::GeometryFace;
     selection->component_id = fixture.component_id;
-    selection->ids().assign(fixture.face_ids.begin(), fixture.face_ids.end());
+    selection->ids.assign(fixture.face_ids.begin(), fixture.face_ids.end());
     return selection;
 }
 

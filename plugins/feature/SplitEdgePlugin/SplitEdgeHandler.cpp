@@ -29,13 +29,13 @@ std::any SplitEdgeHandler::execute(FeatureContext& ctx)
 {
     const auto* selection = ctx.params.value(0).get<ArgTypeEnum::Selector>();
     const auto* ratio = ctx.params.value(1).get<ArgTypeEnum::Float>();
-    if (!selection || !*selection || (*selection)->type() != ElementEnum::GeometryEdge
-        || (*selection)->ids().size() != 1)
+    if (!selection || !*selection || (*selection)->type != ElementEnum::GeometryEdge
+        || (*selection)->ids.size() != 1)
         return std::string("请选择一条需要分割的几何边。");
     if (!ratio || *ratio <= 0.0 || *ratio >= 1.0)
         return std::string("分割比例必须位于 0 和 1 之间。");
     try {
-        const Index edge_id = (*selection)->ids().front();
+        const Index edge_id = (*selection)->ids.front();
         const auto component_id = ctx.model.findComponentIdByGeometryShapeId(TopAbs_EDGE, edge_id);
         const TopoDS_Shape* shape = ctx.model.geomRegistry().getEdge(edge_id);
         if (!component_id || !shape)

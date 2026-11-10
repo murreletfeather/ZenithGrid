@@ -5,7 +5,6 @@
 #include "FeatureContext.h"
 #include "FeatureEvents.h"
 #include "FeatureHandler.h"
-#include "FeatureParams.h"
 #include "FeatureRegistrar.h"
 #include "FeatureSystem.h"
 #include "GeometryData.h"
@@ -16,7 +15,6 @@
 #include "ModelData.h"
 #include "ModelIOSystem.h"
 #include "ModelLayer.h"
-#include "Selection.h"
 #include "UndoStack.h"
 #include "test/OwnerQueue.h"
 #include <BRepPrimAPI_MakeBox.hxx>
@@ -152,16 +150,6 @@ public:
     double last_float_value = 0.0;
 };
 
-/** @brief 只声明一个选择参数，用真实安装与恢复入口验证选择值的所有权。 */
-class SelectorFeatureHandler : public FeatureHandler {
-public:
-    /** @brief 参数声明在重注册前后保持一致，以触发已有参数恢复路径。 */
-    void setup(FeatureRegistrar& reg, FeatureContext&) override
-    {
-        reg.addParameter({ ArgTypeEnum::Selector, "目标面", "GeometryFace", "" });
-    }
-};
-
 HandlerMetaData makeMetaData()
 {
     HandlerMetaData meta_data;
@@ -217,12 +205,7 @@ TEST_CASE("FeatureSystem::setParameter updates value and publishes event", "[Fea
     FeatureSystem::SystemHandlerPtr handler { raw };
     REQUIRE(system.registerHandler(makeMetaData(), std::move(handler)));
 
-    double previous = 0;
-    auto subscription = bus.subscribe<ParameterChangedEvent>([&](const ParameterChangedEvent& event) {
-        previous = *event.previous_value.get<ArgTypeEnum::Float>();
-    });
     REQUIRE(system.setParameter("FakeFeature", 0, core::ArgObject::create<ArgTypeEnum::Float>(2.5)));
-    CHECK(previous == 1.5);
     // 功能在 setup 中订阅了参数变更事件，实时收到新值
     REQUIRE(raw->last_param_index == 0);
     REQUIRE(raw->last_float_value == 2.5);
@@ -230,116 +213,6 @@ TEST_CASE("FeatureSystem::setParameter updates value and publishes event", "[Fea
 
     REQUIRE_FALSE(system.setParameter("NoSuchFeature", 0, { }));
     REQUIRE_FALSE(system.setParameter("FakeFeature", 99, { }));
-}
-
-TEST_CASE("FeatureParams owns topology and precise selection values across installation and copying", "[FeatureSystem][params][selection]")
-{
-    std::shared_ptr<Selection> source;
-    SECTION("Topology IDs")
-    {
-        source = std::make_shared<Selection>(std::vector<Index> { 17 }, ElementEnum::GeometryFace, 7);
-    }
-    SECTION("Precise geometry points")
-    {
-        GeometryPoint point;
-        point.component_id = 7;
-        point.support_kind = GeometryPointKind::Face;
-        point.support_id = 17;
-        point.world_pos = { 1.0, 2.0, 3.0 };
-        point.valid = true;
-        source = std::make_shared<Selection>(Selection::create<ElementEnum::GeometryPoint>({ point }, 7));
-    }
-    const Selection expected = *source;
-    FeatureParams params({ { ArgTypeEnum::Selector, "选择", "", "" } });
-    params.setValue(0, core::ArgObject::create<ArgTypeEnum::Selector>(source));
-
-    // 调用方复用并改写原对象，已安装参数仍应保留提交时的类型、身份与载荷。
-    source->setType(ElementEnum::GeometryEdge);
-    source->component_id = 42;
-    source->ids() = { 99 };
-    const auto require_snapshot = [&expected](const FeatureParams& snapshot) {
-        const auto* value = snapshot.value(0).get<ArgTypeEnum::Selector>();
-        REQUIRE(value);
-        REQUIRE(*value);
-        CHECK((*value)->type() == expected.type());
-        CHECK((*value)->component_id == expected.component_id);
-        if (const auto* expected_points = expected.get<ElementEnum::GeometryPoint>()) {
-            const auto* points = (*value)->get<ElementEnum::GeometryPoint>();
-            REQUIRE(points);
-            REQUIRE(points->size() == expected_points->size());
-            CHECK(points->front().support_id == expected_points->front().support_id);
-            CHECK(points->front().world_pos == expected_points->front().world_pos);
-        } else {
-            CHECK((*value)->ids() == expected.ids());
-        }
-    };
-    require_snapshot(params);
-
-    FeatureParams copied(params);
-    FeatureParams assigned(std::vector<core::ArgType> { });
-    assigned = params;
-    const auto installed = *params.value(0).get<ArgTypeEnum::Selector>();
-    installed->setType(ElementEnum::GeometryEdge);
-    installed->component_id = 55;
-    installed->ids() = { 88 };
-    require_snapshot(copied);
-    require_snapshot(assigned);
-
-    // 空选择仍保留 Selector 载荷，不能退化为无类型参数。
-    params.setValue(0, core::ArgObject::create<ArgTypeEnum::Selector>({ }));
-    REQUIRE(params.value(0).get<ArgTypeEnum::Selector>());
-    CHECK_FALSE(*params.value(0).get<ArgTypeEnum::Selector>());
-}
-
-TEST_CASE("FeatureSystem publishes installed selector values and preserves the previous target when a caller reuses its object", "[FeatureSystem][params][selection]")
-{
-    core::EventBus bus;
-    ModelLayer model;
-    FeatureSystem system(model, bus);
-    REQUIRE(system.registerHandler(makeMetaData(), FeatureSystem::SystemHandlerPtr { std::make_unique<SelectorFeatureHandler>().release() }));
-    std::vector<ParameterChangedEvent> events;
-    auto subscription = bus.subscribe<ParameterChangedEvent>([&events](const ParameterChangedEvent& event) {
-        events.push_back(event);
-    });
-    auto source = std::make_shared<Selection>(std::vector<Index> { 17 }, ElementEnum::GeometryFace, 7);
-    REQUIRE(system.setParameter("FakeFeature", 0, core::ArgObject::create<ArgTypeEnum::Selector>(source)));
-
-    // 同一对象从 A 改为 B 再提交，前值必须仍是 A，不能提前跟着调用方变成 B。
-    source->ids().front() = 23;
-    REQUIRE(system.setParameter("FakeFeature", 0, core::ArgObject::create<ArgTypeEnum::Selector>(source)));
-    REQUIRE(events.size() == 2);
-    REQUIRE(events.back().previous_value.get<ArgTypeEnum::Selector>());
-    REQUIRE(*events.back().previous_value.get<ArgTypeEnum::Selector>());
-    CHECK((*events.back().previous_value.get<ArgTypeEnum::Selector>())->ids() == std::vector<Index> { 17 });
-    const auto installed = *system.params("FakeFeature")->value(0).get<ArgTypeEnum::Selector>();
-    REQUIRE(installed);
-    CHECK(installed->ids() == std::vector<Index> { 23 });
-    REQUIRE(events.back().value.get<ArgTypeEnum::Selector>());
-    CHECK(*events.back().value.get<ArgTypeEnum::Selector>() == installed);
-
-    source->ids().front() = 31;
-    CHECK(installed->ids() == std::vector<Index> { 23 });
-    CHECK((*events.back().value.get<ArgTypeEnum::Selector>())->ids() == std::vector<Index> { 23 });
-    CHECK((*events.back().previous_value.get<ArgTypeEnum::Selector>())->ids() == std::vector<Index> { 17 });
-}
-
-TEST_CASE("Feature replacement restores a selector independently of values retained from the old feature", "[FeatureSystem][params][selection]")
-{
-    core::EventBus bus;
-    ModelLayer model;
-    FeatureSystem system(model, bus);
-    REQUIRE(system.registerHandler(makeMetaData(), FeatureSystem::SystemHandlerPtr { std::make_unique<SelectorFeatureHandler>().release() }));
-    REQUIRE(system.setParameter("FakeFeature", 0, core::ArgObject::create<ArgTypeEnum::Selector>(std::make_shared<Selection>(std::vector<Index> { 17 }, ElementEnum::GeometryFace, 7))));
-    const auto previous = *system.params("FakeFeature")->value(0).get<ArgTypeEnum::Selector>();
-    REQUIRE(previous);
-    REQUIRE(system.registerHandler(makeMetaData(), FeatureSystem::SystemHandlerPtr { std::make_unique<SelectorFeatureHandler>().release() }));
-
-    // 重注册保留业务值，但旧实例泄露到外部的可变句柄不能继续改写新实例参数。
-    previous->ids().front() = 23;
-    const auto restored = *system.params("FakeFeature")->value(0).get<ArgTypeEnum::Selector>();
-    REQUIRE(restored);
-    CHECK(restored->ids() == std::vector<Index> { 17 });
-    CHECK(restored->component_id == 7);
 }
 
 TEST_CASE("FeatureSystem::invoke dispatches to execute", "[FeatureSystem]")

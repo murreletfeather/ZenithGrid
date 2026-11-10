@@ -80,9 +80,9 @@ void ComponentSelectorHighlight::refreshHighlight()
 SelectionVtk ComponentSelectorHighlight::get() const
 {
     SelectionVtk back_selection;
-    back_selection.setType(ElementEnum::Component);
+    back_selection.type = ElementEnum::Component;
     for (const auto& component_id : selected_components_)
-        back_selection.ids().push_back(component_id);
+        back_selection.ids.push_back(component_id);
     return back_selection;
 }
 

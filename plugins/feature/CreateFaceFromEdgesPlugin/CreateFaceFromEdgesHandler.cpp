@@ -36,7 +36,7 @@ std::any CreateFaceFromEdgesHandler::execute(FeatureContext& ctx)
     if (!selection_param || !*selection_param)
         return std::string("请选择闭合轮廓边。");
     const std::shared_ptr<Selection>& selected = *selection_param;
-    if (selected->type() != ElementEnum::GeometryEdge || selected->ids().empty())
+    if (selected->type != ElementEnum::GeometryEdge || selected->ids.empty())
         return std::string("请选择闭合轮廓边。");
 
     try {
@@ -47,8 +47,8 @@ std::any CreateFaceFromEdgesHandler::execute(FeatureContext& ctx)
 
         const auto& component_edge_ids = component->geometry->index.edge_local_to_global;
         std::vector<TopoDS_Edge> edges;
-        edges.reserve(selected->ids().size());
-        for (Index id : selected->ids()) {
+        edges.reserve(selected->ids.size());
+        for (Index id : selected->ids) {
             if (std::find(component_edge_ids.begin(), component_edge_ids.end(), id)
                 == component_edge_ids.end())
                 return std::string("所选轮廓边必须属于目标组件。");

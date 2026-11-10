@@ -44,8 +44,8 @@ std::any AutoGeometryRepairHandler::execute(FeatureContext& ctx)
 {
     const auto* target_param = ctx.params.value(kTargetParam).get<ArgTypeEnum::Selector>();
     if (!target_param || !*target_param
-        || (*target_param)->type() != ElementEnum::Component
-        || (*target_param)->ids().size() != 1) {
+        || (*target_param)->type != ElementEnum::Component
+        || (*target_param)->ids.size() != 1) {
         return std::string("请选择一个几何组件。");
     }
     const double* tolerance = ctx.params.value(kToleranceParam).get<ArgTypeEnum::Float>();
@@ -56,7 +56,7 @@ std::any AutoGeometryRepairHandler::execute(FeatureContext& ctx)
         return std::string("执行模式参数无效。");
 
     try {
-        const Index component_id = (*target_param)->ids().front();
+        const Index component_id = (*target_param)->ids.front();
         ComponentData* component = ctx.model.findComponent(component_id);
         if (!component)
             return std::string("所选组件已失效。");

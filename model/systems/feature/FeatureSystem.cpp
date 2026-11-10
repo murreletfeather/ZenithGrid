@@ -353,10 +353,8 @@ bool FeatureSystem::setParameter(const std::string& unique_name, std::size_t ind
         spdlog::error("FeatureSystem::setParameter: param index {} out of range for feature '{}'", index, unique_name);
         return false;
     }
-    const auto previous = it->second.params.value(index);
     it->second.params.setValue(index, value);
-    // 事件使用实际安装的值，避免重新把调用方的可变选择对象暴露给订阅者。
-    event_bus_->publish(ParameterChangedEvent { unique_name, index, it->second.params.value(index), previous });
+    event_bus_->publish(ParameterChangedEvent { unique_name, index, std::move(value) });
     return true;
 }
 

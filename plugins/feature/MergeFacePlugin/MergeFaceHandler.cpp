@@ -33,17 +33,17 @@ std::any MergeFaceHandler::execute(FeatureContext& ctx)
 {
     const auto* face_param = ctx.params.value(0).get<ArgTypeEnum::Selector>();
     if (!face_param || !*face_param
-        || (*face_param)->type() != ElementEnum::GeometryFace
-        || (*face_param)->ids().size() < 2)
+        || (*face_param)->type != ElementEnum::GeometryFace
+        || (*face_param)->ids.size() < 2)
         return std::string("请选择两个或多个需要合并的几何面。");
 
     try {
         std::optional<Index> component_id;
         std::vector<TopoDS_Face> faces;
-        faces.reserve((*face_param)->ids().size());
+        faces.reserve((*face_param)->ids.size());
 
         // 从每个全局面 ID 反查组件，选择集必须完全属于同一个组件。
-        for (Index face_id : (*face_param)->ids()) {
+        for (Index face_id : (*face_param)->ids) {
             const auto face_component_id =
                 ctx.model.findComponentIdByGeometryShapeId(TopAbs_FACE, face_id);
             if (!face_component_id)
