@@ -731,6 +731,71 @@ TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks"
     check_empty();
 }
 
+TEST_CASE("Actual QML deletes the selected object tree node", "[QML][tree][selection][delete]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto* tree_model = f.tree->findChild<TreeModel*>();
+    auto* selection_state = f.selection_state;
+    REQUIRE(tree_model);
+    REQUIRE(selection_state);
+
+    ComponentDatas components;
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    components.push_back(std::move(component));
+    const Index model_id = model.addModel("delete fixture", std::move(components));
+    const Index component_id = model.modelById(model_id)->componentIds().front();
+    REQUIRE(tree_model->refresh());
+
+    const auto select = [&](Index node_id, int depth, Index component_id) {
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "applyNodeSelection",
+            Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth), Q_ARG(QVariant, component_id)));
+    };
+    const auto delete_selected = [&] {
+        QVariant deleted;
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "deleteSelectedNode",
+            Q_RETURN_ARG(QVariant, deleted)));
+        return deleted.toBool();
+    };
+
+    // 无选中时不执行删除。
+    CHECK_FALSE(delete_selected());
+
+    // 删除选中的 Mesh 子节点：组件保留，选中态保留。
+    const QModelIndex component_index = tree_model->findIndexByNodeId(component_id, 1);
+    REQUIRE(component_index.isValid());
+    const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
+    REQUIRE(mesh_index.isValid());
+    const Index mesh_node_id = tree_model->data(mesh_index, TreeModel::NodeIdRole).toInt();
+    select(mesh_node_id, 2, component_id);
+    CHECK(delete_selected());
+    CHECK(model.findComponent(component_id));
+    CHECK(model.findComponent(component_id)->mesh == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_id);
+    // 选中行身份已清空，重复 Delete 不会再次删除。
+    CHECK_FALSE(delete_selected());
+
+    // 删除选中的 Component：所属模型保留，选中态重置。
+    select(component_id, 1, component_id);
+    CHECK(delete_selected());
+    CHECK(model.findComponent(component_id) == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+
+    // 删除选中的 Model：模型移除，选中态重置。
+    select(model_id, 0, -1);
+    CHECK(delete_selected());
+    CHECK(model.modelById(model_id) == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+
+    pumpEvents();
+}
+
 TEST_CASE("Actual QML preserves expanded rows across incremental imports and deletes", "[QML][tree]")
 {
     application();

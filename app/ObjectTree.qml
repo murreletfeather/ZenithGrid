@@ -63,7 +63,7 @@ Pane {
 
     // 恢复左键选中的行；节点已不存在时退回清空。
     function restoreNodeSelection() {
-        if (_selectedNodeId < 0 || _selectedDepth < 0) {
+        if (_selectedDepth < 0) {
             treeView.selectionModel.clear()
             return
         }
@@ -77,6 +77,7 @@ Pane {
 
     // 左键点击行的唯一入口：depth>2 不参与选中；同节点再次点击取消。
     function applyNodeSelection(nodeId, depth, componentId) {
+        treeView.forceActiveFocus()
         if (depth > 2) {
             restoreNodeSelection()
             return
@@ -470,6 +471,11 @@ Pane {
 
         selectionModel: ItemSelectionModel {}
 
+        Keys.onDeletePressed: {
+            if (objectTree.deleteSelectedNode())
+                event.accepted = true
+        }
+
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AsNeeded
             background: Rectangle {
@@ -531,6 +537,24 @@ Pane {
         } else if (depth === 2 && nodeType === objectTree._nodeTypeGeometry) {
             QModelManager.removeGeometry(componentId)
         }
+    }
+
+    // Delete 快捷键入口：删除当前左键选中的行。
+    function deleteSelectedNode() {
+        if (_selectedDepth < 0 || _selectedDepth > 2)
+            return false
+        const idx = treeModel.findIndexByNodeId(_selectedNodeId, _selectedDepth)
+        if (!idx || !idx.valid)
+            return false
+        const nodeType = treeModel.data(idx, TreeModel.NodeTypeRole)
+        const componentId = treeModel.data(idx, TreeModel.ComponentIdRole)
+        deleteNode(_selectedNodeId, _selectedDepth, nodeType, componentId)
+        // Mesh/Geometry 行已删除，但所属组件继续保留选中。
+        if (_selectedDepth === 2) {
+            _selectedNodeId = -1
+            _selectedDepth = -1
+        }
+        return true
     }
 
     function hideAllNodes() {
