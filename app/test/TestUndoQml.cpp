@@ -19,6 +19,7 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QGuiApplication>
+#include <QItemSelectionModel>
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -597,17 +598,18 @@ TEST_CASE("Actual QML follows successful deletion notifications and preserves se
     CHECK(selection_state->property("activeComponentId").toInt() == cid);
     // 直接修改模型层，验证界面响应实际删除通知，独立于对象树命令入口。
     model.removeComponent(cid);
-    CHECK(selection_state->property("activeModelId").toInt() == mid);
-    CHECK(selection_state->property("activeComponentId").toInt() == remaining_cid);
-    pumpEvents();
-    CHECK(selection_state->property("activeModelId").toInt() == mid);
-    CHECK(selection_state->property("activeComponentId").toInt() == remaining_cid);
-    // 删除最后一个组件仍保留模型选择。
-    model.removeComponent(remaining_cid);
-    CHECK(selection_state->property("activeModelId").toInt() == mid);
+    // 删除当前选中组件后重置选中，不自动选中剩余组件。
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
     pumpEvents();
-    CHECK(selection_state->property("activeModelId").toInt() == mid);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+    // 后续删除不改变已清空的选中。
+    model.removeComponent(remaining_cid);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+    pumpEvents();
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
     model.removeModel(mid);
     CHECK(selection_state->property("activeModelId").toInt() == -1);
@@ -628,6 +630,226 @@ TEST_CASE("Actual QML follows successful deletion notifications and preserves se
     pumpEvents();
     CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
+}
+
+TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks", "[QML][tree][selection]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto* tree_model = f.tree->findChild<TreeModel*>();
+    auto* tree_view = f.tree->findChild<QObject*>("objectTreeView");
+    auto* selection_state = f.selection_state;
+    REQUIRE(tree_model);
+    REQUIRE(tree_view);
+    REQUIRE(selection_state);
+
+    auto make_component = [] {
+        auto component = std::make_unique<ComponentData>();
+        component->mesh = std::make_unique<MeshData>();
+        component->mesh->vertex_positions_ = { { 0.0, 0.0, 0.0 }, { 1.0, 0.0, 0.0 }, { 0.0, 1.0, 0.0 } };
+        component->mesh->vertex_count_ = 3;
+        // 生成 Mesh -> 3D 子节点，用于覆盖 depth>2 行。
+        component->mesh->solid_types_.assign(1, 0);
+        return component;
+    };
+    ComponentDatas components;
+    components.push_back(make_component());
+    components.push_back(make_component());
+    const Index model_id = model.addModel("selection fixture", std::move(components));
+    const auto component_ids = model.modelById(model_id)->componentIds();
+    REQUIRE(component_ids.size() == 2);
+    REQUIRE(tree_model->refresh());
+
+    auto* selection_model = tree_view->property("selectionModel").value<QItemSelectionModel*>();
+    REQUIRE(selection_model);
+
+    const auto apply = [&](Index node_id, int depth, Index component_id) {
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "applyNodeSelection",
+            Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth), Q_ARG(QVariant, component_id)));
+    };
+    const auto check_selected = [&](Index node_id, int depth) {
+        const QModelIndex index = tree_model->findIndexByNodeId(node_id, depth);
+        REQUIRE(index.isValid());
+        CHECK(selection_model->isSelected(index));
+        CHECK(selection_model->selectedIndexes().size() == 1);
+    };
+    const auto check_empty = [&] {
+        CHECK_FALSE(selection_model->hasSelection());
+        CHECK(selection_state->property("activeModelId").toInt() == -1);
+        CHECK(selection_state->property("activeComponentId").toInt() == -1);
+    };
+
+    // Component 左键选中，再次点击取消。
+    apply(component_ids[0], 1, component_ids[0]);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_ids[0]);
+    check_selected(component_ids[0], 1);
+    apply(component_ids[0], 1, component_ids[0]);
+    check_empty();
+
+    // Model 选中时关联其第一个 Component，再次点击取消。
+    apply(model_id, 0, -1);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_ids[0]);
+    check_selected(model_id, 0);
+    apply(model_id, 0, -1);
+    check_empty();
+
+    // 不同组件之间切换选中。
+    apply(component_ids[0], 1, component_ids[0]);
+    apply(component_ids[1], 1, component_ids[1]);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
+    check_selected(component_ids[1], 1);
+
+    // depth>2 不参与选中；即使默认点击清空了 selectionModel，也应恢复原选中行。
+    const QModelIndex component_index = tree_model->findIndexByNodeId(component_ids[1], 1);
+    REQUIRE(component_index.isValid());
+    const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
+    REQUIRE(mesh_index.isValid());
+    const QModelIndex sub_index = tree_model->index(0, 0, mesh_index);
+    REQUIRE(sub_index.isValid());
+    const Index sub_node_id = tree_model->data(sub_index, TreeModel::NodeIdRole).toInt();
+    CHECK(tree_model->data(sub_index, TreeModel::NodeTypeRole).toInt()
+        == static_cast<int>(TreeNode::NodeType::D3));
+    selection_model->clear();
+    apply(sub_node_id, 3, component_ids[1]);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
+    check_selected(component_ids[1], 1);
+
+    // undo/redo 应用后清空对象树选中态。
+    auto* undo = f.manager->getUndoStackAdaptor();
+    REQUIRE(undo);
+    REQUIRE(QMetaObject::invokeMethod(undo, "applied"));
+    check_empty();
+
+    model.removeModel(model_id);
+    pumpEvents();
+    check_empty();
+}
+
+TEST_CASE("Actual QML emphasizes depth-2 selection with its ancestors", "[QML][tree][selection]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto* tree_model = f.tree->findChild<TreeModel*>();
+    REQUIRE(tree_model);
+
+    ComponentDatas components;
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    components.push_back(std::move(component));
+    const Index model_id = model.addModel("emphasis fixture", std::move(components));
+    const Index component_id = model.modelById(model_id)->componentIds().front();
+    REQUIRE(tree_model->refresh());
+
+    const QModelIndex component_index = tree_model->findIndexByNodeId(component_id, 1);
+    REQUIRE(component_index.isValid());
+    const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
+    REQUIRE(mesh_index.isValid());
+    const Index mesh_node_id = tree_model->data(mesh_index, TreeModel::NodeIdRole).toInt();
+
+    const auto select = [&](Index node_id, int depth, Index owner_id) {
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "applyNodeSelection",
+            Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth), Q_ARG(QVariant, owner_id)));
+    };
+    const auto emphasized = [&](Index node_id, int depth) {
+        QVariant result;
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "isNodeEmphasized",
+            Q_RETURN_ARG(QVariant, result), Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth)));
+        return result.toBool();
+    };
+
+    // 选中 Component：Model 与 Component 加粗，depth=2 行不加粗。
+    select(component_id, 1, component_id);
+    CHECK(emphasized(model_id, 0));
+    CHECK(emphasized(component_id, 1));
+    CHECK_FALSE(emphasized(mesh_node_id, 2));
+
+    // 选中 depth=2 行：父级继续加粗，该行也加粗。
+    select(mesh_node_id, 2, component_id);
+    CHECK(emphasized(model_id, 0));
+    CHECK(emphasized(component_id, 1));
+    CHECK(emphasized(mesh_node_id, 2));
+
+    // 再次点击取消后全部恢复常规字重。
+    select(mesh_node_id, 2, component_id);
+    CHECK_FALSE(emphasized(model_id, 0));
+    CHECK_FALSE(emphasized(component_id, 1));
+    CHECK_FALSE(emphasized(mesh_node_id, 2));
+
+    model.removeModel(model_id);
+    pumpEvents();
+}
+
+TEST_CASE("Actual QML deletes the selected object tree node", "[QML][tree][selection][delete]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto* tree_model = f.tree->findChild<TreeModel*>();
+    auto* selection_state = f.selection_state;
+    REQUIRE(tree_model);
+    REQUIRE(selection_state);
+
+    ComponentDatas components;
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    components.push_back(std::move(component));
+    const Index model_id = model.addModel("delete fixture", std::move(components));
+    const Index component_id = model.modelById(model_id)->componentIds().front();
+    REQUIRE(tree_model->refresh());
+
+    const auto select = [&](Index node_id, int depth, Index component_id) {
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "applyNodeSelection",
+            Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth), Q_ARG(QVariant, component_id)));
+    };
+    const auto delete_selected = [&] {
+        QVariant deleted;
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "deleteSelectedNode",
+            Q_RETURN_ARG(QVariant, deleted)));
+        return deleted.toBool();
+    };
+
+    // 无选中时不执行删除。
+    CHECK_FALSE(delete_selected());
+
+    // 删除选中的 Mesh 子节点：组件保留，选中态保留。
+    const QModelIndex component_index = tree_model->findIndexByNodeId(component_id, 1);
+    REQUIRE(component_index.isValid());
+    const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
+    REQUIRE(mesh_index.isValid());
+    const Index mesh_node_id = tree_model->data(mesh_index, TreeModel::NodeIdRole).toInt();
+    select(mesh_node_id, 2, component_id);
+    CHECK(delete_selected());
+    CHECK(model.findComponent(component_id));
+    CHECK(model.findComponent(component_id)->mesh == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == model_id);
+    CHECK(selection_state->property("activeComponentId").toInt() == component_id);
+    // 选中行身份已清空，重复 Delete 不会再次删除。
+    CHECK_FALSE(delete_selected());
+
+    // 删除选中的 Component：所属模型保留，选中态重置。
+    select(component_id, 1, component_id);
+    CHECK(delete_selected());
+    CHECK(model.findComponent(component_id) == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+
+    // 删除选中的 Model：模型移除，选中态重置。
+    select(model_id, 0, -1);
+    CHECK(delete_selected());
+    CHECK(model.modelById(model_id) == nullptr);
+    CHECK(selection_state->property("activeModelId").toInt() == -1);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+
+    pumpEvents();
 }
 
 TEST_CASE("Actual QML preserves expanded rows across incremental imports and deletes", "[QML][tree]")

@@ -44,6 +44,72 @@ Pane {
     readonly property int _nodeTypeMesh: 2
     readonly property int _nodeTypeGeometry: 3
 
+    // 左键选中的节点身份；depth>2 不参与选中，故不会记录。
+    property int _selectedNodeId: -1
+    property int _selectedDepth: -1
+
+    function isNodeSelected(nodeId, depth) {
+        return _selectedNodeId === nodeId && _selectedDepth === depth
+    }
+
+    // 加粗行：活动 Model/Component，以及左键选中的 depth=2 行。
+    function isNodeEmphasized(nodeId, depth) {
+        if (depth === 0)
+            return nodeId === App.selection.activeModelId
+        if (depth === 1)
+            return nodeId === App.selection.activeComponentId
+        return depth === 2 && isNodeSelected(nodeId, depth)
+    }
+
+    // 清空对象树选中态，同时清除活动模型与组件。
+    function clearNodeSelection() {
+        _selectedNodeId = -1
+        _selectedDepth = -1
+        treeView.selectionModel.clear()
+        App.selection.activeComponentId = -1
+        App.selection.activeModelId = -1
+    }
+
+    // 恢复左键选中的行；节点已不存在时退回清空。
+    function restoreNodeSelection() {
+        if (_selectedDepth < 0) {
+            treeView.selectionModel.clear()
+            return
+        }
+        const idx = treeModel.findIndexByNodeId(_selectedNodeId, _selectedDepth)
+        if (!idx || !idx.valid) {
+            clearNodeSelection()
+            return
+        }
+        treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
+    }
+
+    // 左键点击行的唯一入口：depth>2 不参与选中；同节点再次点击取消。
+    function applyNodeSelection(nodeId, depth, componentId) {
+        treeView.forceActiveFocus()
+        if (depth > 2) {
+            restoreNodeSelection()
+            return
+        }
+        if (isNodeSelected(nodeId, depth)) {
+            clearNodeSelection()
+            return
+        }
+        const idx = treeModel.findIndexByNodeId(nodeId, depth)
+        if (!idx || !idx.valid)
+            return
+        treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
+        _selectedNodeId = nodeId
+        _selectedDepth = depth
+        if (depth === 0) {
+            App.selection.activeModelId = nodeId
+            App.selection.activeComponentId = firstComponentId(nodeId)
+        } else {
+            App.selection.activeComponentId = componentId
+            App.selection.activeModelId = QModelManager.query.findModelIdByComponent(componentId)
+        }
+    }
+
     // 树内容底部在视口中的位置，用于空白右键区跟随滚动。
     readonly property real _blankTop:
         Math.max(0, Math.min(treeView.height, treeView.contentHeight - treeView.contentY))
@@ -67,11 +133,8 @@ Pane {
         }
 
         function onModelRemoved(modelId) {
-            if (App.selection.activeModelId === modelId) {
-                treeView.selectionModel.clear()
-                App.selection.activeComponentId = -1
-                App.selection.activeModelId = -1
-            }
+            if (App.selection.activeModelId === modelId)
+                objectTree.clearNodeSelection()
             treeModel.requestRefresh()
         }
 
@@ -80,21 +143,22 @@ Pane {
         }
 
         function onComponentRemoved(componentId) {
-            if (App.selection.activeComponentId === componentId) {
-                // 实际删除当前组件后保留所属模型，并选择剩余的第一个组件。
-                const ownerModelId = App.selection.activeModelId
-                treeView.selectionModel.clear()
-                App.selection.activeComponentId = -1
-                treeModel.requestRefresh()
-                App.selection.activeComponentId = QModelManager.query.hasModel(ownerModelId)
-                        ? objectTree.firstComponentId(ownerModelId) : -1
-            } else {
-                treeModel.requestRefresh()
-            }
+            // 删除当前组件后直接重置选中，不再自动选中剩余组件。
+            if (App.selection.activeComponentId === componentId)
+                objectTree.clearNodeSelection()
+            treeModel.requestRefresh()
         }
 
         function onComponentChanged(componentId) {
             treeModel.requestRefresh()
+        }
+    }
+
+    Connections {
+        target: QModelManager.undoStack
+
+        function onApplied() {
+            objectTree.clearNodeSelection()
         }
     }
 
@@ -179,12 +243,6 @@ Pane {
             readonly property real _padding: 6
             readonly property real _rowHeight: 22
             readonly property real _indentWidth: 20
-            readonly property bool _isActiveModel:
-                viewDelegate.depth === 0
-                && viewDelegate.model.nodeId === App.selection.activeModelId
-            readonly property bool _isActiveComponent:
-                viewDelegate.depth === 1
-                && viewDelegate.model.nodeId === App.selection.activeComponentId
             leftPadding: _padding + depth * _indentWidth + 18
             rightPadding: 0
 
@@ -247,8 +305,7 @@ Pane {
                     color: viewDelegate.model.isVisible ? Theme.textPrimary : Theme.textDisabled
                     font.pixelSize: Theme.fontSizeBody
                     font.family: Theme.monoFamily
-                    font.weight: viewDelegate._isActiveModel
-                                 || viewDelegate._isActiveComponent
+                    font.weight: objectTree.isNodeEmphasized(viewDelegate.model.nodeId, viewDelegate.depth)
                                  ? Font.Bold : Font.Normal
                     font.italic: !viewDelegate.model.isVisible
                     elide: Text.ElideRight
@@ -325,37 +382,17 @@ Pane {
                         return
                     }
                     if (mouse.button === Qt.RightButton) {
-                        if (viewDelegate.depth > 2) return
-                        contextMenu.popup()
-                    } else {
-                        let idx = treeModel.findIndexByNodeId(viewDelegate.model.nodeId, viewDelegate.depth)
-                        let compId = viewDelegate.model.componentId
-
-                        if (!idx.valid) {
-                            return
-                        } else if (viewDelegate.depth === 0
-                                   && App.selection.activeModelId === viewDelegate.model.nodeId) {
-                            // Model 与 Component 是同一业务目标，取消时同步清空。
-                            viewDelegate.treeView.selectionModel.clear()
-                            App.selection.activeComponentId = -1
-                            App.selection.activeModelId = -1
-                        } else if (viewDelegate.depth === 0) {
-                            // 选择 Model 时同步关联其第一个 Component。
-                            viewDelegate.treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
-                            App.selection.activeModelId = viewDelegate.model.nodeId
-                            App.selection.activeComponentId = objectTree.firstComponentId(viewDelegate.model.nodeId)
-                        } else if (viewDelegate.depth === 1
-                                   && App.selection.activeComponentId === compId) {
-                            // Component 与所属 Model 同步取消。
-                            viewDelegate.treeView.selectionModel.clear()
-                            App.selection.activeComponentId = -1
-                            App.selection.activeModelId = -1
+                        // 只有左键选中的行才弹节点菜单；其余行与空白区共用全局菜单。
+                        if (viewDelegate.depth <= 2
+                                && objectTree.isNodeSelected(viewDelegate.model.nodeId, viewDelegate.depth)) {
+                            contextMenu.popup()
                         } else {
-                            viewDelegate.treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
-                            App.selection.activeComponentId = compId
-                            App.selection.activeModelId = QModelManager.query.findModelIdByComponent(compId)
+                            blankContextMenu.popup()
                         }
+                        return
                     }
+                    objectTree.applyNodeSelection(
+                        viewDelegate.model.nodeId, viewDelegate.depth, viewDelegate.model.componentId)
                 }
             }
 
@@ -436,6 +473,11 @@ Pane {
 
         selectionModel: ItemSelectionModel {}
 
+        Keys.onDeletePressed: {
+            if (objectTree.deleteSelectedNode())
+                event.accepted = true
+        }
+
         ScrollBar.vertical: ScrollBar {
             policy: ScrollBar.AsNeeded
             background: Rectangle {
@@ -497,6 +539,24 @@ Pane {
         } else if (depth === 2 && nodeType === objectTree._nodeTypeGeometry) {
             QModelManager.removeGeometry(componentId)
         }
+    }
+
+    // Delete 快捷键入口：删除当前左键选中的行。
+    function deleteSelectedNode() {
+        if (_selectedDepth < 0 || _selectedDepth > 2)
+            return false
+        const idx = treeModel.findIndexByNodeId(_selectedNodeId, _selectedDepth)
+        if (!idx || !idx.valid)
+            return false
+        const nodeType = treeModel.data(idx, TreeModel.NodeTypeRole)
+        const componentId = treeModel.data(idx, TreeModel.ComponentIdRole)
+        deleteNode(_selectedNodeId, _selectedDepth, nodeType, componentId)
+        // Mesh/Geometry 行已删除，但所属组件继续保留选中。
+        if (_selectedDepth === 2) {
+            _selectedNodeId = -1
+            _selectedDepth = -1
+        }
+        return true
     }
 
     function hideAllNodes() {
