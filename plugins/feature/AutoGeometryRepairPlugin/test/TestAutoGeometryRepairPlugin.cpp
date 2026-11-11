@@ -106,10 +106,10 @@ TEST_CASE("AutoGeometryRepair feature detects then repairs free edge gaps", "[Au
     CHECK(navigation_entries.front().menu_id == "geometry");
     CHECK(navigation_entries.front().group_id == "repair");
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::Component;
+    selection->setType(ElementEnum::Component);
     // component_id 是其他选择类型的归属提示；组件选择必须使用 ids 中的明确目标。
     selection->component_id = other.component_id;
-    selection->ids = { fixture.component_id };
+    selection->ids() = { fixture.component_id };
     REQUIRE(feature_system.setParameter("AutoGeometryRepair", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(selection)));
     REQUIRE(feature_system.setParameter("AutoGeometryRepair", 1,
@@ -159,14 +159,14 @@ TEST_CASE("AutoGeometryRepair requires one explicit valid component", "[AutoGeom
     for (int invalid_case = 0; invalid_case < 4; ++invalid_case) {
         CAPTURE(invalid_case);
         auto selection = std::make_shared<Selection>();
-        selection->type = invalid_case == 0 ? ElementEnum::GeometryFace : ElementEnum::Component;
-        selection->ids = { fixture.component_id };
+        selection->setType(invalid_case == 0 ? ElementEnum::GeometryFace : ElementEnum::Component);
+        selection->ids() = { fixture.component_id };
         if (invalid_case == 1)
-            selection->ids.clear();
+            selection->ids().clear();
         if (invalid_case == 2)
-            selection->ids.push_back(other.component_id);
+            selection->ids().push_back(other.component_id);
         if (invalid_case == 3)
-            selection->ids = { -1 };
+            selection->ids() = { -1 };
         REQUIRE(feature_system.setParameter("AutoGeometryRepair", 0,
             core::ArgObject::create<ArgTypeEnum::Selector>(selection)));
         const auto message = std::any_cast<std::string>(feature_system.invoke("AutoGeometryRepair"));

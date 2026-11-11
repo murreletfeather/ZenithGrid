@@ -12,6 +12,7 @@
 #include <vtkActor.h>
 
 class vtkRenderer;
+class GeometryPointResolver;
 class vtkPartitionedDataSet;
 class vtkCompositePolyDataMapper;
 class GeometryActorManagerSelectOp;
@@ -20,6 +21,9 @@ class GeometrySelectManager {
 public:
     GeometrySelectManager(vtkRenderer& renderer, vtkActor& highlight_actor, GeometryActorManagerSelectOp& op);
 
+    /** @brief 在渲染线程释放精确查询缓存和点显示。 */
+    ~GeometrySelectManager();
+
     void select(double posx, double posy, SelectOp op = SelectOp::Toggle);
 
     /**
@@ -27,7 +31,11 @@ public:
      * @note 框选永不清空——由各 selector 按 op 做集合运算（Append->并集 / Remove->差集 / Toggle->对称差）。
      */
     void selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle);
-    void setSelectMode(SelectMode select_mode);
+    void setSelectMode(SelectMode select_mode, double pixel_ratio = 1.0);
+    /** @brief 只更新几何位置悬停显示，不改变确认值。 */
+    void hover(double x, double y);
+    /** @brief 宿主替换几何后清查询缓存及受影响的点，组件 -1 表示全部。 */
+    void invalidateGeometry(Index component_id = -1);
     void clearSelection();
     std::unique_ptr<Selection> getSelection();
     void setHighlightVisible(bool visible);
@@ -54,6 +62,9 @@ private:
     bool highlight_visible_ { true };
 
     std::unordered_map<Index, std::unique_ptr<GeometrySelectorHighlight>> component_selectors_;
+    std::unique_ptr<GeometryPointResolver> point_resolver_;
+    std::unique_ptr<GeometryPointSelectorHighlight> point_selector_;
+    double pixel_ratio_ { 1.0 }; //> 当前视口像素比，不保存参数监听状态。
 };
 
 #endif

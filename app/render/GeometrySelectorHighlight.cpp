@@ -6,10 +6,114 @@
 #include <IVtkTools_SubPolyDataFilter.hxx>
 #include <IVtk_Types.hxx>
 #include <NCollection_List.hxx>
+#include <vtkCellArray.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkRenderer.h>
+#include <vtkUnsignedCharArray.h>
 #include <vtkActor.h>
 #include <vtkMapper.h>
 #include <vtkPartitionedDataSet.h>
 #include <vtkProperty.h>
+
+GeometryPointSelectorHighlight::GeometryPointSelectorHighlight(vtkRenderer& renderer)
+    : renderer_(&renderer)
+    , actor_(vtkSmartPointer<vtkActor>::New())
+    , data_(vtkSmartPointer<vtkPolyData>::New())
+{
+    vtkNew<vtkPolyDataMapper> mapper;
+    mapper->SetInputData(data_);
+    mapper->SetRelativeCoincidentTopologyPointOffsetParameter(highlight::POINT_UNITS);
+    mapper->SetScalarModeToUsePointFieldData();
+    mapper->SelectColorArray("Colors");
+    actor_->SetMapper(mapper);
+    actor_->GetProperty()->SetPointSize(9.0);
+    actor_->GetProperty()->SetRenderPointsAsSpheres(true);
+    actor_->PickableOff();
+    actor_->SetVisibility(false);
+    renderer_->AddActor(actor_);
+}
+
+GeometryPointSelectorHighlight::~GeometryPointSelectorHighlight()
+{
+    renderer_->RemoveActor(actor_);
+}
+
+void GeometryPointSelectorHighlight::select(const GeometryPoint& point)
+{
+    if (!point.valid)
+        return;
+    selection_ = Selection::create<ElementEnum::GeometryPoint>({ point }, point.component_id);
+    hover_ = { };
+    updateHighlight();
+}
+
+void GeometryPointSelectorHighlight::hover(const GeometryPoint& point)
+{
+    hover_ = point;
+    updateHighlight();
+}
+
+void GeometryPointSelectorHighlight::setComponentVisible(Index component_id, bool visible)
+{
+    if (visible)
+        hidden_components_.erase(component_id);
+    else
+        hidden_components_.insert(component_id);
+    updateHighlight();
+}
+
+void GeometryPointSelectorHighlight::clear()
+{
+    selection_ = Selection::create<ElementEnum::GeometryPoint>({ });
+    hover_ = { };
+    updateHighlight();
+}
+
+void GeometryPointSelectorHighlight::disableHighlight()
+{
+    visible_ = false;
+    updateHighlight();
+}
+
+void GeometryPointSelectorHighlight::enableHighlight()
+{
+    visible_ = true;
+    updateHighlight();
+}
+
+Selection GeometryPointSelectorHighlight::get() const
+{
+    return selection_;
+}
+
+void GeometryPointSelectorHighlight::updateHighlight()
+{
+    vtkNew<vtkPoints> points;
+    points->SetDataTypeToDouble();
+    vtkNew<vtkCellArray> vertices;
+    vtkNew<vtkUnsignedCharArray> colors;
+    colors->SetName("Colors");
+    colors->SetNumberOfComponents(3);
+    const auto append = [&](const GeometryPoint& point, unsigned char r, unsigned char g, unsigned char b) {
+        if (!point.valid || hidden_components_.contains(point.component_id))
+            return;
+        const auto id = points->InsertNextPoint(point.world_pos.data());
+        vertices->InsertNextCell(1, &id);
+        const unsigned char color[] { r, g, b };
+        colors->InsertNextTypedTuple(color);
+    };
+    for (const auto& point : *selection_.get<ElementEnum::GeometryPoint>())
+        append(point, 51, 229, 89);
+    append(hover_, 255, 165, 25);
+    data_->SetPoints(points);
+    data_->SetVerts(vertices);
+    data_->GetPointData()->SetScalars(colors);
+    data_->Modified();
+    actor_->SetVisibility(visible_ && points->GetNumberOfPoints() > 0);
+}
 
 // 把共享高亮 actor 挂到当前 selector 的 mapper 上，并按模式套用完整样式（避免残留上一模式属性）
 static void mountLineHighlight(vtkActor& actor, vtkMapper& mapper)
@@ -99,10 +203,10 @@ void GeometryFaceSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryFaceSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.type = ElementEnum::GeometryFace;
+    s.setType(ElementEnum::GeometryFace);
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids.push_back(geomId);
+        s.ids().push_back(geomId);
     return s;
 }
 
@@ -174,10 +278,10 @@ void GeometryEdgeSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryEdgeSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.type = ElementEnum::GeometryEdge;
+    s.setType(ElementEnum::GeometryEdge);
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids.push_back(geomId);
+        s.ids().push_back(geomId);
     return s;
 }
 
@@ -249,10 +353,10 @@ void GeometryVertexSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometryVertexSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.type = ElementEnum::GeometryVertex;
+    s.setType(ElementEnum::GeometryVertex);
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids.push_back(geomId);
+        s.ids().push_back(geomId);
     return s;
 }
 
@@ -325,10 +429,10 @@ void GeometrySolidSelectorHighlight::enableHighlight()
 GeometrySelectionVtk GeometrySolidSelectorHighlight::get() const
 {
     GeometrySelectionVtk s;
-    s.type = ElementEnum::GeometrySolid;
+    s.setType(ElementEnum::GeometrySolid);
     s.component_id = -1;
     for (const auto& [subId, geomId] : selections_)
-        s.ids.push_back(geomId);
+        s.ids().push_back(geomId);
     return s;
 }
 

@@ -15,6 +15,89 @@ QtObject {
     property var argumentTypes: []
     property string featureName: ""
     readonly property QSelection _emptySelection: QSelection {}
+    property int contextIndex: -1
+    property string _idleMode: "None"
+    readonly property var renderWindow: App.registry.renderWindow || null
+
+    // 统一结果只写入当前接收参数；控件销毁或滚出视区不会中断监听。
+    readonly property Connections _selectionChanges: Connections {
+        target: App.selection
+        function onSelectionUpdated(value) {
+            if (App.selection.parameterModel === root && App.selection.listeningSelectorIndex >= 0)
+                root.setValue(App.selection.listeningSelectorIndex, value);
+        }
+    }
+    readonly property Connections _viewportChanges: Connections {
+        target: root.renderWindow
+        function onSelectionFinished(revision) {
+            if (App.selection.parameterModel === root && revision === App.selection.selectionRevision) {
+                App.selection.listeningSelectorIndex = -1;
+                App.selection.selectMode = root._idleMode;
+            }
+        }
+        function onGeometryInvalidated(componentId) {
+            for (let i = 0; i < root.values.length; ++i) {
+                const value = root.values[i];
+                if (root.argumentTypes[i].type === QArgType.Selector && value && value.isGeometryPoint()
+                    && value.getComponentId() === componentId) {
+                    if (App.selection.parameterModel === root && App.selection.listeningSelectorIndex === i)
+                        root.stopSelection();
+                    root.setValue(i, null);
+                }
+            }
+        }
+    }
+
+    function startSelection(index) {
+        root.stopSelection();
+        root.contextIndex = index;
+        root._idleMode = App.selection.selectMode;
+        App.selection.parameterModel = root;
+        App.selection.listeningSelectorIndex = index;
+        const content = root.argumentTypes[index].content;
+        let mode = content.length > 0 ? content.split(",")[0] : "";
+        if (!mode) {
+            const cid = App.selection.activeComponentId;
+            const mesh = cid >= 0 ? QModelManager.query.getMeshSummary(cid) : ({});
+            const geometry = cid >= 0 ? QModelManager.query.getGeometrySummary(cid) : ({});
+            mode = !mesh.has_mesh && geometry.has_geometry ? "GeometryVertex" : "Face";
+        }
+        // 同类型重新开始也要配置；旧值保留到用户真正修改选择。
+        if (App.selection.selectMode === mode) {
+            if (root.renderWindow)
+                root.renderWindow.setSelectMode(mode);
+        } else {
+            App.selection.selectMode = mode;
+        }
+    }
+
+    function finishSelection() {
+        if (root.renderWindow)
+            root.renderWindow.finishSelection(root._idleMode);
+        else
+            root.stopSelection();
+    }
+
+    function stopSelection() {
+        if (App.selection.parameterModel !== root || App.selection.listeningSelectorIndex < 0)
+            return;
+        App.selection.listeningSelectorIndex = -1;
+        App.selection.selectMode = root._idleMode;
+    }
+
+    function clearSelection() {
+        const index = App.selection.listeningSelectorIndex >= 0 ? App.selection.listeningSelectorIndex : root.contextIndex;
+        if (index >= 0)
+            root.setValue(index, null);
+        if (root.renderWindow)
+            root.renderWindow.clearSelection();
+    }
+
+    Component.onDestruction: {
+        root.stopSelection();
+        if (App.selection.parameterModel === root)
+            App.selection.parameterModel = null;
+    }
 
     readonly property Connections _featureChanges: Connections {
         target: root.featureSystem
@@ -25,6 +108,9 @@ QtObject {
     }
 
     function reset(operation) {
+        root.stopSelection();
+        root.contextIndex = -1;
+        App.selection.parameterModel = operation ? root : null;
         root.argumentTypes = operation && operation.info ? operation.info.arg_types : [];
         root.featureName = operation && operation.isFeature && operation.info ? operation.info.name : "";
         // 分类默认值只覆盖声明的参数，其他 Feature 参数保持其持久值。

@@ -115,3 +115,10 @@ precess_test_link_libraries(TestRenderWindowLifecycle renderQml vtkPart modelQml
 vtk_module_autoinit(TARGETS TestRenderWindowLifecycle MODULES
     VTK::GUISupportQtQuick VTK::RenderingOpenGL2 VTK::InteractionStyle
 )
+
+# 单点拾取的离屏回归，不启动交互窗口。
+precess_add_test(TestGeometryEdgePointPicking TestGeometryEdgePointPicking.cpp)
+precess_test_link_libraries(TestGeometryEdgePointPicking vtkPart Data DataOps TKPrim VTK::CommonColor
+    VTK::RenderingOpenGL2 VTK::InteractionStyle
+)
+vtk_module_autoinit(TARGETS TestGeometryEdgePointPicking MODULES VTK::RenderingOpenGL2 VTK::InteractionStyle)

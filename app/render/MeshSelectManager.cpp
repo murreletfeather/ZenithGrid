@@ -199,12 +199,12 @@ std::unique_ptr<Selection> MeshSelectManager::getSelection()
     for (auto& [comp_id, sel] : component_selectors_) {
         auto selection = sel->get();
 
-        for (const auto& id : selection.ids)
-            result->ids.push_back(id);
+        for (const auto& id : selection.ids())
+            result->ids().push_back(id);
 
-        if (selection.ids.size()) {
+        if (selection.ids().size()) {
             result->component_id = comp_id;
-            result->type = selection.type;
+            result->setType(selection.type());
         }
     }
 
@@ -223,12 +223,12 @@ std::unordered_map<Index, std::vector<vtkIdType>> MeshSelectManager::selectedFac
             continue;
 
         SelectionVtk selection = face_selector->get();
-        if (selection.ids.empty())
+        if (selection.ids().empty())
             continue;
 
         auto& face_ids = result[comp_id];
-        face_ids.reserve(selection.ids.size());
-        for (Index id : selection.ids)
+        face_ids.reserve(selection.ids().size());
+        for (Index id : selection.ids())
             face_ids.push_back(static_cast<vtkIdType>(id));
     }
     return result;

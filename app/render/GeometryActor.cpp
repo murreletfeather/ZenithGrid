@@ -47,7 +47,11 @@ void GeometryActor::loadShape(const GeometryDataVtk& geometry_data)
     OccShapeHandle aShapeImpl = new IVtkOCC_Shape(geometry_data.shape);
     aShapeImpl->SetId(static_cast<IVtk_IdType>(geometry_data.component_id));
     this->occ_shape_ = aShapeImpl;
-    this->geometry_index_ = geometry_data.geometry_index;
+    // 每次加载同时更新身份快照；无索引输入必须清空，防止复用 Actor 时沿用旧身份。
+    if (geometry_data.geometry_index)
+        this->geometry_index_ = *geometry_data.geometry_index;
+    else
+        this->geometry_index_ = GeometrySubshapeIndex { };
     vtkSmartPointer<IVtkTools_ShapeDataSource> DS = vtkSmartPointer<IVtkTools_ShapeDataSource>::New();
     DS->SetShape(aShapeImpl);
     DS->Update();

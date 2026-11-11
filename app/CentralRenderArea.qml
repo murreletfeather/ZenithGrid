@@ -752,7 +752,10 @@ Page {
             }
 
             onClearButtonClicked: {
-                myItem.clearSelection()
+                if (App.selection.parameterModel)
+                    App.selection.parameterModel.clearSelection()
+                else
+                    myItem.clearSelection()
             }
         }
 
@@ -871,7 +874,8 @@ Page {
     }
 
     Component.onCompleted: {
-        App.registry.renderWindow = myItem
+        // 替换注册表以通知先创建的参数模型，避免一直绑定到尚未登记的视口。
+        App.registry = Object.assign({}, App.registry, { renderWindow: myItem })
         // 注入功能系统适配器：startInteraction 按名称获取 InteractionState
         myItem.setFeatureAdaptor(QModelManager.featureSystem)
         Qt.callLater(function() { myItem.resetCamera() })

@@ -1,4 +1,5 @@
 #include "GeometrySelectManager.h"
+#include "GeometryPointResolver.h"
 #include "GeometryActorManagerSelectOp.h"
 #include "GeometryActorSelectOp.h"
 #include "GeometrySelectorHighlight.h"
@@ -32,8 +33,35 @@ GeometrySelectManager::GeometrySelectManager(vtkRenderer& renderer, vtkActor& hi
     op_->observeShapePicker(picker_.Get());
 }
 
+GeometrySelectManager::~GeometrySelectManager() = default;
+
+void GeometrySelectManager::hover(double x, double y)
+{
+    if (select_mode_ == SelectMode::GeometryPoint && point_selector_)
+        point_selector_->hover(point_resolver_->resolvePoint(x, y, pixel_ratio_));
+}
+
+void GeometrySelectManager::invalidateGeometry(Index component_id)
+{
+    if (point_resolver_)
+        point_resolver_->clear();
+    if (point_selector_) {
+        point_selector_->hover({ });
+        if (component_id < 0 || point_selector_->get().component_id == component_id)
+            point_selector_->clear();
+    }
+    // 普通几何高亮同样引用旧子形状，替换几何时沿用既有清理规则。
+    component_selectors_.clear();
+    highlight_data_->Initialize();
+}
+
 void GeometrySelectManager::select(double posx, double posy, SelectOp op)
 {
+    if (select_mode_ == SelectMode::GeometryPoint) {
+        point_selector_->select(point_resolver_->resolvePoint(posx, posy, pixel_ratio_));
+        return;
+    }
+
     if (this->select_mode_ == SelectMode::None)
         return;
 
@@ -159,10 +187,20 @@ void GeometrySelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, S
     }
 }
 
-void GeometrySelectManager::setSelectMode(SelectMode select_mode)
+void GeometrySelectManager::setSelectMode(SelectMode select_mode, double pixel_ratio)
 {
     this->select_mode_ = select_mode;
+    pixel_ratio_ = pixel_ratio;
     this->clearSelection();
+    if (select_mode == SelectMode::GeometryPoint) {
+        if (!point_resolver_)
+            point_resolver_ = std::make_unique<GeometryPointResolver>(*renderer_, *op_);
+        if (!point_selector_)
+            point_selector_ = std::make_unique<GeometryPointSelectorHighlight>(*renderer_);
+        if (!highlight_visible_)
+            point_selector_->disableHighlight();
+        return;
+    }
 
     op_->setShapePickerMode(select_mode);
 
@@ -189,6 +227,8 @@ void GeometrySelectManager::applyHighlightStyle(SelectMode mode)
 
 void GeometrySelectManager::clearSelection()
 {
+    if (point_selector_)
+        point_selector_->clear();
     this->component_selectors_.clear();
     highlight_data_->Initialize();
 }
@@ -228,6 +268,12 @@ std::optional<std::pair<Index, std::array<double, 3>>> GeometrySelectManager::sn
 
 void GeometrySelectManager::setHighlightVisible(bool visible)
 {
+    if (point_selector_) {
+        if (visible)
+            point_selector_->enableHighlight();
+        else
+            point_selector_->disableHighlight();
+    }
     if (highlight_visible_ == visible)
         return;
     highlight_visible_ = visible;
@@ -236,6 +282,8 @@ void GeometrySelectManager::setHighlightVisible(bool visible)
 
 void GeometrySelectManager::setHighlightVisible(Index component_id, bool visible)
 {
+    if (point_selector_)
+        point_selector_->setComponentVisible(component_id, visible);
     auto it = component_selectors_.find(component_id);
     if (it == component_selectors_.end())
         return;
@@ -247,15 +295,17 @@ void GeometrySelectManager::setHighlightVisible(Index component_id, bool visible
 
 std::unique_ptr<Selection> GeometrySelectManager::getSelection()
 {
+    if (select_mode_ == SelectMode::GeometryPoint && point_selector_)
+        return std::make_unique<Selection>(point_selector_->get());
     auto result = std::make_unique<Selection>();
 
     for (auto& [comp_id, sel] : component_selectors_) {
         auto selection = sel->get();
-        for (const auto& id : selection.ids)
-            result->ids.push_back(id);
-        if (selection.ids.size()) {
+        for (const auto& id : selection.ids())
+            result->ids().push_back(id);
+        if (selection.ids().size()) {
             result->component_id = comp_id;
-            result->type = selection.type;
+            result->setType(selection.type());
         }
     }
 

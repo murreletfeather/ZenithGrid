@@ -35,7 +35,7 @@ std::any CreateLineFromVerticesHandler::execute(FeatureContext& ctx)
     if (!selection_param || !*selection_param)
         return std::string("请选择两个几何点。");
     const std::shared_ptr<Selection>& selected = *selection_param;
-    if (selected->type != ElementEnum::GeometryVertex || selected->ids.size() != 2)
+    if (selected->type() != ElementEnum::GeometryVertex || selected->ids().size() != 2)
         return std::string("请选择两个几何点。");
 
     try {
@@ -45,14 +45,14 @@ std::any CreateLineFromVerticesHandler::execute(FeatureContext& ctx)
         component->geometry->ensureIndexBuilt(ctx.model.geomRegistry());
 
         const auto& component_vertex_ids = component->geometry->index.vertex_local_to_global;
-        for (Index id : selected->ids) {
+        for (Index id : selected->ids()) {
             if (std::find(component_vertex_ids.begin(), component_vertex_ids.end(), id)
                 == component_vertex_ids.end())
                 return std::string("所选几何点必须属于目标组件。");
         }
 
-        const TopoDS_Shape* start_shape = ctx.model.geomRegistry().getVertex(selected->ids[0]);
-        const TopoDS_Shape* end_shape = ctx.model.geomRegistry().getVertex(selected->ids[1]);
+        const TopoDS_Shape* start_shape = ctx.model.geomRegistry().getVertex(selected->ids()[0]);
+        const TopoDS_Shape* end_shape = ctx.model.geomRegistry().getVertex(selected->ids()[1]);
         if (!start_shape || !end_shape
             || start_shape->ShapeType() != TopAbs_VERTEX
             || end_shape->ShapeType() != TopAbs_VERTEX)

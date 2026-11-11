@@ -90,9 +90,9 @@ TEST_CASE("CreateFaceFromEdges execute creates face from closed edge loop", "[Cr
     // 选择 4 条闭合轮廓边创建面
     auto* component = model_layer.findComponent(component_id);
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometryEdge;
+    selection->setType(ElementEnum::GeometryEdge);
     const auto& edge_ids = component->geometry->index.edge_local_to_global;
-    selection->ids.assign(edge_ids.begin() + 1, edge_ids.end()); // 跳过 0 号保留槽
+    selection->ids().assign(edge_ids.begin() + 1, edge_ids.end()); // 跳过 0 号保留槽
     selection->component_id = component_id;
     REQUIRE(feature_system.setParameter("CreateFaceFromEdges", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(selection)));

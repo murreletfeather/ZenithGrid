@@ -41,7 +41,7 @@ private:
     GeometryRenderStyle style_ { GeometryRenderStyle::SurfaceWithEdges };
     bool visibility_;
     OccShapeHandle occ_shape_;
-    const GeometrySubshapeIndex* geometry_index_;
+    GeometrySubshapeIndex geometry_index_; //> 渲染侧独立身份快照；默认空索引表示没有可拾取身份
 
     vtkNew<vtkActor> poly_actor_;
     vtkNew<vtkActor> line_actor_;

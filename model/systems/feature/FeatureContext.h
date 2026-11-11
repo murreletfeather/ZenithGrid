@@ -82,6 +82,8 @@ struct FeatureContext {
     std::optional<Index> activeComponent() const;
     //! @brief 按身份查询所属模型的组件操作句柄。
     std::optional<ComponentOperator> componentOperator(Index component_id) const;
+    /** @brief 在模型所属线程更新本功能参数并广播变更，供输入互斥与失效清理使用。 */
+    bool setParameter(std::size_t index, core::ArgObject value);
     UndoContext undo; //> undo 上下文（插件层接口入口；语义见 UndoContext 注释）
     /**
      * @brief 纯计算任务；不得持活模型句柄，无模型回写与 undo 记录。

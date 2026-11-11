@@ -44,11 +44,11 @@ std::any MergePointsHandler::execute(FeatureContext& ctx)
 {
     const auto* first_param = ctx.params.value(kFirstPointParam).get<ArgTypeEnum::Selector>();
     const auto* second_param = ctx.params.value(kSecondPointParam).get<ArgTypeEnum::Selector>();
-    if (!first_param || !*first_param || (*first_param)->type != ElementEnum::GeometryVertex
-        || (*first_param)->ids.size() != 1)
+    if (!first_param || !*first_param || (*first_param)->type() != ElementEnum::GeometryVertex
+        || (*first_param)->ids().size() != 1)
         return std::string("请选择第一个几何点。");
-    if (!second_param || !*second_param || (*second_param)->type != ElementEnum::GeometryVertex
-        || (*second_param)->ids.size() != 1)
+    if (!second_param || !*second_param || (*second_param)->type() != ElementEnum::GeometryVertex
+        || (*second_param)->ids().size() != 1)
         return std::string("请选择第二个几何点。");
 
     const int* target_mode = ctx.params.value(kTargetParam).get<ArgTypeEnum::Combo>();
@@ -56,8 +56,8 @@ std::any MergePointsHandler::execute(FeatureContext& ctx)
         return std::string("合并目标位置参数无效。");
 
     try {
-        const Index first_id = (*first_param)->ids.front();
-        const Index second_id = (*second_param)->ids.front();
+        const Index first_id = (*first_param)->ids().front();
+        const Index second_id = (*second_param)->ids().front();
         const auto first_owner =
             ctx.model.findComponentIdByGeometryShapeId(TopAbs_VERTEX, first_id);
         const auto second_owner =

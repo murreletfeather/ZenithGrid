@@ -23,7 +23,7 @@ std::any CreateFaceHandler::execute(ModelLayer& model, Index /*fallback_componen
         return { };
     }
     auto selection = *selection_p;
-    if (selection->type != ElementEnum::Vertex || selection->ids.size() < 3) {
+    if (selection->type() != ElementEnum::Vertex || selection->ids().size() < 3) {
         spdlog::error("CreateFaceHandler::execute: Selection type is not Vertex or vertices are less than 3.");
         return { };
     }
@@ -31,9 +31,9 @@ std::any CreateFaceHandler::execute(ModelLayer& model, Index /*fallback_componen
     // 选择集携带全局点 id：经 pointIdMap 反查所属组件与局部点索引，
     // 目标组件由全局 id 决定，不依赖对象树选中组件
     std::vector<Index> local_ids;
-    local_ids.reserve(selection->ids.size());
+    local_ids.reserve(selection->ids().size());
     Index component_id = -1;
-    for (Index gid : selection->ids) {
+    for (Index gid : selection->ids()) {
         const auto [cid, local] = model.pointIdMap().getLocal(gid);
         if (cid == MeshIDMap::kInvalidComponent) {
             spdlog::error("CreateFaceHandler::execute: Global point id {} is invalid.", gid);
@@ -56,7 +56,7 @@ std::any CreateFaceHandler::execute(ModelLayer& model, Index /*fallback_componen
     }
 
     spdlog::debug("CreateFaceHandler::execute: Creating face on component {} with points ID {}",
-        component_id, selection->ids);
+        component_id, selection->ids());
 
     // 追加面单元（写必脏：标脏 + 通知由操作边界 flush 统一发出）
     target_op->appendFace(local_ids);

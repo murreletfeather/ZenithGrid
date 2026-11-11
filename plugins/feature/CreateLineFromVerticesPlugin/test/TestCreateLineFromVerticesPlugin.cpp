@@ -63,8 +63,8 @@ TEST_CASE("CreateLineFromVertices execute appends shared-topology line to source
     const auto& vertex_ids = component->geometry->index.vertex_local_to_global;
     REQUIRE(vertex_ids.size() == 8 + 1); // 局部 id 从 1 起，0 号为保留槽
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometryVertex;
-    selection->ids = { vertex_ids[1], vertex_ids[2] }; // 下标从 1 起，0 号为保留槽
+    selection->setType(ElementEnum::GeometryVertex);
+    selection->ids() = { vertex_ids[1], vertex_ids[2] }; // 下标从 1 起，0 号为保留槽
     selection->component_id = component_id;
     REQUIRE(feature_system.setParameter("CreateLineFromVertices", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(selection)));

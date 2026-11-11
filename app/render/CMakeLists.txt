@@ -9,6 +9,7 @@ add_library(vtkPart STATIC
     GeometrySelectorHighlight.cpp
     QRenderWindowStyle.cpp
     SelectManager.cpp
+    GeometryPointResolver.cpp
     GeometrySelectManager.cpp
     MeshSelectManager.cpp
     GeometryActor.cpp

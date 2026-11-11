@@ -345,8 +345,9 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
         }
     }
     render_selection_revision_ = selection_revision_;
+    select_manager_->setSelectMode(selection_mode_.toStdString(), overlay_device_pixel_ratio_);
     vtk->selection_observer_tag_ = vtk->style_->AddObserver(vtkCommand::SelectionChangedEvent, this, &QRenderWindow::publishSelection);
-    publishSelection();
+    updateSelectionSnapshot(false);
     return vtk;
 }
 
@@ -428,16 +429,18 @@ void QRenderWindow::deleteModel(Index model_id)
 
 void QRenderWindow::deleteComponent(Index component_id)
 {
+    emit geometryInvalidated(component_id);
     mesh_pipeline_data_.erase(component_id);
     mesh_snapshots_.erase(component_id);
     geometry_visibility_.erase(component_id);
     dispatch_async([component_id, revision = selection_revision_, this](vtkRenderWindow*, vtkUserData user_data) {
         auto* vtk = Data::SafeDownCast(user_data);
         render_selection_revision_ = revision;
-        select_manager_->clearSelection();
+        select_manager_->clearMeshSelection();
+        select_manager_->invalidateGeometry(component_id);
         vtk->mesh_actor_manager_->deleteComponent(component_id);
         vtk->geometry_actor_manager_->deleteComponent(component_id);
-        publishSelection();
+        updateSelectionSnapshot(false);
     });
 }
 
@@ -487,10 +490,10 @@ void QRenderWindow::applyClipPlane(const MeshClipPlane& plane)
         auto* vtk = Data::SafeDownCast(user_data);
         // 裁剪会重排面下标，清理、安装和选择发布必须在同一次渲染回调内完成。
         render_selection_revision_ = revision;
-        select_manager_->clearSelection();
+        select_manager_->clearMeshSelection();
         for (const auto& [component_id, snapshot] : snapshots)
             vtk->mesh_actor_manager_->loadMesh(component_id, snapshot, vtk->renderer_);
-        publishSelection();
+        updateSelectionSnapshot(false);
     });
 }
 
@@ -515,9 +518,9 @@ void QRenderWindow::loadMeshData(Index component_id, const MeshDataVtk& data)
         auto* vtk = Data::SafeDownCast(user_data);
         // 原选择使用旧数据下标，必须在替换数据前清空，安装后再回传空快照。
         render_selection_revision_ = revision;
-        select_manager_->clearSelection();
+        select_manager_->clearMeshSelection();
         vtk->mesh_actor_manager_->loadMesh(component_id, snapshot, vtk->renderer_);
-        publishSelection();
+        updateSelectionSnapshot(false);
     });
     publishComponentVisibility(component_id);
 }
@@ -637,12 +640,14 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
         auto* vtk = Data::SafeDownCast(user_data);
         // 所有面操作统一释放旧下标与高亮，再安装新数据并发布空选择。
         render_selection_revision_ = revision;
-        select_manager_->clearSelection();
+        select_manager_->clearMeshSelection();
         for (const auto& [id, snapshot] : snapshots)
             vtk->mesh_actor_manager_->loadMesh(id, snapshot, vtk->renderer_);
-        for (const auto& [id, visible] : geometry_updates)
+        for (const auto& [id, visible] : geometry_updates) {
             vtk->geometry_actor_manager_->setVisibility(id, visible);
-        publishSelection();
+            select_manager_->setGeometryHighlightVisible(id, visible);
+        }
+        updateSelectionSnapshot(false);
     });
     // 已投递安装命令后同步通知 GUI，后续用户操作不会再被旧渲染回传覆盖。
     for (auto id : notifications)
@@ -659,6 +664,7 @@ void QRenderWindow::onModelChanged(Index model_id)
 
 void QRenderWindow::onComponentChanged(Index component_id)
 {
+    emit geometryInvalidated(component_id);
     if (!model_query_)
         return;
     if (model_query_->getGeometryVtkDataByComponent(component_id))
@@ -679,8 +685,9 @@ void QRenderWindow::onComponentChanged(Index component_id)
             return;
         if (!has_mesh) {
             render_selection_revision_ = revision;
-            select_manager_->clearSelection();
+            select_manager_->clearMeshSelection();
         }
+        select_manager_->invalidateGeometry(component_id);
         // 几何转换仍沿用现有渲染侧路径，显隐结果由 GUI 决定。
         if (auto geometry_data = model_query_->getGeometryVtkDataByComponent(component_id)) {
             vtk->geometry_actor_manager_->loadGeometry(*geometry_data,
@@ -691,7 +698,7 @@ void QRenderWindow::onComponentChanged(Index component_id)
         }
         if (!has_mesh) {
             vtk->mesh_actor_manager_->deleteComponent(component_id);
-            publishSelection();
+            updateSelectionSnapshot(false);
         }
     });
     publishComponentVisibility(component_id);
@@ -730,13 +737,13 @@ void QRenderWindow::setMeshVisibility(Index component_id, bool visibility)
             auto* vtk = Data::SafeDownCast(user_data);
             if (faces_changed) {
                 render_selection_revision_ = revision;
-                select_manager_->clearSelection();
+                select_manager_->clearMeshSelection();
             }
             vtk->mesh_actor_manager_->loadMesh(component_id, snapshot, vtk->renderer_);
             select_manager_->setMeshHighlightVisible(component_id, visibility);
             select_manager_->refreshComponentHighlight();
             if (faces_changed)
-                publishSelection();
+                updateSelectionSnapshot(false);
         });
     }
     publishComponentVisibility(component_id);
@@ -772,11 +779,24 @@ void QRenderWindow::setSelectionRevision(int revision)
         return;
     selection_revision_ = revision;
     emit selectionRevisionChanged();
-    clearSelection();
+    dispatch_async([this, revision](vtkRenderWindow*, vtkUserData) {
+        if (!select_manager_)
+            return;
+        render_selection_revision_ = revision;
+        select_manager_->clearSelection();
+        updateSelectionSnapshot(false);
+    });
 }
 
 void QRenderWindow::publishSelection()
 {
+    updateSelectionSnapshot(true);
+}
+
+void QRenderWindow::updateSelectionSnapshot(bool notify)
+{
+    if (!select_manager_ || !data_)
+        return;
     auto selection = select_manager_->getSelection();
     if (selection && selection->component_id < 0)
         selection->component_id = cur_component_id_;
@@ -788,7 +808,7 @@ void QRenderWindow::publishSelection()
     }
     std::shared_ptr<const Selection> snapshot = std::move(selection);
     const int revision = render_selection_revision_;
-    QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot, faces = std::move(faces), generations = std::move(generations), revision] {
+    QMetaObject::invokeMethod(&selection_dispatcher_, [this, snapshot, faces = std::move(faces), generations = std::move(generations), revision, notify] {
             if (revision != selection_revision_)
                 return;
             // 网格换代后，即使外部参数未切换，也不能恢复旧网格的选择身份。
@@ -800,7 +820,8 @@ void QRenderWindow::publishSelection()
             selection_snapshot_ = snapshot;
             selected_faces_ = faces;
             selected_face_generations_ = generations;
-            emit selectedChanged(); }, Qt::QueuedConnection);
+            if (notify)
+                emit selectedChanged(); }, Qt::QueuedConnection);
 }
 
 void QRenderWindow::publishComponentVisibility(Index component_id)
@@ -837,11 +858,15 @@ void QRenderWindow::setSelectComponent(Index component_id)
 
 void QRenderWindow::setSelectMode(QString select_mode)
 {
+    selection_mode_ = select_mode;
     const auto revision = selection_revision_;
-    dispatch_async([select_mode, revision, this](vtkRenderWindow*, vtkUserData) {
+    dispatch_async([select_mode, revision, ratio = overlay_device_pixel_ratio_, this](vtkRenderWindow* window, vtkUserData) {
+        if (!select_manager_)
+            return;
         render_selection_revision_ = revision;
-        select_manager_->setSelectMode(select_mode.toStdString());
-        publishSelection();
+        select_manager_->setSelectMode(select_mode.toStdString(), ratio);
+        updateSelectionSnapshot(false);
+        window->Render();
     });
 }
 
@@ -855,10 +880,29 @@ void QRenderWindow::setFaceSelectionByAngle(bool enabled, double angle_deg)
 void QRenderWindow::clearSelection()
 {
     const auto revision = selection_revision_;
-    dispatch_async([this, revision](vtkRenderWindow*, vtkUserData) {
+    dispatch_async([this, revision](vtkRenderWindow* window, vtkUserData) {
+        if (!select_manager_)
+            return;
         render_selection_revision_ = revision;
         select_manager_->clearSelection();
         publishSelection();
+        window->Render();
+    });
+}
+
+void QRenderWindow::finishSelection(QString restore_mode)
+{
+    selection_mode_ = restore_mode;
+    const int revision = selection_revision_;
+    dispatch_async([this, revision, restore_mode, ratio = overlay_device_pixel_ratio_](vtkRenderWindow* window, vtkUserData) {
+        if (!select_manager_ || render_selection_revision_ != revision)
+            return;
+        select_manager_->setSelectMode(restore_mode.toStdString(), ratio);
+        // 同一分发器按序交付已排队点击，再结束监听；结束不生成新选择值。
+        QMetaObject::invokeMethod(&selection_dispatcher_, [this, revision] {
+            if (revision == selection_revision_)
+                emit selectionFinished(revision); }, Qt::QueuedConnection);
+        window->Render();
     });
 }
 

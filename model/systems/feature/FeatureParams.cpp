@@ -2,14 +2,25 @@
  * @file FeatureParams.cpp
  */
 #include "FeatureParams.h"
+#include "Selection.h"
 
 #include <filesystem>
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace systems::feature {
 namespace {
+    /** @brief 仅隔离选择参数的可变共享对象，其余载荷保持已有值复制语义。 */
+    core::ArgObject copySelectorValue(core::ArgObject value)
+    {
+        if (const auto* selection = value.get<ArgTypeEnum::Selector>(); selection && *selection)
+            return core::ArgObject::create<ArgTypeEnum::Selector>(std::make_shared<Selection>(**selection));
+        return value;
+    }
+
     long long parseInt(const std::string& content)
     {
         try {
@@ -80,6 +91,24 @@ FeatureParams::FeatureParams(std::vector<core::ArgType> types)
     }
 }
 
+FeatureParams::FeatureParams(const FeatureParams& other)
+    : types_(other.types_)
+{
+    // 重注册先保存前像，再销毁旧功能；旧功能或外部保留的选择不能改写恢复值。
+    values_.reserve(other.values_.size());
+    for (const auto& value : other.values_)
+        values_.push_back(copySelectorValue(value));
+}
+
+FeatureParams& FeatureParams::operator=(const FeatureParams& other)
+{
+    if (this != &other) {
+        FeatureParams snapshot(other);
+        *this = std::move(snapshot);
+    }
+    return *this;
+}
+
 const core::ArgObject& FeatureParams::value(std::size_t index) const
 {
     if (index >= values_.size()) {
@@ -93,6 +122,6 @@ void FeatureParams::setValue(std::size_t index, core::ArgObject new_value)
     if (index >= values_.size()) {
         throw std::out_of_range("FeatureParams::setValue: index out of range");
     }
-    values_[index] = std::move(new_value);
+    values_[index] = copySelectorValue(std::move(new_value));
 }
 }

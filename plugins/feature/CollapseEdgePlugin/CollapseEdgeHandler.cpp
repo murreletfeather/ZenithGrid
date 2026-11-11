@@ -34,13 +34,13 @@ std::any CollapseEdgeHandler::execute(FeatureContext& ctx)
 {
     const auto* selection = ctx.params.value(0).get<ArgTypeEnum::Selector>();
     const auto* target = ctx.params.value(1).get<ArgTypeEnum::Combo>();
-    if (!selection || !*selection || (*selection)->type != ElementEnum::GeometryEdge
-        || (*selection)->ids.size() != 1)
+    if (!selection || !*selection || (*selection)->type() != ElementEnum::GeometryEdge
+        || (*selection)->ids().size() != 1)
         return std::string("请选择一条需要压缩的几何边。");
     if (!target || *target < 0 || *target > 3)
         return std::string("请选择有效的压缩目标位置。");
     try {
-        const Index edge_id = (*selection)->ids.front();
+        const Index edge_id = (*selection)->ids().front();
         const auto component_id = ctx.model.findComponentIdByGeometryShapeId(TopAbs_EDGE, edge_id);
         const TopoDS_Shape* shape = ctx.model.geomRegistry().getEdge(edge_id);
         if (!component_id || !shape)

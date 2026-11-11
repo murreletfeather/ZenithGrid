@@ -33,7 +33,15 @@ public:
      *        网格模式按 op（Append/Remove/Toggle）做集合运算；几何/组件模式当前忽略 op（仍走原逻辑）。
      */
     void selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle);
-    void setSelectMode(const std::string& select_mode);
+    void setSelectMode(const std::string& select_mode, double pixel_ratio = 1.0);
+    /** @brief 当前选择类型决定是否使用单点位置输入，无额外采集会话。 */
+    bool isGeometryPointMode() const { return select_mode_ == SelectMode::GeometryPoint; }
+    /** @brief 悬停只更新点显示，未发布确认集合。 */
+    void hover(double x, double y);
+    /** @brief 网格显示重建不清除几何点和几何高亮。 */
+    void clearMeshSelection();
+    /** @brief 由场景更新入口显式通知几何替换，不订阅模型事件。 */
+    void invalidateGeometry(Index component_id = -1);
     /**
      * @brief 设置网格面选择的角度扩散参数
      * @param enabled 是否启用按角度扩散

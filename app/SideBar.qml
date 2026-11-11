@@ -108,7 +108,7 @@ Item{
             }
             onClicked:{
                 // 先停止参数监听，执行后的视口清空便不会反向清掉刚提交的参数。
-                App.selection.listeningSelectorIndex = -1
+                root.session.parameterModel.stopSelection()
                 if (root.activeOp && root.activeOp.execute) {
                     try {
                         const result = root.activeOp.execute(App.selection.activeComponentId, root.parameters)
@@ -469,34 +469,10 @@ Item{
                 highlighted: App.selection.listeningSelectorIndex === index
                 checked: App.selection.listeningSelectorIndex === index
                 onClicked: {
-                    if (!checked) {
-                        App.selection.listeningSelectorIndex = index
-                        // 每次开始选择都按参数重设模式：content 指定的拾取类型优先；
-                        // 未指定时纯几何（无网格）组件兜底几何点模式，其余兜底 Face
-                        if (model.content.length > 0) {
-                            const modes = model.content.split(",")
-                            if (modes.length > 0)
-                                App.selection.selectMode = modes[0]
-                        } else {
-                            const cid = App.selection.activeComponentId
-                            const meshSummary = cid >= 0 ? QModelManager.query.getMeshSummary(cid) : ({})
-                            const geomSummary = cid >= 0 ? QModelManager.query.getGeometrySummary(cid) : ({})
-                            App.selection.selectMode = (!meshSummary.has_mesh && geomSummary.has_geometry) ? "GeometryVertex" : "Face"
-                        }
-                    } else {
-                        App.selection.listeningSelectorIndex = -1
-                    }
-                }
-            }
-
-            Connections {
-                target: App.selection
-                enabled: selectStartButton.checked
-                function onSelectionUpdated(selection) {
-                    // 切换参数的同步通知可能先于 checked 绑定刷新，必须核对当前监听者。
-                    if (App.selection.listeningSelectorIndex !== index)
-                        return
-                    root.setParam(index, selection)
+                    if (checked)
+                        root.session.parameterModel.finishSelection()
+                    else
+                        root.session.parameterModel.startSelection(index)
                 }
             }
 

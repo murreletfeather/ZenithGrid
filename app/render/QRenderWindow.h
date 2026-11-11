@@ -108,6 +108,8 @@ public:
      * @brief 投递选择与高亮清空命令，GUI 缓存仅在收到渲染侧空快照后更新
      */
     Q_INVOKABLE void clearSelection();
+    /** @brief 排在已有点击之后恢复视口模式，结束不再发布临时集合。 */
+    Q_INVOKABLE void finishSelection(QString restore_mode);
 
     /**
      * @brief 注入功能系统适配器（交互服务经 FeatureSystem::activeInteraction 获取激活的交互状态）
@@ -245,6 +247,10 @@ public:
 signals:
     void selectedChanged();
     void selectionRevisionChanged();
+    /** @brief 同代次点击已交付后通知参数层解除监听。 */
+    void selectionFinished(int revision);
+    /** @brief 几何替换或删除的组件范围，参数层据其关联清理旧点值。 */
+    void geometryInvalidated(Index component_id);
     void geometryStyleChanged();
     void meshStyleChanged();
     void clicked();
@@ -287,11 +293,14 @@ private:
 
     //! @brief 渲染线程制作选择快照，排队交付 GUI 线程，禁止 QML 直接读取拾取器。
     void publishSelection();
+    /** @brief 内部显示重建只更新缓存；用户确认操作才通知参数。 */
+    void updateSelectionSnapshot(bool notify);
     /** @brief 在 GUI 线程发布当前显隐结果，对象树只接收最新状态。 */
     void publishComponentVisibility(Index component_id);
     // QQuickVTKItem 会接管事件分发，GUI 排队通知交给独立 QObject。
     QObject selection_dispatcher_;
     std::shared_ptr<const Selection> selection_snapshot_; //> 仅 GUI 线程访问
+    QString selection_mode_ { "None" }; //> GUI 配置镜像，只用于场景图重建。
     int selection_revision_ { }; //> GUI 侧版本
     int render_selection_revision_ { }; //> 渲染侧已应用版本
     SelectedFaces selected_faces_; //> 与 QML 选择同批回传的原始面 ID，仅 GUI 访问

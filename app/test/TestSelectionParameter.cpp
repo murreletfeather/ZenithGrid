@@ -47,13 +47,31 @@ TEST_CASE("Selection parameter requires typed selections and preserves values on
     REQUIRE(system.registerHandler(meta, std::move(handler)));
     systems::feature::QFeatureSystemAdaptor adaptor(system);
     QSelection selection(std::make_unique<Selection>());
-    selection.get()->type = ElementEnum::Face;
-    selection.get()->ids = { 7 };
+    selection.get()->setType(ElementEnum::Face);
+    selection.get()->ids() = { 7 };
     REQUIRE(adaptor.setParameter("SelectionTest", 0, QVariant::fromValue(&selection)));
     const auto* params = system.params("SelectionTest");
     REQUIRE(params != nullptr);
-    REQUIRE(*params->value(0).get<ArgTypeEnum::Selector>() == selection.get());
+    REQUIRE((*params->value(0).get<ArgTypeEnum::Selector>())->ids() == selection.get()->ids());
 
+    SECTION("Native parameter installation owns an independent point snapshot")
+    {
+        GeometryPoint point;
+        point.valid = true;
+        point.component_id = 7;
+        point.support_kind = GeometryPointKind::Edge;
+        point.support_id = 11;
+        point.edge_parameter = 0.25;
+        auto input = std::make_shared<Selection>(Selection::create<ElementEnum::GeometryPoint>({ point }, 7));
+        REQUIRE(system.setParameter("SelectionTest", 0, core::ArgObject::create<ArgTypeEnum::Selector>(input)));
+        input->get<ElementEnum::GeometryPoint>()->front().edge_parameter = 0.75;
+        const auto installed = *params->value(0).get<ArgTypeEnum::Selector>();
+        REQUIRE(installed != input);
+        CHECK(installed->get<ElementEnum::GeometryPoint>()->front().edge_parameter == 0.25);
+        CHECK_THROWS(installed->ids());
+        REQUIRE(system.setParameter("SelectionTest", 0, core::ArgObject::create<ArgTypeEnum::Selector>(input)));
+        CHECK((*params->value(0).get<ArgTypeEnum::Selector>())->get<ElementEnum::GeometryPoint>()->front().edge_parameter == 0.75);
+    }
     SECTION("Empty selection object clears the stored selection")
     {
         QSelection empty_selection;
@@ -79,13 +97,13 @@ TEST_CASE("Selection parameter requires typed selections and preserves values on
         };
         for (const auto& invalid_value : invalid_values) {
             CHECK_FALSE(adaptor.setParameter("SelectionTest", 0, invalid_value));
-            CHECK(*params->value(0).get<ArgTypeEnum::Selector>() == selection.get());
+            CHECK((*params->value(0).get<ArgTypeEnum::Selector>())->ids() == selection.get()->ids());
         }
     }
     SECTION("Wrong non-null type preserves the stored selection")
     {
         CHECK_FALSE(adaptor.setParameter("SelectionTest", 0, QStringLiteral("invalid")));
-        CHECK(*params->value(0).get<ArgTypeEnum::Selector>() == selection.get());
+        CHECK((*params->value(0).get<ArgTypeEnum::Selector>())->ids() == selection.get()->ids());
     }
     system.unregisterHandler(meta);
 }

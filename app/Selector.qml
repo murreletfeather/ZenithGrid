@@ -22,6 +22,7 @@ RowLayout {
 
     ComboBox{
         id: selectModeComboBox
+        enabled: App.selection.listeningSelectorIndex < 0 || App.selection.selectMode !== "GeometryPoint"
         model: [
             { text: "...", value: "None" },
             { text: "组件", value: "Component" },
@@ -30,6 +31,7 @@ RowLayout {
             { text: "面", value: "Face" },
             { text: "体", value: "Solid" },
             { text: "几何点", value: "GeometryVertex" },
+            { text: "边上位置", value: "GeometryPoint" },
             { text: "几何边", value: "GeometryEdge" },
             { text: "几何面", value: "GeometryFace" },
             { text: "几何体", value: "GeometrySolid" },

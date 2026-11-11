@@ -40,6 +40,7 @@ QtObject {
     readonly property Connections _selectionChanges: Connections {
         target: App.selection
         function onSelectionInvalidated() {
+            root.parameterModel.stopSelection();
             App.selection.listeningSelectorIndex = -1;
             root.parameterModel.clearSelections();
         }
@@ -62,7 +63,7 @@ QtObject {
             const featureName = operation && operation.isFeature && operation.info ? operation.info.name : "";
             root.parameterModel.featureSystem.setFeatureActive(featureName);
             if (!preserveParameters) {
-                App.selection.listeningSelectorIndex = -1;
+                root.parameterModel.stopSelection();
                 root.parameterModel.reset(operation);
             } else
                 root.parameterModel.argumentTypes = operation.info.arg_types;

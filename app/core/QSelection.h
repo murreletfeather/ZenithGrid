@@ -1,9 +1,9 @@
-#ifndef  Q_SELECTION_H
-#define Q_SELECTION_H 
+#ifndef Q_SELECTION_H
+#define Q_SELECTION_H
+#include "Selection.h"
 #include <QObject>
 #include <QVariantList>
 #include <qqmlintegration.h>
-#include "Selection.h"
 
 //! @brief Element在QML中暴露了枚举Element::Type，在QML中以Element.Face获取枚举值
 class Element : public QObject, public ElementEnum {
@@ -31,21 +31,21 @@ public:
      * 存入
      * @param data 待存入的数据
      */
-    void set(std::shared_ptr<Selection> data) { data_ = std::move(data); }
+    void set(std::shared_ptr<Selection> data) { data_ = data ? std::make_shared<Selection>(*data) : nullptr; }
     /**
      * 取出
      * @return 存储的Selection对象
      */
     std::shared_ptr<Selection> get() { return data_; }
 
-    /**
-     * @brief 获取该选择的数组大小
-     * @return 存储数组大小
-     */
+    /** @brief 判断精确点载荷，界面不解释其拓扑参数。 */
+    Q_INVOKABLE bool isGeometryPoint() const { return data_ && data_->type() == ElementEnum::GeometryPoint; }
+
+    /** @brief 获取当前载荷的元素数量。 */
     Q_INVOKABLE size_t size()
     {
         if (data_) {
-            return data_->ids.size();
+            return data_->size();
         }
         return 0;
     }
@@ -53,16 +53,16 @@ public:
      * @brief 获取选中数据的类型枚举值
      * @return 类型枚举值
      */
-    Q_INVOKABLE Element::Type type() { return data_->type; }
+    Q_INVOKABLE Element::Type type() { return static_cast<Element::Type>(data_ ? data_->type() : ElementEnum::None); }
     /**
      * @brief 初始化一个Selection数据
      */
     Q_INVOKABLE void initialize()
     {
         std::unique_ptr<Selection> temp = std::make_unique<Selection>();
-        temp->type = ElementEnum::Face;
+        temp->setType(ElementEnum::Face);
         for (int i = 1; i < 2; i++) {
-            temp->ids.push_back(i);
+            temp->ids().push_back(i);
         }
         data_ = std::move(temp);
     }
@@ -73,7 +73,7 @@ public:
      */
     Q_INVOKABLE int ids(int i)
     {
-        return data_->ids[i];
+        return data_ && data_->type() != ElementEnum::GeometryPoint && i >= 0 && static_cast<size_t>(i) < data_->size() ? data_->ids()[i] : -1;
     }
     /**
      * @brief 返回选中对象的模型 ID
@@ -81,15 +81,15 @@ public:
      */
     Q_INVOKABLE Index getComponentId()
     {
-        return data_->component_id;
+        return data_ ? data_->component_id : -1;
     }
     Q_INVOKABLE QVariantList getAsComponentIds()
     {
         QVariantList list;
         if (!data_)
             return list;
-        if (data_->type == ElementEnum::Component) {
-            for (auto id : data_->ids)
+        if (data_->type() == ElementEnum::Component) {
+            for (auto id : data_->ids())
                 list.append(id);
         }
         return list;

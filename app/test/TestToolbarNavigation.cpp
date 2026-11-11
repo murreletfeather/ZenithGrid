@@ -940,8 +940,8 @@ TEST_CASE("Actual parameter controls preserve edits through scrolling and accept
     CHECK(sidebar->property("parameters").value<QJSValue>().property(1).toString() == "picked");
     CHECK(sidebar->property("parameters").value<QJSValue>().property(2).toBool());
     QSelection picked(std::make_unique<Selection>());
-    picked.get()->type = ElementEnum::Face;
-    picked.get()->ids = { 7 };
+    picked.get()->setType(ElementEnum::Face);
+    picked.get()->ids() = { 7 };
     REQUIRE(QMetaObject::invokeMethod(sidebar.get(), "setParam", Q_ARG(QVariant, 3), Q_ARG(QVariant, QVariant::fromValue(&picked))));
     QPointer<QQuickItem> old_numeric(numeric);
     auto* parameters = findItem(item, "operationParameters");
@@ -967,7 +967,9 @@ TEST_CASE("Actual parameter controls preserve edits through scrolling and accept
     CHECK(toggle->property("checked").toBool());
     auto* displayed_selection = qobject_cast<QSelection*>(target->parentItem()->property("value").value<QObject*>());
     REQUIRE(displayed_selection);
-    CHECK(displayed_selection->get() == picked.get());
+    CHECK(displayed_selection->get() != picked.get()); // 参数持有独立选择快照。
+    CHECK(displayed_selection->get()->ids() == picked.get()->ids());
+    CHECK(displayed_selection->get()->type() == picked.get()->type());
     const int before_update = probe_state.notifications;
     REQUIRE(manager->getFeatureSystemAdaptor()->setParameter("fixture", 0, 12.0));
     settle();

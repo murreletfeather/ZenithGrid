@@ -155,6 +155,7 @@ TEST_CASE("QRenderWindow queues selection updates and discards results for old p
         auto* data = QRenderWindow::Data::SafeDownCast(user_data);
         REQUIRE(data != nullptr);
         QCoreApplication::processEvents();
+        CHECK(updates == 0); // 初始化和场景图重建不向参数发布空集合。
         const int before = updates;
 
         // 选择完成通知只能在 GUI 事件队列消费后送达；切换参数则丢弃旧版本快照。
