@@ -31,6 +31,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <exception>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -267,6 +268,7 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     vtk->mesh_actor_manager_->bindRender(vtk->renderer_);
     vtk->geometry_actor_manager_ = std::make_unique<GeometryActorManager>();
     vtk->geometry_actor_manager_->bindRender(vtk->renderer_);
+    vtk->geometry_actor_manager_->setSurfacePrecision(surface_precision_);
 
     select_manager_ = std::make_unique<SelectManager>(*vtk->renderer_,
         vtk->mesh_actor_manager_->op(), vtk->geometry_actor_manager_->op());
@@ -1007,6 +1009,33 @@ void QRenderWindow::setGeometryStyle(int style)
 int QRenderWindow::getGeometryStyle()
 {
     return static_cast<int>(geometry_style_);
+}
+
+void QRenderWindow::setSurfacePrecision(int precision)
+{
+    if (!surface_precision::isValid(precision) || surface_precision_ == precision)
+        return;
+    surface_precision_ = precision;
+    dispatch_async([this, precision, revision = selection_revision_](vtkRenderWindow*, vtkUserData user_data) {
+        auto* vtk = Data::SafeDownCast(user_data);
+        if (!vtk || !select_manager_)
+            return;
+        // 显示切档沿用 develop 的临时高亮清理，但不提交空结果覆盖已填写参数。
+        render_selection_revision_ = revision;
+        select_manager_->clearSelection();
+        updateSelectionSnapshot(false);
+        try {
+            vtk->geometry_actor_manager_->setSurfacePrecision(precision);
+        } catch (const std::exception& error) {
+            spdlog::error("曲面显示精细度切换失败：{}", error.what());
+        }
+    });
+    emit surfacePrecisionChanged();
+}
+
+int QRenderWindow::getSurfacePrecision() const
+{
+    return surface_precision_;
 }
 
 void QRenderWindow::setMeshStyle(int style)

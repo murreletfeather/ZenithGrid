@@ -143,9 +143,15 @@ TEST_CASE("Curved edge points use exact parameters and reject opaque foreground 
     CHECK(scene.selection->getSelection()->size() == 0);
     scene.geometry.setVisibility(2, false);
     scene.selection->select(p[0], p[1]);
-    const auto result = scene.selection->getSelection();
-    REQUIRE(result->size() == 1);
-    const auto& point = result->get<ElementEnum::GeometryPoint>()->front();
-    CHECK(point.edge_parameter == Catch::Approx(parameter).margin(1e-6));
-    CHECK(gp_Pnt(point.world_pos[0], point.world_pos[1], point.world_pos[2]).Distance(expected) < 1e-6);
+    // 清理临时显示后再次拾取，各档位仍使用相同的精确曲线与全局身份。
+    for (int precision : { 0, 3, 1, 2 }) {
+        scene.selection->clearSelection();
+        scene.geometry.setSurfacePrecision(precision);
+        scene.selection->select(p[0], p[1]);
+        const auto result = scene.selection->getSelection();
+        REQUIRE(result->size() == 1);
+        const auto& point = result->get<ElementEnum::GeometryPoint>()->front();
+        CHECK(point.edge_parameter == Catch::Approx(parameter).margin(1e-6));
+        CHECK(gp_Pnt(point.world_pos[0], point.world_pos[1], point.world_pos[2]).Distance(expected) < 1e-6);
+    }
 }
