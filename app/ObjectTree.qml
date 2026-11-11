@@ -52,6 +52,15 @@ Pane {
         return _selectedNodeId === nodeId && _selectedDepth === depth
     }
 
+    // 加粗行：活动 Model/Component，以及左键选中的 depth=2 行。
+    function isNodeEmphasized(nodeId, depth) {
+        if (depth === 0)
+            return nodeId === App.selection.activeModelId
+        if (depth === 1)
+            return nodeId === App.selection.activeComponentId
+        return depth === 2 && isNodeSelected(nodeId, depth)
+    }
+
     // 清空对象树选中态，同时清除活动模型与组件。
     function clearNodeSelection() {
         _selectedNodeId = -1
@@ -234,12 +243,6 @@ Pane {
             readonly property real _padding: 6
             readonly property real _rowHeight: 22
             readonly property real _indentWidth: 20
-            readonly property bool _isActiveModel:
-                viewDelegate.depth === 0
-                && viewDelegate.model.nodeId === App.selection.activeModelId
-            readonly property bool _isActiveComponent:
-                viewDelegate.depth === 1
-                && viewDelegate.model.nodeId === App.selection.activeComponentId
             leftPadding: _padding + depth * _indentWidth + 18
             rightPadding: 0
 
@@ -302,8 +305,7 @@ Pane {
                     color: viewDelegate.model.isVisible ? Theme.textPrimary : Theme.textDisabled
                     font.pixelSize: Theme.fontSizeBody
                     font.family: Theme.monoFamily
-                    font.weight: viewDelegate._isActiveModel
-                                 || viewDelegate._isActiveComponent
+                    font.weight: objectTree.isNodeEmphasized(viewDelegate.model.nodeId, viewDelegate.depth)
                                  ? Font.Bold : Font.Normal
                     font.italic: !viewDelegate.model.isVisible
                     elide: Text.ElideRight

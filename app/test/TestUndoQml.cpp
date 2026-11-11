@@ -731,6 +731,62 @@ TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks"
     check_empty();
 }
 
+TEST_CASE("Actual QML emphasizes depth-2 selection with its ancestors", "[QML][tree][selection]")
+{
+    application();
+    QmlFixture f;
+    auto& model = *f.manager->getModelManager();
+    model.setUndoRecorder(nullptr);
+    auto* tree_model = f.tree->findChild<TreeModel*>();
+    REQUIRE(tree_model);
+
+    ComponentDatas components;
+    auto component = std::make_unique<ComponentData>();
+    component->mesh = std::make_unique<MeshData>();
+    components.push_back(std::move(component));
+    const Index model_id = model.addModel("emphasis fixture", std::move(components));
+    const Index component_id = model.modelById(model_id)->componentIds().front();
+    REQUIRE(tree_model->refresh());
+
+    const QModelIndex component_index = tree_model->findIndexByNodeId(component_id, 1);
+    REQUIRE(component_index.isValid());
+    const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
+    REQUIRE(mesh_index.isValid());
+    const Index mesh_node_id = tree_model->data(mesh_index, TreeModel::NodeIdRole).toInt();
+
+    const auto select = [&](Index node_id, int depth, Index owner_id) {
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "applyNodeSelection",
+            Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth), Q_ARG(QVariant, owner_id)));
+    };
+    const auto emphasized = [&](Index node_id, int depth) {
+        QVariant result;
+        REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "isNodeEmphasized",
+            Q_RETURN_ARG(QVariant, result), Q_ARG(QVariant, node_id), Q_ARG(QVariant, depth)));
+        return result.toBool();
+    };
+
+    // 选中 Component：Model 与 Component 加粗，depth=2 行不加粗。
+    select(component_id, 1, component_id);
+    CHECK(emphasized(model_id, 0));
+    CHECK(emphasized(component_id, 1));
+    CHECK_FALSE(emphasized(mesh_node_id, 2));
+
+    // 选中 depth=2 行：父级继续加粗，该行也加粗。
+    select(mesh_node_id, 2, component_id);
+    CHECK(emphasized(model_id, 0));
+    CHECK(emphasized(component_id, 1));
+    CHECK(emphasized(mesh_node_id, 2));
+
+    // 再次点击取消后全部恢复常规字重。
+    select(mesh_node_id, 2, component_id);
+    CHECK_FALSE(emphasized(model_id, 0));
+    CHECK_FALSE(emphasized(component_id, 1));
+    CHECK_FALSE(emphasized(mesh_node_id, 2));
+
+    model.removeModel(model_id);
+    pumpEvents();
+}
+
 TEST_CASE("Actual QML deletes the selected object tree node", "[QML][tree][selection][delete]")
 {
     application();
