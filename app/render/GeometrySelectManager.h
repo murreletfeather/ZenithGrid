@@ -34,8 +34,8 @@ public:
     void setSelectMode(SelectMode select_mode, double pixel_ratio = 1.0);
     /** @brief 只更新几何位置悬停显示，不改变确认值。 */
     void hover(double x, double y);
-    /** @brief 宿主替换几何后清查询缓存及受影响的点，组件 -1 表示全部。 */
-    void invalidateGeometry(Index component_id = -1);
+    /** @brief 宿主替换几何后清查询缓存及该组件的确认点。 */
+    void invalidateGeometry(Index component_id);
     void clearSelection();
     std::unique_ptr<Selection> getSelection();
     void setHighlightVisible(bool visible);

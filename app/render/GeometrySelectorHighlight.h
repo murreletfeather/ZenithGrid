@@ -35,7 +35,7 @@ public:
     /** @brief 确认有效点并替换前一个分割位置。 */
     void select(const GeometryPoint& point);
     /** @brief 更新瞬时悬停点，空命中只移除悬停显示。 */
-    void hover(const GeometryPoint& point = { });
+    void hover(const GeometryPoint& point);
     /** @brief 单个组件显隐只影响显示，不改变已确认的参数值。 */
     void setComponentVisible(Index component_id, bool visible);
     void clear() override;

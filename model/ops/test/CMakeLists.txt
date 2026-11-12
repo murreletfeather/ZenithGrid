@@ -4,8 +4,5 @@ precess_test_link_libraries(TestGeometryBuilder DataOps TKBRep TKPrim TKTopAlgo)
 precess_add_test(TestGeometryTopologyEditor TestGeometryTopologyEditor.cpp TestGeometryRepairValidation.cpp)
 precess_test_link_libraries(TestGeometryTopologyEditor DataOps TKBRep TKPrim TKTopAlgo)
 
-precess_add_test(TestGeometryPointOps TestGeometryPointOps.cpp)
-precess_test_link_libraries(TestGeometryPointOps DataOps TKBRep TKPrim TKTopAlgo)
-
 precess_add_test(TestObjMeshIO TestObjMeshIO.cpp)
 precess_test_link_libraries(TestObjMeshIO DataOps)

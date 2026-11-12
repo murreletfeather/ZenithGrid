@@ -108,7 +108,7 @@ struct ShapeSnapshot {
     TopoDS_Shape shape;
     std::vector<std::pair<double, std::array<double, 3>>> samples;
     std::vector<Bnd_Box> segment_bounds; //> 与相邻采样参数一一对应，共用候选快照的刷新周期。
-    std::shared_ptr<IntCurvesFace_ShapeIntersector> intersector;
+    std::unique_ptr<IntCurvesFace_ShapeIntersector> intersector;
     std::array<double, 3> minimum { }, maximum { };
     bool has_bounds { false };
 };
@@ -159,7 +159,7 @@ struct GeometryPointResolver::Impl {
                 ShapeSnapshot face { .component_id = component_id, .id = id, .shape = shape };
                 // 修剪面算法与包围盒随几何快照装配，切换输入不重建；悬停仅筛选并求交。
                 const double tolerance = std::max(Precision::Confusion(), BRep_Tool::Tolerance(TopoDS::Face(shape)));
-                face.intersector = std::make_shared<IntCurvesFace_ShapeIntersector>();
+                face.intersector = std::make_unique<IntCurvesFace_ShapeIntersector>();
                 face.intersector->Load(shape, tolerance);
                 Bnd_Box bounds;
                 BRepBndLib::AddOptimal(shape, bounds, false, true);
@@ -282,8 +282,8 @@ struct GeometryPointResolver::Impl {
     }
 
     /** @brief 按候选自身像素检查遮挡，仅接纳同一拓扑来源在相邻面上的局部表征误差。 */
-    bool unobstructed(const std::array<double, 3>& point, const ShapeSnapshot* snap_source = nullptr,
-        double edge_parameter = 0.0) const
+    bool unobstructed(const std::array<double, 3>& point, const ShapeSnapshot& edge_source,
+        double edge_parameter) const
     {
         auto screen = display(point);
         if (!screen)
@@ -304,12 +304,12 @@ struct GeometryPointResolver::Impl {
                 || property->GetOpacity() < 1.0)
                 continue;
             auto hit = intersect(face, origin, direction);
-            if (hit && std::sqrt(distanceSquared(hit->world_pos, origin)) + tolerance < candidate_distance) {
-                if (snap_source && snap_source->component_id == face.component_id) {
+            if (hit && std::sqrt(distanceSquared(*hit, origin)) + tolerance < candidate_distance) {
+                if (edge_source.component_id == face.component_id) {
                     // 限定已验证 pcurve 的局部邻域；斜射线长度会放大间隙，须沿局部面法向核对。
                     const auto admits_representation = [&](const GeometryPoint& boundary, double source_tolerance) {
                         const double representation_tolerance = std::max(Precision::Confusion(), source_tolerance) + tolerance;
-                        if (distanceSquared(hit->world_pos, boundary.world_pos) > representation_tolerance * representation_tolerance)
+                        if (distanceSquared(*hit, boundary.world_pos) > representation_tolerance * representation_tolerance)
                             return false;
                         gp_Pnt ignored;
                         gp_Vec du, dv;
@@ -318,19 +318,16 @@ struct GeometryPointResolver::Impl {
                         const double magnitude = normal.Magnitude();
                         if (std::isfinite(magnitude) && magnitude > std::numeric_limits<double>::min()) {
                             const gp_Vec gap(gp_Pnt(point[0], point[1], point[2]),
-                                gp_Pnt(hit->world_pos[0], hit->world_pos[1], hit->world_pos[2]));
+                                gp_Pnt((*hit)[0], (*hit)[1], (*hit)[2]));
                             const double normal_gap = std::abs(gap.Dot(normal) / magnitude);
                             return std::isfinite(normal_gap) && normal_gap <= representation_tolerance;
                         }
                         return false;
                     };
-                    if (snap_source->shape.ShapeType() == TopAbs_EDGE) {
-                        const auto edge = TopoDS::Edge(snap_source->shape);
-                        const auto boundary = GeometryPointOps::projectEdgePointOnFace(TopoDS::Face(face.shape), edge,
-                            face.component_id, face.id, snap_source->id, edge_parameter);
-                        if (boundary && admits_representation(*boundary, BRep_Tool::Tolerance(edge)))
-                            continue;
-                    }
+                    const auto edge = TopoDS::Edge(edge_source.shape);
+                    const auto boundary = GeometryPointOps::projectEdgePointOnFace(TopoDS::Face(face.shape), edge, edge_parameter);
+                    if (boundary && admits_representation(*boundary, BRep_Tool::Tolerance(edge)))
+                        continue;
                 }
                 return false;
             }
@@ -339,11 +336,9 @@ struct GeometryPointResolver::Impl {
     }
 
     /** @brief 用射线与 AABB 先筛选，再复用该面的 OCC 修剪面相交算法。 */
-    std::optional<GeometryPoint> intersect(const ShapeSnapshot& face,
+    std::optional<std::array<double, 3>> intersect(const ShapeSnapshot& face,
         const std::array<double, 3>& origin, const std::array<double, 3>& direction) const
     {
-        if (!face.intersector)
-            return std::nullopt;
         if (face.has_bounds) {
             double first = 0, last = std::numeric_limits<double>::max();
             for (size_t axis = 0; axis < 3; ++axis) {
@@ -377,14 +372,7 @@ struct GeometryPointResolver::Impl {
         if (!hit)
             return std::nullopt;
         const auto& position = face.intersector->Pnt(hit);
-        GeometryPoint point;
-        point.component_id = face.component_id;
-        point.support_kind = GeometryPointKind::Face;
-        point.support_id = face.id;
-        point.world_pos = { position.X(), position.Y(), position.Z() };
-        point.face_uv = { face.intersector->UParameter(hit), face.intersector->VParameter(hit) };
-        point.valid = true;
-        return point;
+        return std::array<double, 3> { position.X(), position.Y(), position.Z() };
     }
 
     /** @brief 按屏幕距离精化曲线参数；被遮挡的分支失败后仍尝试其余候选。 */
@@ -444,7 +432,8 @@ struct GeometryPointResolver::Impl {
             for (double endpoint : { edge.samples[segment - 1].first, edge.samples[segment].first })
                 if (distance(endpoint) < distance(parameter))
                     parameter = endpoint;
-            if (distance(parameter) > radius)
+            const double precise_distance = distance(parameter);
+            if (precise_distance > radius)
                 continue;
             const gp_Pnt position = curve.Value(parameter);
             GeometryPoint point;
@@ -454,12 +443,9 @@ struct GeometryPointResolver::Impl {
             point.world_pos = { position.X(), position.Y(), position.Z() };
             point.edge_parameter = parameter;
             point.valid = true;
-            if (!unobstructed(point.world_pos, &edge, parameter))
+            if (!unobstructed(point.world_pos, edge, parameter))
                 continue;
-            const auto screen = display(point.world_pos);
-            const double precise_distance = screen ? std::hypot((*screen)[0] - x, (*screen)[1] - y) : std::numeric_limits<double>::infinity();
-            if (precise_distance <= radius)
-                return std::pair { point, precise_distance };
+            return std::pair { point, precise_distance };
         }
         return std::nullopt;
     }

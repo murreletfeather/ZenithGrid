@@ -210,6 +210,12 @@ TEST_CASE("SplitFace feature splits one face and records one undo operation", "[
     REQUIRE(feature_system.setParameter("SplitFace", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(makeSelection(
             ElementEnum::GeometryFace, fixture.component_id, fixture.face_id))));
+    // 几何位置没有拓扑 ID，误选为切割工具时应提示重选而不是抛出载荷异常。
+    REQUIRE(feature_system.setParameter("SplitFace", 1,
+        core::ArgObject::create<ArgTypeEnum::Selector>(std::make_shared<Selection>(
+            Selection::create<ElementEnum::GeometryPoint>({ GeometryPoint { } }, fixture.component_id)))));
+    CHECK(std::any_cast<std::string>(feature_system.invoke("SplitFace"))
+        == "请选择用于分割目标面的几何边或几何面。");
     REQUIRE(feature_system.setParameter("SplitFace", 1,
         core::ArgObject::create<ArgTypeEnum::Selector>(makeSelection(
             ElementEnum::GeometryEdge, fixture.component_id, fixture.splitting_edge_id))));

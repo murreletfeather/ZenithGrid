@@ -23,14 +23,14 @@ QtObject {
     readonly property Connections _selectionChanges: Connections {
         target: App.selection
         function onSelectionUpdated(value) {
-            if (App.selection.parameterModel === root && App.selection.listeningSelectorIndex >= 0)
+            if (App.selection.listeningSelectorIndex >= 0)
                 root.setValue(App.selection.listeningSelectorIndex, value);
         }
     }
     readonly property Connections _viewportChanges: Connections {
         target: root.renderWindow
         function onSelectionFinished(revision) {
-            if (App.selection.parameterModel === root && revision === App.selection.selectionRevision) {
+            if (revision === App.selection.selectionRevision) {
                 App.selection.listeningSelectorIndex = -1;
                 App.selection.selectMode = root._idleMode;
             }
@@ -40,7 +40,7 @@ QtObject {
                 const value = root.values[i];
                 if (root.argumentTypes[i].type === QArgType.Selector && value && value.isGeometryPoint()
                     && value.getComponentId() === componentId) {
-                    if (App.selection.parameterModel === root && App.selection.listeningSelectorIndex === i)
+                    if (App.selection.listeningSelectorIndex === i)
                         root.stopSelection();
                     root.setValue(i, null);
                 }
@@ -52,7 +52,6 @@ QtObject {
         root.stopSelection();
         root.contextIndex = index;
         root._idleMode = App.selection.selectMode;
-        App.selection.parameterModel = root;
         App.selection.listeningSelectorIndex = index;
         const content = root.argumentTypes[index].content;
         let mode = content.length > 0 ? content.split(",")[0] : "";
@@ -79,25 +78,19 @@ QtObject {
     }
 
     function stopSelection() {
-        if (App.selection.parameterModel !== root || App.selection.listeningSelectorIndex < 0)
+        if (App.selection.listeningSelectorIndex < 0)
             return;
         App.selection.listeningSelectorIndex = -1;
         App.selection.selectMode = root._idleMode;
     }
 
+    // 选择中由视口的空结果回写；结束后只清最近操作的参数，不重复提交。
     function clearSelection() {
-        const index = App.selection.listeningSelectorIndex >= 0 ? App.selection.listeningSelectorIndex : root.contextIndex;
-        if (index >= 0)
-            root.setValue(index, null);
-        if (root.renderWindow)
-            root.renderWindow.clearSelection();
+        if (App.selection.listeningSelectorIndex < 0 && root.contextIndex >= 0)
+            root.setValue(root.contextIndex, null);
     }
 
-    Component.onDestruction: {
-        root.stopSelection();
-        if (App.selection.parameterModel === root)
-            App.selection.parameterModel = null;
-    }
+    Component.onDestruction: root.stopSelection()
 
     readonly property Connections _featureChanges: Connections {
         target: root.featureSystem
@@ -110,7 +103,6 @@ QtObject {
     function reset(operation) {
         root.stopSelection();
         root.contextIndex = -1;
-        App.selection.parameterModel = operation ? root : null;
         root.argumentTypes = operation && operation.info ? operation.info.arg_types : [];
         root.featureName = operation && operation.isFeature && operation.info ? operation.info.name : "";
         // 分类默认值只覆盖声明的参数，其他 Feature 参数保持其持久值。

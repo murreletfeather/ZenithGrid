@@ -34,6 +34,8 @@ std::any DeleteGeometryHandler::execute(FeatureContext& ctx)
     if (!selection_param || !*selection_param)
         return std::string("请选择一个几何形状。");
     const std::shared_ptr<Selection>& selected = *selection_param;
+    if (selected->type() == ElementEnum::GeometryPoint)
+        return std::string("选择必须是几何点、边、面或体。");
     if (selected->ids().size() != 1)
         return std::string("请选择一个几何形状。");
 

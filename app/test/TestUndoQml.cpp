@@ -939,6 +939,14 @@ TEST_CASE("QML point input finishes without rewriting values and clears only its
     REQUIRE(parameters);
     REQUIRE(viewport);
     REQUIRE(parameters->property("renderWindow").value<QObject*>() == viewport);
+    QObject* selector = nullptr;
+    for (auto* object : f.viewport->findChildren<QObject*>()) {
+        if (object->metaObject()->indexOfSignal("clearButtonClicked()") >= 0) {
+            selector = object;
+            break;
+        }
+    }
+    REQUIRE(selector);
     QSelection other(std::make_unique<Selection>(std::vector<Index> { 17 }, ElementEnum::GeometryFace, 1));
     REQUIRE(f.manager->getFeatureSystemAdaptor()->setParameter("ManySelectors", 1, QVariant::fromValue(&other)));
     f.selection_state->setProperty("selectMode", "GeometryFace");
@@ -960,12 +968,26 @@ TEST_CASE("QML point input finishes without rewriting values and clears only its
     CHECK((*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>())->get<ElementEnum::GeometryPoint>()->front().edge_parameter == 3);
     REQUIRE(QMetaObject::invokeMethod(f.selection_state, "selectionUpdated", Q_ARG(QVariant, QVariant::fromValue(&other))));
     CHECK((*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>())->type() == ElementEnum::GeometryPoint);
-    REQUIRE(QMetaObject::invokeMethod(parameters, "clearSelection"));
+    REQUIRE(QMetaObject::invokeMethod(selector, "clearButtonClicked"));
     CHECK_FALSE(*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>());
     CHECK((*system.params("ManySelectors")->value(1).get<ArgTypeEnum::Selector>())->ids() == std::vector<Index> { 17 });
     REQUIRE(QMetaObject::invokeMethod(parameters, "startSelection", Q_ARG(QVariant, 0)));
     emit viewport->selectionFinished(revision); // 旧结束通知不能停止新一轮选择。
     CHECK(f.selection_state->property("listeningSelectorIndex").toInt() == 0);
-    REQUIRE(QMetaObject::invokeMethod(parameters, "clearSelection"));
+    REQUIRE(f.manager->getFeatureSystemAdaptor()->setParameter("ManySelectors", 0, QVariant::fromValue(&selected)));
+    REQUIRE(QMetaObject::invokeMethod(selector, "clearButtonClicked"));
+    // 采集中复用视口空快照写回；清空按钮不抢先提交第二份结果。
+    CHECK(*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>());
+    REQUIRE(QMetaObject::invokeMethod(f.selection_state, "selectionUpdated", Q_ARG(QVariant, QVariant::fromValue(static_cast<QSelection*>(nullptr)))));
+    CHECK_FALSE(*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>());
     CHECK(f.selection_state->property("listeningSelectorIndex").toInt() == 0);
+
+    // 复用组件几何失效通知清理点参数，不需要插件主动回写，也不清除其他参数。
+    REQUIRE(f.manager->getFeatureSystemAdaptor()->setParameter("ManySelectors", 0, QVariant::fromValue(&selected)));
+    emit viewport->geometryInvalidated(2);
+    CHECK(*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>());
+    emit viewport->geometryInvalidated(1);
+    CHECK_FALSE(*system.params("ManySelectors")->value(0).get<ArgTypeEnum::Selector>());
+    CHECK(f.selection_state->property("listeningSelectorIndex").toInt() == -1);
+    CHECK((*system.params("ManySelectors")->value(1).get<ArgTypeEnum::Selector>())->ids() == std::vector<Index> { 17 });
 }

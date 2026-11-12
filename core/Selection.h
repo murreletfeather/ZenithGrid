@@ -60,9 +60,6 @@ public:
     /** @brief 只在枚举和载荷均匹配时读取，错误类型返回空指针。 */
     template <ElementEnum::Type T>
     const Value<T>* get() const { return type_ == T ? std::any_cast<Value<T>>(&value_) : nullptr; }
-    /** @brief 在类型约束内修改已有载荷，不暴露裸 std::any。 */
-    template <ElementEnum::Type T>
-    Value<T>* get() { return type_ == T ? std::any_cast<Value<T>>(&value_) : nullptr; }
     /** @brief 返回统一选择类型。 */
     ElementEnum::Type type() const { return type_; }
     /** @brief 既有拓扑构建器切换 ID 类型；跨载荷类型时同时清空旧值。 */
@@ -89,7 +86,7 @@ public:
     /**
      * @brief 保留原拓扑集合构建流程，同时拒绝把 ID 写入精确点载荷。
      * @throws std::logic_error 当前载荷不包含拓扑 ID 数组，例如 GeometryPoint 点列。
-     * @note 几何点请通过 get<ElementEnum::GeometryPoint>() 修改，类型不匹配时返回空指针。
+     * @note 几何点请通过 create<ElementEnum::GeometryPoint>() 构造新的选择值。
      */
     std::vector<Index>& ids()
     {

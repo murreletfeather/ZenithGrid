@@ -1,1 +1,1 @@
-{"system":"FeatureSystem","handler":{"name":"SplitEdge","display_name":"分割边","description":"按归一化比例将一条几何边分成两条边"}}
+{"system":"FeatureSystem","handler":{"name":"SplitEdge","display_name":"分割边","description":"在几何边上选择分割点，将边分成两条边"}}

@@ -47,7 +47,7 @@ void GeometrySelectManager::invalidateGeometry(Index component_id)
         point_resolver_->clear();
     if (point_selector_) {
         point_selector_->hover({ });
-        if (component_id < 0 || point_selector_->get().component_id == component_id)
+        if (point_selector_->get().component_id == component_id)
             point_selector_->clear();
     }
     // 普通几何高亮同样引用旧子形状，替换几何时沿用既有清理规则。

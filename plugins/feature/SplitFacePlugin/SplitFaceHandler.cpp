@@ -41,9 +41,10 @@ std::any SplitFaceHandler::execute(FeatureContext& ctx)
         return std::string("请选择一个需要分割的几何面。");
 
     const auto* tool_param = ctx.params.value(1).get<ArgTypeEnum::Selector>();
-    if (!tool_param || !*tool_param || (*tool_param)->ids().empty()
+    if (!tool_param || !*tool_param
         || ((*tool_param)->type() != ElementEnum::GeometryEdge
-            && (*tool_param)->type() != ElementEnum::GeometryFace)) {
+            && (*tool_param)->type() != ElementEnum::GeometryFace)
+        || (*tool_param)->ids().empty()) {
         return std::string("请选择用于分割目标面的几何边或几何面。");
     }
 

@@ -81,6 +81,8 @@ TEST_CASE("SplitEdge derives its target from the precise point and splits the ed
     double first = 0.0, last = 0.0;
     BRep_Tool::Range(TopoDS::Edge(edges(1)), first, last);
     CHECK((first == Catch::Approx(point.edge_parameter) || last == Catch::Approx(point.edge_parameter)));
+    // 原生执行保留参数，再次执行由后端拒绝已失效的边；失败不增加撤销记录。
+    CHECK(std::any_cast<std::string>(system.invoke("SplitEdge")) == "所选几何边已失效。");
     REQUIRE(undo.undo());
     edges.Clear();
     TopExp::MapShapes(*model.findComponent(component_id)->geometry->rootShape, TopAbs_EDGE, edges);

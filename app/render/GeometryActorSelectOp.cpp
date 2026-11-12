@@ -319,14 +319,10 @@ std::vector<std::pair<Index, TopoDS_Shape>> GeometryActorSelectOp::subshapes(Top
     const auto& shapes = index.type_maps[static_cast<size_t>(type_index)];
     for (int local_id = 1; local_id <= shapes.Extent(); ++local_id) {
         Index id = -1;
-        if (type == TopAbs_VERTEX)
-            id = index.vertexGlobalId(local_id);
-        else if (type == TopAbs_EDGE)
+        if (type == TopAbs_EDGE)
             id = index.edgeGlobalId(local_id);
         else if (type == TopAbs_FACE)
             id = index.faceGlobalId(local_id);
-        else if (type == TopAbs_SOLID)
-            id = index.solidGlobalId(local_id);
         if (id >= 0)
             result.emplace_back(id, shapes.FindKey(local_id));
     }

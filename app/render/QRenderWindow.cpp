@@ -490,7 +490,7 @@ void QRenderWindow::applyClipPlane(const MeshClipPlane& plane)
     }
     dispatch_async([this, revision = selection_revision_, snapshots = std::move(snapshots)](vtkRenderWindow*, vtkUserData user_data) {
         auto* vtk = Data::SafeDownCast(user_data);
-        // 裁剪会重排面下标，清理、安装和选择发布必须在同一次渲染回调内完成。
+        // 裁剪会重排面下标，清理与安装快照在同一次渲染回调内完成，不回写参数。
         render_selection_revision_ = revision;
         select_manager_->clearMeshSelection();
         for (const auto& [component_id, snapshot] : snapshots)
@@ -518,7 +518,7 @@ void QRenderWindow::loadMeshData(Index component_id, const MeshDataVtk& data)
     const auto snapshot = prepareMeshSnapshot(component_id);
     dispatch_async([this, component_id, snapshot, revision = selection_revision_](vtkRenderWindow*, vtkUserData user_data) {
         auto* vtk = Data::SafeDownCast(user_data);
-        // 原选择使用旧数据下标，必须在替换数据前清空，安装后再回传空快照。
+        // 原选择使用旧数据下标，替换前清空，安装后只更新快照。
         render_selection_revision_ = revision;
         select_manager_->clearMeshSelection();
         vtk->mesh_actor_manager_->loadMesh(component_id, snapshot, vtk->renderer_);
@@ -640,7 +640,7 @@ void QRenderWindow::applyFaceOperation(FaceOperation operation, const std::vecto
     dispatch_async([this, revision = selection_revision_, snapshots = std::move(snapshots),
                        geometry_updates = std::move(geometry_updates)](vtkRenderWindow*, vtkUserData user_data) {
         auto* vtk = Data::SafeDownCast(user_data);
-        // 所有面操作统一释放旧下标与高亮，再安装新数据并发布空选择。
+        // 面操作释放旧下标与高亮，再安装新数据；内部清理不提交参数结果。
         render_selection_revision_ = revision;
         select_manager_->clearMeshSelection();
         for (const auto& [id, snapshot] : snapshots)

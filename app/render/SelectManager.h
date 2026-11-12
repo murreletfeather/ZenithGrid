@@ -41,7 +41,7 @@ public:
     /** @brief 网格显示重建不清除几何点和几何高亮。 */
     void clearMeshSelection();
     /** @brief 由场景更新入口显式通知几何替换，不订阅模型事件。 */
-    void invalidateGeometry(Index component_id = -1);
+    void invalidateGeometry(Index component_id);
     /**
      * @brief 设置网格面选择的角度扩散参数
      * @param enabled 是否启用按角度扩散

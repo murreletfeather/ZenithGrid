@@ -68,7 +68,6 @@ std::any SplitEdgeHandler::execute(FeatureContext& ctx)
         if (!op)
             return std::string("几何操作失败，详细原因请查看日志。");
         op->replaceGeometryRoot(std::move(result));
-        ctx.setParameter(0, core::ArgObject::create<ArgTypeEnum::Selector>({ }));
         return std::string("分割边成功");
     } catch (const std::exception& error) {
         spdlog::error("SplitEdge: {}", error.what());

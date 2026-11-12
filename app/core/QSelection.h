@@ -28,10 +28,10 @@ public:
     }
 
     /**
-     * 存入
+     * @brief 共享保存选择值，不复制底层载荷。
      * @param data 待存入的数据
      */
-    void set(std::shared_ptr<Selection> data) { data_ = data ? std::make_shared<Selection>(*data) : nullptr; }
+    void set(std::shared_ptr<Selection> data) { data_ = std::move(data); }
     /**
      * 取出
      * @return 存储的Selection对象
@@ -53,7 +53,7 @@ public:
      * @brief 获取选中数据的类型枚举值
      * @return 类型枚举值
      */
-    Q_INVOKABLE Element::Type type() { return static_cast<Element::Type>(data_ ? data_->type() : ElementEnum::None); }
+    Q_INVOKABLE Element::Type type() { return data_ ? data_->type() : ElementEnum::None; }
     /**
      * @brief 初始化一个Selection数据
      */

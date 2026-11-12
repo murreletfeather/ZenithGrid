@@ -1,8 +1,11 @@
 #include "GeometryBuilder.h"
 #include "GeometryData.h"
+#include "GeometryPointOps.h"
 #include "GeometryTopologyEditor.h"
 
 #include <BRepCheck_Analyzer.hxx>
+#include <BRepLib_CheckCurveOnSurface.hxx>
+#include <BRepPrimAPI_MakeCylinder.hxx>
 #include <BRepTools.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAdaptor_Surface.hxx>
@@ -2364,4 +2367,58 @@ TEST_CASE("GeometryTopologyEditor isolates coarse tolerances when choosing a pat
             REQUIRE(serializeRepairShape(root) == before);
         }
     }
+}
+
+TEST_CASE("GeometryTopologyEditor splits shared cylinder edges and preserves all pcurves", "[GeometryPointOps]")
+{
+    bool circular = true;
+    SECTION("circular rim shared by cap and side") { }
+    SECTION("periodic seam with two pcurves on one face") { circular = false; }
+    const auto root = makeGeometryRoot(BRepPrimAPI_MakeCylinder(5.0, 10.0).Shape());
+    TopoDS_Edge target;
+    for (TopExp_Explorer explorer(root, TopAbs_EDGE); explorer.More(); explorer.Next()) {
+        const auto edge = TopoDS::Edge(explorer.Current());
+        const BRepAdaptor_Curve curve(edge);
+        if ((circular && curve.GetType() == GeomAbs_Circle && std::abs(curve.Value(curve.FirstParameter()).Z() - 10.0) < 1e-7)
+            || (!circular && curve.GetType() == GeomAbs_Line)) {
+            target = edge;
+            break;
+        }
+    }
+    REQUIRE_FALSE(target.IsNull());
+    double first = 0.0, last = 0.0;
+    BRep_Tool::Range(target, first, last);
+    const auto before = serializeRepairShape(root);
+    CHECK_THROWS(GeometryTopologyEditor::splitEdgeAtParameter(root, target, first));
+    CHECK_THROWS(GeometryTopologyEditor::splitEdgeAtParameter(root, target, last));
+    const auto result = GeometryTopologyEditor::splitEdgeAtParameter(root, target, first + (last - first) * 0.3);
+    REQUIRE(BRepCheck_Analyzer(result).IsValid());
+    CHECK(countSubshapes(result, TopAbs_SOLID) == 1);
+    CHECK(countSubshapes(result, TopAbs_FACE) == 3);
+    CHECK(countSubshapes(result, TopAbs_EDGE) == countSubshapes(root, TopAbs_EDGE) + 1);
+    // 切边后的每个邻面都保留参数曲线，复用查询同时验证精确边点到面的映射。
+    for (TopExp_Explorer face(result, TopAbs_FACE); face.More(); face.Next()) {
+        for (TopExp_Explorer edge(face.Current(), TopAbs_EDGE); edge.More(); edge.Next()) {
+            const auto current = TopoDS::Edge(edge.Current());
+            if (BRep_Tool::Degenerated(current))
+                continue;
+            REQUIRE(BRep_Tool::SameParameter(current));
+            REQUIRE(BRep_Tool::SameRange(current));
+            BRepLib_CheckCurveOnSurface check(current, TopoDS::Face(face.Current()));
+            check.Perform();
+            REQUIRE(check.IsDone());
+            REQUIRE(check.MaxDistance() <= BRep_Tool::Tolerance(current) * 2.0 + 1.0e-7);
+            BRep_Tool::Range(current, first, last);
+            const auto mapped = GeometryPointOps::projectEdgePointOnFace(
+                TopoDS::Face(face.Current()), current, (first + last) * 0.5);
+            REQUIRE(mapped);
+            const auto expected = BRepAdaptor_Curve(current).Value((first + last) * 0.5);
+            CHECK(gp_Pnt(mapped->world_pos[0], mapped->world_pos[1], mapped->world_pos[2]).Distance(expected)
+                <= BRep_Tool::Tolerance(current));
+        }
+    }
+    CHECK(serializeRepairShape(root) == before);
+    GProp_GProps volume;
+    BRepGProp::VolumeProperties(result, volume);
+    CHECK(volume.Mass() == Catch::Approx(std::acos(-1.0) * 250).epsilon(1.0e-7));
 }

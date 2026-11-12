@@ -62,7 +62,7 @@ public:
     vtkActor& getPolyActor();
     bool isVisible() const;
 
-    /** @brief 枚举渲染侧独立索引中的子形状及其全局身份，不读取 GUI 模型。 */
+    /** @brief 枚举渲染侧独立索引中的边或面及其全局身份，不读取 GUI 模型。 */
     std::vector<std::pair<Index, TopoDS_Shape>> subshapes(TopAbs_ShapeEnum type) const;
 
 private:

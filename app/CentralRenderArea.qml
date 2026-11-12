@@ -792,10 +792,8 @@ Page {
             }
 
             onClearButtonClicked: {
-                if (App.selection.parameterModel)
-                    App.selection.parameterModel.clearSelection()
-                else
-                    myItem.clearSelection()
+                App.selection.clearSelectionRequested()
+                myItem.clearSelection()
             }
         }
 

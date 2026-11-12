@@ -16,7 +16,7 @@ public:
     /** @brief 释放旧几何候选，下一次拾取按新场景重新准备。 */
     void clear();
     /** @brief 在屏幕半径内求最近可见边位置，坐标与参数均来自真实曲线。 */
-    GeometryPoint resolvePoint(double x, double y, double pixel_ratio = 1.0) const;
+    GeometryPoint resolvePoint(double x, double y, double pixel_ratio) const;
 
 private:
     struct Impl;
