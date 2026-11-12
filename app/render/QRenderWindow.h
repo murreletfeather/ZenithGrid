@@ -302,6 +302,9 @@ private:
     void publishSelection();
     /** @brief 内部显示重建只更新缓存；用户确认操作才通知参数。 */
     void updateSelectionSnapshot(bool notify);
+    //! @brief 只应用网格/几何显隐，不触发回传；由组件级操作合并后统一通知。
+    void applyMeshVisibility(Index component_id, bool visibility);
+    void applyGeometryVisibility(Index component_id, bool visibility);
     /** @brief 在 GUI 线程发布当前显隐结果，对象树只接收最新状态。 */
     void publishComponentVisibility(Index component_id);
     // QQuickVTKItem 会接管事件分发，GUI 排队通知交给独立 QObject。
