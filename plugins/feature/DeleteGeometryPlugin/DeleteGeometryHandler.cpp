@@ -34,19 +34,21 @@ std::any DeleteGeometryHandler::execute(FeatureContext& ctx)
     if (!selection_param || !*selection_param)
         return std::string("请选择一个几何形状。");
     const std::shared_ptr<Selection>& selected = *selection_param;
-    if (selected->ids.size() != 1)
+    if (selected->type() == ElementEnum::GeometryPoint)
+        return std::string("选择必须是几何点、边、面或体。");
+    if (selected->ids().size() != 1)
         return std::string("请选择一个几何形状。");
 
     const bool* delete_children_param = ctx.params.value(1).get<ArgTypeEnum::Bool>();
     const bool delete_children = delete_children_param ? *delete_children_param : true;
 
     try {
-        const Index shape_id = selected->ids.front();
+        const Index shape_id = selected->ids().front();
         TopAbs_ShapeEnum shape_type = TopAbs_SHAPE;
         const TopoDS_Shape* selected_shape = nullptr;
 
         // 选择类型决定全局几何 ID 的类别以及对应的 OCC Shape 注册表。
-        switch (selected->type) {
+        switch (selected->type()) {
         case ElementEnum::GeometryVertex:
             shape_type = TopAbs_VERTEX;
             selected_shape = ctx.model.geomRegistry().getVertex(shape_id);

@@ -47,8 +47,8 @@ TEST_CASE("Selection parameter requires typed selections and preserves values on
     REQUIRE(system.registerHandler(meta, std::move(handler)));
     systems::feature::QFeatureSystemAdaptor adaptor(system);
     QSelection selection(std::make_unique<Selection>());
-    selection.get()->type = ElementEnum::Face;
-    selection.get()->ids = { 7 };
+    selection.get()->setType(ElementEnum::Face);
+    selection.get()->ids() = { 7 };
     REQUIRE(adaptor.setParameter("SelectionTest", 0, QVariant::fromValue(&selection)));
     const auto* params = system.params("SelectionTest");
     REQUIRE(params != nullptr);

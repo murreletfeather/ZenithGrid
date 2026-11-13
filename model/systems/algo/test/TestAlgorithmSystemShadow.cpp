@@ -686,7 +686,7 @@ TEST_CASE("Inline geometry and mapping algorithms execute the target resolved be
     auto* handler = algorithm.get();
     REQUIRE(system.registerHandler(meta, AlgorithmSystem::SystemHandlerPtr { algorithm.release() }));
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::Component;
+    selection->setType(ElementEnum::Component);
     selection->component_id = target;
     const std::vector<core::ArgObject> args { core::ArgObject::create<ArgTypeEnum::Selector>(selection) };
     OwnerQueue queue;
@@ -745,7 +745,7 @@ TEST_CASE("Inline algorithm failures and cancellation keep partial real effects 
     handler->fail = !cancel;
     REQUIRE(system.registerHandler({ "Inline", "Inline label" }, AlgorithmSystem::SystemHandlerPtr { algorithm.release() }));
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::Component;
+    selection->setType(ElementEnum::Component);
     selection->component_id = target;
     OwnerQueue queue;
     systems::job::JobRunner runner(model, &undo, queue.dispatcher());
@@ -779,7 +779,7 @@ TEST_CASE("Inline execution shares an outer operation and synchronous execution 
     auto* handler = algorithm.get();
     REQUIRE(system.registerHandler({ "Inline", "Inline label" }, AlgorithmSystem::SystemHandlerPtr { algorithm.release() }));
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::Component;
+    selection->setType(ElementEnum::Component);
     selection->component_id = target;
     const std::vector<core::ArgObject> args { core::ArgObject::create<ArgTypeEnum::Selector>(selection) };
     OwnerQueue queue;
@@ -812,7 +812,7 @@ TEST_CASE("Inline algorithms remain available without an undo stack", "[Algorith
     auto* handler = algorithm.get();
     REQUIRE(system.registerHandler({ "Inline", "" }, AlgorithmSystem::SystemHandlerPtr { algorithm.release() }));
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::Component;
+    selection->setType(ElementEnum::Component);
     selection->component_id = target;
     OwnerQueue queue;
     systems::job::JobRunner runner(model, nullptr, queue.dispatcher());

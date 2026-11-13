@@ -56,13 +56,20 @@ TEST_CASE("DeleteGeometry execute removes selected solid from component root", "
     const std::any hint = feature_system.invoke("DeleteGeometry");
     REQUIRE(std::any_cast<std::string>(hint) == "请选择一个几何形状。");
 
+    // 虚拟位置不能作为待删除的拓扑对象，拒绝后仍能继续选择实体执行。
+    REQUIRE(feature_system.setParameter("DeleteGeometry", 0,
+        core::ArgObject::create<ArgTypeEnum::Selector>(std::make_shared<Selection>(
+            Selection::create<ElementEnum::GeometryPoint>({ GeometryPoint { } }, component_id)))));
+    CHECK(std::any_cast<std::string>(feature_system.invoke("DeleteGeometry"))
+        == "选择必须是几何点、边、面或体。");
+
     // 选择长方体（顶层实体）删除，保留下级拓扑
     auto* component = model_layer.findComponent(component_id);
     const auto& solid_ids = component->geometry->index.solid_local_to_global;
     REQUIRE(solid_ids.size() == 1 + 1); // 局部 id 从 1 起，0 号为保留槽
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometrySolid;
-    selection->ids = { solid_ids[1] }; // 下标从 1 起，0 号为保留槽
+    selection->setType(ElementEnum::GeometrySolid);
+    selection->ids() = { solid_ids[1] }; // 下标从 1 起，0 号为保留槽
     selection->component_id = component_id;
     REQUIRE(feature_system.setParameter("DeleteGeometry", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(selection)));
@@ -92,8 +99,8 @@ TEST_CASE("DeleteGeometry defaults to cascading deletion", "[DeleteGeometryPlugi
     REQUIRE(feature_system.registerHandler(handlerMetaData(), std::move(handler)));
     auto* component = model_layer.findComponent(component_id);
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometrySolid;
-    selection->ids = { component->geometry->index.solid_local_to_global[1] };
+    selection->setType(ElementEnum::GeometrySolid);
+    selection->ids() = { component->geometry->index.solid_local_to_global[1] };
     selection->component_id = component_id;
     REQUIRE(feature_system.setParameter("DeleteGeometry", 0,
         core::ArgObject::create<ArgTypeEnum::Selector>(selection)));

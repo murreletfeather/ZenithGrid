@@ -22,6 +22,7 @@ RowLayout {
 
     ComboBox{
         id: selectModeComboBox
+        enabled: App.selection.listeningSelectorIndex < 0 || App.selection.selectMode !== "GeometryPoint"
         model: [
             { text: "...", value: "None" },
             { text: "组件", value: "Component" },
@@ -39,6 +40,9 @@ RowLayout {
 
         // 绑定建立在自己的属性上——ComboBox 内部不会碰它，绑定不会被用户交互破坏
         property string sourceMode: App.selection.selectMode
+
+        // 虚拟点仅由插件参数启用，此处显示状态，不提供独立切换入口。
+        displayText: sourceMode === "GeometryPoint" ? qsTr("虚拟几何点") : currentText
 
         // 外部值变化 → 更新显示（初始化时也会触发一次，不用 Component.onCompleted）
         onSourceModeChanged: {

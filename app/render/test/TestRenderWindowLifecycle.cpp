@@ -197,6 +197,7 @@ TEST_CASE("QRenderWindow queues selection updates and discards results for old p
         auto* data = QRenderWindow::Data::SafeDownCast(user_data);
         REQUIRE(data != nullptr);
         QCoreApplication::processEvents();
+        CHECK(updates == 0); // 初始化和场景图重建不向参数发布空集合。
         const int before = updates;
 
         // 选择完成通知只能在 GUI 事件队列消费后送达；切换参数则丢弃旧版本快照。
@@ -663,7 +664,7 @@ TEST_CASE("QRenderWindow precision survives geometry undo redo and scene recreat
     };
     auto selection_ids = [&] {
         const std::unique_ptr<QSelection> selected(item.selectedIDs());
-        return selected && selected->get() ? selected->get()->ids : std::vector<Index> {};
+        return selected && selected->get() ? selected->get()->ids() : std::vector<Index> {};
     };
     auto pick_sphere = [&](const QString& mode, double center_x, double radius, Index expected_id) {
         item.clearSelection();
@@ -708,14 +709,15 @@ TEST_CASE("QRenderWindow precision survives geometry undo redo and scene recreat
     CHECK(target_updates == updates_before_same_level);
     CHECK(selection_ids() == std::vector<Index> { original_face_id });
 
-    // 正常清理入口发布空结果并清高亮；改变显示精度不生成模型历史。
+    // 显示切档清理临时集合及高亮，不发布空参数，也不生成模型历史。
     const int selections_before_switch = selection_updates;
     item.setSurfacePrecision(0);
     REQUIRE(renderUntil(quick_window, [&] {
-        return selection_updates > selections_before_switch && selection_ids().empty();
+        return selection_ids().empty();
     }));
     REQUIRE(read_scene());
     CHECK(state.highlight_cells == 0);
+    CHECK(selection_updates == selections_before_switch);
     REQUIRE(state.triangles < fine_triangles);
     const auto coarse_triangles = state.triangles;
     const auto coarse_bounds = state.bounds;

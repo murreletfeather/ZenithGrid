@@ -22,7 +22,7 @@ SelectManager::SelectManager(vtkRenderer& renderer,
 SelectManager::~SelectManager() = default;
 
 static bool is_mesh_mode(SelectMode m) { return m >= SelectMode::Vertex && m <= SelectMode::Solid; }
-static bool is_geom_mode(SelectMode m) { return m >= SelectMode::GeometryVertex && m <= SelectMode::GeometrySolid; }
+static bool is_geom_mode(SelectMode m) { return (m >= SelectMode::GeometryVertex && m <= SelectMode::GeometrySolid) || m == SelectMode::GeometryPoint; }
 
 void SelectManager::select(double posx, double posy, SelectOp op)
 {
@@ -38,6 +38,8 @@ void SelectManager::select(double posx, double posy, SelectOp op)
 
 void SelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp op)
 {
+    if (isGeometryPointMode())
+        return;
     if (select_mode_ == SelectMode::Component) {
         component_selector_->selectArea(xmin, ymin, xmax, ymax, op);
         return;
@@ -48,7 +50,7 @@ void SelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp 
         geom_->selectArea(xmin, ymin, xmax, ymax, op);
 }
 
-void SelectManager::setSelectMode(const std::string& select_mode)
+void SelectManager::setSelectMode(const std::string& select_mode, double pixel_ratio)
 {
     SelectMode mode = SelectMode::None;
     if (select_mode == "Vertex") {
@@ -67,6 +69,8 @@ void SelectManager::setSelectMode(const std::string& select_mode)
         mode = SelectMode::GeometryFace;
     } else if (select_mode == "GeometrySolid") {
         mode = SelectMode::GeometrySolid;
+    } else if (select_mode == "GeometryPoint") {
+        mode = SelectMode::GeometryPoint;
     } else if (select_mode == "Component") {
         mode = SelectMode::Component;
     }
@@ -86,7 +90,7 @@ void SelectManager::setSelectMode(const std::string& select_mode)
         mesh_->clearSelection();
 
     if (is_geom_mode(mode))
-        geom_->setSelectMode(mode);
+        geom_->setSelectMode(mode, pixel_ratio);
     else
         geom_->clearSelection();
 }
@@ -162,4 +166,21 @@ std::unique_ptr<Selection> SelectManager::getSelection()
     if (is_mesh_mode(select_mode_))
         return mesh_->getSelection();
     return nullptr;
+}
+
+void SelectManager::hover(double x, double y)
+{
+    if (isGeometryPointMode())
+        geom_->hover(x, y);
+}
+
+void SelectManager::clearMeshSelection()
+{
+    component_selector_->clear();
+    mesh_->clearSelection();
+}
+
+void SelectManager::invalidateGeometry(Index component_id)
+{
+    geom_->invalidateGeometry(component_id);
 }

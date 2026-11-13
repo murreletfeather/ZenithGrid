@@ -106,7 +106,7 @@ void QRenderWindowStyle::detachRubberBand()
 void QRenderWindowStyle::OnLeftButtonDown()
 {
     auto* iren = this->GetInteractor();
-    if (iren && iren->GetControlKey()) {
+    if (iren && iren->GetControlKey() && !(select_manager_ && select_manager_->isGeometryPointMode())) {
         // Ctrl+左键 → 进入框选模式；不调父类，相机不被旋转/平移
         box_selecting_ = true;
         click_ = true;
@@ -154,7 +154,8 @@ void QRenderWindowStyle::OnLeftButtonUp()
         click_ = false;
         int pos[2];
         this->GetInteractor()->GetEventPosition(pos);
-        if (interaction_service_ && interaction_service_->hasActiveState())
+        if (interaction_service_ && interaction_service_->hasActiveState()
+            && !(select_manager_ && select_manager_->isGeometryPointMode()))
             interaction_service_->pick(pos[0], pos[1]);
         else if (select_manager_) {
             select_manager_->select(pos[0], pos[1], op);
@@ -176,6 +177,13 @@ void QRenderWindowStyle::OnMouseMove()
         return;
     }
 
+    // 精确点属于选择器；分割边无需启用插件 interaction 也能显示悬停。
+    if (select_manager_ && select_manager_->isGeometryPointMode() && this->State == VTKIS_NONE) {
+        const int* pos = this->GetInteractor()->GetEventPosition();
+        select_manager_->hover(pos[0], pos[1]);
+        this->GetInteractor()->Render();
+        return;
+    }
     // 仅在无拖拽（非旋转/平移等相机操作）时做交互动态预览
     if (interaction_service_ && interaction_service_->hasActiveState() && this->State == VTKIS_NONE) {
         int pos[2];

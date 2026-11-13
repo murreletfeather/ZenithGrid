@@ -89,9 +89,9 @@ PatchFaceFixture addPatchBoundary(ModelLayer& model_layer, bool isolated)
 std::shared_ptr<Selection> makeEdgeSelection(const PatchFaceFixture& fixture)
 {
     auto selection = std::make_shared<Selection>();
-    selection->type = ElementEnum::GeometryEdge;
+    selection->setType(ElementEnum::GeometryEdge);
     selection->component_id = fixture.component_id;
-    selection->ids = { fixture.seed_edge_id };
+    selection->ids() = { fixture.seed_edge_id };
     return selection;
 }
 

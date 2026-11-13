@@ -174,12 +174,10 @@ std::optional<Index> GeometryActorSelectOp::resolvePickedSubshape(IVtkTools_Shap
     if (!firstId(picker->GetPickedSubShapesIds(shapeId, false), out_sub_id))
         return std::nullopt;
 
-    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
-    if (!geomIndex)
-        return std::nullopt;
+    const GeometrySubshapeIndex& geomIndex = geometry_actor_->geometry_index_;
 
     ElementEnum::Type elemType = ElementEnum::None;
-    return mapSubshapeToGeomId(geometry_actor_->occ_shape_, *geomIndex, wantType, out_sub_id, elemType);
+    return mapSubshapeToGeomId(geometry_actor_->occ_shape_, geomIndex, wantType, out_sub_id, elemType);
 }
 
 std::vector<std::pair<IVtk_IdType, Index>> GeometryActorSelectOp::resolvePickedSubshapes(
@@ -199,16 +197,14 @@ std::vector<std::pair<IVtk_IdType, Index>> GeometryActorSelectOp::resolvePickedS
     else
         return out;
 
-    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
-    if (!geomIndex)
-        return out;
+    const GeometrySubshapeIndex& geomIndex = geometry_actor_->geometry_index_;
 
     const NCollection_List<IVtk_IdType> subs = picker->GetPickedSubShapesIds(shapeId, true);
     out.reserve(static_cast<size_t>(subs.Extent()));
     for (const IVtk_IdType subId : subs) {
         ElementEnum::Type elemType = ElementEnum::None;
         if (auto geomId = mapSubshapeToGeomId(
-                geometry_actor_->occ_shape_, *geomIndex, wantType, subId, elemType)) {
+                geometry_actor_->occ_shape_, geomIndex, wantType, subId, elemType)) {
             out.emplace_back(subId, *geomId);
         }
     }
@@ -244,9 +240,7 @@ bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IV
     if (pickedSub.IsNull())
         return false;
 
-    const GeometrySubshapeIndex* geomIndex = geometry_actor_->geometry_index_;
-    if (!geomIndex)
-        return false;
+    const GeometrySubshapeIndex& geomIndex = geometry_actor_->geometry_index_;
 
     const int solidTi = GeometrySubshapeIndex::typeIndex(TopAbs_SOLID);
 
@@ -254,9 +248,9 @@ bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IV
     if (pickedSub.ShapeType() == TopAbs_SOLID) {
         solidShape = pickedSub;
     } else {
-        const int nSolids = geomIndex->type_maps[solidTi].Extent();
+        const int nSolids = geomIndex.type_maps[solidTi].Extent();
         for (int localId = 1; localId <= nSolids; ++localId) {
-            const TopoDS_Shape& solid = geomIndex->type_maps[solidTi].FindKey(localId);
+            const TopoDS_Shape& solid = geomIndex.type_maps[solidTi].FindKey(localId);
             for (TopExp_Explorer exp(solid, TopAbs_FACE); exp.More(); exp.Next()) {
                 if (exp.Current().IsSame(pickedSub)) {
                     solidShape = solid;
@@ -270,11 +264,11 @@ bool GeometryActorSelectOp::resolvePickedSolid(IVtkTools_ShapePicker* picker, IV
             return false;
     }
 
-    const int localTypeId = geomIndex->type_maps[solidTi].FindIndex(solidShape);
+    const int localTypeId = geomIndex.type_maps[solidTi].FindIndex(solidShape);
     if (localTypeId <= 0)
         return false;
 
-    GeomSolidId gid = geomIndex->solidGlobalId(localTypeId);
+    GeomSolidId gid = geomIndex.solidGlobalId(localTypeId);
     if (gid == kInvalidGeomSolidId)
         return false;
 
@@ -313,4 +307,24 @@ vtkActor& GeometryActorSelectOp::getPolyActor()
 bool GeometryActorSelectOp::isVisible() const
 {
     return geometry_actor_->isVisible();
+}
+
+std::vector<std::pair<Index, TopoDS_Shape>> GeometryActorSelectOp::subshapes(TopAbs_ShapeEnum type) const
+{
+    std::vector<std::pair<Index, TopoDS_Shape>> result;
+    const auto& index = geometry_actor_->geometry_index_;
+    const int type_index = GeometrySubshapeIndex::typeIndex(type);
+    if (type_index < 0)
+        return result;
+    const auto& shapes = index.type_maps[static_cast<size_t>(type_index)];
+    for (int local_id = 1; local_id <= shapes.Extent(); ++local_id) {
+        Index id = -1;
+        if (type == TopAbs_EDGE)
+            id = index.edgeGlobalId(local_id);
+        else if (type == TopAbs_FACE)
+            id = index.faceGlobalId(local_id);
+        if (id >= 0)
+            result.emplace_back(id, shapes.FindKey(local_id));
+    }
+    return result;
 }

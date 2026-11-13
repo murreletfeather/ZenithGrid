@@ -11,6 +11,8 @@ QtObject {
         property int selectionRevision: 0
         onListeningSelectorIndexChanged: ++selectionRevision
         signal selectionUpdated(var sel)
+        // 用户主动清空；操作会话处理结束后的参数，视口仍走原有清空入口。
+        signal clearSelectionRequested()
         signal selectionInvalidated()
     }
 

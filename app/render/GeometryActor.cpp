@@ -33,10 +33,11 @@ GeometryActor::~GeometryActor()
 
 void GeometryActor::loadShape(const GeometryDataVtk& geometry_data)
 {
-    // 直接沿用模型形状及索引，显示重建只更新可再生的离散缓存。
+    // 沿用模型形状；显示重建只更新可再生的离散缓存。
     occ_shape_ = new IVtkOCC_Shape(geometry_data.shape);
     occ_shape_->SetId(static_cast<IVtk_IdType>(geometry_data.component_id));
-    geometry_index_ = geometry_data.geometry_index;
+    // 渲染侧独立保存身份快照；无索引输入清空旧身份，避免借用 GUI 索引。
+    geometry_index_ = geometry_data.geometry_index ? *geometry_data.geometry_index : GeometrySubshapeIndex { };
     // 输入可能附带更细的网格，先清理以便在标准网格上初始化拾取缓存。
     BRepTools::Clean(occ_shape_->GetShape());
     rebuildMesh(surface_precision::kDefault);

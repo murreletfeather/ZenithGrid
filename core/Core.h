@@ -39,7 +39,8 @@ enum class SelectMode {
     GeometryEdge,
     GeometryFace,
     GeometrySolid,
-    Component
+    Component,
+    GeometryPoint
 };
 
 /**

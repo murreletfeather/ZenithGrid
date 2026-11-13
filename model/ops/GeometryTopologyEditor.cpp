@@ -2398,7 +2398,6 @@ GeometryTopologyDiagnosticResult GeometryTopologyEditor::diagnoseTopology(
     return session->takeResult();
 }
 
-
 TopoDS_Shape GeometryTopologyEditor::splitEdge(
     const TopoDS_Shape& root,
     const TopoDS_Edge& edge,
@@ -2408,49 +2407,68 @@ TopoDS_Shape GeometryTopologyEditor::splitEdge(
         throw std::invalid_argument("Geometry root and edge must not be null");
     if (!std::isfinite(ratio) || ratio <= 0.0 || ratio >= 1.0)
         throw std::invalid_argument("Split ratio must be between zero and one");
+    double first = 0.0, last = 0.0;
+    if (BRep_Tool::Curve(edge, first, last).IsNull())
+        throw std::invalid_argument("Selected edge has no splittable 3D curve");
+    // 兼容比例输入仍沿选择方向换算；新拾取入口直接保存精确曲线参数。
+    const double curve_ratio = edge.Orientation() == TopAbs_REVERSED ? 1.0 - ratio : ratio;
+    return splitEdgeAtParameter(root, edge, first + (last - first) * curve_ratio);
+}
+
+TopoDS_Shape GeometryTopologyEditor::splitEdgeAtParameter(
+    const TopoDS_Shape& root, const TopoDS_Edge& edge, double parameter)
+{
+    if (root.IsNull() || edge.IsNull())
+        throw std::invalid_argument("Geometry root and edge must not be null");
     requireSubshape(root, edge, TopAbs_EDGE, "Selected edge does not belong to the geometry root");
-
     try {
-        TopoDS_Vertex start;
-        TopoDS_Vertex end;
-        // 构造子边时统一使用曲线正向端点，选择方向仅用于换算分割比例。
-        const TopoDS_Edge forward_edge = TopoDS::Edge(edge.Oriented(TopAbs_FORWARD));
-        TopExp::Vertices(forward_edge, start, end, true);
-        double first = 0.0;
-        double last = 0.0;
-        const occ::handle<Geom_Curve> curve = BRep_Tool::Curve(edge, first, last);
-        if (start.IsNull() || end.IsNull() || curve.IsNull()
-            || !std::isfinite(first) || !std::isfinite(last) || first >= last)
-            throw std::invalid_argument("Selected edge has no splittable 3D curve");
+        double first = 0.0, last = 0.0;
+        const auto original_curve = BRep_Tool::Curve(edge, first, last);
+        if (original_curve.IsNull() || !std::isfinite(first) || !std::isfinite(last)
+            || !std::isfinite(parameter) || parameter <= first + Precision::PConfusion()
+            || parameter >= last - Precision::PConfusion())
+            throw std::invalid_argument("Split parameter must lie strictly inside the edge range");
+        const auto precision = PrecisionPolicy::fromShape(edge);
+        const auto position = original_curve->Value(parameter);
+        if (position.Distance(original_curve->Value(first)) <= precision.numerical_floor
+            || position.Distance(original_curve->Value(last)) <= precision.numerical_floor)
+            throw std::invalid_argument("Split point is too close to an existing endpoint");
 
-        const double curve_ratio = edge.Orientation() == TopAbs_REVERSED ? 1.0 - ratio : ratio;
-        const double parameter = first + (last - first) * curve_ratio;
-        const TopoDS_Vertex middle = BRepBuilderAPI_MakeVertex(curve->Value(parameter));
-        BRepBuilderAPI_MakeEdge first_builder(curve, start, middle, first, parameter);
-        BRepBuilderAPI_MakeEdge second_builder(curve, middle, end, parameter, last);
-        if (!first_builder.IsDone() || !second_builder.IsDone())
-            throw std::runtime_error("OpenCASCADE failed to build split edges");
-
+        // 深复制整模型，随后修复和参数补写均不得触碰 undo 前像的共享 TShape。
+        BRepBuilderAPI_Copy copier(root, true, false);
+        const auto working_edge = TopoDS::Edge(copier.ModifiedShape(edge).Oriented(TopAbs_FORWARD));
+        TopoDS_Vertex start, end;
+        TopExp::Vertices(working_edge, start, end, true);
+        if (start.IsNull() || end.IsNull() || BRep_Tool::Degenerated(working_edge))
+            throw std::invalid_argument("Selected edge has no splittable endpoints");
+        const TopoDS_Vertex middle = BRepBuilderAPI_MakeVertex(position);
+        ShapeBuild_Edge edge_builder;
+        // 复制原边的全部曲线表示，包含共享面的 pcurve 和周期缝边的双 pcurve。
+        const auto first_edge = edge_builder.CopyReplaceVertices(working_edge, start, middle);
+        const auto second_edge = edge_builder.CopyReplaceVertices(working_edge, middle, end);
+        BRep_Builder builder;
+        builder.Range(first_edge, first, parameter);
+        builder.Range(second_edge, parameter, last);
+        builder.UpdateVertex(middle, parameter, first_edge, BRep_Tool::Tolerance(middle));
+        builder.UpdateVertex(middle, parameter, second_edge, BRep_Tool::Tolerance(middle));
         BRepBuilderAPI_MakeWire wire_builder;
-        wire_builder.Add(first_builder.Edge());
-        wire_builder.Add(second_builder.Edge());
+        wire_builder.Add(first_edge);
+        wire_builder.Add(second_edge);
         if (!wire_builder.IsDone())
-            throw std::runtime_error("OpenCASCADE failed to build the split wire");
-
-        const int edge_count = countSubshapes(root, TopAbs_EDGE);
-        const int vertex_count = countSubshapes(root, TopAbs_VERTEX);
-        occ::handle<BRepTools_ReShape> reshaper = new BRepTools_ReShape();
-        reshaper->Replace(forward_edge, wire_builder.Wire());
-        TopoDS_Shape result = fixAndValidate(reshaper->Apply(root), "Splitting the edge");
-        if (countSubshapes(result, TopAbs_EDGE) != edge_count + 1
-            || countSubshapes(result, TopAbs_VERTEX) != vertex_count + 1)
-            throw std::runtime_error("Splitting the edge did not create two connected edges");
+            throw std::runtime_error("OpenCASCADE failed to build split edges");
+        occ::handle<BRepTools_ReShape> reshaper = new BRepTools_ReShape;
+        reshaper->Replace(working_edge, wire_builder.Wire());
+        const auto result = fixAndValidate(reshaper->Apply(copier.Shape()), "Splitting the edge");
+        if (countSubshapes(result, TopAbs_EDGE) != countSubshapes(root, TopAbs_EDGE) + 1
+            || countSubshapes(result, TopAbs_VERTEX) != countSubshapes(root, TopAbs_VERTEX) + 1
+            || countSubshapes(result, TopAbs_FACE) != countSubshapes(root, TopAbs_FACE)
+            || countSubshapes(result, TopAbs_SOLID) != countSubshapes(root, TopAbs_SOLID))
+            throw std::runtime_error("Splitting the edge changed unrelated topology");
         return result;
     } catch (const Standard_Failure& error) {
         const char* detail = error.GetMessageString();
-        throw std::runtime_error(detail
-                ? std::string("OpenCASCADE failed to split the edge: ") + detail
-                : "OpenCASCADE failed to split the edge");
+        throw std::runtime_error(detail ? std::string("OpenCASCADE failed to split the edge: ") + detail
+                                        : "OpenCASCADE failed to split the edge");
     }
 }
 

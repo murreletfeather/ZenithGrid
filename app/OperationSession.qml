@@ -39,8 +39,11 @@ QtObject {
     }
     readonly property Connections _selectionChanges: Connections {
         target: App.selection
+        function onClearSelectionRequested() {
+            root.parameterModel.clearSelection();
+        }
         function onSelectionInvalidated() {
-            App.selection.listeningSelectorIndex = -1;
+            root.parameterModel.stopSelection();
             root.parameterModel.clearSelections();
         }
     }
@@ -62,7 +65,6 @@ QtObject {
             const featureName = operation && operation.isFeature && operation.info ? operation.info.name : "";
             root.parameterModel.featureSystem.setFeatureActive(featureName);
             if (!preserveParameters) {
-                App.selection.listeningSelectorIndex = -1;
                 root.parameterModel.reset(operation);
             } else
                 root.parameterModel.argumentTypes = operation.info.arg_types;

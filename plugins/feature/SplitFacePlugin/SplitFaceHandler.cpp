@@ -36,19 +36,20 @@ std::any SplitFaceHandler::execute(FeatureContext& ctx)
 {
     const auto* face_param = ctx.params.value(0).get<ArgTypeEnum::Selector>();
     if (!face_param || !*face_param
-        || (*face_param)->type != ElementEnum::GeometryFace
-        || (*face_param)->ids.size() != 1)
+        || (*face_param)->type() != ElementEnum::GeometryFace
+        || (*face_param)->ids().size() != 1)
         return std::string("请选择一个需要分割的几何面。");
 
     const auto* tool_param = ctx.params.value(1).get<ArgTypeEnum::Selector>();
-    if (!tool_param || !*tool_param || (*tool_param)->ids.empty()
-        || ((*tool_param)->type != ElementEnum::GeometryEdge
-            && (*tool_param)->type != ElementEnum::GeometryFace)) {
+    if (!tool_param || !*tool_param
+        || ((*tool_param)->type() != ElementEnum::GeometryEdge
+            && (*tool_param)->type() != ElementEnum::GeometryFace)
+        || (*tool_param)->ids().empty()) {
         return std::string("请选择用于分割目标面的几何边或几何面。");
     }
 
     try {
-        const Index face_id = (*face_param)->ids.front();
+        const Index face_id = (*face_param)->ids().front();
         const TopoDS_Shape* face_shape = ctx.model.geomRegistry().getFace(face_id);
         if (!face_shape || face_shape->ShapeType() != TopAbs_FACE)
             return std::string("所选目标面已失效。");
@@ -67,10 +68,10 @@ std::any SplitFaceHandler::execute(FeatureContext& ctx)
         // 索引释放前复制轻量 OCC 句柄；所有切割工具必须与目标面属于同一组件。
         const TopoDS_Face target_face = TopoDS::Face(*face_shape);
         TopoDS_Shape result;
-        if ((*tool_param)->type == ElementEnum::GeometryEdge) {
+        if ((*tool_param)->type() == ElementEnum::GeometryEdge) {
             std::vector<TopoDS_Edge> splitting_edges;
-            splitting_edges.reserve((*tool_param)->ids.size());
-            for (Index edge_id : (*tool_param)->ids) {
+            splitting_edges.reserve((*tool_param)->ids().size());
+            for (Index edge_id : (*tool_param)->ids()) {
                 const auto edge_component_id =
                     ctx.model.findComponentIdByGeometryShapeId(TopAbs_EDGE, edge_id);
                 if (!edge_component_id || *edge_component_id != *component_id)
@@ -85,8 +86,8 @@ std::any SplitFaceHandler::execute(FeatureContext& ctx)
                 *component->geometry->rootShape, target_face, splitting_edges);
         } else {
             std::vector<TopoDS_Face> splitting_faces;
-            splitting_faces.reserve((*tool_param)->ids.size());
-            for (Index tool_face_id : (*tool_param)->ids) {
+            splitting_faces.reserve((*tool_param)->ids().size());
+            for (Index tool_face_id : (*tool_param)->ids()) {
                 const auto tool_component_id =
                     ctx.model.findComponentIdByGeometryShapeId(TopAbs_FACE, tool_face_id);
                 if (!tool_component_id || *tool_component_id != *component_id)

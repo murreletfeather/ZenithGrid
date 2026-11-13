@@ -177,6 +177,14 @@ public:
         double ratio);
 
     /**
+     * @brief 在精确曲线参数处切边，保留所有相邻面上的 pcurve 和共享拓扑。
+     * @param parameter 曲线有效区间内部的参数，不受所选边方向影响。
+     * @note 对工作副本操作，原模型与撤销快照保持不变；端点处拒绝切分。
+     */
+    static TopoDS_Shape splitEdgeAtParameter(
+        const TopoDS_Shape& root, const TopoDS_Edge& edge, double parameter);
+
+    /**
      * @brief 将一条 Edge 压缩到目标位置。
      * @param target_position 压缩后的公共顶点位置。
      */

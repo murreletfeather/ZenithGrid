@@ -116,6 +116,13 @@ vtk_module_autoinit(TARGETS TestRenderWindowLifecycle MODULES
     VTK::GUISupportQtQuick VTK::RenderingOpenGL2 VTK::InteractionStyle
 )
 
+# 单点拾取的离屏回归，不启动交互窗口。
+precess_add_test(TestGeometryEdgePointPicking TestGeometryEdgePointPicking.cpp)
+precess_test_link_libraries(TestGeometryEdgePointPicking vtkPart Data DataOps TKPrim VTK::CommonColor
+    VTK::RenderingOpenGL2 VTK::InteractionStyle
+)
+vtk_module_autoinit(TARGETS TestGeometryEdgePointPicking MODULES VTK::RenderingOpenGL2 VTK::InteractionStyle)
+
 # 曲面显示精细度覆盖双向网格重建、固定拾取缓存与显示数据刷新。
 precess_add_test(TestGeometrySurfacePrecision TestGeometrySurfacePrecision.cpp)
 precess_test_link_libraries(TestGeometrySurfacePrecision vtkPart spdlog::spdlog

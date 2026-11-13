@@ -122,11 +122,11 @@ struct GeometryScene {
 
 void checkRepick(GeometrySelectManager& selection, const std::array<double, 2>& display, const std::vector<Index>& expected)
 {
-    CHECK(selection.getSelection()->ids == expected);
+    CHECK(selection.getSelection()->ids() == expected);
     selection.select(display[0], display[1]);
-    REQUIRE(selection.getSelection()->ids.empty());
+    REQUIRE(selection.getSelection()->ids().empty());
     selection.select(display[0], display[1], SelectOp::Append);
-    CHECK(selection.getSelection()->ids == expected);
+    CHECK(selection.getSelection()->ids() == expected);
 }
 
 std::vector<vtkIdType> topologyCells(vtkPolyData& data, const OccShapeHandle& shape, bool faces)
@@ -276,7 +276,7 @@ TEST_CASE("CAD loading finer input mesh restores standard precision before picki
     const auto display = scene.project(gp_Pnt(3.0, 2.0, std::sqrt(87.0)));
     const std::vector<Index> expected { scene.geometry.index.faceGlobalId(1) };
     selection.select(display[0], display[1]);
-    REQUIRE(selection.getSelection()->ids == expected);
+    REQUIRE(selection.getSelection()->ids() == expected);
 
     for (const int precision : { 3, 0, surface_precision::kDefault }) {
         CAPTURE(precision);
@@ -291,7 +291,7 @@ TEST_CASE("CAD loading finer input mesh restores standard precision before picki
             CHECK(count == standard_count);
         scene.window->Render();
         selection.select(display[0], display[1]);
-        CHECK(selection.getSelection()->ids == expected);
+        CHECK(selection.getSelection()->ids() == expected);
     }
 }
 
@@ -462,7 +462,7 @@ TEST_CASE("CAD nonstandard initial precision supports registered picking before 
     const std::vector<Index> expected { expected_id };
     const auto display = scene.project(point);
     selection.select(display[0], display[1]);
-    REQUIRE(selection.getSelection()->ids == expected);
+    REQUIRE(selection.getSelection()->ids() == expected);
 
     // 宿主在切档前清空选择；既有 Picker 缓存继续解析点、边、面和体。
     selection.clearSelection();
@@ -471,10 +471,10 @@ TEST_CASE("CAD nonstandard initial precision supports registered picking before 
     REQUIRE(highlight_data != nullptr);
     CHECK(highlight_data->GetNumberOfCells() == 0);
     scene.manager.setSurfacePrecision(3 - initial_precision);
-    CHECK(selection.getSelection()->ids.empty());
+    CHECK(selection.getSelection()->ids().empty());
     scene.window->Render();
     selection.select(display[0], display[1], SelectOp::Append);
-    REQUIRE(selection.getSelection()->ids == expected);
+    REQUIRE(selection.getSelection()->ids() == expected);
     checkRepick(selection, display, expected);
     CHECK(highlight_data->GetNumberOfCells() > 0);
 }
@@ -532,13 +532,13 @@ TEST_CASE("CAD spline face and curved edge picking stay stable across display pr
         selection.setSelectMode(modes[mode_index]);
         const auto display = scene.project(points[mode_index]);
         selection.select(display[0], display[1]);
-        REQUIRE(selection.getSelection()->ids == std::vector<Index> { expected_ids[mode_index] });
+        REQUIRE(selection.getSelection()->ids() == std::vector<Index> { expected_ids[mode_index] });
         std::vector<std::vector<Index>> samples;
         for (const int dx : { -2, 0, 2 }) {
             for (const int dy : { -2, 0, 2 }) {
                 selection.clearSelection();
                 selection.select(display[0] + dx, display[1] + dy);
-                samples.push_back(selection.getSelection()->ids);
+                samples.push_back(selection.getSelection()->ids());
             }
         }
         selection.clearSelection();
@@ -575,7 +575,7 @@ TEST_CASE("CAD hidden geometry restores picking after precision rebuild", "[geom
     const auto display = scene.project(gp_Pnt(3.0, 2.0, std::sqrt(87.0)));
     const std::vector<Index> selected_ids { scene.geometry.index.faceGlobalId(1) };
     selection.select(display[0], display[1]);
-    REQUIRE(selection.getSelection()->ids == selected_ids);
+    REQUIRE(selection.getSelection()->ids() == selected_ids);
 
     // 分别覆盖全局 Hidden 样式和对象树组件可见性开关。
     const std::array<GeometryRenderStyle, 2> restored_styles {
@@ -590,7 +590,7 @@ TEST_CASE("CAD hidden geometry restores picking after precision rebuild", "[geom
             scene.manager.setCurrentRenderStyle(GeometryRenderStyle::Hidden);
         scene.manager.setSurfacePrecision(precision);
         CHECK_FALSE(scene.actor()->isVisible());
-        CHECK(selection.getSelection()->ids.empty());
+        CHECK(selection.getSelection()->ids().empty());
 
         if (component_hidden)
             scene.manager.setVisibility(kComponentId, true);
@@ -598,7 +598,7 @@ TEST_CASE("CAD hidden geometry restores picking after precision rebuild", "[geom
         scene.window->Render();
         REQUIRE(scene.actor()->isVisible());
         selection.select(display[0], display[1], SelectOp::Append);
-        REQUIRE(selection.getSelection()->ids == selected_ids);
+        REQUIRE(selection.getSelection()->ids() == selected_ids);
         checkRepick(selection, display, selected_ids);
         precision = 0;
     }
