@@ -10,6 +10,9 @@
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkCellData.h>       
+#include <vtkImplicitFunction.h>
+#include <vtkPlane.h>          
 
 MeshActorSelectOpFactory::MeshActorSelectOpFactory() = default;
 MeshActorSelectOpFactory::MeshActorSelectOpFactory(std::weak_ptr<MeshActor> mesh_actor)
@@ -31,6 +34,18 @@ MeshActorSelectOp::MeshActorSelectOp(std::shared_ptr<MeshActor> mesh_actor)
     if (!mesh_actor_) {
         throw std::runtime_error("MeshActorSelectOp: mesh_actor is nullptr");
     }
+}
+
+MeshActorSelectOp::MeshActorSelectOp(const MeshActorSelectOp& other)
+    : mesh_actor_(other.mesh_actor_)
+{
+}
+
+MeshActorSelectOp& MeshActorSelectOp::operator=(const MeshActorSelectOp& other)
+{
+    if (this != &other)
+        mesh_actor_ = other.mesh_actor_;
+    return *this;
 }
 
 vtkProp& MeshActorSelectOp::getSolidActor()

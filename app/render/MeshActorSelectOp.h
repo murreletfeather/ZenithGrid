@@ -42,6 +42,13 @@ class MeshActorSelectOp {
 public:
     MeshActorSelectOp(std::shared_ptr<MeshActor> mesh_actor);
 
+    // 仅拷贝共享的 mesh_actor_；vtkNew 裁剪滤波器保持默认构造（按调用惰性使用），
+    // 这样本类在保留裁剪器存活的前提下恢复可拷贝，使穿透框选测试可以值传递/拷贝。
+    MeshActorSelectOp(const MeshActorSelectOp& other);
+    MeshActorSelectOp& operator=(const MeshActorSelectOp& other);
+    MeshActorSelectOp(MeshActorSelectOp&&) = default;
+    MeshActorSelectOp& operator=(MeshActorSelectOp&&) = default;
+
     vtkProp& getSolidActor();
     vtkProp& getFaceActor();
     vtkProp& getEdgeActor();
