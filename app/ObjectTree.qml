@@ -44,14 +44,6 @@ Pane {
     readonly property int _nodeTypeMesh: 2
     readonly property int _nodeTypeGeometry: 3
 
-    // 左键选中的节点身份；depth>2 不参与选中，故不会记录。
-    property int _selectedNodeId: -1
-    property int _selectedDepth: -1
-
-    function isNodeSelected(nodeId, depth) {
-        return _selectedNodeId === nodeId && _selectedDepth === depth
-    }
-
     // 加粗行：仅活动 Model/Component；更深层级只高亮，不加粗。
     function isNodeEmphasized(nodeId, depth) {
         if (depth === 0)
@@ -63,8 +55,6 @@ Pane {
 
     // 清空对象树选中态，同时清除活动模型与组件。
     function clearNodeSelection() {
-        _selectedNodeId = -1
-        _selectedDepth = -1
         treeView.selectionModel.clear()
         App.selection.activeComponentId = -1
         App.selection.activeModelId = -1
@@ -73,16 +63,14 @@ Pane {
     // 左键点击行的唯一入口：任意层级均可选中；同节点再次点击取消。
     function applyNodeSelection(nodeId, depth, componentId) {
         treeView.forceActiveFocus()
-        if (isNodeSelected(nodeId, depth)) {
-            clearNodeSelection()
-            return
-        }
         const idx = treeModel.findIndexByNodeId(nodeId, depth)
         if (!idx || !idx.valid)
             return
+        if (treeView.selectionModel.isSelected(idx)) {
+            clearNodeSelection()
+            return
+        }
         treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
-        _selectedNodeId = nodeId
-        _selectedDepth = depth
         if (depth === 0) {
             App.selection.activeModelId = nodeId
             App.selection.activeComponentId = firstComponentId(nodeId)
@@ -364,8 +352,8 @@ Pane {
                         return
                     }
                     if (mouse.button === Qt.RightButton) {
-                        // 只有左键选中的行才弹节点菜单；更深层级提示功能开发中。
-                        if (objectTree.isNodeSelected(viewDelegate.model.nodeId, viewDelegate.depth)) {
+                        // 只有实际选中的行才弹节点菜单；更深层级提示功能开发中。
+                        if (viewDelegate.selected) {
                             if (viewDelegate.depth <= 2)
                                 contextMenu.popup()
                             else
@@ -540,21 +528,36 @@ Pane {
         }
     }
 
-    // Delete 快捷键入口：删除当前左键选中的行。
+    // 模型索引深度：根节点为 0，逐级向下递增。
+    function nodeDepth(index) {
+        let depth = 0
+        let parent = index.parent
+        while (parent && parent.valid) {
+            ++depth
+            parent = parent.parent
+        }
+        return depth
+    }
+
+    // Delete 快捷键入口：仅取得实际选中行并调用既有删除入口。
     function deleteSelectedNode() {
-        if (_selectedDepth < 0 || _selectedDepth > 2)
+        const indexes = treeView.selectionModel.selectedIndexes
+        if (indexes.length === 0)
             return false
-        const idx = treeModel.findIndexByNodeId(_selectedNodeId, _selectedDepth)
-        if (!idx || !idx.valid)
+        const idx = indexes[0]
+        const depth = nodeDepth(idx)
+        if (depth < 0 || depth > 2)
             return false
         const nodeType = treeModel.data(idx, TreeModel.NodeTypeRole)
+        const canDelete = (depth === 0 && nodeType === _nodeTypeModel)
+                || (depth === 1 && nodeType === _nodeTypeComponent)
+                || (depth === 2
+                    && (nodeType === _nodeTypeMesh || nodeType === _nodeTypeGeometry))
+        if (!canDelete)
+            return false
         const componentId = treeModel.data(idx, TreeModel.ComponentIdRole)
-        deleteNode(_selectedNodeId, _selectedDepth, nodeType, componentId)
-        // Mesh/Geometry 行已删除，但所属组件继续保留选中。
-        if (_selectedDepth === 2) {
-            _selectedNodeId = -1
-            _selectedDepth = -1
-        }
+        const nodeId = treeModel.data(idx, TreeModel.NodeIdRole)
+        deleteNode(nodeId, depth, nodeType, componentId)
         return true
     }
 
