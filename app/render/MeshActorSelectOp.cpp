@@ -1,7 +1,10 @@
 #include "MeshActorSelectOp.h"
 #include "MeshActor.h"
 
+#include <vtkExtractGeometry.h>
+#include <vtkExtractPolyDataGeometry.h>
 #include <vtkExtractSelection.h>
+#include <vtkIdTypeArray.h>
 #include <vtkLine.h>
 #include <vtkPolyData.h>
 #include <vtkSelection.h>
@@ -43,6 +46,44 @@ vtkProp& MeshActorSelectOp::getFaceActor()
 vtkProp& MeshActorSelectOp::getEdgeActor()
 {
     return *mesh_actor_->edge_actor_;
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getSolidData()
+{
+    return mesh_actor_->solid_data_.Get();
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData()
+{
+    // 未启用剖切：体网格未裁，cell 下标即原始 solid id，直接返回。
+    if (!mesh_actor_->clip_enabled_)
+        return mesh_actor_->solid_data_.Get();
+    // 确保体网格 CellData 携带 vtkOriginalCellIds（cell 下标即原始 solid id），
+    // 裁剪后该数组随 cell 数据透传，供 MeshSelectManager 还原被裁 cell 的原始 solid id。
+    auto* cd = mesh_actor_->solid_data_->GetCellData();
+    if (!cd->HasArray("vtkOriginalCellIds")) {
+        vtkNew<vtkIdTypeArray> orig;
+        orig->SetName("vtkOriginalCellIds");
+        orig->SetNumberOfTuples(mesh_actor_->solid_data_->GetNumberOfCells());
+        for (vtkIdType i = 0; i < orig->GetNumberOfTuples(); ++i)
+            orig->SetValue(i, i);
+        cd->AddArray(orig);
+    }
+    solid_clipper_->SetInputData(mesh_actor_->solid_data_);
+    solid_clipper_->SetImplicitFunction(mesh_actor_->clip_plane_.GetPointer());
+    solid_clipper_->Update();
+    return solid_clipper_->GetOutput();
+}
+
+vtkPolyData* MeshActorSelectOp::getSolidEdgeData()
+{
+    // 未启用剖切：内部边未裁，直接返回数据层已提取的内部边。
+    if (!mesh_actor_->clip_enabled_)
+        return mesh_actor_->solid_internal_edges_.Get();
+    solid_edge_clipper_->SetInputData(mesh_actor_->solid_internal_edges_);
+    solid_edge_clipper_->SetImplicitFunction(mesh_actor_->clip_plane_.GetPointer());
+    solid_edge_clipper_->Update();
+    return solid_edge_clipper_->GetOutput();
 }
 
 bool MeshActorSelectOp::isVisible() const

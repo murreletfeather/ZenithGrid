@@ -2,11 +2,14 @@
 #define MESH_ACTOR_SELECT_OP_H
 #include <memory>
 #include <optional>
+#include <vtkExtractGeometry.h>
+#include <vtkExtractPolyDataGeometry.h>
 #include <vtkSmartPointer.h>
 
 class vtkIdTypeArray;
 class vtkProp;
 class vtkPolyData;
+class vtkUnstructuredGrid;
 class vtkExtractSelection;
 class MeshActorSelectOp;
 class MeshActor;
@@ -43,6 +46,33 @@ public:
     vtkProp& getFaceActor();
     vtkProp& getEdgeActor();
 
+    /**
+     * @brief 体网格（体单元）数据集（未裁剪）
+     *
+     * cell id 即 solid id（该数据集的 vtkOriginalCellIds 为 identity），点 id 即组件内局部
+     * 点 id（vtkOriginalPointIds 为 identity）。体网格**内部**的体单元与内部节点只能从这里
+     * 选到——face/edge/solid actor 渲染的都是边界表示，不含内部单元。
+     */
+    vtkUnstructuredGrid* getSolidData();
+
+    /**
+     * @brief 遵守剖切条件的体网格（体单元）数据集，供穿透框选内部命中使用
+     *
+     * 无剖切时返回 getSolidData()（原始体网格，cell 下标即 solid id）；
+     * 有剖切时返回 solid_clipper_ 的输出（已裁剪的体网格），其 CellData 携带 vtkOriginalCellIds，
+     * 可将裁剪后的 cell 下标还原为原始模型体 id。调用方须对拾取结果做此还原。
+     */
+    vtkUnstructuredGrid* getClippedSolidData();
+
+    /**
+     * @brief 体网格的边数据集（遵守剖切条件的 vtkExtractEdges 输出），含体单元之间的**内部边**
+     *
+     * cell 为 VTK_LINE，点数据带 vtkOriginalPointIds（组件内局部点 id）。
+     * Edge 模式靠它选中体网格内部边；内部边不在 MeshData::edge_vertices_ 里，没有模型边 id，
+     * 因此派生出的边其 edge_id 为 -1，按端点对标识（已有兜底路径）。
+     */
+    vtkPolyData* getSolidEdgeData();
+
     bool isVisible() const;
 
     /**
@@ -68,5 +98,10 @@ public:
 
 private:
     std::shared_ptr<MeshActor> mesh_actor_; // 非空
+
+    // 选择专用的裁剪滤波器：复用 MeshActor 的 clip_plane_ 与 solid_data_/solid_internal_edges_，
+    // 在穿透框选时对体网格与内部边做与渲染一致的剖切，避免选中已被裁掉的元素。
+    vtkNew<vtkExtractGeometry> solid_clipper_;
+    vtkNew<vtkExtractPolyDataGeometry> solid_edge_clipper_;
 };
 #endif // MESH_ACTOR_SELECT_OP_H

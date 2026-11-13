@@ -20,6 +20,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkUnstructuredGrid.h>
 
 namespace {
 void _cancel_highlight(vtkIdTypeArray* selected_ids)
@@ -193,7 +194,7 @@ void VertexSelectorHighlight::setupHighlightStyle(vtkActor& actor, vtkMapper& ma
 
 void VertexSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-    int xmin, int ymin, int xmax, int ymax, SelectOp op)
+    int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume)
 {
     // 与点选对齐：从 face/edge/solid 三个 actor 的命中 cell 派生点并合并（一次多 actor 拾取结果）。
     std::unordered_set<vtkIdType> local_ids;
@@ -260,6 +261,36 @@ void VertexSelectorHighlight::selectArea(
     if (auto* solid_poly = solid_actor ? vtkPolyData::SafeDownCast(
             vtkPolyDataMapper::SafeDownCast(solid_actor->GetMapper())->GetInput()) : nullptr) {
         derive_points(solid_actor, solid_poly, hit_of(&select_op_.getSolidActor()));
+    }
+
+    // 4) 体网格内部节点：上面三条都是边界表示，体网格内部的节点只能从命中的体单元派生
+    if (volume && !volume->cells.empty()) {
+        if (auto* vol = select_op_.getSolidData()) {
+            auto* vol_orig_pt_ids = vtkIdTypeArray::SafeDownCast(
+                vol->GetPointData()->GetArray("vtkOriginalPointIds"));
+            for (vtkIdType cell_id : volume->cells) {
+                if (cell_id < 0 || cell_id >= vol->GetNumberOfCells())
+                    continue;
+                vtkCell* cell = vol->GetCell(cell_id);
+                if (!cell)
+                    continue;
+                for (int i = 0; i < cell->GetNumberOfPoints(); ++i) {
+                    const vtkIdType rp = cell->GetPointId(i);
+                    if (rp < 0 || rp >= vol->GetNumberOfPoints())
+                        continue;
+                    double p[3];
+                    vol->GetPoint(rp, p);
+                    if (!area_pick::isWorldPointInScreenBox(renderer_, solid_actor,
+                            p[0], p[1], p[2], xmin, ymin, xmax, ymax))
+                        continue;
+                    const vtkIdType lp = (vol_orig_pt_ids && rp < vol_orig_pt_ids->GetNumberOfTuples())
+                        ? vol_orig_pt_ids->GetValue(rp)
+                        : rp;
+                    if (lp >= 0)
+                        local_ids.insert(lp);
+                }
+            }
+        }
     }
 
     spdlog::debug("[VertexArea] local_ids.size()={}", local_ids.size());

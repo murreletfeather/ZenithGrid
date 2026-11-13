@@ -124,6 +124,7 @@ void MeshActor::applyDataSnapshot(std::shared_ptr<const MeshDataSnapshot> snapsh
     solid_internal_source_->SetOutput(solid_internal_edges_);
     clip_plane_->SetOrigin(data.clip.origin.data());
     clip_plane_->SetNormal(data.clip.normal.data());
+    clip_enabled_ = data.clip.enabled;
     topology_diagnostics_->setClipPlane(data.clip.enabled ? clip_plane_.GetPointer() : nullptr);
     syncDisplayAttributes();
     // 发布新的连通性后刷新绘制缓存，不能因连接未改变而复用旧线框着色器。

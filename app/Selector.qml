@@ -64,6 +64,43 @@ RowLayout {
         opacity: enabled ? 1.0 : 0.6
     }
     CheckBox {
+        id: penetratingCheckBox
+        indicator: Rectangle {
+            implicitWidth: 24
+            implicitHeight: 24
+            x: penetratingCheckBox.leftPadding
+            y: penetratingCheckBox.topPadding + (penetratingCheckBox.availableHeight - height) / 2
+            radius: Theme.radiusControl
+            color: penetratingCheckBox.checked ? (penetratingCheckBox.enabled ? Theme.primaryPressed : Theme.textSecondary) : Theme.surface
+            border.width: 2
+            border.color: penetratingCheckBox.checked || penetratingCheckBox.visualFocus ? Theme.primaryPressed : Theme.textSecondary
+            Shape {
+                anchors.fill: parent
+                visible: penetratingCheckBox.checked
+                ShapePath {
+                    strokeColor: Theme.textOnPrimary
+                    strokeWidth: 3
+                    fillColor: "transparent"
+                    capStyle: ShapePath.RoundCap
+                    joinStyle: ShapePath.RoundJoin
+                    startX: 5
+                    startY: 12
+                    PathLine { x: 10; y: 17 }
+                    PathLine { x: 19; y: 7 }
+                }
+            }
+        }
+        text: qsTr("穿透框选")
+        visible: App.selection.selectMode === "Vertex"
+            || App.selection.selectMode === "Edge"
+            || App.selection.selectMode === "Face"
+            || App.selection.selectMode === "Solid"
+        checked: App.selection.penetrating
+        onToggled: App.selection.penetrating = checked
+        ToolTip.visible: hovered
+        ToolTip.text: qsTr("开启后框选可选中被遮挡的背面单元，以及体网格内部的体单元/节点/边；关闭则只选可见最前一层。单选始终为非穿透。")
+    }
+    CheckBox {
         id: angleSpreadCheckBox
         // 加大勾选区域，以实色背景区分已选状态；保留控件自身的键盘和无障碍行为。
         indicator: Rectangle {
