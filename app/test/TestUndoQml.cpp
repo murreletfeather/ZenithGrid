@@ -632,7 +632,7 @@ TEST_CASE("Actual QML follows successful deletion notifications and preserves se
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
 }
 
-TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks", "[QML][tree][selection]")
+TEST_CASE("Actual QML toggles object tree selection across all rows", "[QML][tree][selection]")
 {
     application();
     QmlFixture f;
@@ -704,7 +704,7 @@ TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks"
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
     check_selected(component_ids[1], 1);
 
-    // depth>2 不参与选中；即使默认点击清空了 selectionModel，也应恢复原选中行。
+    // depth>2 行同样可选中，再次点击取消。
     const QModelIndex component_index = tree_model->findIndexByNodeId(component_ids[1], 1);
     REQUIRE(component_index.isValid());
     const QModelIndex mesh_index = tree_model->index(0, 0, component_index);
@@ -714,11 +714,12 @@ TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks"
     const Index sub_node_id = tree_model->data(sub_index, TreeModel::NodeIdRole).toInt();
     CHECK(tree_model->data(sub_index, TreeModel::NodeTypeRole).toInt()
         == static_cast<int>(TreeNode::NodeType::D3));
-    selection_model->clear();
     apply(sub_node_id, 3, component_ids[1]);
     CHECK(selection_state->property("activeModelId").toInt() == model_id);
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
-    check_selected(component_ids[1], 1);
+    check_selected(sub_node_id, 3);
+    apply(sub_node_id, 3, component_ids[1]);
+    check_empty();
 
     // undo/redo 应用后清空对象树选中态。
     auto* undo = f.manager->getUndoStackAdaptor();
@@ -731,7 +732,7 @@ TEST_CASE("Actual QML toggles object tree selection and ignores sub-node clicks"
     check_empty();
 }
 
-TEST_CASE("Actual QML emphasizes depth-2 selection with its ancestors", "[QML][tree][selection]")
+TEST_CASE("Actual QML emphasizes only model and component rows", "[QML][tree][selection]")
 {
     application();
     QmlFixture f;
@@ -771,11 +772,11 @@ TEST_CASE("Actual QML emphasizes depth-2 selection with its ancestors", "[QML][t
     CHECK(emphasized(component_id, 1));
     CHECK_FALSE(emphasized(mesh_node_id, 2));
 
-    // 选中 depth=2 行：父级继续加粗，该行也加粗。
+    // 选中 depth=2 行：父级继续加粗，该行只高亮不加粗。
     select(mesh_node_id, 2, component_id);
     CHECK(emphasized(model_id, 0));
     CHECK(emphasized(component_id, 1));
-    CHECK(emphasized(mesh_node_id, 2));
+    CHECK_FALSE(emphasized(mesh_node_id, 2));
 
     // 再次点击取消后全部恢复常规字重。
     select(mesh_node_id, 2, component_id);
@@ -785,6 +786,17 @@ TEST_CASE("Actual QML emphasizes depth-2 selection with its ancestors", "[QML][t
 
     model.removeModel(model_id);
     pumpEvents();
+}
+
+TEST_CASE("Actual QML provides an unavailable menu for deep object tree rows", "[QML][tree][selection]")
+{
+    application();
+    QmlFixture f;
+
+    auto* item = f.tree->findChild<QObject*>("nodeMenuUnavailableItem");
+    REQUIRE(item);
+    CHECK(item->property("text").toString() == "功能开发中");
+    CHECK_FALSE(item->property("enabled").toBool());
 }
 
 TEST_CASE("Actual QML deletes the selected object tree node", "[QML][tree][selection][delete]")

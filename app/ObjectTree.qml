@@ -52,13 +52,13 @@ Pane {
         return _selectedNodeId === nodeId && _selectedDepth === depth
     }
 
-    // 加粗行：活动 Model/Component，以及左键选中的 depth=2 行。
+    // 加粗行：仅活动 Model/Component；更深层级只高亮，不加粗。
     function isNodeEmphasized(nodeId, depth) {
         if (depth === 0)
             return nodeId === App.selection.activeModelId
         if (depth === 1)
             return nodeId === App.selection.activeComponentId
-        return depth === 2 && isNodeSelected(nodeId, depth)
+        return false
     }
 
     // 清空对象树选中态，同时清除活动模型与组件。
@@ -70,27 +70,9 @@ Pane {
         App.selection.activeModelId = -1
     }
 
-    // 恢复左键选中的行；节点已不存在时退回清空。
-    function restoreNodeSelection() {
-        if (_selectedDepth < 0) {
-            treeView.selectionModel.clear()
-            return
-        }
-        const idx = treeModel.findIndexByNodeId(_selectedNodeId, _selectedDepth)
-        if (!idx || !idx.valid) {
-            clearNodeSelection()
-            return
-        }
-        treeView.selectionModel.setCurrentIndex(idx, ItemSelectionModel.ClearAndSelect)
-    }
-
-    // 左键点击行的唯一入口：depth>2 不参与选中；同节点再次点击取消。
+    // 左键点击行的唯一入口：任意层级均可选中；同节点再次点击取消。
     function applyNodeSelection(nodeId, depth, componentId) {
         treeView.forceActiveFocus()
-        if (depth > 2) {
-            restoreNodeSelection()
-            return
-        }
         if (isNodeSelected(nodeId, depth)) {
             clearNodeSelection()
             return
@@ -382,10 +364,12 @@ Pane {
                         return
                     }
                     if (mouse.button === Qt.RightButton) {
-                        // 只有左键选中的行才弹节点菜单；其余行与空白区共用全局菜单。
-                        if (viewDelegate.depth <= 2
-                                && objectTree.isNodeSelected(viewDelegate.model.nodeId, viewDelegate.depth)) {
-                            contextMenu.popup()
+                        // 只有左键选中的行才弹节点菜单；更深层级提示功能开发中。
+                        if (objectTree.isNodeSelected(viewDelegate.model.nodeId, viewDelegate.depth)) {
+                            if (viewDelegate.depth <= 2)
+                                contextMenu.popup()
+                            else
+                                nodeMenuUnavailable.popup()
                         } else {
                             blankContextMenu.popup()
                         }
@@ -492,15 +476,20 @@ Pane {
         }
     }
 
-    // 空白区右键：内容底部以下不遮挡行，只承接空白处右键。
+    // 空白区：左键清除选中，右键提供全局展开/折叠。
     MouseArea {
         anchors.left: treeView.left
         anchors.right: treeView.right
         y: treeView.y + objectTree._blankTop
         height: treeView.height - objectTree._blankTop
-        acceptedButtons: Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onClicked: blankContextMenu.popup()
+        onClicked: (mouse) => {
+            if (mouse.button === Qt.RightButton)
+                blankContextMenu.popup()
+            else
+                objectTree.clearNodeSelection()
+        }
     }
 
     AppMenu {
@@ -514,6 +503,16 @@ Pane {
         MenuItem {
             text: "全部折叠"
             onTriggered: objectTree.collapseSubtree(-1)
+        }
+    }
+
+    AppMenu {
+        id: nodeMenuUnavailable
+
+        MenuItem {
+            objectName: "nodeMenuUnavailableItem"
+            text: "功能开发中"
+            enabled: false
         }
     }
 

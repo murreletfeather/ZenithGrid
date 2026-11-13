@@ -325,6 +325,24 @@ ApplicationWindow {
             }
         }
 
+        // 左键点击对象树外部时清除其选中态；被动接收，不拦截原交互。
+        TapHandler {
+            acceptedButtons: Qt.LeftButton
+
+            onTapped: (eventPoint) => {
+                const tree = App.registry.objectTree
+                if (!tree)
+                    return
+                if (!tree.visible || tree.window !== dockHost.window) {
+                    tree.clearNodeSelection()
+                    return
+                }
+                const local = tree.mapFromItem(dockHost, eventPoint.position)
+                if (!tree.contains(local))
+                    tree.clearNodeSelection()
+            }
+        }
+
         Component.onCompleted: {
             // 等窗口完成首轮布局后再按实际尺寸分配面板占比。
             Qt.callLater(function() {
