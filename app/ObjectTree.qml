@@ -94,17 +94,16 @@ Pane {
         }
     }
 
-    // 左键选择入口：单行替换选中，不切换活动对象。
-    function selectRow(index) {
+    // 左键选择入口：单行替换选中；显式左键再次点击已选中行时取消。
+    function selectRow(index, toggle = false) {
         if (!index || !index.valid)
             return
         treeView.forceActiveFocus()
+        if (toggle && treeView.selectionModel.isSelected(index)) {
+            clearRowSelection()
+            return
+        }
         treeView.selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
-    }
-
-    // 右键未选中行时先按普通树规则选中该行，再打开菜单。
-    function selectRowForContextMenu(index) {
-        objectTree.selectRow(index)
     }
 
     // 单目标命令读取当前选中行。
@@ -289,7 +288,6 @@ Pane {
         clip: true
         flickDeceleration: 100000
         boundsBehavior: Flickable.StopAtBounds
-        bottomMargin: 32
         columnWidthProvider: function(column) { return colWidth }
         property real colWidth: treeView.width
         // 键盘导航由下方 Keys 统一处理，保持单选语义。
@@ -459,18 +457,19 @@ Pane {
                     }
                     const index = treeView.index(viewDelegate.row, 0)
                     if (mouse.button === Qt.RightButton) {
-                        // 右键未选中行时按普通树规则先选中该行；已选中行保留选择。
-                        if (!viewDelegate.selected)
-                            objectTree.selectRowForContextMenu(index)
-                        if (viewDelegate.depth <= 1)
+                        // 右键只读取当前选择，不改变选中；未选中行使用全局菜单。
+                        if (!viewDelegate.selected) {
+                            blankContextMenu.popup()
+                        } else if (viewDelegate.depth <= 1) {
                             nodeContextMenu.popup()
-                        else if (viewDelegate.depth === 2)
+                        } else if (viewDelegate.depth === 2) {
                             nodeActionsMenu.popup()
-                        else
+                        } else {
                             deepContextMenu.popup()
+                        }
                         return
                     }
-                    objectTree.selectRow(index)
+                    objectTree.selectRow(index, true)
                 }
             }
 
@@ -712,6 +711,7 @@ Pane {
 
     AppMenu {
         id: blankContextMenu
+        objectName: "blankContextMenu"
 
         onOpened: objectTree._menuOpen = true
         onClosed: objectTree.notifyMenuClosed()

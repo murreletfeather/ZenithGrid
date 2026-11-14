@@ -724,6 +724,13 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
 
+    // 再次点击同一行取消选中；再点击恢复。
+    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    CHECK(selection_count() == 0);
+    CHECK(selection_state->property("activeComponentId").toInt() == -1);
+    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    CHECK(selection_count() == 1);
+
     // 再次普通点击另一行替换选中，活动对象仍不变。
     click(second_delegate, Qt::LeftButton, Qt::NoModifier);
     CHECK(selection_count() == 1);
@@ -766,7 +773,8 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK_FALSE(selection_model->hasSelection());
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
 
-    // 重新右键当前活动 Component：菜单项切换为取消，触发后保留行选择。
+    // 重新左键选中当前活动 Component，右键菜单项切换为取消。
+    click(second_delegate, Qt::LeftButton, Qt::NoModifier);
     click(second_delegate, Qt::RightButton, Qt::NoModifier);
     auto* cancel_current = second_delegate->findChild<QObject*>("activeComponentItem");
     REQUIRE(cancel_current);
@@ -784,6 +792,7 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     REQUIRE(QMetaObject::invokeMethod(tree_view_object, "itemAtIndex",
         Q_RETURN_ARG(QQuickItem*, mesh_delegate), Q_ARG(QModelIndex, mesh_index)));
     REQUIRE(mesh_delegate);
+    click(mesh_delegate, Qt::LeftButton, Qt::NoModifier);
     click(mesh_delegate, Qt::RightButton, Qt::NoModifier);
     auto* mesh_menu = mesh_delegate->findChild<QObject*>("nodeActionsMenu");
     REQUIRE(mesh_menu);
@@ -810,6 +819,8 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     REQUIRE(tree_model);
     REQUIRE(tree_view_object);
     REQUIRE(selection_state);
+    auto* selection_model = tree_view_object->property("selectionModel").value<QItemSelectionModel*>();
+    REQUIRE(selection_model);
 
     ComponentDatas components;
     components.push_back(std::make_unique<ComponentData>());
@@ -863,7 +874,9 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     const auto active_item = [](QQuickItem* delegate) -> QObject* {
         return delegate->findChild<QObject*>("activeComponentItem");
     };
-    const auto open_menu = [&](QQuickItem* delegate) -> QObject* {
+    const auto open_menu = [&](QQuickItem* delegate, const QModelIndex& index) -> QObject* {
+        if (!selection_model->isSelected(index))
+            selection_model->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
         click(delegate, Qt::RightButton);
         auto* item = active_item(delegate);
         REQUIRE(item);
@@ -877,8 +890,16 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
         QCoreApplication::processEvents();
     };
 
+    // 右键未选中行不改变选中，只打开全局菜单。
+    click(first_delegate, Qt::RightButton);
+    CHECK_FALSE(selection_model->hasSelection());
+    auto* global_menu = f.tree->findChild<QObject*>("blankContextMenu");
+    REQUIRE(global_menu);
+    CHECK(global_menu->property("visible").toBool());
+    close_menu(global_menu);
+
     // 未设置活动组件：菜单项为设置。
-    auto* menu = open_menu(first_delegate);
+    auto* menu = open_menu(first_delegate, first_index);
     auto* item = active_item(first_delegate);
     REQUIRE(item);
     CHECK(item->property("text").toString() == "设置活动组件");
@@ -887,14 +908,14 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[0]);
 
     // 当前活动行：菜单项为取消。
-    menu = open_menu(first_delegate);
+    menu = open_menu(first_delegate, first_index);
     item = active_item(first_delegate);
     REQUIRE(item);
     CHECK(item->property("text").toString() == "取消活动组件");
     close_menu(menu);
 
     // 其他行：菜单项为设置，触发后直接切换活动组件。
-    menu = open_menu(second_delegate);
+    menu = open_menu(second_delegate, second_index);
     item = active_item(second_delegate);
     REQUIRE(item);
     CHECK(item->property("text").toString() == "设置活动组件");
@@ -903,7 +924,7 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
 
     // 当前活动行取消后，恢复为设置文案。
-    menu = open_menu(second_delegate);
+    menu = open_menu(second_delegate, second_index);
     item = active_item(second_delegate);
     REQUIRE(item);
     CHECK(item->property("text").toString() == "取消活动组件");
@@ -912,7 +933,7 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
 
-    menu = open_menu(first_delegate);
+    menu = open_menu(first_delegate, first_index);
     item = active_item(first_delegate);
     REQUIRE(item);
     CHECK(item->property("text").toString() == "设置活动组件");
@@ -1069,9 +1090,17 @@ TEST_CASE("Actual QML shows unavailable menu for deep rows", "[QML][tree][select
     auto* selection_model = tree_view_object->property("selectionModel").value<QItemSelectionModel*>();
     REQUIRE(selection_model);
 
-    // 右键未选中的深层行：先选中该行，再打开深层菜单。
+    // 左键选中深层行后，右键打开深层菜单。
     const QPointF pos = host.contentItem()->mapFromItem(delegate,
         delegate->width() / 2, delegate->height() / 2);
+    QMouseEvent left_press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
+        Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QCoreApplication::sendEvent(&host, &left_press);
+    QMouseEvent left_release(QEvent::MouseButtonRelease, pos, host.mapToGlobal(pos.toPoint()),
+        Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QCoreApplication::sendEvent(&host, &left_release);
+    QCoreApplication::processEvents();
+    CHECK(selection_model->isSelected(sub_index));
     QMouseEvent press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
         Qt::RightButton, Qt::RightButton, Qt::NoModifier);
     QCoreApplication::sendEvent(&host, &press);
@@ -1079,7 +1108,6 @@ TEST_CASE("Actual QML shows unavailable menu for deep rows", "[QML][tree][select
         Qt::RightButton, Qt::NoButton, Qt::NoModifier);
     QCoreApplication::sendEvent(&host, &release);
     QCoreApplication::processEvents();
-    CHECK(selection_model->isSelected(sub_index));
     CHECK(selection_state->property("activeModelId").toInt() == -1);
 
     auto* menu = delegate->findChild<QObject*>("deepContextMenu");
@@ -1150,7 +1178,8 @@ TEST_CASE("Actual QML navigates object tree rows with keyboard", "[QML][tree][se
     tree_view->forceActiveFocus();
     const auto select_first = [&] {
         REQUIRE(QMetaObject::invokeMethod(f.tree.get(), "selectRow",
-            Q_ARG(QVariant, QVariant::fromValue(first_index))));
+            Q_ARG(QVariant, QVariant::fromValue(first_index)),
+            Q_ARG(QVariant, false)));
     };
     const auto send_key = [&](int key, Qt::KeyboardModifiers modifiers) {
         QKeyEvent press(QEvent::KeyPress, key, modifiers);
