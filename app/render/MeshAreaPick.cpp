@@ -246,18 +246,9 @@ std::unordered_set<vtkIdType> penetratingPickCells(vtkPlanes* world_frustum,
     local_frustum->SetPoints(local_points);
     local_frustum->SetNormals(local_normals);
 
-    // 2) 视锥求交。用默认模式（PreserveTopology 关闭）：输出只含被选中的 cell
-    vtkSmartPointer<vtkDataSet> input
-        = vtkSmartPointer<vtkDataSet>::Take(vtkDataSet::SafeDownCast(data->NewInstance()));
-    if (input) {
-        input->ShallowCopy(data);
-        input->GetCellData()->RemoveArray("vtkOriginalCellIds");
-    } else {
-        input = data;
-    }
-
+    // 2) 视锥求交。用默认模式（PreserveTopology 关闭）：输出只含被选中的 cell。
     vtkNew<vtkExtractSelectedFrustum> extract;
-    extract->SetInputData(input);
+    extract->SetInputData(data);
     extract->SetFrustum(local_frustum);
     extract->SetFieldType(vtkSelectionNode::CELL);
     extract->Update();
@@ -268,13 +259,13 @@ std::unordered_set<vtkIdType> penetratingPickCells(vtkPlanes* world_frustum,
     auto* orig_cell_ids = vtkIdTypeArray::SafeDownCast(
         out_ds->GetCellData()->GetArray("vtkOriginalCellIds"));
     if (!orig_cell_ids) {
-        spdlog::warn("[AreaPick] penetrating: vtkOriginalCellIds missing, dataset skipped");
+        spdlog::warn("[AreaPick] penetrating: frustum output missing vtkOriginalCellIds, dataset skipped");
         return ids;
     }
     for (vtkIdType i = 0; i < orig_cell_ids->GetNumberOfTuples(); ++i) {
-        const vtkIdType orig = orig_cell_ids->GetValue(i);
-        if (orig >= 0 && orig < data->GetNumberOfCells())
-            ids.insert(orig);
+        const vtkIdType local = orig_cell_ids->GetValue(i);
+        if (local >= 0 && local < data->GetNumberOfCells())
+            ids.insert(local);
     }
     return ids;
 }
