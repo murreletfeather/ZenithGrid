@@ -111,7 +111,6 @@ void appendSolidCellEdges(unsigned char cell_type,
         break;
     case CELL_POLYHEDRON: // 42
         for (Index fi = face_begin; fi < face_end; ++fi) {
-            // solid_faces[fi] 为该多面体的一个面在 solid_faces_vertices_offset_ 中的索引
             const Index face_idx = solid_faces[static_cast<size_t>(fi)];
             if (face_idx < 0 || face_idx + 1 >= static_cast<Index>(solid_faces_vertices_offset.size()))
                 continue;
@@ -123,7 +122,9 @@ void appendSolidCellEdges(unsigned char cell_type,
             for (Index j = 0; j < fn; ++j) {
                 const Index a = solid_faces_vertices[static_cast<size_t>(vb + j)];
                 const Index b = solid_faces_vertices[static_cast<size_t>(vb + (j + 1) % fn)];
-                add(a, b);
+                if (a < 0 || b < 0)
+                    continue;
+                out.push_back({ a, b });
             }
         }
         break;
