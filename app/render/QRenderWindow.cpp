@@ -310,6 +310,8 @@ QQuickVTKItem::vtkUserData QRenderWindow::initializeVTK(vtkRenderWindow* renderW
     if (mesh_id_query_)
         select_manager_->setMeshIdQuery(mesh_id_query_.get());
     vtk->style_->SetSelectManager(this->select_manager_.get());
+    if (penetrating_)
+        select_manager_->setPenetrating(penetrating_);
 
     // 通用交互服务：网格/几何顶点吸附均经选择系统封装接口完成，不接触 picker
     interaction_service_ = std::make_unique<InteractionService>(*vtk->renderer_, *vtk->overlay_renderer_,
@@ -891,6 +893,20 @@ void QRenderWindow::setSelectMode(QString select_mode)
         select_manager_->setSelectMode(select_mode.toStdString());
         publishSelection();
     });
+}
+
+void QRenderWindow::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
+    dispatch_async([enabled, this](vtkRenderWindow* renderWindow, vtkUserData userData) -> void {
+        if (select_manager_)
+            select_manager_->setPenetrating(enabled);
+    });
+}
+
+bool QRenderWindow::penetrating() const
+{
+    return penetrating_;
 }
 
 void QRenderWindow::setFaceSelectionByAngle(bool enabled, double angle_deg)

@@ -618,6 +618,8 @@ void MeshPipelineData::rebuildOutputs()
     prepared_->visible_edges = publishPolyData(edges);
     prepared_->solid_surface = publishPolyData(surface->GetOutput());
     prepared_->solid_internal_edges = internal_edges;
+    prepared_->clipped_solids = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    prepared_->clipped_solids->ShallowCopy(solids);
     dirty_ = false;
 }
 

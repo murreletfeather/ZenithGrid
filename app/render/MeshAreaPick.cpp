@@ -8,20 +8,32 @@
 #include <spdlog/spdlog.h>
 #include <vtkActor.h>
 #include <vtkActor2D.h>
+#include <vtkCellData.h>
+#include <vtkDataArray.h>
+#include <vtkDataSet.h>
+#include <vtkDoubleArray.h>
+#include <vtkExtractSelectedFrustum.h>
 #include <vtkHardwarePicker.h>
 #include <vtkHardwareSelector.h>
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
 #include <vtkMatrix4x4.h>
 #include <vtkNew.h>
+#include <vtkPlanes.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkProp.h>
 #include <vtkPropCollection.h>
 #include <vtkProperty.h>
+#include <vtkRenderedAreaPicker.h>
+#include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 
 #include <algorithm>
+#include <cmath>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -159,6 +171,144 @@ std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executeAreaPicks(
         }
     }
     spdlog::debug("[AreaPick] hit actor count={}", result.size());
+
+    return result;
+}
+
+vtkSmartPointer<vtkPlanes> buildSelectionFrustum(vtkRenderer* renderer,
+    int xmin, int ymin, int xmax, int ymax)
+{
+    if (!renderer)
+        return nullptr;
+
+    // 用 VTK 自带的区域拾取器生成世界空间视锥（6 个平面：left/right/bottom/top/near/far）。
+    vtkNew<vtkRenderedAreaPicker> area_picker;
+    area_picker->AreaPick(xmin, ymin, xmax, ymax, renderer);
+    vtkPlanes* frustum = area_picker->GetFrustum();
+    if (!frustum || frustum->GetNumberOfPlanes() < 6
+        || !frustum->GetPoints() || !frustum->GetNormals()) {
+        spdlog::warn("[AreaPick] frustum unavailable, rect=({},{},{},{})",
+            xmin, ymin, xmax, ymax);
+        return nullptr;
+    }
+    return vtkSmartPointer<vtkPlanes>(frustum);
+}
+
+std::unordered_set<vtkIdType> penetratingPickCells(vtkPlanes* world_frustum,
+    vtkDataSet* data, vtkMatrix4x4* local_to_world)
+{
+    std::unordered_set<vtkIdType> ids;
+    if (!world_frustum || !data || data->GetNumberOfCells() == 0)
+        return ids;
+
+    vtkPoints* world_points = world_frustum->GetPoints();
+    vtkDataArray* world_normals = world_frustum->GetNormals();
+    if (!world_points || !world_normals)
+        return ids;
+
+    // 1) 把视锥的 6 个平面从世界空间变换到数据集所在空间：
+    vtkNew<vtkMatrix4x4> m;
+    if (local_to_world)
+        m->DeepCopy(local_to_world);
+    vtkNew<vtkMatrix4x4> inv_m;
+    inv_m->DeepCopy(m);
+    inv_m->Invert();
+    vtkNew<vtkMatrix4x4> t_m;
+    t_m->DeepCopy(m);
+    t_m->Transpose();
+
+    vtkNew<vtkPoints> local_points;
+    local_points->SetNumberOfPoints(6);
+    vtkNew<vtkDoubleArray> local_normals;
+    local_normals->SetNumberOfComponents(3);
+    local_normals->SetNumberOfTuples(6);
+
+    for (int i = 0; i < 6; ++i) {
+        double pw[4] = { 0.0, 0.0, 0.0, 1.0 };
+        world_points->GetPoint(i, pw);
+        double pl[4] = { 0.0, 0.0, 0.0, 1.0 };
+        inv_m->MultiplyPoint(pw, pl);
+        const double wpw = (pl[3] != 0.0) ? pl[3] : 1.0;
+        local_points->SetPoint(i, pl[0] / wpw, pl[1] / wpw, pl[2] / wpw);
+
+        double nw[4] = { 0.0, 0.0, 0.0, 0.0 };
+        world_normals->GetTuple(i, nw);
+        double nl[4] = { 0.0, 0.0, 0.0, 0.0 };
+        t_m->MultiplyPoint(nw, nl);
+        const double len = std::sqrt(nl[0] * nl[0] + nl[1] * nl[1] + nl[2] * nl[2]);
+        if (len > 0.0)
+            local_normals->SetTuple3(i, nl[0] / len, nl[1] / len, nl[2] / len);
+        else
+            local_normals->SetTuple3(i, nw[0], nw[1], nw[2]);
+    }
+
+    vtkNew<vtkPlanes> local_frustum;
+    local_frustum->SetPoints(local_points);
+    local_frustum->SetNormals(local_normals);
+
+    // 2) 视锥求交。用默认模式（PreserveTopology 关闭）：输出只含被选中的 cell。
+    vtkNew<vtkExtractSelectedFrustum> extract;
+    extract->SetInputData(data);
+    extract->SetFrustum(local_frustum);
+    extract->SetFieldType(vtkSelectionNode::CELL);
+    extract->Update();
+
+    auto* out_ds = vtkDataSet::SafeDownCast(extract->GetOutput());
+    if (!out_ds)
+        return ids;
+    auto* orig_cell_ids = vtkIdTypeArray::SafeDownCast(
+        out_ds->GetCellData()->GetArray("vtkOriginalCellIds"));
+    if (!orig_cell_ids) {
+        spdlog::warn("[AreaPick] penetrating: frustum output missing vtkOriginalCellIds, dataset skipped");
+        return ids;
+    }
+    for (vtkIdType i = 0; i < orig_cell_ids->GetNumberOfTuples(); ++i) {
+        const vtkIdType local = orig_cell_ids->GetValue(i);
+        if (local >= 0 && local < data->GetNumberOfCells())
+            ids.insert(local);
+    }
+    return ids;
+}
+
+std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executePenetratingAreaPicks(
+    vtkRenderer* renderer,
+    const std::vector<vtkActor*>& target_actors,
+    int xmin, int ymin, int xmax, int ymax)
+{
+    std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> result;
+    if (!renderer || target_actors.empty())
+        return result;
+
+    auto world_frustum = buildSelectionFrustum(renderer, xmin, ymin, xmax, ymax);
+    if (!world_frustum)
+        return result;
+
+    for (vtkActor* actor : target_actors) {
+        if (!actor)
+            continue;
+        auto* mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
+        if (!mapper)
+            continue;
+        auto* poly = vtkPolyData::SafeDownCast(mapper->GetInput());
+        if (!poly || poly->GetNumberOfCells() == 0)
+            continue;
+
+        auto ids = penetratingPickCells(world_frustum, poly, actor->GetMatrix());
+        const vtkIdType picked_count = static_cast<vtkIdType>(ids.size());
+        if (picked_count == 0)
+            continue;
+        const vtkIdType cell_count = poly->GetNumberOfCells();
+        if (picked_count == cell_count && cell_count > 0)
+            spdlog::warn("[AreaPick] penetrating: picked all {} cells, frustum/rect likely invalid",
+                cell_count);
+        else
+            spdlog::debug("[AreaPick] penetrating actor: cells={} picked={}",
+                cell_count, picked_count);
+        result[actor] = std::move(ids);
+    }
+
+    spdlog::debug("[AreaPick] penetrating targets={} rect=({},{},{},{}) hit actor count={}",
+        target_actors.size(), xmin, ymin, xmax, ymax, result.size());
 
     return result;
 }

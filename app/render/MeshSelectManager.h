@@ -37,8 +37,18 @@ public:
     /**
      * @brief 矩形框选入口（Ctrl+左键拖拽）：框选永不清空，由各 selector 按 op
      *        （Append->并集 / Remove->差集 / Toggle->对称差）做集合运算；无命中也不清空。
+     *        框选是否穿透由 setPenetrating() 控制（UI 开关）；单选恒为非穿透。
      */
     void selectArea(int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle);
+
+    /**
+     * @brief 设置框选是否穿透（穿透与非穿透并存，由 UI 开关决定走哪条）
+     * @param enabled true  穿透：屏幕矩形反投影成视锥做几何求交，框内前层与背面单元一并命中，
+     *                      并额外对体网格求交，可选中内部体单元/内部节点/内部边；
+     *                false 非穿透：走硬件拾取，受深度遮挡只命中可见最前一层
+     */
+    void setPenetrating(bool enabled);
+
     void setSelectMode(SelectMode select_mode);
     /**
      * @brief 设置面选择的角度扩散参数，并同步到已创建的面选择器
@@ -84,6 +94,7 @@ private:
     bool highlight_visible_ { true };
 
     FaceSelectionSpreadOptions face_selection_spread_options_;
+    bool penetrating_ { false }; //> 框选是否穿透（UI 开关；默认非穿透）
     std::unordered_map<Index, std::unique_ptr<SelectorHighlight>> component_selectors_; //> 每个 component 对应的选择器
 };
 
