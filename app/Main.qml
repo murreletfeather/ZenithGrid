@@ -222,6 +222,17 @@ ApplicationWindow {
         onActivated: QModelManager.undoStack.redo()
     }
 
+    // 全局左键按下：点击对象树外部时清空行选择（活动组件保持不变）。
+    Connections {
+        target: Docking.GlobalInput
+
+        function onLeftPressed(globalPos) {
+            const tree = App.registry.objectTree
+            if (tree)
+                tree.handleGlobalLeftPress(globalPos.x, globalPos.y)
+        }
+    }
+
     Connections {
         target: App.selection
         function onActiveModelIdChanged() {
@@ -322,24 +333,6 @@ ApplicationWindow {
 
             PreferencesWindow {
                 anchors.fill: parent
-            }
-        }
-
-        // 左键点击对象树外部时清除其选中态；被动接收，不拦截原交互。
-        TapHandler {
-            acceptedButtons: Qt.LeftButton
-
-            onTapped: (eventPoint) => {
-                const tree = App.registry.objectTree
-                if (!tree)
-                    return
-                if (!tree.visible || tree.window !== dockHost.window) {
-                    tree.clearNodeSelection()
-                    return
-                }
-                const local = tree.mapFromItem(dockHost, eventPoint.position)
-                if (!tree.contains(local))
-                    tree.clearNodeSelection()
             }
         }
 
