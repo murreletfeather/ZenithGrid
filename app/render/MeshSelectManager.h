@@ -48,8 +48,6 @@ public:
      *                false 非穿透：走硬件拾取，受深度遮挡只命中可见最前一层
      */
     void setPenetrating(bool enabled);
-    //! @brief 当前框选是否穿透
-    bool isPenetrating() const;
 
     void setSelectMode(SelectMode select_mode);
     /**

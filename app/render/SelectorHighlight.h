@@ -52,8 +52,7 @@ struct FaceSelectionSpreadOptions {
  *
  */
 struct MeshVolumeHits {
-    std::unordered_set<vtkIdType> cells; //!< 命中的体单元 id（即 solid id）
-    std::unordered_set<vtkIdType> edges; //!< 命中的体网格边 id（vtkExtractEdges 输出的 cell id）
+    std::unordered_set<vtkIdType> cells; //!< 命中的体单元 id（即 solid id）；点/边/体模式共用，内部元素由各自选择器从体单元派生
 };
 
 class SelectorHighlight {

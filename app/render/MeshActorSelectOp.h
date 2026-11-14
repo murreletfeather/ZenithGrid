@@ -2,8 +2,6 @@
 #define MESH_ACTOR_SELECT_OP_H
 #include <memory>
 #include <optional>
-#include <vtkExtractGeometry.h>
-#include <vtkExtractPolyDataGeometry.h>
 #include <vtkSmartPointer.h>
 
 class vtkIdTypeArray;
@@ -42,13 +40,6 @@ class MeshActorSelectOp {
 public:
     MeshActorSelectOp(std::shared_ptr<MeshActor> mesh_actor);
 
-    // 仅拷贝共享的 mesh_actor_；vtkNew 裁剪滤波器保持默认构造（按调用惰性使用），
-    // 这样本类在保留裁剪器存活的前提下恢复可拷贝，使穿透框选测试可以值传递/拷贝。
-    MeshActorSelectOp(const MeshActorSelectOp& other);
-    MeshActorSelectOp& operator=(const MeshActorSelectOp& other);
-    MeshActorSelectOp(MeshActorSelectOp&&) = default;
-    MeshActorSelectOp& operator=(MeshActorSelectOp&&) = default;
-
     vtkProp& getSolidActor();
     vtkProp& getFaceActor();
     vtkProp& getEdgeActor();
@@ -63,22 +54,12 @@ public:
     vtkUnstructuredGrid* getSolidData();
 
     /**
-     * @brief 遵守剖切条件的体网格（体单元）数据集，供穿透框选内部命中使用
+     * @brief 遵守裁剪条件的体网格（体单元）数据集，供穿透框选内部命中使用
      *
-     * 无剖切时返回 getSolidData()（原始体网格，cell 下标即 solid id）；
-     * 有剖切时返回 solid_clipper_ 的输出（已裁剪的体网格），其 CellData 携带 vtkOriginalCellIds，
-     * 可将裁剪后的 cell 下标还原为原始模型体 id。调用方须对拾取结果做此还原。
+     * 直接取用数据层快照中已发布的体裁剪结果（携带 vtkOriginalCellIds，可将裁剪后的
+     * cell 下标还原为原始模型体 id），不在选择时重复裁剪。调用方须对拾取结果做此还原。
      */
     vtkUnstructuredGrid* getClippedSolidData();
-
-    /**
-     * @brief 体网格的边数据集（遵守剖切条件的 vtkExtractEdges 输出），含体单元之间的**内部边**
-     *
-     * cell 为 VTK_LINE，点数据带 vtkOriginalPointIds（组件内局部点 id）。
-     * Edge 模式靠它选中体网格内部边；内部边不在 MeshData::edge_vertices_ 里，没有模型边 id，
-     * 因此派生出的边其 edge_id 为 -1，按端点对标识（已有兜底路径）。
-     */
-    vtkPolyData* getSolidEdgeData();
 
     bool isVisible() const;
 
@@ -105,10 +86,5 @@ public:
 
 private:
     std::shared_ptr<MeshActor> mesh_actor_; // 非空
-
-    // 选择专用的裁剪滤波器：复用 MeshActor 的 clip_plane_ 与 solid_data_/solid_internal_edges_，
-    // 在穿透框选时对体网格与内部边做与渲染一致的剖切，避免选中已被裁掉的元素。
-    vtkNew<vtkExtractGeometry> solid_clipper_;
-    vtkNew<vtkExtractPolyDataGeometry> solid_edge_clipper_;
 };
 #endif // MESH_ACTOR_SELECT_OP_H

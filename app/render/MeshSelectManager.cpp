@@ -149,26 +149,21 @@ void MeshSelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, Selec
                 vtkMatrix4x4* m = solid_actor ? solid_actor->GetMatrix() : nullptr;
 
                 MeshVolumeHits vh;
-                if (select_mode_ != SelectMode::Edge) {
-                    if (auto* vol = select_op->getClippedSolidData()) {
-                        auto picked = area_pick::penetratingPickCells(frustum, vol, m);
-                        auto* orig = vtkIdTypeArray::SafeDownCast(
-                            vol->GetCellData()->GetArray("vtkOriginalCellIds"));
+                if (auto* vol = select_op->getClippedSolidData()) {
+                    auto picked = area_pick::penetratingPickCells(frustum, vol, m);
+                    auto* orig = vtkIdTypeArray::SafeDownCast(
+                        vol->GetCellData()->GetArray("vtkOriginalCellIds"));
+                    if (orig) {
                         for (vtkIdType c : picked) {
-                            if (orig && c >= 0 && c < orig->GetNumberOfTuples()) {
+                            if (c >= 0 && c < orig->GetNumberOfTuples()) {
                                 const vtkIdType o = orig->GetValue(c);
                                 if (o >= 0)
                                     vh.cells.insert(o);
-                            } else if (c >= 0) {
-                                vh.cells.insert(c);
                             }
                         }
                     }
-                } else {
-                    if (auto* vol_edges = select_op->getSolidEdgeData())
-                        vh.edges = area_pick::penetratingPickCells(frustum, vol_edges, m);
                 }
-                if (!vh.cells.empty() || !vh.edges.empty())
+                if (!vh.cells.empty())
                     volume_hits.emplace(comp_id, std::move(vh));
             }
         }
@@ -187,11 +182,6 @@ void MeshSelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, Selec
 void MeshSelectManager::setPenetrating(bool enabled)
 {
     penetrating_ = enabled;
-}
-
-bool MeshSelectManager::isPenetrating() const
-{
-    return penetrating_;
 }
 
 void MeshSelectManager::setSelectMode(SelectMode select_mode)

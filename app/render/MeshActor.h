@@ -102,9 +102,6 @@ private:
     vtkSmartPointer<vtkPolyData> solid_surface_;
     vtkSmartPointer<vtkPolyData> solid_internal_edges_;
 
-    /** @brief 当前是否处于裁剪启用状态，供选择管线判断是否对体网格/内部边做裁剪。 */
-    bool clip_enabled_ { false };
-
     vtkNew<vtkPolyDataMapper> edge_mapper_;
     vtkNew<vtkPolyDataMapper> face_mapper_;
     vtkNew<vtkPolyDataMapper> solid_mapper_;

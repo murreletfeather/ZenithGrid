@@ -205,29 +205,29 @@ void VertexSelectorHighlight::selectArea(
         return it == hits.end() ? nullptr : &it->second;
     };
 
-    // 从单个 actor 的命中 cell 派生"组件局部点 id"
-    auto derive_points = [&](vtkActor* target, vtkPolyData* poly,
+    // 从单个数据集的命中 cell 派生"组件局部点 id"
+    auto derive_points = [&](vtkActor* target, vtkDataSet* data,
         const std::unordered_set<vtkIdType>* picked) {
-        if (!target || !poly || !picked || picked->empty())
+        if (!target || !data || !picked || picked->empty())
             return;
-        if (poly->GetNumberOfCells() == 0)
+        if (data->GetNumberOfCells() == 0)
             return;
 
         // 裁剪链上点 id 会重排：vTK 拾取后经 vtkOriginalPointIds 还原组件局部点 id
         auto* orig_pt_ids = vtkIdTypeArray::SafeDownCast(
-            poly->GetPointData()->GetArray("vtkOriginalPointIds"));
+            data->GetPointData()->GetArray("vtkOriginalPointIds"));
         for (vtkIdType cell_id : *picked) {
-            if (cell_id < 0 || cell_id >= poly->GetNumberOfCells())
+            if (cell_id < 0 || cell_id >= data->GetNumberOfCells())
                 continue;
-            vtkCell* cell = poly->GetCell(cell_id);
+            vtkCell* cell = data->GetCell(cell_id);
             if (!cell)
                 continue;
             for (int i = 0; i < cell->GetNumberOfPoints(); ++i) {
                 vtkIdType rp = cell->GetPointId(i);
-                if (rp < 0 || rp >= poly->GetNumberOfPoints())
+                if (rp < 0 || rp >= data->GetNumberOfPoints())
                     continue;
                 double p[3];
-                poly->GetPoint(rp, p);
+                data->GetPoint(rp, p);
                 // 像素在框内才保留（demo POINTS 语义）
                 if (!area_pick::isWorldPointInScreenBox(renderer_, target,
                         p[0], p[1], p[2], xmin, ymin, xmax, ymax))
