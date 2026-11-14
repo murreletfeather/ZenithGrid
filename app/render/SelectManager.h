@@ -43,8 +43,6 @@ public:
      * @note 仅对网格模式生效；单选恒为非穿透。
      */
     void setPenetrating(bool enabled);
-    //! @brief 网格框选当前是否穿透
-    bool isPenetrating() const;
 
     void setSelectMode(const std::string& select_mode);
     /**
@@ -77,7 +75,6 @@ private:
     std::unique_ptr<GeometrySelectManager> geom_;
     std::unique_ptr<ComponentSelectorHighlight> component_selector_;
     SelectMode select_mode_ { SelectMode::None };
-    bool penetrating_ { false };
     vtkRenderer* renderer_ {};
     vtkNew<vtkActor> highlight_actor_;
 };
