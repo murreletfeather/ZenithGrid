@@ -37,6 +37,8 @@ public:
      * @param unique_name 功能唯一名称
      */
     Q_INVOKABLE QVariant invoke(const QString& unique_name);
+    /** @brief 文件功能调用，返回 succeeded 和 result，区分同步成功的空结果与调用失败。 */
+    Q_INVOKABLE QVariantMap invokeFile(const QString& unique_name);
     /**
      * @brief 修改功能参数，实时生效并广播参数变更事件
      * @param unique_name 功能唯一名称
@@ -100,7 +102,7 @@ public:
     void notifyScalarAttributeDisplayRequested(Index component_id, const std::string& attribute_name);
 
 signals:
-    //! @brief 同步功能调用失败，由宿主统一显示；失败返回无效 QVariant。
+    //! @brief 同步功能调用失败，由宿主统一显示。
     void invocationFailed(const QString& error);
     void featuresInfoChanged();
     //! @brief 功能请求在指定 Component 上渲染标量属性
@@ -109,6 +111,7 @@ signals:
     void paramValueChanged(QString feature, int index, QVariant value);
 
 private:
+    std::optional<QVariant> tryInvoke(const QString& unique_name);
     FeatureSystem* feature_system_;
     Index active_model_id_ { -1 };
     Index active_component_id_ { -1 };

@@ -1,0 +1,8 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "NastranImport",
+    "display_name": "Nastran 网格",
+    "description": "导入 Nastran Bulk Data 文件中的线性壳单元和体单元"
+  }
+}

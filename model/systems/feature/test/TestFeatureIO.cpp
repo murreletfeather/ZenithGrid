@@ -117,11 +117,35 @@ public:
 private:
     FileTypeDeclaration declared_;
 };
+
+class NativeImportFeature final : public FeatureHandler {
+public:
+    explicit NativeImportFeature(ImportComponentsFn read)
+        : read_(std::move(read))
+    {
+    }
+
+    void setup(FeatureRegistrar& registrar, FeatureContext&) override
+    {
+        registrar.setFileType({ FileDirection::Import, { "dat" } });
+        registrar.addParameter({ ArgTypeEnum::Paths, "输入文件", "", "" });
+    }
+
+    std::any execute(FeatureContext& context) override
+    {
+        const auto& paths = *context.params.value(0).get<ArgTypeEnum::Paths>();
+        return context.importModels("Native batch import", paths, read_);
+    }
+
+private:
+    ImportComponentsFn read_;
+};
+
 FeatureSystem::SystemHandlerPtr makeFileFeature()
 {
     return FeatureSystem::SystemHandlerPtr { std::make_unique<FileFeatureHandler>().release() };
 }
-Index addTriangleComponent(ModelLayer& model, const std::string& name = "Target")
+ComponentDatas makeTriangleComponents(const std::string& name)
 {
     auto component = std::make_unique<ComponentData>();
     component->name = name;
@@ -130,7 +154,11 @@ Index addTriangleComponent(ModelLayer& model, const std::string& name = "Target"
     component->mesh->vertex_positions_ = { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 } };
     ComponentDatas components;
     components.push_back(std::move(component));
-    const auto id = model.addModel(name, std::move(components));
+    return components;
+}
+Index addTriangleComponent(ModelLayer& model, const std::string& name = "Target")
+{
+    const auto id = model.addModel(name, makeTriangleComponents(name));
     return model.modelById(id)->componentIds().front();
 }
 std::size_t pointCount(const ModelLayer& model, Index id)
@@ -441,6 +469,132 @@ TEST_CASE("Native file features declare their parameters and work without IOSyst
     CHECK(system.getFileTypes(FileDirection::Export).size() == 1);
     system.unregisterHandler(exporting);
     CHECK(system.getFileTypes(FileDirection::Export).empty());
+}
+
+TEST_CASE("Native batch import parses before writing and shares one undo operation", "[FeatureSystem][file][job]")
+{
+    const std::vector<std::filesystem::path> paths { std::filesystem::path(u8"父目录/第一.dat"), "second.dat" };
+    const std::vector<std::filesystem::path> malformed_paths { paths.front(), "malformed.dat" };
+    std::vector<std::filesystem::path> parsed_paths;
+    std::thread::id read_thread;
+    OwnerQueue queue;
+    core::EventBus bus;
+    ImportModelObserver observer;
+    ModelLayer model(&observer);
+    UndoStack undo(model);
+    model.setUndoRecorder(&undo);
+    systems::job::JobRunner runner(model, &undo, queue.dispatcher());
+    FeatureSystem system(model, bus, &undo);
+    REQUIRE(system.ioSystem() == nullptr);
+
+    HandlerMetaData importing;
+    importing.name = "NativeImportBatch";
+    importing.display_name = "Native file import";
+    auto feature = std::make_unique<NativeImportFeature>([&](const std::filesystem::path& path, const systems::job::ProgressFn& report) {
+        parsed_paths.push_back(path);
+        read_thread = std::this_thread::get_id();
+        if (path == "malformed.dat")
+            throw std::runtime_error("malformed input");
+        report(0.5, "Parsed mesh");
+        return makeTriangleComponents("Imported mesh");
+    });
+    REQUIRE(system.registerHandler(importing, FeatureSystem::SystemHandlerPtr { feature.release() }));
+    REQUIRE(system.setParameter(importing.name, 0, core::ArgObject::create<ArgTypeEnum::Paths>(paths)));
+    CHECK(system.getFileTypes(FileDirection::Export).empty());
+
+    const auto check_batch = [&] {
+        CHECK(parsed_paths == paths);
+        REQUIRE(observer.added.size() == 2);
+        const auto first_id = observer.added.front();
+        const auto second_id = observer.added.back();
+        REQUIRE(model.modelById(first_id));
+        CHECK(model.modelById(first_id)->model_name_ == "第一.dat");
+        REQUIRE(model.modelById(second_id));
+        CHECK(model.modelById(second_id)->model_name_ == "second.dat");
+        const auto& components = model.modelById(second_id)->componentIds();
+        REQUIRE(components.size() == 1);
+        CHECK(pointCount(model, components.front()) == 3);
+        CHECK(undo.undoLabel() == importing.display_name);
+        REQUIRE(undo.undo());
+        CHECK_FALSE(model.modelById(first_id));
+        CHECK_FALSE(model.modelById(second_id));
+        CHECK_FALSE(undo.canUndo());
+        REQUIRE(undo.redo());
+        CHECK(model.modelById(first_id));
+        CHECK(model.modelById(second_id));
+        CHECK_FALSE(undo.canRedo());
+    };
+    const auto check_no_import = [&] {
+        CHECK(observer.added.empty());
+        CHECK_FALSE(undo.canUndo());
+        CHECK_FALSE(model.writesPending());
+    };
+
+    SECTION("Synchronous host imports an entire batch")
+    {
+        const auto result = system.invoke(importing.name);
+        CHECK_FALSE(result.has_value());
+        CHECK(read_thread == std::this_thread::get_id());
+        check_batch();
+    }
+    SECTION("Synchronous parse failure leaves the model and undo history untouched")
+    {
+        REQUIRE(system.setParameter(importing.name, 0, core::ArgObject::create<ArgTypeEnum::Paths>(malformed_paths)));
+        CHECK_THROWS_AS(system.invoke(importing.name), std::runtime_error);
+        CHECK(parsed_paths == malformed_paths);
+        check_no_import();
+    }
+    SECTION("Desktop host uses the existing runner")
+    {
+        system.setJobRunner(&runner);
+        const auto invoke = [&] {
+            return std::any_cast<std::shared_ptr<systems::job::Job>>(system.invoke(importing.name));
+        };
+        SECTION("The owner thread installs only the captured batch")
+        {
+            auto job = invoke();
+            REQUIRE(job);
+            CHECK(job->owner() == importing.name);
+            REQUIRE(system.setParameter(importing.name, 0, core::ArgObject::create<ArgTypeEnum::Paths>(malformed_paths)));
+            auto finish = queue.take();
+            CHECK(read_thread != std::this_thread::get_id());
+            CHECK(model.writesPending());
+            CHECK(observer.added.empty());
+            finish();
+            CHECK(job->state() == systems::job::JobState::Done);
+            CHECK_FALSE(model.writesPending());
+            check_batch();
+        }
+        SECTION("Cancellation after parsing discards the entire batch")
+        {
+            auto job = invoke();
+            REQUIRE(job);
+            auto finish = queue.take();
+            CHECK(parsed_paths == paths);
+            job->cancel();
+            finish();
+            CHECK(job->state() == systems::job::JobState::Cancelled);
+            check_no_import();
+        }
+        SECTION("An exception from the second reader discards the first result")
+        {
+            REQUIRE(system.setParameter(importing.name, 0, core::ArgObject::create<ArgTypeEnum::Paths>(malformed_paths)));
+            auto job = invoke();
+            REQUIRE(job);
+            queue.take()();
+            CHECK(job->state() == systems::job::JobState::Failed);
+            CHECK(job->error().find("malformed input") != std::string::npos);
+            CHECK(parsed_paths == malformed_paths);
+            check_no_import();
+        }
+        SECTION("A rejected publication does not read on the owner thread")
+        {
+            runner.stop();
+            CHECK_FALSE(invoke());
+            CHECK(parsed_paths.empty());
+            check_no_import();
+        }
+    }
 }
 
 TEST_CASE("File Features use their own IDs while sharing labels and extensions", "[FeatureSystem][file]")

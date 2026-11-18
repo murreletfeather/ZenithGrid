@@ -14,6 +14,7 @@
 #include "QModelManager.h"
 #include "QSelection.h"
 #include "QTaskStatus.h"
+#include "SessionQuery.h"
 #include "SystemPluginManager.h"
 
 #include <QEventLoop>
@@ -41,6 +42,7 @@
 #include <QSvgRenderer>
 #include <QTemporaryDir>
 #include <QTimer>
+#include <QUrl>
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -74,15 +76,27 @@ class FileCompletionFeature final : public systems::feature::FeatureHandler {
 public:
     std::any result;
     int calls { 0 };
+    bool fail_sync { false };
     void setup(systems::feature::FeatureRegistrar& registrar, systems::feature::FeatureContext&) override
     {
         registrar.setFileType({ systems::feature::FileDirection::Import, { "dat" } });
         registrar.addParameter({ ArgTypeEnum::Paths, "Files", "", "" });
     }
-    std::any execute(systems::feature::FeatureContext&) override
+    std::any execute(systems::feature::FeatureContext& context) override
     {
         ++calls;
-        return result;
+        if (result.has_value())
+            return result;
+
+        const auto& paths = *context.params.value(0).get<ArgTypeEnum::Paths>();
+        const auto read = [fail_sync = fail_sync](const std::filesystem::path&, const systems::job::ProgressFn&) {
+            if (fail_sync)
+                throw std::runtime_error("broken deck");
+            ComponentDatas components;
+            components.push_back(std::make_unique<ComponentData>());
+            return components;
+        };
+        return context.importModels("导入样例", paths, read);
     }
 };
 QQuickItem* findItem(QQuickItem* root, const QString& name)
@@ -306,6 +320,7 @@ TEST_CASE("File completion follows accepted submission without creating windows"
             readonly property OperationSession operationSession: OperationSession { featureSystem: backend }
             readonly property string panelTitle: operationSession.panelTitle
             property int resets: 0
+            property string invocationError: ""
             property QtObject viewport: QtObject {
                 function resetCamera() { ++flow.resets }
             }
@@ -314,6 +329,13 @@ TEST_CASE("File completion follows accepted submission without creating windows"
                 signal taskFinished()
                 signal taskFailed(string error)
                 signal taskCancelled()
+            }
+            Connections {
+                target: backend
+                function onInvocationFailed(error) {
+                    flow.invocationError = error;
+                    flow.taskStatus.taskFailed(error);
+                }
             }
             Component.onCompleted: App.registry.renderWindow = viewport
             function selectFile() { importFiles(["file:///C:/input%20one.dat", "file:///C:/input%20two.dat"]) }
@@ -355,7 +377,10 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     CHECK(resets() == 1); // 未提交不能消费其他任务的结束通知。
     feature.result.reset();
     invoke("executeFile");
+    CHECK(session::SessionQuery(model).listModels().size() == 2);
     CHECK(resets() == 2);
+    invoke("finishFile");
+    CHECK(resets() == 2); // 同步导入已完成，后续任务通知不会再次复位。
     feature.result = std::make_shared<systems::job::Job>("import");
     invoke("executeFile");
     invoke("failFile");
@@ -363,6 +388,16 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     invoke("executeFile");
     invoke("cancelFile");
     CHECK(resets() == 2);
+    feature.result.reset();
+    feature.fail_sync = true;
+    invoke("executeFile");
+    CHECK(flow->property("invocationError").toString() == "broken deck");
+    CHECK(session::SessionQuery(model).listModels().size() == 2);
+    CHECK(resets() == 2);
+    feature.fail_sync = false;
+    invoke("executeFile");
+    CHECK(session::SessionQuery(model).listModels().size() == 4);
+    CHECK(resets() == 3);
     auto other_handler = std::make_unique<FileCompletionFeature>();
     REQUIRE(system.registerHandler({ "Other" }, systems::feature::FeatureSystem::SystemHandlerPtr { other_handler.release() }));
     invoke("selectExplicitFile");
@@ -372,6 +407,103 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     CHECK(flow->property("panelTitle").toString() == "操作面板");
     CHECK(QGuiApplication::allWindows().size() == windows);
 }
+
+#if defined(PRECESS_NASTRAN_TEST_PLUGIN) && defined(PRECESS_OBJ_TEST_PLUGIN)
+TEST_CASE("Startup imports Nastran and legacy files in argument order", "[navigation][file][startup]")
+{
+    application();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto executable = directory.filePath("isolated/Test.exe").toStdString();
+    QModelManager manager(executable);
+    for (const auto* plugin : { PRECESS_NASTRAN_TEST_PLUGIN, PRECESS_OBJ_TEST_PLUGIN })
+        REQUIRE(manager.getSystemPluginManager()->registerPlugin(QUrl::fromLocalFile(QString::fromUtf8(plugin))));
+
+    const auto write = [&](const QString& name, const QByteArray& content) {
+        QFile file(directory.filePath(name));
+        REQUIRE(file.open(QIODevice::WriteOnly));
+        REQUIRE(file.write(content) == content.size());
+        return QUrl::fromLocalFile(file.fileName());
+    };
+    const QByteArray triangle = "BEGIN BULK\nGRID,1,,0.,0.,0.\nGRID,2,,1.,0.,0.\nGRID,3,,0.,1.,0.\nCTRIA3,1,1,1,2,3\nENDDATA\n";
+    const QString first_name = QString::fromUtf8("第一个 网格.nas");
+    const QString legacy_name = "legacy.obj";
+    const QString last_name = "last.BDF";
+    const QList<QUrl> arguments {
+        write(first_name, triangle),
+        write(legacy_name, "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n"),
+        write("broken.nas", "BEGIN BULK\nGRID,1,,0.,0.,0.\nCTRIA3,1,1,1,2,3\nENDDATA\n"),
+        write(last_name, triangle)
+    };
+
+    QStringList events;
+    QList<Index> models;
+    QEventLoop loop;
+    auto* task_status = manager.getTaskStatus();
+    auto* query = manager.getModelQuery();
+    QObject::connect(task_status, &QTaskStatus::taskStarted, &loop, [&] { events.append("start"); });
+    QObject::connect(task_status, &QTaskStatus::taskFailed, &loop, [&] { events.append("failed"); });
+    QObject::connect(task_status, &QTaskStatus::taskFinished, &loop, [&] { events.append("finish"); });
+    QObject::connect(manager.getModelObserver(), &QModelObserver::modelAdded, &loop, [&](Index id) {
+        events.append(query->getModelName(id));
+        models.append(id);
+    });
+
+    QQmlEngine engine;
+    engine.rootContext()->setContextProperty("startupArguments", QVariant::fromValue(arguments));
+    engine.rootContext()->setContextProperty("startupFeatureSystem", manager.getFeatureSystemAdaptor());
+    engine.rootContext()->setContextProperty("startupLegacySystem", manager.getModelIOSystemAdaptor());
+    engine.rootContext()->setContextProperty("startupTaskStatus", task_status);
+    engine.rootContext()->setContextProperty("startupLoop", &loop);
+    QQmlComponent component(&engine);
+    component.setData(R"QML(
+        import QtQuick
+        import "qrc:/navigation-ui"
+        StartupFileImport {
+            id: startup
+            featureSystem: startupFeatureSystem
+            taskStatus: startupTaskStatus
+            property int legacyReads: 0
+            property int completions: 0
+            property bool importedAny: false
+            ioSystem: QtObject {
+                function read(format, url, args) {
+                    ++startup.legacyReads;
+                    return startupLegacySystem.read(format, url, args);
+                }
+            }
+            onFinished: function(imported) {
+                ++startup.completions;
+                startup.importedAny = imported;
+                startupLoop.quit();
+            }
+            function start() { startup.open(startupArguments); }
+        }
+    )QML",
+        QUrl("qrc:/navigation-ui/StartupFileImportHarness.qml"));
+    INFO(component.errorString().toStdString());
+    REQUIRE(component.isReady());
+    std::unique_ptr<QObject> startup(component.create());
+    REQUIRE(startup);
+    QTimer::singleShot(10000, &loop, &QEventLoop::quit);
+    REQUIRE(QMetaObject::invokeMethod(startup.get(), "start"));
+    if (!startup->property("completions").toInt())
+        loop.exec();
+
+    CHECK(startup->property("completions").toInt() == 1);
+    CHECK(startup->property("importedAny").toBool());
+    CHECK(startup->property("legacyReads").toInt() == 1);
+    CHECK(events == QStringList { "start", first_name, "finish", legacy_name, "start", "failed", "finish", "start", last_name, "finish" });
+    REQUIRE(models.size() == 3);
+    for (const auto id : models) {
+        const auto components = query->getComponentIds(id);
+        REQUIRE(components.size() == 1);
+        const auto mesh = query->getMeshSummary(components.front());
+        CHECK(mesh.value("vertex_count").toInt() == 3);
+        CHECK(mesh.value("face_count").toInt() == 1);
+    }
+}
+#endif
 
 TEST_CASE("Feature navigation aggregates generic entries and shares executable children", "[navigation][feature]")
 {

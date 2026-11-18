@@ -24,9 +24,12 @@
 
 namespace systems::feature {
 namespace {
+    constexpr auto kLegacyImportPrefix = "LegacyIO.Import/";
+    constexpr auto kLegacyExportPrefix = "LegacyIO.Export/";
+
     std::string fileFeatureName(FileDirection direction, const std::string& key)
     {
-        return (direction == FileDirection::Import ? "LegacyIO.Import/" : "LegacyIO.Export/") + key;
+        return (direction == FileDirection::Import ? kLegacyImportPrefix : kLegacyExportPrefix) + key;
     }
 
     template <ArgTypeEnum Type>
@@ -156,6 +159,11 @@ FeatureIOSystemRegister::FeatureIOSystemRegister(FeatureSystem& system)
     : system_(&system)
 {
     assert(system.ioSystem());
+}
+
+bool FeatureIOSystemRegister::isLegacyFileFeature(std::string_view name)
+{
+    return name.starts_with(kLegacyImportPrefix) || name.starts_with(kLegacyExportPrefix);
 }
 
 bool FeatureIOSystemRegister::registerPlugin(const QJsonObject& meta_data, PluginBase& plugin)

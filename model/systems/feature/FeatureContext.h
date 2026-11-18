@@ -4,17 +4,21 @@
  */
 #ifndef FEATURE_CONTEXT_H
 #define FEATURE_CONTEXT_H
+#include "ComponentData.h"
 #include "ComponentOperator.h" // std::optional<ComponentOperator> 需要完整类型
 #include "Core.h"
 #include "FeatureEventGateway.h" // events 成员类型（功能经其订阅事件，调用点需完整类型）
 #include "Job.h" // runComputeJob 成员类型（systems::job::Job / JobTaskFn）
 
+#include <any>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 class ModelLayer;
 
@@ -35,6 +39,9 @@ using CaptureJobFn = std::function<systems::job::JobTaskFn(const ComponentOperat
 //! GUI 准备与提交覆盖整个模型层；worker 仍只拿自持输入和结果。
 using LayerCaptureJobFn = std::function<systems::job::JobTaskFn(const ModelLayer&)>;
 using LayerWritebackFn = std::function<void(ModelLayer&, systems::job::ProgressFn)>;
+
+//! @brief 读取一个文件并返回自持组件。读失败抛异常；report 为进度及取消检查点。
+using ImportComponentsFn = std::function<ComponentDatas(const std::filesystem::path&, const systems::job::ProgressFn&)>;
 
 /**
  * @brief 临时预览视图：插件控制两次 execute 之间的开层、重试和取消。
@@ -83,6 +90,13 @@ struct FeatureContext {
     //! @brief 按身份查询所属模型的组件操作句柄。
     std::optional<ComponentOperator> componentOperator(Index component_id) const;
     UndoContext undo; //> undo 上下文（插件层接口入口；语义见 UndoContext 注释）
+    /**
+     * @brief 正式执行入口使用的批量文件导入。整批读取成功后，每个文件以文件名创建一个模型。
+     * 读取回调只访问自持输入，不捕获功能上下文或活模型。宿主决定后台或同步执行。
+     * @return 同步成功返回空，供文件流程执行导入收尾。空路径返回提示文字，
+     * 后台返回 shared_ptr<Job>（空指针表示未提交）。
+     */
+    std::any importModels(std::string label, std::vector<std::filesystem::path> paths, ImportComponentsFn read);
     /**
      * @brief 纯计算任务；不得持活模型句柄，无模型回写与 undo 记录。
      * 输入须在 GUI 复制，失败抛异常。任务到 GUI 清理结束持续占用模型；忙或未装配时返回空。

@@ -97,6 +97,18 @@ ApplicationWindow {
     // 操作状态由窗口持有，侧栏隐藏或重建不会结束当前操作。
     readonly property OperationSession operationSession: OperationSession {}
 
+    StartupFileImport {
+        id: startupFiles
+        featureSystem: QModelManager.featureSystem
+        ioSystem: QModelManager.ioSystem
+        taskStatus: QModelManager.taskStatus
+        onFinished: function(imported) {
+            // 导入通知先排队加载 Actor，再重置相机。
+            if (imported && App.registry.renderWindow)
+                App.registry.renderWindow.resetCamera()
+        }
+    }
+
     // 配色由 Theme 统一解析；AppPalette 与 dock 只接收结果，不自行计算。
     // ToolTip 等按应用调色板取色的弹窗据此跟随主题与壁纸状态。
     Binding {
@@ -426,19 +438,6 @@ ApplicationWindow {
         QModelManager.featureSystem.setActiveModel(App.selection.activeModelId)
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
-        Qt.callLater(function() {
-            let imported = false
-            for (let i = 0; i < commandLineArgs.length; ++i) {
-                let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
-                if (!ok) {
-                    console.exception("启动打开失败: " + commandLineArgs[i]);
-                } else {
-                    imported = true
-                }
-            }
-            // 导入通知先排队加载 Actor，再重置相机。
-            if (imported && App.registry.renderWindow)
-                App.registry.renderWindow.resetCamera()
-        })
+        Qt.callLater(startupFiles.open, commandLineArgs)
     }
 }

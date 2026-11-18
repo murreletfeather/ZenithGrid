@@ -137,7 +137,10 @@ Item {
                     } else if (root.isWasm)
                         QWasmBridge.downloadFile(outputPath.split(/[\\/]/).pop(), outputPath);
                 };
-                const result = root.featureSystem.invoke(name);
+                const invocation = root.featureSystem.invokeFile(name);
+                if (!invocation.succeeded)
+                    return;
+                const result = invocation.result;
                 if (result && result.submitted !== undefined) {
                     // 本次确实占用了单槽才等待；主线程此处不让出事件循环。
                     if (result.submitted)

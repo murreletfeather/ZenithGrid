@@ -1,4 +1,5 @@
 #include "QFeatureSystemAdaptor.h"
+#include "FeatureIOSystemRegister.h"
 #include "FeatureParams.h"
 #include "FeatureSystem.h"
 #include "Job.h"
@@ -28,7 +29,8 @@ QVariantList fileFeaturesToQVariant(const std::vector<systems::feature::FileFeat
         for (const auto& extension : info.extensions)
             extensions.append(QString::fromStdString(extension));
         result.append(QVariantMap { { "direction", direction }, { "display_name", QString::fromStdString(info.display_name) },
-            { "extensions", extensions }, { "feature", QString::fromStdString(info.feature) } });
+            { "extensions", extensions }, { "feature", QString::fromStdString(info.feature) },
+            { "legacy_io", systems::feature::FeatureIOSystemRegister::isLegacyFileFeature(info.feature) } });
     }
     return result;
 }
@@ -121,6 +123,17 @@ FeatureSystem* QFeatureSystemAdaptor::featureSystem() const
 
 QVariant QFeatureSystemAdaptor::invoke(const QString& unique_name)
 {
+    return tryInvoke(unique_name).value_or(QVariant {});
+}
+
+QVariantMap QFeatureSystemAdaptor::invokeFile(const QString& unique_name)
+{
+    auto result = tryInvoke(unique_name);
+    return { { "succeeded", result.has_value() }, { "result", std::move(result).value_or(QVariant {}) } };
+}
+
+std::optional<QVariant> QFeatureSystemAdaptor::tryInvoke(const QString& unique_name)
+{
     // 插件的同步校验发生在任务启动前，C++ 异常不能穿过 Qt 元调用边界。
     try {
         return anyToQVariant(feature_system_->invoke(unique_name.toStdString()));
@@ -131,7 +144,7 @@ QVariant QFeatureSystemAdaptor::invoke(const QString& unique_name)
         spdlog::error("FeatureSystemAdaptor::invoke {}: unknown exception", unique_name.toStdString());
         emit invocationFailed(tr("功能执行发生未知异常"));
     }
-    return {};
+    return std::nullopt;
 }
 
 QVariantList QFeatureSystemAdaptor::getImportFileTypes() const
