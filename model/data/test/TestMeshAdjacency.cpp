@@ -244,6 +244,35 @@ TEST_CASE("MeshAdjacency assigns and releases global edge ids")
     REQUIRE(adj.edgeStableId(mesh, adj.findEdgeByEndpoints(mesh, 0, 1).value()).value() == 0);
 }
 
+TEST_CASE("MeshAdjacency resolves volume-cell (internal) edges")
+{
+    // 单个六面体（VTK_HEXAHEDRON=12），8 个顶点 0..7
+    MeshData mesh;
+    mesh.solid_types_ = { 12 };
+    mesh.solid_vertices_ = { 0, 1, 2, 3, 4, 5, 6, 7 };
+    mesh.solid_vertices_offset_ = { 0, 8 };
+
+    MeshAdjacency adj;
+
+    // 体单元的全部 12 条边均可反查到稳定局部边 id（含原先用端点对兜底的"内部边"）
+    REQUIRE(adj.edgeCount(mesh) == 12);
+    auto e_vertical = adj.findEdgeByEndpoints(mesh, 4, 0); // 竖边 (0,4)
+    REQUIRE(e_vertical.has_value());
+    REQUIRE(adj.edgeStableId(mesh, *e_vertical).has_value());
+    auto e_bottom = adj.findEdgeByEndpoints(mesh, 1, 0); // 底边 (0,1)
+    REQUIRE(e_bottom.has_value());
+    // 同一条边交换端点亦命中同一身份
+    REQUIRE(adj.edgeStableId(mesh, *e_bottom) == adj.edgeStableId(mesh, *adj.findEdgeByEndpoints(mesh, 0, 1)));
+
+    // 非边（对角线 0-2）不在体单元边表内
+    REQUIRE_FALSE(adj.findEdgeByEndpoints(mesh, 0, 2).has_value());
+
+    // 与已有面边/物化边共享端点对时复用同一稳定 id（此处无面/物化边，仅验证体边自身一致）
+    auto e_again = adj.findEdgeByEndpoints(mesh, 0, 4);
+    REQUIRE(e_again.has_value());
+    REQUIRE(adj.edgeStableId(mesh, *e_again) == adj.edgeStableId(mesh, *e_vertical));
+}
+
 TEST_CASE("MeshAdjacency edge handles expire after rebuild")
 {
     MeshData mesh;

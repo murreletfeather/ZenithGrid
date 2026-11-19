@@ -7,6 +7,7 @@
 class vtkIdTypeArray;
 class vtkProp;
 class vtkPolyData;
+class vtkUnstructuredGrid;
 class vtkExtractSelection;
 class MeshActorSelectOp;
 class MeshActor;
@@ -42,6 +43,23 @@ public:
     vtkProp& getSolidActor();
     vtkProp& getFaceActor();
     vtkProp& getEdgeActor();
+
+    /**
+     * @brief 体网格（体单元）数据集（未裁剪）
+     *
+     * cell id 即 solid id（该数据集的 vtkOriginalCellIds 为 identity），点 id 即组件内局部
+     * 点 id（vtkOriginalPointIds 为 identity）。体网格**内部**的体单元与内部节点只能从这里
+     * 选到——face/edge/solid actor 渲染的都是边界表示，不含内部单元。
+     */
+    vtkUnstructuredGrid* getSolidData();
+
+    /**
+     * @brief 遵守裁剪条件的体网格（体单元）数据集，供穿透框选内部命中使用
+     *
+     * 直接取用数据层快照中已发布的体裁剪结果（携带 vtkOriginalCellIds，可将裁剪后的
+     * cell 下标还原为原始模型体 id），不在选择时重复裁剪。调用方须对拾取结果做此还原。
+     */
+    vtkUnstructuredGrid* getClippedSolidData();
 
     bool isVisible() const;
 

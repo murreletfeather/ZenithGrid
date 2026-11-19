@@ -21,6 +21,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkUnstructuredGrid.h>
 
 namespace {
 std::array<vtkIdType, 2> _find_selected_edge(vtkHardwarePicker& picker, vtkCell& picked_cell, vtkPolyData& pickedPoly)
@@ -222,7 +223,7 @@ void EdgeSelectorHighlight::setupHighlightStyle(vtkActor& actor, vtkMapper& mapp
 
 void EdgeSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-    int xmin, int ymin, int xmax, int ymax, SelectOp op)
+    int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume)
 {
     // 与点选对齐：从 face/edge/solid 三个 actor 的命中 cell 派生边并合并端点对。
     // face CELLS 主路径健壮（面表面有 z 遮挡）；edge actor 补独立/物化边；solid 表面补体网格表面边。
@@ -234,24 +235,24 @@ void EdgeSelectorHighlight::selectArea(
         return it == hits.end() ? nullptr : &it->second;
     };
 
-    // 从单个 actor 的命中 cell 派生"局部点 id 端点对"
-    auto derive_edges = [&](vtkActor* target, vtkPolyData* poly,
+    // 从单个数据集的命中 cell 派生"局部点 id 端点对"
+    auto derive_edges = [&](vtkActor* target, vtkDataSet* data,
         const std::unordered_set<vtkIdType>* picked) {
-        if (!target || !poly || !picked || picked->empty())
+        if (!target || !data || !picked || picked->empty())
             return;
-        if (poly->GetNumberOfCells() == 0)
+        if (data->GetNumberOfCells() == 0)
             return;
 
         // 裁剪链上点 id 会重排：vTK 拾取后经 vtkOriginalPointIds 还原组件局部点 id
         auto* orig_pt_ids = vtkIdTypeArray::SafeDownCast(
-            poly->GetPointData()->GetArray("vtkOriginalPointIds"));
+            data->GetPointData()->GetArray("vtkOriginalPointIds"));
         for (vtkIdType cell_id : *picked) {
-            if (cell_id < 0 || cell_id >= poly->GetNumberOfCells())
+            if (cell_id < 0 || cell_id >= data->GetNumberOfCells())
                 continue;
-            vtkCell* cell = poly->GetCell(cell_id);
+            vtkCell* cell = data->GetCell(cell_id);
             if (!cell)
                 continue;
-            // 线 cell 本身就是边；面 cell 经 GetEdge 拆边
+            // 线 cell 本身就是边；面/体 cell 经 GetEdge 拆边
             const bool is_line = cell->GetCellType() == VTK_LINE;
             for (int e = 0; e < (is_line ? 1 : cell->GetNumberOfEdges()); ++e) {
                 vtkIdList* pt_ids = nullptr;
@@ -268,8 +269,8 @@ void EdgeSelectorHighlight::selectArea(
                 const vtkIdType rp0 = pt_ids->GetId(0);
                 const vtkIdType rp1 = pt_ids->GetId(1);
                 double pp0[3], pp1[3];
-                poly->GetPoint(rp0, pp0);
-                poly->GetPoint(rp1, pp1);
+                data->GetPoint(rp0, pp0);
+                data->GetPoint(rp1, pp1);
                 // 线段与框相交即选中（端点落入或穿过矩形均算），无需框到端点
                 if (!area_pick::isScreenSegmentIntersectsBox(renderer_, target,
                         pp0[0], pp0[1], pp0[2], pp1[0], pp1[1], pp1[2],
@@ -310,6 +311,12 @@ void EdgeSelectorHighlight::selectArea(
     if (auto* solid_poly = solid_actor ? vtkPolyData::SafeDownCast(
             vtkPolyDataMapper::SafeDownCast(solid_actor->GetMapper())->GetInput()) : nullptr) {
         derive_edges(solid_actor, solid_poly, hit_of(&select_op_.getSolidActor()));
+    }
+
+    // 4) 体网格内部边：上面三条都是边界表示，体单元之间的内部边只能从体网格派生。
+    if (volume && !volume->cells.empty()) {
+        if (auto* vol = select_op_.getSolidData())
+            derive_edges(solid_actor, vol, &volume->cells);
     }
 
     spdlog::debug("[EdgeArea] picked_edge_set.size()={}", picked_edge_set.size());

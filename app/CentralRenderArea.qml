@@ -764,6 +764,7 @@ Page {
                         myItem.clearSelection()
                 }
                 function onSelectModeChanged() { myItem.setSelectMode(App.selection.selectMode) }
+                function onPenetratingChanged() { myItem.setPenetrating(App.selection.penetrating) }
                 function onSelectionInvalidated() {
                     myItem.clearSelection()
                 }

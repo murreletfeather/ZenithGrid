@@ -2,11 +2,15 @@
 #include "MeshActor.h"
 
 #include <vtkExtractSelection.h>
+#include <vtkIdTypeArray.h>
 #include <vtkLine.h>
 #include <vtkPolyData.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkCellData.h>       
+#include <vtkImplicitFunction.h>
+#include <vtkPlane.h>          
 
 MeshActorSelectOpFactory::MeshActorSelectOpFactory() = default;
 MeshActorSelectOpFactory::MeshActorSelectOpFactory(std::weak_ptr<MeshActor> mesh_actor)
@@ -43,6 +47,20 @@ vtkProp& MeshActorSelectOp::getFaceActor()
 vtkProp& MeshActorSelectOp::getEdgeActor()
 {
     return *mesh_actor_->edge_actor_;
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getSolidData()
+{
+    return mesh_actor_->solid_data_.Get();
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData()
+{
+    // 数据层已在快照中按裁剪条件发布体裁剪结果（携带 vtkOriginalCellIds），选择直接取用，不在选择时重复裁剪。
+    if (auto* snap = mesh_actor_->data_snapshot_.get())
+        if (auto* clipped = snap->clipped_solids.Get())
+            return clipped;
+    return mesh_actor_->solid_data_.Get();
 }
 
 bool MeshActorSelectOp::isVisible() const
