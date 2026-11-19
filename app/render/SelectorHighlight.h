@@ -46,13 +46,13 @@ struct FaceSelectionSpreadOptions {
 /**
  * @brief 穿透框选时体网格的命中结果
  *
- * 体网格**内部**的体单元、内部节点、体网格内部边都不在 face/edge/solid actor 的渲染数据里
+ * 体网格**内部**的体单元与内部节点不在 face/edge/solid actor 的渲染数据里
  * （那三个都是边界表示：face_data_ 是边界面、edge_data_ 是边界边、solid_filter_ 输出是表面壳），
  * 只能直接对体网格求交得到，所以单独透传给选择器。
  *
  */
 struct MeshVolumeHits {
-    std::unordered_set<vtkIdType> cells; //!< 命中的体单元 id（即 solid id）；点/边/体模式共用，内部元素由各自选择器从体单元派生
+    std::unordered_set<vtkIdType> cells; //!< 命中的体单元 id（即 solid id）；点/体模式共用，内部元素由各自选择器从体单元派生
 };
 
 class SelectorHighlight {
@@ -65,7 +65,7 @@ public:
     //! @brief 应用一次多 actor 框选拾取结果到本选择器（MeshSelectManager 已先清空全部组件选择并分发命中）
     //! @param hits 各 actor(PROP) 在本框内的命中 render id 集合（本选择器按自身 actor 取用）
     //! @param xmin ymin xmax ymax  屏幕像素矩形（Edge/Vertex 屏幕投影二次过滤用）
-    //! @param volume 体网格命中（穿透框选时才有）；Face 模式忽略，Vertex/Edge/Solid 用其派生内部单元
+    //! @param volume 体网格命中（穿透框选时才有）；Face/Edge 模式忽略，Vertex/Solid 用其派生内部单元
     virtual void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
         int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle,

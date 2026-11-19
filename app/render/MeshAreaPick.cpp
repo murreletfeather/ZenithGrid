@@ -8,6 +8,7 @@
 #include <spdlog/spdlog.h>
 #include <vtkActor.h>
 #include <vtkActor2D.h>
+#include <vtkAreaPicker.h>
 #include <vtkCellData.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
@@ -26,7 +27,6 @@
 #include <vtkProp.h>
 #include <vtkPropCollection.h>
 #include <vtkProperty.h>
-#include <vtkRenderedAreaPicker.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
 #include <vtkSelection.h>
@@ -181,8 +181,9 @@ vtkSmartPointer<vtkPlanes> buildSelectionFrustum(vtkRenderer* renderer,
     if (!renderer)
         return nullptr;
 
-    // 用 VTK 自带的区域拾取器生成世界空间视锥（6 个平面：left/right/bottom/top/near/far）。
-    vtkNew<vtkRenderedAreaPicker> area_picker;
+    // 用普通区域拾取器生成世界空间视锥（6 个平面：left/right/bottom/top/near/far）。
+    vtkNew<vtkAreaPicker> area_picker;
+    area_picker->PickFromListOn();
     area_picker->AreaPick(xmin, ymin, xmax, ymax, renderer);
     vtkPlanes* frustum = area_picker->GetFrustum();
     if (!frustum || frustum->GetNumberOfPlanes() < 6
@@ -273,14 +274,11 @@ std::unordered_set<vtkIdType> penetratingPickCells(vtkPlanes* world_frustum,
 std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executePenetratingAreaPicks(
     vtkRenderer* renderer,
     const std::vector<vtkActor*>& target_actors,
+    vtkPlanes* world_frustum,
     int xmin, int ymin, int xmax, int ymax)
 {
     std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> result;
-    if (!renderer || target_actors.empty())
-        return result;
-
-    auto world_frustum = buildSelectionFrustum(renderer, xmin, ymin, xmax, ymax);
-    if (!world_frustum)
+    if (!renderer || target_actors.empty() || !world_frustum)
         return result;
 
     for (vtkActor* actor : target_actors) {
@@ -298,12 +296,8 @@ std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executePenetratingAr
         if (picked_count == 0)
             continue;
         const vtkIdType cell_count = poly->GetNumberOfCells();
-        if (picked_count == cell_count && cell_count > 0)
-            spdlog::warn("[AreaPick] penetrating: picked all {} cells, frustum/rect likely invalid",
-                cell_count);
-        else
-            spdlog::debug("[AreaPick] penetrating actor: cells={} picked={}",
-                cell_count, picked_count);
+        spdlog::debug("[AreaPick] penetrating actor: cells={} picked={}",
+            cell_count, picked_count);
         result[actor] = std::move(ids);
     }
 

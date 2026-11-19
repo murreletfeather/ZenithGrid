@@ -43,24 +43,27 @@ std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executeAreaPicks(
     int xmin, int ymin, int xmax, int ymax,
     int field_association);
 
-//! @brief 穿透框选：把屏幕矩形反投影成相机视锥，用 vtkExtractSelectedFrustum 对每个
-//!        target actor 的 polydata 直接做几何求交。
+//! @brief 穿透框选：用预构建的世界空间视锥对每个 target actor 的 polydata 直接做
+//!        vtkExtractSelectedFrustum 几何求交。
 //!        与 executeAreaPicks（硬件拾取）的根本差别：硬件拾取走深度测试，每像素只留最前
 //!        一个 id，被遮挡的背面单元不产生命中；本函数只判"投影是否落在矩形内"，不做遮挡
 //!        判定，因此框内前层与背面单元一并命中（跨组件同样穿透）。
 //!        穿透与非穿透两条路径语义分离，由调用方用参数选择。
 //! @param renderer       渲染器（用于屏幕→世界反投影）
 //! @param target_actors  参与拾取的 actor 列表（隐藏组件的 actor 由调用方排除）
-//! @param xmin ymin xmax ymax  屏幕像素坐标矩形
+//! @param world_frustum  buildSelectionFrustum 预构建的世界视锥（一次拖框只构造一次，面/独立边/体数据共用；为空则直接返回空结果）
+//! @param xmin ymin xmax ymax  屏幕像素坐标矩形（仅用于日志）
 //! @return actor(PROP) -> 命中 cell id 集合（局部 cell id，与 executeAreaPicks 的 id 空间一致，
 //!         可直接喂给各 selector 的 selectArea）
 std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executePenetratingAreaPicks(
     vtkRenderer* renderer,
     const std::vector<vtkActor*>& target_actors,
+    vtkPlanes* world_frustum,
     int xmin, int ymin, int xmax, int ymax);
 
 //! @brief 构建屏幕矩形对应的世界空间视锥（6 面 vtkPlanes）
 //!        与 VTK 的 vtkInteractorStyleRubberBandPick 同一套构造逻辑，保证视锥与屏幕矩形严格一致。
+//!        内部用普通 vtkAreaPicker 配空拾取列表仅取视锥，不做硬件拾取与场景 actor 遍历。
 //!        返回的对象可复用于多个数据集的求交，避免每个数据集都重建一次（AreaPick 有开销）。
 //! @return 视锥；rectangle 退化或拾取器不可用时返回 nullptr
 vtkSmartPointer<vtkPlanes> buildSelectionFrustum(vtkRenderer* renderer,
