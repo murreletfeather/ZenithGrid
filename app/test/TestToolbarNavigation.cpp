@@ -296,6 +296,42 @@ TEST_CASE("Qt feature information exposes navigation as JavaScript arrays", "[na
     CHECK(result.toString() == "[\"feature:Ordinary\"]");
 }
 
+TEST_CASE("Qt file invocation distinguishes rejection from an empty result", "[feature][file][Qt]")
+{
+    application();
+    ModelLayer model;
+    core::EventBus bus;
+    systems::feature::FeatureSystem system(model, bus);
+    systems::feature::QFeatureSystemAdaptor adaptor(system);
+    const auto check_rejected = [&](const QString& name) {
+        const auto invocation = adaptor.invokeFile(name);
+        CHECK(invocation.value("succeeded") == QVariant(false));
+        CHECK_FALSE(invocation.value("result").isValid());
+    };
+    check_rejected("Missing");
+
+    const systems::feature::HandlerMetaData info { .name = "Completion" };
+    auto handler = std::make_unique<FileCompletionFeature>();
+    auto& feature = *handler;
+    REQUIRE(system.registerHandler(info, systems::feature::FeatureSystem::SystemHandlerPtr { handler.release() }));
+    REQUIRE(adaptor.setParameter("Completion", 0, QStringList { "input.dat" }));
+    {
+        const auto operation = model.beginWriteOperation();
+        REQUIRE(operation);
+        check_rejected("Completion");
+        CHECK(feature.calls == 0);
+    }
+
+    const auto invocation = adaptor.invokeFile("Completion");
+    CHECK(invocation.value("succeeded").toBool());
+    CHECK_FALSE(invocation.value("result").isValid());
+    CHECK(feature.calls == 1);
+    CHECK(session::SessionQuery(model).listModels().size() == 1);
+
+    system.unregisterHandler(info);
+    check_rejected("Completion");
+}
+
 TEST_CASE("File completion follows accepted submission without creating windows", "[navigation][file][headless]")
 {
     application();

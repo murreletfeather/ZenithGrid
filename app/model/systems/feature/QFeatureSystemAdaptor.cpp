@@ -136,7 +136,8 @@ std::optional<QVariant> QFeatureSystemAdaptor::tryInvoke(const QString& unique_n
 {
     // 插件的同步校验发生在任务启动前，C++ 异常不能穿过 Qt 元调用边界。
     try {
-        return anyToQVariant(feature_system_->invoke(unique_name.toStdString()));
+        if (const auto result = feature_system_->tryInvoke(unique_name.toStdString()))
+            return anyToQVariant(*result);
     } catch (const std::exception& error) {
         spdlog::error("FeatureSystemAdaptor::invoke {}: {}", unique_name.toStdString(), error.what());
         emit invocationFailed(QString::fromUtf8(error.what()));
