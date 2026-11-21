@@ -10,6 +10,7 @@
 #include <optional>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
+#include <stdexcept>
 #include <utility>
 
 namespace systems::io {
@@ -64,6 +65,8 @@ void ModelIOSystem::write(Index model, const std::filesystem::path& path, const 
         spdlog::warn("file type {} not registered when write model file", file_type);
         return;
     }
+    if (it->second.info.read_only)
+        throw std::invalid_argument("Cannot write read-only file type: " + file_type);
 
     auto* m = manager_->modelById(model);
     auto cids = m ? m->componentIds() : std::vector<Index> { };
@@ -85,6 +88,8 @@ void ModelIOSystem::writeComponents(const std::vector<Index>& component_ids,
         spdlog::warn("file type {} not registered when write model file", file_type);
         return;
     }
+    if (it->second.info.read_only)
+        throw std::invalid_argument("Cannot write read-only file type: " + file_type);
 
     it->second.handler->write_components(*manager_, component_ids, path, args);
 }
@@ -102,7 +107,8 @@ bool ModelIOSystem::registerHandler(const HandlerMetaData& meta_data, SystemHand
         "", // TODO: 以后从meta_data中获取描述信息
         meta_data.extensions,
         handler->read_args_type(),
-        handler->write_args_type() };
+        meta_data.read_only ? std::vector<core::ArgType> {} : handler->write_args_type(),
+        meta_data.read_only };
     entries_.emplace(file_type, IOEntry { std::move(handler), std::move(info) });
 
     spdlog::info("registered file type: {}, supported file extension: {}", file_type, fmt::join(meta_data.extensions, ", "));

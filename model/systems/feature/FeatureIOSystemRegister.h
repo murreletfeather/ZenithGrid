@@ -4,7 +4,6 @@
  */
 #pragma once
 #include "SystemRegisterBase.h"
-#include <string_view>
 
 namespace systems::feature {
 class FeatureSystem;
@@ -13,8 +12,6 @@ class FeatureSystem;
 class FeatureIOSystemRegister : public SystemRegisterBase {
 public:
     explicit FeatureIOSystemRegister(FeatureSystem& system);
-    /** @brief 判断文件功能是否由旧 IO 注册器桥接。 */
-    static bool isLegacyFileFeature(std::string_view name);
     bool registerPlugin(const QJsonObject& meta_data, PluginBase& plugin) override;
     void unregisterPlugin(const QJsonObject& meta_data) override;
 

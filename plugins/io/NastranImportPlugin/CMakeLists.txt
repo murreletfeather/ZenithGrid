@@ -1,4 +1,4 @@
-precess_add_feature_plugin(NastranImportPlugin
+precess_add_io_plugin(NastranImportPlugin
 	SOURCES "NastranImportHandler.cpp" "NastranReader.cpp"
 	PLUGIN_H "NastranImportPlugin.h"
 )

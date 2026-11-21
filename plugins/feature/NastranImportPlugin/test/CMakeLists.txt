@@ -1,2 +1,0 @@
-precess_add_test(TestNastranImport TestNastranImport.cpp)
-precess_test_link_libraries(TestNastranImport NastranImportPluginlib FeatureSystem Data)

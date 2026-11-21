@@ -24,12 +24,9 @@
 
 namespace systems::feature {
 namespace {
-    constexpr auto kLegacyImportPrefix = "LegacyIO.Import/";
-    constexpr auto kLegacyExportPrefix = "LegacyIO.Export/";
-
     std::string fileFeatureName(FileDirection direction, const std::string& key)
     {
-        return (direction == FileDirection::Import ? kLegacyImportPrefix : kLegacyExportPrefix) + key;
+        return (direction == FileDirection::Import ? "LegacyIO.Import/" : "LegacyIO.Export/") + key;
     }
 
     template <ArgTypeEnum Type>
@@ -161,19 +158,17 @@ FeatureIOSystemRegister::FeatureIOSystemRegister(FeatureSystem& system)
     assert(system.ioSystem());
 }
 
-bool FeatureIOSystemRegister::isLegacyFileFeature(std::string_view name)
-{
-    return name.starts_with(kLegacyImportPrefix) || name.starts_with(kLegacyExportPrefix);
-}
-
 bool FeatureIOSystemRegister::registerPlugin(const QJsonObject& meta_data, PluginBase& plugin)
 {
     system_->model_layer_->assertOperationIdle();
     const auto file_type = meta_data.value("file_type").toString().toStdString();
     if (file_type.empty())
         return false;
+    const bool read_only = meta_data.value("read_only").toBool();
     // 适配器不能覆盖同名的已有功能。
     for (const auto direction : { FileDirection::Import, FileDirection::Export }) {
+        if (direction == FileDirection::Export && read_only)
+            continue;
         if (system_->params(fileFeatureName(direction, file_type)))
             return false;
     }
@@ -185,6 +180,8 @@ bool FeatureIOSystemRegister::registerPlugin(const QJsonObject& meta_data, Plugi
     assert(found != infos.end());
     const auto& info = **found;
     for (const auto direction : { FileDirection::Import, FileDirection::Export }) {
+        if (direction == FileDirection::Export && info.read_only)
+            continue;
         HandlerMetaData feature;
         feature.name = fileFeatureName(direction, file_type);
         feature.display_name = file_type;
@@ -203,7 +200,10 @@ void FeatureIOSystemRegister::unregisterPlugin(const QJsonObject& meta_data)
     // 忙时在移除任何条目前拒绝，保持两侧注册及插件列表不变。
     system_->model_layer_->assertOperationIdle();
     const auto file_type = meta_data.value("file_type").toString().toStdString();
+    const bool read_only = meta_data.value("read_only").toBool();
     for (const auto direction : { FileDirection::Export, FileDirection::Import }) {
+        if (direction == FileDirection::Export && read_only)
+            continue;
         HandlerMetaData feature;
         feature.name = fileFeatureName(direction, file_type);
         system_->unregisterHandler(feature);

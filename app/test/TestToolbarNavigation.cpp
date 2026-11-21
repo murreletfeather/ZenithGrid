@@ -87,16 +87,16 @@ public:
         ++calls;
         if (result.has_value())
             return result;
+        if (fail_sync)
+            throw std::runtime_error("broken deck");
 
         const auto& paths = *context.params.value(0).get<ArgTypeEnum::Paths>();
-        const auto read = [fail_sync = fail_sync](const std::filesystem::path&, const systems::job::ProgressFn&) {
-            if (fail_sync)
-                throw std::runtime_error("broken deck");
+        for (const auto& path : paths) {
             ComponentDatas components;
             components.push_back(std::make_unique<ComponentData>());
-            return components;
-        };
-        return context.importModels("导入样例", paths, read);
+            context.model.addModel(path.filename().string(), std::move(components));
+        }
+        return {};
     }
 };
 QQuickItem* findItem(QQuickItem* root, const QString& name)
@@ -462,7 +462,7 @@ TEST_CASE("Startup imports Nastran and legacy files in argument order", "[naviga
         return QUrl::fromLocalFile(file.fileName());
     };
     const QByteArray triangle = "BEGIN BULK\nGRID,1,,0.,0.,0.\nGRID,2,,1.,0.,0.\nGRID,3,,0.,1.,0.\nCTRIA3,1,1,1,2,3\nENDDATA\n";
-    const QString first_name = QString::fromUtf8("第一个 网格.nas");
+    const QString first_name = QString::fromUtf8("第一个 网格 \xF0\x9F\x9A\x80.nas");
     const QString legacy_name = "legacy.obj";
     const QString last_name = "last.BDF";
     const QList<QUrl> arguments {
@@ -474,63 +474,92 @@ TEST_CASE("Startup imports Nastran and legacy files in argument order", "[naviga
 
     QStringList events;
     QList<Index> models;
-    QEventLoop loop;
-    auto* task_status = manager.getTaskStatus();
+    QObject connection_context;
     auto* query = manager.getModelQuery();
-    QObject::connect(task_status, &QTaskStatus::taskStarted, &loop, [&] { events.append("start"); });
-    QObject::connect(task_status, &QTaskStatus::taskFailed, &loop, [&] { events.append("failed"); });
-    QObject::connect(task_status, &QTaskStatus::taskFinished, &loop, [&] { events.append("finish"); });
-    QObject::connect(manager.getModelObserver(), &QModelObserver::modelAdded, &loop, [&](Index id) {
+    QObject::connect(manager.getModelObserver(), &QModelObserver::modelAdded, &connection_context, [&](Index id) {
         events.append(query->getModelName(id));
         models.append(id);
     });
 
-    QQmlEngine engine;
-    engine.rootContext()->setContextProperty("startupArguments", QVariant::fromValue(arguments));
-    engine.rootContext()->setContextProperty("startupFeatureSystem", manager.getFeatureSystemAdaptor());
-    engine.rootContext()->setContextProperty("startupLegacySystem", manager.getModelIOSystemAdaptor());
-    engine.rootContext()->setContextProperty("startupTaskStatus", task_status);
-    engine.rootContext()->setContextProperty("startupLoop", &loop);
-    QQmlComponent component(&engine);
-    component.setData(R"QML(
-        import QtQuick
-        import "qrc:/navigation-ui"
-        StartupFileImport {
-            id: startup
-            featureSystem: startupFeatureSystem
-            taskStatus: startupTaskStatus
-            property int legacyReads: 0
-            property int completions: 0
-            property bool importedAny: false
-            ioSystem: QtObject {
-                function read(format, url, args) {
-                    ++startup.legacyReads;
-                    return startupLegacySystem.read(format, url, args);
-                }
-            }
-            onFinished: function(imported) {
-                ++startup.completions;
-                startup.importedAny = imported;
-                startupLoop.quit();
-            }
-            function start() { startup.open(startupArguments); }
-        }
-    )QML",
-        QUrl("qrc:/navigation-ui/StartupFileImportHarness.qml"));
-    INFO(component.errorString().toStdString());
-    REQUIRE(component.isReady());
-    std::unique_ptr<QObject> startup(component.create());
-    REQUIRE(startup);
-    QTimer::singleShot(10000, &loop, &QEventLoop::quit);
-    REQUIRE(QMetaObject::invokeMethod(startup.get(), "start"));
-    if (!startup->property("completions").toInt())
-        loop.exec();
+    auto* features = manager.getFeatureSystemAdaptor();
+    const QString format = QString::fromUtf8("Nastran 网格");
+    const auto is_nastran = [&](const QVariant& entry) {
+        return entry.toMap().value("display_name").toString() == format;
+    };
+    const auto imports = features->getImportFileTypes();
+    const auto nastran = std::find_if(imports.cbegin(), imports.cend(), is_nastran);
+    REQUIRE(nastran != imports.cend());
+    const auto type = nastran->toMap();
+    CHECK(type.value("extensions").toStringList() == QStringList { "nas", "bdf" });
+    CHECK_FALSE(std::ranges::any_of(features->getExportFileTypes(), is_nastran));
 
-    CHECK(startup->property("completions").toInt() == 1);
-    CHECK(startup->property("importedAny").toBool());
-    CHECK(startup->property("legacyReads").toInt() == 1);
-    CHECK(events == QStringList { "start", first_name, "finish", legacy_name, "start", "failed", "finish", "start", last_name, "finish" });
-    REQUIRE(models.size() == 3);
+    SECTION("Startup invokes the registered IO formats in argument order")
+    {
+        auto* io = manager.getModelIOSystemAdaptor();
+        REQUIRE(io->read("All files", arguments[0], {}));
+        REQUIRE(io->read("All files", arguments[1], {}));
+        CHECK_FALSE(io->read("All files", arguments[2], {}));
+        REQUIRE(io->read("All files", arguments[3], {}));
+        CHECK(events == QStringList { first_name, legacy_name, last_name });
+        REQUIRE(models.size() == 3);
+    }
+    SECTION("File flow imports Nastran through the existing Feature bridge")
+    {
+        auto* task_status = manager.getTaskStatus();
+        QEventLoop loop;
+        bool finished = false;
+        QStringList failures;
+        QObject::connect(task_status, &QTaskStatus::taskFinished, &loop, [&] {
+            finished = true;
+            loop.quit();
+        });
+        QObject::connect(task_status, &QTaskStatus::taskFailed, &loop, [&](const QString& error) {
+            failures.append(error);
+        });
+
+        const QList<QUrl> mesh_files { arguments[0], arguments[3] };
+        QQmlEngine engine;
+        engine.rootContext()->setContextProperty("meshFiles", QVariant::fromValue(mesh_files));
+        engine.rootContext()->setContextProperty("backend", features);
+        engine.rootContext()->setContextProperty("importTaskStatus", task_status);
+        QQmlComponent component(&engine);
+        component.setData(R"QML(
+            import QtQuick
+            import app.core
+            import "qrc:/navigation-ui"
+            FileFeatureFlow {
+                featureSystem: backend
+                taskStatus: importTaskStatus
+                readonly property OperationSession operationSession: OperationSession { featureSystem: backend }
+                function selectFiles() { importFiles(meshFiles) }
+                function executeFile() { App.activeOperation.execute() }
+                function clearFile() { App.activeOperation = null }
+            }
+        )QML",
+            QUrl("qrc:/navigation-ui/NastranIOHarness.qml"));
+        INFO(component.errorString().toStdString());
+        REQUIRE(component.isReady());
+        std::unique_ptr<QObject> flow(component.create());
+        REQUIRE(flow);
+        const auto clear = qScopeGuard([&] { QMetaObject::invokeMethod(flow.get(), "clearFile"); });
+        REQUIRE(QMetaObject::invokeMethod(flow.get(), "selectFiles"));
+        const auto values = features->getParameterValues(type.value("feature").toString());
+        REQUIRE_FALSE(values.isEmpty());
+        REQUIRE(values.front().toStringList() == QStringList { arguments[0].toLocalFile(), arguments[3].toLocalFile() });
+        REQUIRE(models.isEmpty());
+
+        REQUIRE(QMetaObject::invokeMethod(flow.get(), "executeFile"));
+        REQUIRE(task_status->isWritePending());
+        QTimer::singleShot(10000, &loop, &QEventLoop::quit);
+        if (!finished)
+            loop.exec();
+
+        REQUIRE(finished);
+        CHECK(failures.isEmpty());
+        CHECK(events == QStringList { first_name, last_name });
+        REQUIRE(models.size() == 2);
+    }
+
     for (const auto id : models) {
         const auto components = query->getComponentIds(id);
         REQUIRE(components.size() == 1);

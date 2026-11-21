@@ -1,5 +1,4 @@
 #include "QFeatureSystemAdaptor.h"
-#include "FeatureIOSystemRegister.h"
 #include "FeatureParams.h"
 #include "FeatureSystem.h"
 #include "Job.h"
@@ -29,8 +28,7 @@ QVariantList fileFeaturesToQVariant(const std::vector<systems::feature::FileFeat
         for (const auto& extension : info.extensions)
             extensions.append(QString::fromStdString(extension));
         result.append(QVariantMap { { "direction", direction }, { "display_name", QString::fromStdString(info.display_name) },
-            { "extensions", extensions }, { "feature", QString::fromStdString(info.feature) },
-            { "legacy_io", systems::feature::FeatureIOSystemRegister::isLegacyFileFeature(info.feature) } });
+            { "extensions", extensions }, { "feature", QString::fromStdString(info.feature) } });
     }
     return result;
 }

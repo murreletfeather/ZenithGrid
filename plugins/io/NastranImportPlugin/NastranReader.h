@@ -11,7 +11,7 @@
 
 struct MeshData;
 
-namespace systems::feature {
+namespace systems::io {
 
 /**
  * @brief 读取并校验完整网格，返回持有坐标与连接关系的组件数据。

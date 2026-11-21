@@ -1,8 +1,7 @@
 #include "ComponentData.h"
-#include "EventBus.h"
-#include "FeatureSystem.h"
 #include "MeshData.h"
 #include "ModelData.h"
+#include "ModelIOSystem.h"
 #include "ModelLayer.h"
 #include "ModelObserver.h"
 #include "NastranImportHandler.h"
@@ -23,7 +22,7 @@
 #include <vector>
 
 namespace fs = std::filesystem;
-using namespace systems::feature;
+using namespace systems::io;
 
 namespace {
 
@@ -404,7 +403,7 @@ TEST_CASE("Nastran applies GRDSET only to a blank GRID input coordinate system",
     }
 }
 
-TEST_CASE("Nastran import executes as a native File Feature with a UTF-8 filename", "[NastranImport]")
+TEST_CASE("Nastran import executes through ModelIOSystem with a UTF-8 filename", "[NastranImport]")
 {
     auto path = core::TempFile::instance().path();
     path.replace_extension(fs::path(u8".三角网格.BDF"));
@@ -417,24 +416,19 @@ TEST_CASE("Nastran import executes as a native File Feature with a UTF-8 filenam
 
     ImportedModelObserver observer;
     ModelLayer model(&observer);
-    core::EventBus bus;
-    FeatureSystem system(model, bus);
-    REQUIRE(system.ioSystem() == nullptr);
+    ModelIOSystem system(model);
 
-    HandlerMetaData metadata;
-    metadata.name = "NastranImport";
-    metadata.display_name = "Nastran 网格";
+    const HandlerMetaData metadata { "Nastran 网格", { "nas", "bdf" }, true };
     auto handler = std::make_unique<NastranImportHandler>();
-    REQUIRE(system.registerHandler(metadata, FeatureSystem::SystemHandlerPtr { handler.release() }));
+    REQUIRE(system.registerHandler(metadata, ModelIOSystem::SystemHandlerPtr { handler.release() }));
 
-    const auto formats = system.getFileTypes(FileDirection::Import);
+    const auto formats = system.registeredFileTypeInfos();
     REQUIRE(formats.size() == 1);
-    CHECK(formats.front().feature == metadata.name);
-    CHECK(formats.front().extensions == std::vector<std::string> { "nas", "bdf" });
-    CHECK(system.getFileTypes(FileDirection::Export).empty());
+    CHECK(formats.front()->name == metadata.file_type);
+    CHECK(formats.front()->extensions == std::vector<std::string> { "nas", "bdf" });
+    CHECK(formats.front()->read_only);
 
-    REQUIRE(system.setParameter(metadata.name, 0, core::ArgObject::create<ArgTypeEnum::Paths>({ path })));
-    CHECK_FALSE(system.invoke(metadata.name).has_value());
+    REQUIRE(system.read(path, metadata.file_type, {}));
 
     const auto* model_data = model.modelById(observer.added);
     REQUIRE(model_data);

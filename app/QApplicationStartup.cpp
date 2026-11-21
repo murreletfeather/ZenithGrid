@@ -23,7 +23,6 @@
 #include <QQuickWindow>
 #endif
 
-#include <QFileInfo>
 #include <QGuiApplication>
 #include <QKeyEvent>
 #include <QUrl>
@@ -132,7 +131,7 @@ bool QApplicationStartup::initialize()
 
         QList<QUrl> arguments;
         for (const auto& argument : app_.arguments().mid(1))
-            arguments << QUrl::fromLocalFile(QFileInfo(argument).absoluteFilePath());
+            arguments << QUrl::fromLocalFile(argument);
         engine_->rootContext()->setContextProperty("QLogManager", QLogManager::instance());
         engine_->rootContext()->setContextProperty("commandLineArgs", QVariant::fromValue(arguments));
 #ifdef __EMSCRIPTEN__

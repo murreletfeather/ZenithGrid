@@ -22,7 +22,7 @@
 
 #include "MeshData.h"
 
-namespace systems::feature {
+namespace systems::io {
 namespace {
 
     using ExternalId = std::int64_t;
