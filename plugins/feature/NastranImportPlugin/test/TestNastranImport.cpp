@@ -206,6 +206,51 @@ TEST_CASE("Nastran ignores a sequence number that matches another card's continu
     CHECK(mesh->face_vertices_ == std::vector<Index> { 1, 0, 2 });
 }
 
+TEST_CASE("Nastran rejects conflicting owners of a named continuation", "[NastranImport]")
+{
+    const auto short_grid = fixedLine("GRID", 8, { "10", "", "1", "2", "0" });
+    const auto marked_grid = fixedLine("GRID", 8, { "10", "", "1", "2", "0" }, "+N7");
+    const auto long_grid = fixedLine("GRID*", 16, { "20", "", "4", "5" }, "BN7");
+    const auto child = fixedLine("*N7", 16, { "8" });
+    const std::string remainder = "GRID,30,,0,1,0\n"
+                                  "CTRIA3,700,2,10,20,30\n";
+
+    const auto check_conflict = [&](const std::string& deck, std::string_view label) {
+        const auto path = writeDeck(deck, ".bdf");
+        const auto error = readError(path);
+        CHECK(error.find("ambiguous continuation identifier " + std::string(label)) != std::string::npos);
+        for (const char* line : { "1", "2" }) {
+            CAPTURE(line);
+            CHECK((error.find(path.filename().string() + ":" + line) != std::string::npos
+                || error.find(std::string("line ") + line) != std::string::npos));
+        }
+    };
+
+    SECTION("A unique owner receives the coordinate from the continuation")
+    {
+        const auto mesh = readNastranMesh(writeDeck(short_grid + long_grid + child + remainder), no_progress);
+        REQUIRE(mesh);
+        CHECK(mesh->vertex_positions_ == std::vector<std::array<double, 3>> { { 1, 2, 0 }, { 4, 5, 8 }, { 0, 1, 0 } });
+    }
+    SECTION("Marked and unmarked claims conflict in either order")
+    {
+        check_conflict(marked_grid + long_grid + child + remainder, "N7");
+        check_conflict(long_grid + marked_grid + child + remainder, "N7");
+    }
+    SECTION("A numeric tail on a long GRID can be a continuation reference")
+    {
+        const auto competing_grid = fixedLine("GRID", 8, { "10", "", "1", "2", "0" }, "+0000012");
+        const auto numeric_grid = fixedLine("GRID*", 16, { "20", "", "4", "5" }, "00000012");
+        const auto numeric_child = fixedLine("*0000012", 16, { "8" });
+        check_conflict(competing_grid + numeric_grid + numeric_child + remainder, "0000012");
+    }
+    SECTION("An adjacent long continuation conflicts with a remote marked claim")
+    {
+        const auto unmarked_grid = fixedLine("GRID*", 16, { "20", "", "4", "5" });
+        check_conflict(marked_grid + unmarked_grid + child + remainder, "N7");
+    }
+}
+
 TEST_CASE("Nastran rejects malformed named fixed continuation links", "[NastranImport]")
 {
     const auto parent = fixedLine("GRID*", 16, { "10", "", "1", "2" }, "+P1");

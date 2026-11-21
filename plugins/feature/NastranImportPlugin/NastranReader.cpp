@@ -58,7 +58,9 @@ namespace {
         std::vector<std::string> fields;
         std::string continuation;
         std::size_t payload_slots;
+        bool fixed;
         bool has_marker = false;
+        bool numeric_trailer = false;
     };
 
     struct BulkCard {
@@ -178,8 +180,9 @@ namespace {
         row.first_field = upper(first);
         const bool large = row.first_field.ends_with('*') || row.first_field.starts_with('*');
         row.payload_slots = large ? 4 : 8;
+        row.fixed = comma == std::string_view::npos;
         row.fields.reserve(row.payload_slots);
-        if (comma != std::string_view::npos) {
+        if (!row.fixed) {
             line.remove_prefix(comma + 1);
             for (;;) {
                 const auto next_comma = line.find(',');
@@ -204,6 +207,7 @@ namespace {
         const auto trailer = fixedContinuationField(line);
         if (!trailer.empty()) {
             row.has_marker = hasContinuationMarker(trailer);
+            row.numeric_trailer = trim(trailer).find_first_not_of("0123456789") == std::string_view::npos;
             // 续行标签按第 74–80 列匹配。第 73 列可以是任意字符。
             row.continuation = upper(trim(trailer.substr(1)));
         }
@@ -310,9 +314,10 @@ namespace {
             bytes_ = bytes;
         }
 
-        void reserveMarkedContinuation(std::string_view line, const CardPrefix& prefix)
+        void indexMarkedContinuation(const PhysicalLine& physical, const CardPrefix& prefix)
         {
-            // 即使普通列尾序号恰好相同，也优先保留明确声明的续行目标。
+            // 记录声明位置，检测无标记尾栏或相邻长卡与显式续行声明冲突的情况。
+            const auto& line = physical.text;
             std::string label;
             if (prefix.comma == std::string_view::npos) {
                 const auto trailer = fixedContinuationField(line);
@@ -322,7 +327,7 @@ namespace {
                 label = splitRow(line).continuation;
             }
             if (!label.empty())
-                marked_continuations_.insert(std::move(label));
+                marked_continuations_.try_emplace(std::move(label), physical.number);
         }
 
         void indexContinuations()
@@ -340,7 +345,7 @@ namespace {
                 if (isEndData(upper(firstWord(line->text))))
                     break;
                 const auto prefix = splitCardPrefix(line->text);
-                reserveMarkedContinuation(line->text, prefix);
+                indexMarkedContinuation(*line, prefix);
                 const auto first = prefix.first_field;
                 if (!isContinuation(first)) {
                     collecting = false;
@@ -403,6 +408,12 @@ namespace {
             return std::nullopt;
         }
 
+        [[noreturn]] void failAmbiguousContinuation(std::size_t line, std::string_view card,
+            const std::string& label, std::size_t other_line) const
+        {
+            fail(path_, line, card, "ambiguous continuation identifier " + label + " (also claimed at line " + std::to_string(other_line) + ")");
+        }
+
         BulkCard joinCard(PhysicalLine header)
         {
             auto row = splitRow(header.text);
@@ -427,17 +438,32 @@ namespace {
                         adjacent = &*pending_;
                 }
 
-                const auto first = adjacent ? splitCardPrefix(adjacent->text).first_field : std::string_view {};
+                const auto [first, comma] = adjacent ? splitCardPrefix(adjacent->text) : CardPrefix { {}, std::string_view::npos };
                 const bool adjacent_continuation = adjacent && isContinuation(first);
                 const bool automatic = adjacent_continuation && continuationLabel(first).empty();
                 auto named = !row.continuation.empty() && (row.has_marker || !automatic)
                     ? continuation_indices_.find(row.continuation)
                     : continuation_indices_.end();
-                // 普通尾栏不能抢占显式标签，但指回本卡已使用的标签仍是循环引用。
+                const bool fixed_grid_header = row.fixed && !run && current_line == card.line && card.name == "GRID";
+                // 短 GRID 的八个数据槽已覆盖整张卡，纯数字尾栏可作为序号忽略。
+                // 其余匹配到同一标签的无标记尾栏不能被显式声明静默抢占。
                 if (named != continuation_indices_.end() && !row.has_marker
-                    && marked_continuations_.contains(row.continuation)
-                    && continuations_[named->second].owner_line != card.line)
-                    named = continuation_indices_.end();
+                    && continuations_[named->second].owner_line != card.line) {
+                    if (const auto marked = marked_continuations_.find(row.continuation); marked != marked_continuations_.end()) {
+                        if (!(fixed_grid_header && row.payload_slots == 8 && row.numeric_trailer))
+                            failAmbiguousContinuation(current_line, card.name, row.continuation, marked->second);
+                        named = continuation_indices_.end();
+                    }
+                }
+
+                // 没有自己的续行链接的长 GRID 也可能按相邻规则接收下一行。
+                // 若别处又声明了该行，不能悄悄令 GRID 的 Z 坐标回退为默认值。
+                if (named == continuation_indices_.end() && fixed_grid_header && row.payload_slots == 4
+                    && !row.has_marker && comma == std::string_view::npos && first.starts_with('*')) {
+                    const auto label = upper(continuationLabel(first));
+                    if (const auto marked = marked_continuations_.find(label); marked != marked_continuations_.end())
+                        failAmbiguousContinuation(current_line, card.name, label, marked->second);
+                }
 
                 const PhysicalLine* next = nullptr;
                 if (named != continuation_indices_.end()) {
@@ -496,7 +522,7 @@ namespace {
         std::optional<PhysicalLine> pending_;
         std::vector<ContinuationRun> continuations_;
         std::unordered_map<std::string, std::size_t> continuation_indices_;
-        std::unordered_set<std::string> marked_continuations_;
+        std::unordered_map<std::string, std::size_t> marked_continuations_;
         std::size_t indexed_run_ = 0;
     };
 
