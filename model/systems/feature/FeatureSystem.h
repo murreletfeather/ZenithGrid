@@ -84,9 +84,14 @@ public:
     void unregisterHandler(const HandlerMetaData& meta_data);
     /**
      * @brief 菜单触发的功能调用
-     * @return 功能返回的结果，功能不存在时为空 std::any
+     * @return 功能返回的结果，调用被拒绝时为空 std::any
      */
     std::any invoke(const std::string& unique_name);
+    /**
+     * @brief 执行已注册的功能，执行异常向调用方传播。
+     * @return 功能未注册或模型操作占用时返回 nullopt，执行成功时保留功能的返回值（可为空 std::any）。
+     */
+    std::optional<std::any> tryInvoke(const std::string& unique_name);
 
     /**
      * @brief 修改功能参数并广播 ParameterChangedEvent

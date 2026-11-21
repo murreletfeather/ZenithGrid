@@ -1,0 +1,8 @@
+{
+  "system": "ModelIOSystem",
+  "handler": {
+    "file_type": "Nastran 网格",
+    "extensions": [ "nas", "bdf" ],
+    "read_only": true
+  }
+}

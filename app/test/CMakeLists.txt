@@ -121,6 +121,12 @@ precess_test_link_libraries(TestToolbarNavigation modelQml modelQmlplugin System
 target_compile_definitions(TestToolbarNavigation PRIVATE
     PRECESS_SETUP_TEST_PLUGIN="$<TARGET_FILE:SetupNavigationTestPlugin>")
 add_dependencies(TestToolbarNavigation SetupNavigationTestPlugin)
+if(TARGET NastranImportPlugin AND TARGET OBJModelPlugin AND NOT EMSCRIPTEN)
+    target_compile_definitions(TestToolbarNavigation PRIVATE
+        PRECESS_NASTRAN_TEST_PLUGIN="$<TARGET_FILE:NastranImportPlugin>"
+        PRECESS_OBJ_TEST_PLUGIN="$<TARGET_FILE:OBJModelPlugin>")
+    add_dependencies(TestToolbarNavigation NastranImportPlugin OBJModelPlugin)
+endif()
 qt_add_resources(TestToolbarNavigation navigation_ui
     PREFIX "/navigation-ui"
     BASE "${CMAKE_CURRENT_SOURCE_DIR}/.."

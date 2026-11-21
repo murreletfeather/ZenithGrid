@@ -153,6 +153,9 @@ TEST_CASE("Legacy IO registration supplies a Feature import with parameters and 
     int io_updates = 0;
     io.setOnDialogNameFiltersChanged([&] { ++io_updates; });
     REQUIRE(bridge.registerPlugin(metadata, plugin));
+    REQUIRE(io.registeredFileTypeInfos().size() == 1);
+    CHECK_FALSE(io.registeredFileTypeInfos().front()->read_only);
+    CHECK(system.getFileTypes(FileDirection::Export).size() == 1);
     const auto files = system.getFileTypes(FileDirection::Import);
     REQUIRE(files.size() == 1);
     const auto& feature = files.front().feature;
@@ -190,6 +193,45 @@ TEST_CASE("Legacy IO registration supplies a Feature import with parameters and 
     CHECK(io_updates == 2);
     CHECK(system.getFileTypes(FileDirection::Import).empty());
     CHECK(io.registeredFileTypeInfos().empty());
+}
+
+TEST_CASE("Read-only IO registers only an import Feature and rejects direct writes", "[FeatureSystem][file][io]")
+{
+    core::EventBus bus;
+    ImportModelObserver observer;
+    ModelLayer model(&observer);
+    systems::io::ModelIOSystem io(model);
+    FeatureSystem system(model, bus, nullptr, &io);
+    FeatureIOSystemRegister bridge(system);
+    BridgeIOPlugin plugin;
+    const QJsonObject metadata { { "file_type", "Read-only format" }, { "extensions", QJsonArray { "dat" } }, { "read_only", true } };
+    HandlerMetaData reserved_export;
+    reserved_export.name = "LegacyIO.Export/Read-only format";
+    REQUIRE(system.registerHandler(reserved_export, makeFileFeature()));
+    const auto* reserved_params = system.params(reserved_export.name);
+
+    REQUIRE(bridge.registerPlugin(metadata, plugin));
+    const auto formats = io.registeredFileTypeInfos();
+    REQUIRE(formats.size() == 1);
+    CHECK(formats.front()->read_only);
+    CHECK(formats.front()->write_arg_types.empty());
+    CHECK(system.getFileTypes(FileDirection::Export).empty());
+    CHECK(system.params(reserved_export.name) == reserved_params);
+
+    const auto imports = system.getFileTypes(FileDirection::Import);
+    REQUIRE(imports.size() == 1);
+    const auto& importing = imports.front().feature;
+    REQUIRE(system.setParameter(importing, 0, core::ArgObject::create<ArgTypeEnum::Paths>({ "sample.dat" })));
+    REQUIRE(system.setParameter(importing, 1, core::ArgObject::create<ArgTypeEnum::Int>(7)));
+    CHECK_FALSE(system.invoke(importing).has_value());
+    REQUIRE(observer.added.size() == 1);
+    CHECK_THROWS_AS(io.write(observer.last_added, "output.dat", "Read-only format", {}), std::invalid_argument);
+    CHECK_THROWS_AS(io.writeComponents({}, "output.dat", "Read-only format", {}), std::invalid_argument);
+
+    bridge.unregisterPlugin(metadata);
+    CHECK(system.getFileTypes(FileDirection::Import).empty());
+    CHECK(io.registeredFileTypeInfos().empty());
+    CHECK(system.params(reserved_export.name) == reserved_params);
 }
 
 TEST_CASE("Legacy file jobs preserve input and keep model ownership until completion", "[FeatureSystem][file][job]")
