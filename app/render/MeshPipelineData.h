@@ -45,6 +45,7 @@ struct MeshDataSnapshot {
     vtkSmartPointer<vtkPolyData> solid_surface;
     vtkSmartPointer<vtkPolyData> solid_internal_edges;
     vtkSmartPointer<vtkUnstructuredGrid> clipped_solids;
+    std::shared_ptr<const std::vector<unsigned char>> selectable_points;
 };
 
 /** @brief 在创建线程串行修改网格数据，主动计算后向渲染端发布轻量快照。 */
