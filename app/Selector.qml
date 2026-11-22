@@ -98,7 +98,7 @@ RowLayout {
         checked: App.selection.penetrating
         onToggled: App.selection.penetrating = checked
         ToolTip.visible: hovered
-        ToolTip.text: qsTr("开启后框选可选中被遮挡的背面单元；点/体模式还可穿透选中体网格内部的体单元与节点；边、面来自已有网格数据。关闭则只选可见最前一层。单选始终为非穿透。")
+        ToolTip.text: qsTr("开启后框选可选中被遮挡的背面单元；点可选内部节点、体可选内部体单元；边、面只来自已有显式网格。关闭则只选可见最前一层。单选始终为非穿透。")
     }
     CheckBox {
         id: angleSpreadCheckBox
