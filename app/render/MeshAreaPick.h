@@ -78,6 +78,15 @@ vtkSmartPointer<vtkPlanes> buildSelectionFrustum(vtkRenderer* renderer,
 std::unordered_set<vtkIdType> penetratingPickCells(vtkPlanes* world_frustum,
     vtkDataSet* data, vtkMatrix4x4* local_to_world);
 
+//! @brief 判断一个数据空间点是否落在视锥内（六面全判，含近/远平面）。
+//!        用于穿透选点：逐点遍历组件公共点表，配合可选点位图决定该点是否命中。
+//!        vtkPlanes 的法向朝内，点在视锥内当且仅当对全部平面 EvaluateFunction >= 0。
+//! @param world_frustum  buildSelectionFrustum 得到的世界视锥
+//! @param local_to_world 数据空间 → 世界的变换矩阵（点表用组件 actor 的矩阵；可为空表示相同）
+//! @return 点是否位于视锥内（含边界）
+bool isPointInFrustum(vtkPlanes* world_frustum, vtkMatrix4x4* local_to_world,
+    double lx, double ly, double lz);
+
 //! @brief 数据空间 (lx,ly,lz) → world → display，测试屏幕投影是否落在框选矩形内。
 //!        用于 face CELLS 拾取后的二次过滤，避免"面只一角进框、所有点/边都高亮"。
 bool isWorldPointInScreenBox(vtkRenderer* renderer,

@@ -20,6 +20,7 @@
 #include <vtkInformation.h>
 #include <vtkMatrix4x4.h>
 #include <vtkNew.h>
+#include <vtkPlane.h>
 #include <vtkPlanes.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -305,6 +306,23 @@ std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> executePenetratingAr
         target_actors.size(), xmin, ymin, xmax, ymax, result.size());
 
     return result;
+}
+
+bool isPointInFrustum(vtkPlanes* world_frustum, vtkMatrix4x4* local_to_world,
+    double lx, double ly, double lz)
+{
+    if (!world_frustum || world_frustum->GetNumberOfPlanes() < 6)
+        return false;
+    double world[4] = { lx, ly, lz, 1.0 };
+    if (local_to_world)
+        local_to_world->MultiplyPoint(world, world);
+    // vtkPlanes 的法向朝视锥内侧；点在视锥内（含边界）当且仅当对每个平面 EvaluateFunction >= 0。
+    // 6 个平面含近/远裁剪面，故相机前后之外的点会被排除。
+    for (vtkIdType i = 0; i < world_frustum->GetNumberOfPlanes(); ++i) {
+        if (world_frustum->GetPlane(i)->EvaluateFunction(world) < 0.0)
+            return false;
+    }
+    return true;
 }
 
 bool isWorldPointInScreenBox(vtkRenderer* renderer,
