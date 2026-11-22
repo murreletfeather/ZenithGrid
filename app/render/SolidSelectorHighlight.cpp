@@ -179,7 +179,7 @@ void SolidSelectorHighlight::setupHighlightStyle(vtkActor& actor, vtkMapper& map
 
 void SolidSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-    int /*xmin*/, int /*ymin*/, int /*xmax*/, int /*ymax*/, SelectOp op, const MeshVolumeHits* volume)
+    int /*xmin*/, int /*ymin*/, int /*xmax*/, int /*ymax*/, SelectOp op)
 {
     // 反查 render cell id -> 原 solid id（去重），再按 op 做集合运算（见下方 switch）
     std::unordered_set<vtkIdType> to_add;
@@ -207,16 +207,9 @@ void SolidSelectorHighlight::selectArea(
         }
     }
 
-    // 2) 体网格内部：直接命中的体单元，其 cell id 即 solid id（该数据集 vtkOriginalCellIds 为 identity）
-    //    体表面路径只能选到"有面露在表面"的体，内部体单元必须走这里
-    if (volume && !volume->cells.empty()) {
-        spdlog::debug("[SolidArea] volume cells={}", volume->cells.size());
-        to_add.insert(volume->cells.begin(), volume->cells.end());
-    }
-
     if (to_add.empty())
         return;
-    // 按 op 对框内命中的体做集合运算：Append->并集；Remove->差集；Toggle->对称差。
+    // 按 op 对命中的体做集合运算：Append->并集；Remove->差集；Toggle->对称差。
     std::unordered_set<vtkIdType> cur;
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
         cur.insert(selected_ids_->GetValue(i));
@@ -236,6 +229,45 @@ void SolidSelectorHighlight::selectArea(
             if (to_add.find(id) == to_add.end())
                 result.insert(id);
         for (auto id : to_add)
+            if (cur.find(id) == cur.end())
+                result.insert(id);
+        break;
+    }
+    selected_ids_->SetNumberOfValues(0);
+    selected_ids_->ClearLookup();
+    for (vtkIdType orig : result)
+        selected_ids_->InsertNextValue(orig);
+    selected_ids_->Modified();
+    enableHighlight();
+}
+
+void SolidSelectorHighlight::selectPenetratingSolids(
+    const std::unordered_set<vtkIdType>& solid_ids, SelectOp op)
+{
+    // 穿透选体：体 id 已由 MeshSelectManager 从 clipped_solids 求交并经 vtkOriginalCellIds 还原（原始 solid id），直接做集合运算，不再读取体候选载荷。
+    spdlog::debug("[SolidPenetrating] solid_ids.size()={}", solid_ids.size());
+    if (solid_ids.empty())
+        return;
+
+    std::unordered_set<vtkIdType> cur;
+    for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
+        cur.insert(selected_ids_->GetValue(i));
+    std::unordered_set<vtkIdType> result;
+    switch (op) {
+    case SelectOp::Append:
+        result = cur;
+        result.insert(solid_ids.begin(), solid_ids.end());
+        break;
+    case SelectOp::Remove:
+        for (auto id : cur)
+            if (solid_ids.find(id) == solid_ids.end())
+                result.insert(id);
+        break;
+    case SelectOp::Toggle:
+        for (auto id : cur)
+            if (solid_ids.find(id) == solid_ids.end())
+                result.insert(id);
+        for (auto id : solid_ids)
             if (cur.find(id) == cur.end())
                 result.insert(id);
         break;

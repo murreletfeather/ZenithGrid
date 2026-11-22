@@ -2,11 +2,13 @@
 #define MESH_ACTOR_SELECT_OP_H
 #include <memory>
 #include <optional>
+#include <vector>
 #include <vtkSmartPointer.h>
 
 class vtkIdTypeArray;
 class vtkProp;
 class vtkPolyData;
+class vtkPoints;
 class vtkUnstructuredGrid;
 class vtkExtractSelection;
 class MeshActorSelectOp;
@@ -45,21 +47,26 @@ public:
     vtkProp& getEdgeActor();
 
     /**
-     * @brief 体网格（体单元）数据集（未裁剪）
+     * @brief 组件公共点表（渲染端私有 vtkPoints），供穿透选点逐点做视锥判断
      *
-     * cell id 即 solid id（该数据集的 vtkOriginalCellIds 为 identity），点 id 即组件内局部
-     * 点 id（vtkOriginalPointIds 为 identity）。体网格**内部**的体单元与内部节点只能从这里
-     * 选到——face/edge/solid actor 渲染的都是边界表示，不含内部单元。
+     * 下标即组件原始点 id，与快照的 selectable_points 位图同一键空间；底层坐标只读共享。
      */
-    vtkUnstructuredGrid* getSolidData();
+    vtkPoints* getPoints() const;
 
     /**
-     * @brief 遵守裁剪条件的体网格（体单元）数据集，供穿透框选内部命中使用
+     * @brief 穿透选点的可选点身份图（按组件原始点下标索引，1 表示仍被保留单元引用）
+     *
+     * 来自数据层快照，与 getPoints() 配套使用；快照缺失时返回 nullptr。
+     */
+    const std::vector<unsigned char>* getSelectablePoints() const;
+
+    /**
+     * @brief 遵守裁剪条件的体网格（体单元）数据集，供穿透框选内部体单元使用
      *
      * 直接取用数据层快照中已发布的体裁剪结果（携带 vtkOriginalCellIds，可将裁剪后的
-     * cell 下标还原为原始模型体 id），不在选择时重复裁剪。调用方须对拾取结果做此还原。
+     * cell 下标还原为原始模型体 id）。快照已保证该字段非空（无过滤时复用原始体），调用方须对拾取结果做 ID 还原。
      */
-    vtkUnstructuredGrid* getClippedSolidData();
+    vtkUnstructuredGrid* getClippedSolidData() const;
 
     bool isVisible() const;
 

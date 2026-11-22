@@ -194,7 +194,7 @@ void VertexSelectorHighlight::setupHighlightStyle(vtkActor& actor, vtkMapper& ma
 
 void VertexSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-    int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume)
+    int xmin, int ymin, int xmax, int ymax, SelectOp op)
 {
     // 与点选对齐：从 face/edge/solid 三个 actor 的命中 cell 派生点并合并（一次多 actor 拾取结果）。
     std::unordered_set<vtkIdType> local_ids;
@@ -263,41 +263,11 @@ void VertexSelectorHighlight::selectArea(
         derive_points(solid_actor, solid_poly, hit_of(&select_op_.getSolidActor()));
     }
 
-    // 4) 体网格内部节点：上面三条都是边界表示，体网格内部的节点只能从命中的体单元派生
-    if (volume && !volume->cells.empty()) {
-        if (auto* vol = select_op_.getSolidData()) {
-            auto* vol_orig_pt_ids = vtkIdTypeArray::SafeDownCast(
-                vol->GetPointData()->GetArray("vtkOriginalPointIds"));
-            for (vtkIdType cell_id : volume->cells) {
-                if (cell_id < 0 || cell_id >= vol->GetNumberOfCells())
-                    continue;
-                vtkCell* cell = vol->GetCell(cell_id);
-                if (!cell)
-                    continue;
-                for (int i = 0; i < cell->GetNumberOfPoints(); ++i) {
-                    const vtkIdType rp = cell->GetPointId(i);
-                    if (rp < 0 || rp >= vol->GetNumberOfPoints())
-                        continue;
-                    double p[3];
-                    vol->GetPoint(rp, p);
-                    if (!area_pick::isWorldPointInScreenBox(renderer_, solid_actor,
-                            p[0], p[1], p[2], xmin, ymin, xmax, ymax))
-                        continue;
-                    const vtkIdType lp = (vol_orig_pt_ids && rp < vol_orig_pt_ids->GetNumberOfTuples())
-                        ? vol_orig_pt_ids->GetValue(rp)
-                        : rp;
-                    if (lp >= 0)
-                        local_ids.insert(lp);
-                }
-            }
-        }
-    }
-
     spdlog::debug("[VertexArea] local_ids.size()={}", local_ids.size());
     if (local_ids.empty())
         return;
 
-    // 按 op 对框内命中的点做集合运算：Append->并集；Remove->差集；Toggle->对称差。
+    // 按 op 对命中的点做集合运算：Append->并集；Remove->差集；Toggle->对称差。
     std::unordered_set<vtkIdType> cur;
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
         cur.insert(selected_ids_->GetValue(i));
@@ -317,6 +287,45 @@ void VertexSelectorHighlight::selectArea(
             if (local_ids.find(id) == local_ids.end())
                 result.insert(id);
         for (auto id : local_ids)
+            if (cur.find(id) == cur.end())
+                result.insert(id);
+        break;
+    }
+    selected_ids_->SetNumberOfValues(0);
+    selected_ids_->ClearLookup();
+    for (vtkIdType v : result)
+        selected_ids_->InsertNextValue(v);
+    selected_ids_->Modified();
+    enableHighlight();
+}
+
+void VertexSelectorHighlight::selectPenetratingPoints(
+    const std::unordered_set<vtkIdType>& point_ids, SelectOp op)
+{
+    // 穿透选点：点 id 已由 MeshSelectManager 从公共点表+位图+视锥算出（组件局部点 id），直接做集合运算，不再从命中体单元派生。
+    spdlog::debug("[VertexPenetrating] point_ids.size()={}", point_ids.size());
+    if (point_ids.empty())
+        return;
+
+    std::unordered_set<vtkIdType> cur;
+    for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
+        cur.insert(selected_ids_->GetValue(i));
+    std::unordered_set<vtkIdType> result;
+    switch (op) {
+    case SelectOp::Append:
+        result = cur;
+        result.insert(point_ids.begin(), point_ids.end());
+        break;
+    case SelectOp::Remove:
+        for (auto id : cur)
+            if (point_ids.find(id) == point_ids.end())
+                result.insert(id);
+        break;
+    case SelectOp::Toggle:
+        for (auto id : cur)
+            if (point_ids.find(id) == point_ids.end())
+                result.insert(id);
+        for (auto id : point_ids)
             if (cur.find(id) == cur.end())
                 result.insert(id);
         break;

@@ -4,6 +4,7 @@
 #include <vtkExtractSelection.h>
 #include <vtkIdTypeArray.h>
 #include <vtkLine.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
@@ -49,18 +50,24 @@ vtkProp& MeshActorSelectOp::getEdgeActor()
     return *mesh_actor_->edge_actor_;
 }
 
-vtkUnstructuredGrid* MeshActorSelectOp::getSolidData()
+vtkPoints* MeshActorSelectOp::getPoints() const
 {
-    return mesh_actor_->solid_data_.Get();
+    return mesh_actor_->points_.Get();
 }
 
-vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData()
+const std::vector<unsigned char>* MeshActorSelectOp::getSelectablePoints() const
 {
-    // 数据层已在快照中按裁剪条件发布体裁剪结果（携带 vtkOriginalCellIds），选择直接取用，不在选择时重复裁剪。
     if (auto* snap = mesh_actor_->data_snapshot_.get())
-        if (auto* clipped = snap->clipped_solids.Get())
-            return clipped;
-    return mesh_actor_->solid_data_.Get();
+        return snap->selectable_points.get();
+    return nullptr;
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData() const
+{
+    // 数据层快照始终发布合法的体数据（无过滤时复用原始体、全滤空为空网格）。
+    if (auto* snap = mesh_actor_->data_snapshot_.get())
+        return snap->clipped_solids.Get();
+    return nullptr;
 }
 
 bool MeshActorSelectOp::isVisible() const

@@ -43,18 +43,6 @@ struct FaceSelectionSpreadOptions {
     double angle_deg { 30.0 };
 };
 
-/**
- * @brief 穿透框选时体网格的命中结果
- *
- * 体网格**内部**的体单元与内部节点不在 face/edge/solid actor 的渲染数据里
- * （那三个都是边界表示：face_data_ 是边界面、edge_data_ 是边界边、solid_filter_ 输出是表面壳），
- * 只能直接对体网格求交得到，所以单独透传给选择器。
- *
- */
-struct MeshVolumeHits {
-    std::unordered_set<vtkIdType> cells; //!< 命中的体单元 id（即 solid id）；点/体模式共用，内部元素由各自选择器从体单元派生
-};
-
 class SelectorHighlight {
 public:
     virtual ~SelectorHighlight() = default;
@@ -62,14 +50,14 @@ public:
     virtual void select(double posx, double posy,
         vtkHardwarePicker* picker, vtkActor* picked_actor,
         vtkIdType picked_cell_id, vtkIdType picked_point_id, SelectOp op = SelectOp::Toggle) = 0;
-    //! @brief 应用一次多 actor 框选拾取结果到本选择器（MeshSelectManager 已先清空全部组件选择并分发命中）
+    //! @brief 应用一次框选命中到本选择器（框选不清空，由各选择器按 op 做集合运算）
     //! @param hits 各 actor(PROP) 在本框内的命中 render id 集合（本选择器按自身 actor 取用）
     //! @param xmin ymin xmax ymax  屏幕像素矩形（Edge/Vertex 屏幕投影二次过滤用）
-    //! @param volume 体网格命中（穿透框选时才有）；Face/Edge 模式忽略，Vertex/Solid 用其派生内部单元
+    //!        非穿透由硬件拾取、穿透 Face/Edge 由视锥拾取，二者都经此入口从命中单元派生 ID；
+    //!        Vertex/Solid 的穿透另走各自的 selectPenetratingPoints/Solids（直接交付点/体 ID）。
     virtual void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-        int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle,
-        const MeshVolumeHits* volume = nullptr)
+        int xmin, int ymin, int xmax, int ymax, SelectOp op = SelectOp::Toggle)
         = 0;
     /**
      * @brief 清空选中元素，并取消高亮
@@ -100,7 +88,7 @@ public:
         vtkIdType picked_cell_id, vtkIdType picked_point_id, SelectOp op) override;
     void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-        int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume = nullptr) override;
+        int xmin, int ymin, int xmax, int ymax, SelectOp op) override;
     void clear() override;
     void disableHighlight() override;
     void enableHighlight() override;
@@ -154,7 +142,7 @@ public:
         vtkIdType picked_cell_id, vtkIdType picked_point_id, SelectOp op) override;
     void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-        int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume = nullptr) override;
+        int xmin, int ymin, int xmax, int ymax, SelectOp op) override;
     void clear() override;
     void disableHighlight() override;
     void enableHighlight() override;
@@ -191,7 +179,9 @@ public:
         vtkIdType picked_cell_id, vtkIdType picked_point_id, SelectOp op) override;
     void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-        int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume = nullptr) override;
+        int xmin, int ymin, int xmax, int ymax, SelectOp op) override;
+    //! @brief 穿透选体的具体入口：直接接收已还原的原始体 id 集合
+    void selectPenetratingSolids(const std::unordered_set<vtkIdType>& solid_ids, SelectOp op);
     void clear() override;
     void disableHighlight() override;
     void enableHighlight() override;
@@ -222,7 +212,9 @@ public:
         vtkIdType picked_cell_id, vtkIdType picked_point_id, SelectOp op) override;
     void selectArea(
         const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
-        int xmin, int ymin, int xmax, int ymax, SelectOp op, const MeshVolumeHits* volume = nullptr) override;
+        int xmin, int ymin, int xmax, int ymax, SelectOp op) override;
+    //! @brief 穿透选点的具体入口：直接接收组件局部点 id 集合（由点表+位图+视锥筛出）
+    void selectPenetratingPoints(const std::unordered_set<vtkIdType>& point_ids, SelectOp op);
     void clear() override;
     void disableHighlight() override;
     void enableHighlight() override;
