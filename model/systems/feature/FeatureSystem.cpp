@@ -321,14 +321,19 @@ void FeatureSystem::unregisterHandler(const HandlerMetaData& meta_data)
 
 std::any FeatureSystem::invoke(const std::string& unique_name)
 {
+    return tryInvoke(unique_name).value_or(std::any {});
+}
+
+std::optional<std::any> FeatureSystem::tryInvoke(const std::string& unique_name)
+{
     if (model_layer_->writesPending() && !model_layer_->hasWritePrivilege()) {
         spdlog::warn("FeatureSystem::invoke: '{}' rejected while model operation is pending", unique_name);
-        return { };
+        return std::nullopt;
     }
     auto it = entries_.find(unique_name);
     if (it == entries_.end() || !it->second.handler) {
         spdlog::error("FeatureSystem::invoke: Feature '{}' not found", unique_name);
-        return { };
+        return std::nullopt;
     }
 
     // 操作边界（统一装配，无模式分支）：execute 返回后统一 flush 本次操作的组件变更通知；

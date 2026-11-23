@@ -14,6 +14,7 @@
 #include "QModelManager.h"
 #include "QSelection.h"
 #include "QTaskStatus.h"
+#include "SessionQuery.h"
 #include "SystemPluginManager.h"
 
 #include <QEventLoop>
@@ -41,6 +42,7 @@
 #include <QSvgRenderer>
 #include <QTemporaryDir>
 #include <QTimer>
+#include <QUrl>
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
@@ -74,15 +76,27 @@ class FileCompletionFeature final : public systems::feature::FeatureHandler {
 public:
     std::any result;
     int calls { 0 };
+    bool fail_sync { false };
     void setup(systems::feature::FeatureRegistrar& registrar, systems::feature::FeatureContext&) override
     {
         registrar.setFileType({ systems::feature::FileDirection::Import, { "dat" } });
         registrar.addParameter({ ArgTypeEnum::Paths, "Files", "", "" });
     }
-    std::any execute(systems::feature::FeatureContext&) override
+    std::any execute(systems::feature::FeatureContext& context) override
     {
         ++calls;
-        return result;
+        if (result.has_value())
+            return result;
+        if (fail_sync)
+            throw std::runtime_error("broken deck");
+
+        const auto& paths = *context.params.value(0).get<ArgTypeEnum::Paths>();
+        for (const auto& path : paths) {
+            ComponentDatas components;
+            components.push_back(std::make_unique<ComponentData>());
+            context.model.addModel(path.filename().string(), std::move(components));
+        }
+        return {};
     }
 };
 QQuickItem* findItem(QQuickItem* root, const QString& name)
@@ -282,6 +296,42 @@ TEST_CASE("Qt feature information exposes navigation as JavaScript arrays", "[na
     CHECK(result.toString() == "[\"feature:Ordinary\"]");
 }
 
+TEST_CASE("Qt file invocation distinguishes rejection from an empty result", "[feature][file][Qt]")
+{
+    application();
+    ModelLayer model;
+    core::EventBus bus;
+    systems::feature::FeatureSystem system(model, bus);
+    systems::feature::QFeatureSystemAdaptor adaptor(system);
+    const auto check_rejected = [&](const QString& name) {
+        const auto invocation = adaptor.invokeFile(name);
+        CHECK(invocation.value("succeeded") == QVariant(false));
+        CHECK_FALSE(invocation.value("result").isValid());
+    };
+    check_rejected("Missing");
+
+    const systems::feature::HandlerMetaData info { .name = "Completion" };
+    auto handler = std::make_unique<FileCompletionFeature>();
+    auto& feature = *handler;
+    REQUIRE(system.registerHandler(info, systems::feature::FeatureSystem::SystemHandlerPtr { handler.release() }));
+    REQUIRE(adaptor.setParameter("Completion", 0, QStringList { "input.dat" }));
+    {
+        const auto operation = model.beginWriteOperation();
+        REQUIRE(operation);
+        check_rejected("Completion");
+        CHECK(feature.calls == 0);
+    }
+
+    const auto invocation = adaptor.invokeFile("Completion");
+    CHECK(invocation.value("succeeded").toBool());
+    CHECK_FALSE(invocation.value("result").isValid());
+    CHECK(feature.calls == 1);
+    CHECK(session::SessionQuery(model).listModels().size() == 1);
+
+    system.unregisterHandler(info);
+    check_rejected("Completion");
+}
+
 TEST_CASE("File completion follows accepted submission without creating windows", "[navigation][file][headless]")
 {
     application();
@@ -306,6 +356,7 @@ TEST_CASE("File completion follows accepted submission without creating windows"
             readonly property OperationSession operationSession: OperationSession { featureSystem: backend }
             readonly property string panelTitle: operationSession.panelTitle
             property int resets: 0
+            property string invocationError: ""
             property QtObject viewport: QtObject {
                 function resetCamera() { ++flow.resets }
             }
@@ -314,6 +365,13 @@ TEST_CASE("File completion follows accepted submission without creating windows"
                 signal taskFinished()
                 signal taskFailed(string error)
                 signal taskCancelled()
+            }
+            Connections {
+                target: backend
+                function onInvocationFailed(error) {
+                    flow.invocationError = error;
+                    flow.taskStatus.taskFailed(error);
+                }
             }
             Component.onCompleted: App.registry.renderWindow = viewport
             function selectFile() { importFiles(["file:///C:/input%20one.dat", "file:///C:/input%20two.dat"]) }
@@ -355,7 +413,10 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     CHECK(resets() == 1); // 未提交不能消费其他任务的结束通知。
     feature.result.reset();
     invoke("executeFile");
+    CHECK(session::SessionQuery(model).listModels().size() == 2);
     CHECK(resets() == 2);
+    invoke("finishFile");
+    CHECK(resets() == 2); // 同步导入已完成，后续任务通知不会再次复位。
     feature.result = std::make_shared<systems::job::Job>("import");
     invoke("executeFile");
     invoke("failFile");
@@ -363,6 +424,16 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     invoke("executeFile");
     invoke("cancelFile");
     CHECK(resets() == 2);
+    feature.result.reset();
+    feature.fail_sync = true;
+    invoke("executeFile");
+    CHECK(flow->property("invocationError").toString() == "broken deck");
+    CHECK(session::SessionQuery(model).listModels().size() == 2);
+    CHECK(resets() == 2);
+    feature.fail_sync = false;
+    invoke("executeFile");
+    CHECK(session::SessionQuery(model).listModels().size() == 4);
+    CHECK(resets() == 3);
     auto other_handler = std::make_unique<FileCompletionFeature>();
     REQUIRE(system.registerHandler({ "Other" }, systems::feature::FeatureSystem::SystemHandlerPtr { other_handler.release() }));
     invoke("selectExplicitFile");
@@ -372,6 +443,132 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     CHECK(flow->property("panelTitle").toString() == "操作面板");
     CHECK(QGuiApplication::allWindows().size() == windows);
 }
+
+#if defined(PRECESS_NASTRAN_TEST_PLUGIN) && defined(PRECESS_OBJ_TEST_PLUGIN)
+TEST_CASE("Startup imports Nastran and legacy files in argument order", "[navigation][file][startup]")
+{
+    application();
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    const auto executable = directory.filePath("isolated/Test.exe").toStdString();
+    QModelManager manager(executable);
+    for (const auto* plugin : { PRECESS_NASTRAN_TEST_PLUGIN, PRECESS_OBJ_TEST_PLUGIN })
+        REQUIRE(manager.getSystemPluginManager()->registerPlugin(QUrl::fromLocalFile(QString::fromUtf8(plugin))));
+
+    const auto write = [&](const QString& name, const QByteArray& content) {
+        QFile file(directory.filePath(name));
+        REQUIRE(file.open(QIODevice::WriteOnly));
+        REQUIRE(file.write(content) == content.size());
+        return QUrl::fromLocalFile(file.fileName());
+    };
+    const QByteArray triangle = "BEGIN BULK\nGRID,1,,0.,0.,0.\nGRID,2,,1.,0.,0.\nGRID,3,,0.,1.,0.\nCTRIA3,1,1,1,2,3\nENDDATA\n";
+    const QString first_name = QString::fromUtf8("第一个 网格 \xF0\x9F\x9A\x80.nas");
+    const QString legacy_name = "legacy.obj";
+    const QString last_name = "last.BDF";
+    const QList<QUrl> arguments {
+        write(first_name, triangle),
+        write(legacy_name, "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n"),
+        write("broken.nas", "BEGIN BULK\nGRID,1,,0.,0.,0.\nCTRIA3,1,1,1,2,3\nENDDATA\n"),
+        write(last_name, triangle)
+    };
+
+    QStringList events;
+    QList<Index> models;
+    QObject connection_context;
+    auto* query = manager.getModelQuery();
+    QObject::connect(manager.getModelObserver(), &QModelObserver::modelAdded, &connection_context, [&](Index id) {
+        events.append(query->getModelName(id));
+        models.append(id);
+    });
+
+    auto* features = manager.getFeatureSystemAdaptor();
+    const QString format = QString::fromUtf8("Nastran 网格");
+    const auto is_nastran = [&](const QVariant& entry) {
+        return entry.toMap().value("display_name").toString() == format;
+    };
+    const auto imports = features->getImportFileTypes();
+    const auto nastran = std::find_if(imports.cbegin(), imports.cend(), is_nastran);
+    REQUIRE(nastran != imports.cend());
+    const auto type = nastran->toMap();
+    CHECK(type.value("extensions").toStringList() == QStringList { "nas", "bdf" });
+    CHECK_FALSE(std::ranges::any_of(features->getExportFileTypes(), is_nastran));
+
+    SECTION("Startup invokes the registered IO formats in argument order")
+    {
+        auto* io = manager.getModelIOSystemAdaptor();
+        REQUIRE(io->read("All files", arguments[0], {}));
+        REQUIRE(io->read("All files", arguments[1], {}));
+        CHECK_FALSE(io->read("All files", arguments[2], {}));
+        REQUIRE(io->read("All files", arguments[3], {}));
+        CHECK(events == QStringList { first_name, legacy_name, last_name });
+        REQUIRE(models.size() == 3);
+    }
+    SECTION("File flow imports Nastran through the existing Feature bridge")
+    {
+        auto* task_status = manager.getTaskStatus();
+        QEventLoop loop;
+        bool finished = false;
+        QStringList failures;
+        QObject::connect(task_status, &QTaskStatus::taskFinished, &loop, [&] {
+            finished = true;
+            loop.quit();
+        });
+        QObject::connect(task_status, &QTaskStatus::taskFailed, &loop, [&](const QString& error) {
+            failures.append(error);
+        });
+
+        const QList<QUrl> mesh_files { arguments[0], arguments[3] };
+        QQmlEngine engine;
+        engine.rootContext()->setContextProperty("meshFiles", QVariant::fromValue(mesh_files));
+        engine.rootContext()->setContextProperty("backend", features);
+        engine.rootContext()->setContextProperty("importTaskStatus", task_status);
+        QQmlComponent component(&engine);
+        component.setData(R"QML(
+            import QtQuick
+            import app.core
+            import "qrc:/navigation-ui"
+            FileFeatureFlow {
+                featureSystem: backend
+                taskStatus: importTaskStatus
+                readonly property OperationSession operationSession: OperationSession { featureSystem: backend }
+                function selectFiles() { importFiles(meshFiles) }
+                function executeFile() { App.activeOperation.execute() }
+                function clearFile() { App.activeOperation = null }
+            }
+        )QML",
+            QUrl("qrc:/navigation-ui/NastranIOHarness.qml"));
+        INFO(component.errorString().toStdString());
+        REQUIRE(component.isReady());
+        std::unique_ptr<QObject> flow(component.create());
+        REQUIRE(flow);
+        const auto clear = qScopeGuard([&] { QMetaObject::invokeMethod(flow.get(), "clearFile"); });
+        REQUIRE(QMetaObject::invokeMethod(flow.get(), "selectFiles"));
+        const auto values = features->getParameterValues(type.value("feature").toString());
+        REQUIRE_FALSE(values.isEmpty());
+        REQUIRE(values.front().toStringList() == QStringList { arguments[0].toLocalFile(), arguments[3].toLocalFile() });
+        REQUIRE(models.isEmpty());
+
+        REQUIRE(QMetaObject::invokeMethod(flow.get(), "executeFile"));
+        REQUIRE(task_status->isWritePending());
+        QTimer::singleShot(10000, &loop, &QEventLoop::quit);
+        if (!finished)
+            loop.exec();
+
+        REQUIRE(finished);
+        CHECK(failures.isEmpty());
+        CHECK(events == QStringList { first_name, last_name });
+        REQUIRE(models.size() == 2);
+    }
+
+    for (const auto id : models) {
+        const auto components = query->getComponentIds(id);
+        REQUIRE(components.size() == 1);
+        const auto mesh = query->getMeshSummary(components.front());
+        CHECK(mesh.value("vertex_count").toInt() == 3);
+        CHECK(mesh.value("face_count").toInt() == 1);
+    }
+}
+#endif
 
 TEST_CASE("Feature navigation aggregates generic entries and shares executable children", "[navigation][feature]")
 {

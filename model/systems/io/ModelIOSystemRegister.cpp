@@ -40,6 +40,7 @@ HandlerMetaData ModelIOSystemRegister::toMetaData(const QJsonObject& meta_data) 
 {
     HandlerMetaData handle_data;
     handle_data.file_type = meta_data.value("file_type").toString().toStdString();
+    handle_data.read_only = meta_data.value("read_only").toBool();
     QJsonArray extensions = meta_data.value("extensions").toArray();
     for (const auto& ext : extensions)
     {

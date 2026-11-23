@@ -26,6 +26,7 @@ class ModelIOHandler;
 struct HandlerMetaData {
     std::string file_type; //> 处理的文件格式，取Wikipedia上对应模型类型词条名称，如"Wavefront .obj file", "ISO 10303-21"；名称不得含圆括号（Qt 会按第一个'('截断文件对话框过滤器名），如"OFF (file format)"须写作"OFF file format"
     std::vector<std::string> extensions; //> 支持的文件扩展名列表，如["txt", "obj"]
+    bool read_only { false }; //> 格式只提供读取能力，已有插件默认为可读写
 };
 
 /**
