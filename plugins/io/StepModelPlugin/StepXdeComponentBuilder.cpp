@@ -13,6 +13,7 @@
 #include <XCAFDoc_ShapeTool.hxx>
 
 #include <TopoDS_Shape.hxx>
+#include <TopLoc_Location.hxx>
 #include <spdlog/spdlog.h>
 
 namespace systems::io {
@@ -37,9 +38,17 @@ static std::string labelName(const TDF_Label& label)
     return buf;
 }
 
+/**
+ * @brief 展开装配实例并收集位于世界坐标系的叶形状。
+ * @param shapeTool XDE 形状工具。
+ * @param label 当前实例或自由形状的标签。
+ * @param parent_location 父装配到世界坐标系的变换。
+ * @param outLeaves 输出的零件定义标签及其已定位的形状。
+ */
 static void collectLeafShapes(
     const Handle(XCAFDoc_ShapeTool) & shapeTool,
     const TDF_Label& label,
+    const TopLoc_Location& parent_location,
     std::vector<std::pair<TDF_Label, TopoDS_Shape>>& outLeaves)
 {
     TDF_Label refLabel = label;
@@ -51,19 +60,22 @@ static void collectLeafShapes(
         }
     }
 
+    // 从实例标签取形状，保留本级实例变换及定义形状自身的位置。
+    const TopoDS_Shape shape = shapeTool->GetShape(label);
     if (shapeTool->IsAssembly(refLabel)) {
+        const TopLoc_Location assembly_location = parent_location * shape.Location();
         NCollection_Sequence<TDF_Label> children;
         shapeTool->GetComponents(refLabel, children);
 
         for (Standard_Integer i = 1; i <= children.Length(); ++i) {
-            collectLeafShapes(shapeTool, children.Value(i), outLeaves);
+            collectLeafShapes(shapeTool, children.Value(i), assembly_location, outLeaves);
         }
         return;
     }
 
-    TopoDS_Shape shape = shapeTool->GetShape(refLabel);
     if (!shape.IsNull()) {
-        outLeaves.emplace_back(refLabel, shape);
+        // 本级位置已在 shape 中，仅前乘父级累计变换以得到世界坐标。
+        outLeaves.emplace_back(refLabel, shape.Moved(parent_location));
     }
 }
 
@@ -84,7 +96,7 @@ std::optional<ModelPayload> StepXdeComponentBuilder::buildModelData(
 
     std::vector<std::pair<TDF_Label, TopoDS_Shape>> leaves;
     for (Standard_Integer i = 1; i <= freeShapes.Length(); ++i) {
-        collectLeafShapes(shapeTool, freeShapes.Value(i), leaves);
+        collectLeafShapes(shapeTool, freeShapes.Value(i), TopLoc_Location {}, leaves);
     }
 
     if (leaves.empty()) {
