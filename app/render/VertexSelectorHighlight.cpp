@@ -20,6 +20,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkUnstructuredGrid.h>
 
 namespace {
 void _cancel_highlight(vtkIdTypeArray* selected_ids)
@@ -204,29 +205,29 @@ void VertexSelectorHighlight::selectArea(
         return it == hits.end() ? nullptr : &it->second;
     };
 
-    // 从单个 actor 的命中 cell 派生"组件局部点 id"
-    auto derive_points = [&](vtkActor* target, vtkPolyData* poly,
+    // 从单个数据集的命中 cell 派生"组件局部点 id"
+    auto derive_points = [&](vtkActor* target, vtkDataSet* data,
         const std::unordered_set<vtkIdType>* picked) {
-        if (!target || !poly || !picked || picked->empty())
+        if (!target || !data || !picked || picked->empty())
             return;
-        if (poly->GetNumberOfCells() == 0)
+        if (data->GetNumberOfCells() == 0)
             return;
 
         // 裁剪链上点 id 会重排：vTK 拾取后经 vtkOriginalPointIds 还原组件局部点 id
         auto* orig_pt_ids = vtkIdTypeArray::SafeDownCast(
-            poly->GetPointData()->GetArray("vtkOriginalPointIds"));
+            data->GetPointData()->GetArray("vtkOriginalPointIds"));
         for (vtkIdType cell_id : *picked) {
-            if (cell_id < 0 || cell_id >= poly->GetNumberOfCells())
+            if (cell_id < 0 || cell_id >= data->GetNumberOfCells())
                 continue;
-            vtkCell* cell = poly->GetCell(cell_id);
+            vtkCell* cell = data->GetCell(cell_id);
             if (!cell)
                 continue;
             for (int i = 0; i < cell->GetNumberOfPoints(); ++i) {
                 vtkIdType rp = cell->GetPointId(i);
-                if (rp < 0 || rp >= poly->GetNumberOfPoints())
+                if (rp < 0 || rp >= data->GetNumberOfPoints())
                     continue;
                 double p[3];
-                poly->GetPoint(rp, p);
+                data->GetPoint(rp, p);
                 // 像素在框内才保留（demo POINTS 语义）
                 if (!area_pick::isWorldPointInScreenBox(renderer_, target,
                         p[0], p[1], p[2], xmin, ymin, xmax, ymax))
@@ -266,7 +267,7 @@ void VertexSelectorHighlight::selectArea(
     if (local_ids.empty())
         return;
 
-    // 按 op 对框内命中的点做集合运算：Append->并集；Remove->差集；Toggle->对称差。
+    // 按 op 对命中的点做集合运算：Append->并集；Remove->差集；Toggle->对称差。
     std::unordered_set<vtkIdType> cur;
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
         cur.insert(selected_ids_->GetValue(i));
@@ -286,6 +287,45 @@ void VertexSelectorHighlight::selectArea(
             if (local_ids.find(id) == local_ids.end())
                 result.insert(id);
         for (auto id : local_ids)
+            if (cur.find(id) == cur.end())
+                result.insert(id);
+        break;
+    }
+    selected_ids_->SetNumberOfValues(0);
+    selected_ids_->ClearLookup();
+    for (vtkIdType v : result)
+        selected_ids_->InsertNextValue(v);
+    selected_ids_->Modified();
+    enableHighlight();
+}
+
+void VertexSelectorHighlight::selectPenetratingPoints(
+    const std::unordered_set<vtkIdType>& point_ids, SelectOp op)
+{
+    // 穿透选点：点 id 已由 MeshSelectManager 从公共点表+位图+视锥算出（组件局部点 id），直接做集合运算，不再从命中体单元派生。
+    spdlog::debug("[VertexPenetrating] point_ids.size()={}", point_ids.size());
+    if (point_ids.empty())
+        return;
+
+    std::unordered_set<vtkIdType> cur;
+    for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
+        cur.insert(selected_ids_->GetValue(i));
+    std::unordered_set<vtkIdType> result;
+    switch (op) {
+    case SelectOp::Append:
+        result = cur;
+        result.insert(point_ids.begin(), point_ids.end());
+        break;
+    case SelectOp::Remove:
+        for (auto id : cur)
+            if (point_ids.find(id) == point_ids.end())
+                result.insert(id);
+        break;
+    case SelectOp::Toggle:
+        for (auto id : cur)
+            if (point_ids.find(id) == point_ids.end())
+                result.insert(id);
+        for (auto id : point_ids)
             if (cur.find(id) == cur.end())
                 result.insert(id);
         break;

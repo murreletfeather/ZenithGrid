@@ -2,11 +2,16 @@
 #include "MeshActor.h"
 
 #include <vtkExtractSelection.h>
+#include <vtkIdTypeArray.h>
 #include <vtkLine.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkCellData.h>       
+#include <vtkImplicitFunction.h>
+#include <vtkPlane.h>          
 
 MeshActorSelectOpFactory::MeshActorSelectOpFactory() = default;
 MeshActorSelectOpFactory::MeshActorSelectOpFactory(std::weak_ptr<MeshActor> mesh_actor)
@@ -43,6 +48,26 @@ vtkProp& MeshActorSelectOp::getFaceActor()
 vtkProp& MeshActorSelectOp::getEdgeActor()
 {
     return *mesh_actor_->edge_actor_;
+}
+
+vtkPoints* MeshActorSelectOp::getPoints() const
+{
+    return mesh_actor_->points_.Get();
+}
+
+const std::vector<unsigned char>* MeshActorSelectOp::getSelectablePoints() const
+{
+    if (auto* snap = mesh_actor_->data_snapshot_.get())
+        return snap->selectable_points.get();
+    return nullptr;
+}
+
+vtkUnstructuredGrid* MeshActorSelectOp::getClippedSolidData() const
+{
+    // 数据层快照始终发布合法的体数据（无过滤时复用原始体、全滤空为空网格）。
+    if (auto* snap = mesh_actor_->data_snapshot_.get())
+        return snap->clipped_solids.Get();
+    return nullptr;
 }
 
 bool MeshActorSelectOp::isVisible() const

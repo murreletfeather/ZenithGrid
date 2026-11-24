@@ -4,15 +4,20 @@
 #include "Selection.h"
 #include "SelectorHighlight.h"
 #include <vtkActor.h>
+#include <vtkCellData.h>
 #include <vtkCompositePolyDataMapper.h>
 #include <vtkDataObject.h>
 #include <vtkDataSet.h>
 #include <vtkHardwarePicker.h>
 #include <vtkIdTypeArray.h>
+#include <vtkMatrix4x4.h>
 #include <vtkPartitionedDataSet.h>
 #include <vtkPointData.h>
+#include <vtkPoints.h>
 #include <vtkPointPicker.h>
+#include <vtkPolyData.h>
 #include <vtkRenderer.h>
+#include <vtkUnstructuredGrid.h>
 
 MeshSelectManager::MeshSelectManager(vtkRenderer& renderer, vtkActor& highlight_actor, MeshActorManagerSelectOp& op)
     : op_(&op)
@@ -91,45 +96,128 @@ void MeshSelectManager::selectArea(int xmin, int ymin, int xmax, int ymax, Selec
     if (this->select_mode_ == SelectMode::None)
         return;
 
-    // 收集可见组件的源 actor（按模式；隐藏组件不渲染 → 一次拾取不会命中它）
+    // 一次拖框只构造一次视锥（穿透路径面/边/体共用；非穿透不建）。
+    vtkSmartPointer<vtkPlanes> frustum;
+    if (penetrating_) {
+        frustum = area_pick::buildSelectionFrustum(renderer_, xmin, ymin, xmax, ymax);
+        if (!frustum)
+            return;
+    }
+
+    // 按模式一次性收集候选 actor（所有可见组件一起拾取，互为 z-buffer）
     std::vector<vtkActor*> targets;
     auto add_if_actor = [&](vtkProp* prop) {
         if (auto* actor = vtkActor::SafeDownCast(prop))
             targets.push_back(actor);
     };
+    const bool actor_pick = !penetrating_
+        || select_mode_ == SelectMode::Face
+        || select_mode_ == SelectMode::Edge;
+    if (actor_pick) {
+        for (Index comp_id : op_->getAllComponentIds()) {
+            auto select_op = op_->getSelectOp(comp_id);
+            if (!select_op || !select_op->isVisible())
+                continue;
+            if (!penetrating_) {
+                switch (select_mode_) {
+                case SelectMode::Face:
+                    add_if_actor(&select_op->getFaceActor());
+                    break;
+                case SelectMode::Solid:
+                    add_if_actor(&select_op->getSolidActor());
+                    break;
+                case SelectMode::Edge:
+                case SelectMode::Vertex:
+                    add_if_actor(&select_op->getFaceActor());
+                    add_if_actor(&select_op->getEdgeActor());
+                    add_if_actor(&select_op->getSolidActor());
+                    break;
+                default:
+                    break;
+                }
+            } else {
+                // 穿透且面/边：只用显式面/独立边 actor，不带 solid actor（含内部线框）。
+                add_if_actor(&select_op->getFaceActor());
+                if (select_mode_ == SelectMode::Edge)
+                    add_if_actor(&select_op->getEdgeActor());
+            }
+        }
+        if (targets.empty())
+            return;
+    }
+
+    // 一次 actor 拾取（非穿透硬件 / 穿透面边视锥），结果供逐组件分发；点/体穿透为空。
+    auto hits = actor_pick
+        ? (penetrating_
+            ? area_pick::executePenetratingAreaPicks(renderer_, targets, frustum, xmin, ymin, xmax, ymax)
+            : area_pick::executeAreaPicks(renderer_, targets,
+                xmin, ymin, xmax, ymax, vtkDataObject::FIELD_ASSOCIATION_CELLS))
+        : std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>> {};
+
+    // 逐组件分发。非穿透与穿透面/边走通用 selectArea；点/体穿透各自算好 ID 后走具体入口。
+    // 点/体用组件（solid actor）的变换矩阵，面/边在各自 actor 数据与拾取里已带变换。
     for (Index comp_id : op_->getAllComponentIds()) {
         auto select_op = op_->getSelectOp(comp_id);
         if (!select_op || !select_op->isVisible())
             continue;
-        switch (select_mode_) {
-        case SelectMode::Face:
-            add_if_actor(&select_op->getFaceActor());
-            break;
-        case SelectMode::Solid:
-            add_if_actor(&select_op->getSolidActor());
-            break;
-        case SelectMode::Edge:
-        case SelectMode::Vertex:
-            add_if_actor(&select_op->getFaceActor());
-            add_if_actor(&select_op->getEdgeActor());
-            add_if_actor(&select_op->getSolidActor());
-            break;
-        default:
-            break;
+        auto* sel = getOrCreateSelector(comp_id);
+        if (!sel)
+            continue;
+
+        if (!penetrating_ || select_mode_ == SelectMode::Face || select_mode_ == SelectMode::Edge) {
+            sel->selectArea(hits, xmin, ymin, xmax, ymax, op);
+            continue;
+        }
+
+        auto* solid_actor = vtkActor::SafeDownCast(&select_op->getSolidActor());
+        vtkMatrix4x4* component_matrix = solid_actor ? solid_actor->GetMatrix() : nullptr;
+        if (select_mode_ == SelectMode::Vertex) {
+            // 直接遍历组件公共点表：先查可选位图，再用视锥六面判断（含近远平面）。
+            auto* vsel = dynamic_cast<VertexSelectorHighlight*>(sel);
+            auto* points = vsel ? select_op->getPoints() : nullptr;
+            if (!points)
+                continue;
+            auto* mask = select_op->getSelectablePoints();
+            std::unordered_set<vtkIdType> point_ids;
+            const vtkIdType n = points->GetNumberOfPoints();
+            for (vtkIdType id = 0; id < n; ++id) {
+                if (mask && (id >= static_cast<vtkIdType>(mask->size())
+                        || (*mask)[static_cast<size_t>(id)] == 0))
+                    continue;
+                double p[3];
+                points->GetPoint(id, p);
+                if (area_pick::isPointInFrustum(frustum, component_matrix, p[0], p[1], p[2]))
+                    point_ids.insert(id);
+            }
+            vsel->selectPenetratingPoints(point_ids, op);
+        } else if (select_mode_ == SelectMode::Solid) {
+            // 直接对裁剪后体网格求交，cell 下标经 vtkOriginalCellIds 还原为原始体 id。
+            auto* ssel = dynamic_cast<SolidSelectorHighlight*>(sel);
+            auto* vol = ssel ? select_op->getClippedSolidData() : nullptr;
+            if (!vol)
+                continue;
+            auto picked = area_pick::penetratingPickCells(frustum, vol, component_matrix);
+            auto* orig = vtkIdTypeArray::SafeDownCast(
+                vol->GetCellData()->GetArray("vtkOriginalCellIds"));
+            std::unordered_set<vtkIdType> solid_ids;
+            // 缺 vtkOriginalCellIds 时不猜测映射：跳过该组件的全部命中（合法空结果）。
+            if (orig) {
+                for (vtkIdType c : picked) {
+                    if (c >= 0 && c < orig->GetNumberOfTuples()) {
+                        const vtkIdType o = orig->GetValue(c);
+                        if (o >= 0)
+                            solid_ids.insert(o);
+                    }
+                }
+            }
+            ssel->selectPenetratingSolids(solid_ids, op);
         }
     }
-    if (targets.empty())
-        return;
+}
 
-    // 一次 HardwareSelector 拾取全部目标 actor，按 actor(PROP) 分组
-    auto hits = area_pick::executeAreaPicks(renderer_, targets,
-        xmin, ymin, xmax, ymax, vtkDataObject::FIELD_ASSOCIATION_CELLS);
-
-    // 分发到各组件 selector（已清空 → 命中即该组件新选择；无命中时其 selectArea 内部直接返回）
-    for (Index comp_id : op_->getAllComponentIds()) {
-        if (auto* sel = getOrCreateSelector(comp_id))
-            sel->selectArea(hits, xmin, ymin, xmax, ymax, op);
-    }
+void MeshSelectManager::setPenetrating(bool enabled)
+{
+    penetrating_ = enabled;
 }
 
 void MeshSelectManager::setSelectMode(SelectMode select_mode)

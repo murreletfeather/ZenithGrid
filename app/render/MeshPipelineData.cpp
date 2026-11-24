@@ -54,6 +54,41 @@ vtkSmartPointer<vtkPolyData> publishPolyData(vtkPolyData* input)
     return output;
 }
 
+/** @brief 只复制体网格包装；坐标、属性和连通性数组在发布后只读共享。 */
+vtkSmartPointer<vtkUnstructuredGrid> publishSolids(vtkUnstructuredGrid* input)
+{
+    auto output = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    output->ShallowCopy(input);
+    if (input->GetPoints()) {
+        vtkNew<vtkPoints> points;
+        points->SetData(input->GetPoints()->GetData());
+        output->SetPoints(points);
+    }
+    return output;
+}
+
+// 穿透选点的可选点身份图：按"保留单元实际引用的点"收集，而不是数据集的全部点。
+void markSelectablePoints(vtkDataSet* data, std::vector<unsigned char>& mask)
+{
+    if (!data)
+        return;
+    auto* orig = vtkIdTypeArray::SafeDownCast(
+        data->GetPointData()->GetArray("vtkOriginalPointIds"));
+    for (vtkIdType c = 0; c < data->GetNumberOfCells(); ++c) {
+        vtkCell* cell = data->GetCell(c);
+        if (!cell)
+            continue;
+        for (vtkIdType i = 0; i < cell->GetNumberOfPoints(); ++i) {
+            const vtkIdType local = cell->GetPointId(i);
+            // 裁剪输出的局部点经 vtkOriginalPointIds 还原；无标签时局部点即原始点。
+            const vtkIdType orig_id = (orig && local >= 0 && local < orig->GetNumberOfTuples())
+                ? orig->GetValue(local) : local;
+            if (orig_id >= 0 && orig_id < static_cast<vtkIdType>(mask.size()))
+                mask[static_cast<size_t>(orig_id)] = 1;
+        }
+    }
+}
+
 // 将组件局部点属性写入 PointData，供面/体 mapper 按点属性渲染。
 void addPointAttributes(
     vtkPointData& point_data,
@@ -618,6 +653,22 @@ void MeshPipelineData::rebuildOutputs()
     prepared_->visible_edges = publishPolyData(edges);
     prepared_->solid_surface = publishPolyData(surface->GetOutput());
     prepared_->solid_internal_edges = internal_edges;
+
+    // 穿透选点资格：按保留下来的 face/edge/solid 单元实际引用的点收集，取并集。
+    // 位图按组件原始点下标索引，与 MeshActor 的公共 vtkPoints 同一键空间。
+    {
+        auto mask = std::make_shared<std::vector<unsigned char>>(
+            static_cast<size_t>(solid_data_->GetNumberOfPoints()), 0);
+        markSelectablePoints(faces, *mask);
+        markSelectablePoints(edges, *mask);
+        markSelectablePoints(solids, *mask);
+        prepared_->selectable_points = std::move(mask);
+    }
+
+    // 穿透选体输入：发布管线最终体数据，始终非空（getter 不再回退原始体）。
+    prepared_->clipped_solids = (solids == solid_data_)
+        ? prepared_->original_solids
+        : publishSolids(solids);
     dirty_ = false;
 }
 

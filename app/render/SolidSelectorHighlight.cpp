@@ -181,35 +181,35 @@ void SolidSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
     int /*xmin*/, int /*ymin*/, int /*xmax*/, int /*ymax*/, SelectOp op)
 {
-    // solid actor 的命中即体表面 render cell id（MeshSelectManager 一次多 actor 拾取、已清空后分发）
-    auto it = hits.find(&select_op_.getSolidActor());
-    if (it == hits.end())
-        return;
-    const auto& picked = it->second;
-
-    spdlog::debug("[SolidArea] picked.size()={}", picked.size());
-    if (picked.empty())
-        return;
-
-    // 反查 render cell id -> 原 solid id：solid_actor mapper 输入 poly data 上挂的
-    // vtkOriginalCellIds 跟着 solid_filter_(可能含 clip)透传，索引是 render cell 下标
-    auto* target = vtkActor::SafeDownCast(&select_op_.getSolidActor());
-    auto* mapper = vtkPolyDataMapper::SafeDownCast(target->GetMapper());
-    vtkPolyData* poly = mapper ? mapper->GetInput() : nullptr;
-    auto* orig_cell_ids = poly
-        ? vtkIdTypeArray::SafeDownCast(poly->GetCellData()->GetArray("vtkOriginalCellIds"))
-        : nullptr;
-    if (!orig_cell_ids)
-        return;
-
     // 反查 render cell id -> 原 solid id（去重），再按 op 做集合运算（见下方 switch）
     std::unordered_set<vtkIdType> to_add;
-    for (vtkIdType cid : picked) {
-        vtkIdType orig = orig_cell_ids->GetValue(cid);
-        if (orig >= 0)
-            to_add.insert(orig);
+
+    // 1) 体表面：solid actor 的命中即体表面 render cell id
+    auto it = hits.find(&select_op_.getSolidActor());
+    if (it != hits.end() && !it->second.empty()) {
+        const auto& picked = it->second;
+        spdlog::debug("[SolidArea] surface picked.size()={}", picked.size());
+
+        // 反查：solid_actor mapper 输入 poly data 上挂的 vtkOriginalCellIds 跟着
+        // solid_filter_(可能含 clip)透传，索引是 render cell 下标
+        auto* target = vtkActor::SafeDownCast(&select_op_.getSolidActor());
+        auto* mapper = vtkPolyDataMapper::SafeDownCast(target->GetMapper());
+        vtkPolyData* poly = mapper ? mapper->GetInput() : nullptr;
+        auto* orig_cell_ids = poly
+            ? vtkIdTypeArray::SafeDownCast(poly->GetCellData()->GetArray("vtkOriginalCellIds"))
+            : nullptr;
+        if (orig_cell_ids) {
+            for (vtkIdType cid : picked) {
+                vtkIdType orig = orig_cell_ids->GetValue(cid);
+                if (orig >= 0)
+                    to_add.insert(orig);
+            }
+        }
     }
-    // 按 op 对框内命中的体做集合运算：Append->并集；Remove->差集；Toggle->对称差。
+
+    if (to_add.empty())
+        return;
+    // 按 op 对命中的体做集合运算：Append->并集；Remove->差集；Toggle->对称差。
     std::unordered_set<vtkIdType> cur;
     for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
         cur.insert(selected_ids_->GetValue(i));
@@ -229,6 +229,45 @@ void SolidSelectorHighlight::selectArea(
             if (to_add.find(id) == to_add.end())
                 result.insert(id);
         for (auto id : to_add)
+            if (cur.find(id) == cur.end())
+                result.insert(id);
+        break;
+    }
+    selected_ids_->SetNumberOfValues(0);
+    selected_ids_->ClearLookup();
+    for (vtkIdType orig : result)
+        selected_ids_->InsertNextValue(orig);
+    selected_ids_->Modified();
+    enableHighlight();
+}
+
+void SolidSelectorHighlight::selectPenetratingSolids(
+    const std::unordered_set<vtkIdType>& solid_ids, SelectOp op)
+{
+    // 穿透选体：体 id 已由 MeshSelectManager 从 clipped_solids 求交并经 vtkOriginalCellIds 还原（原始 solid id），直接做集合运算，不再读取体候选载荷。
+    spdlog::debug("[SolidPenetrating] solid_ids.size()={}", solid_ids.size());
+    if (solid_ids.empty())
+        return;
+
+    std::unordered_set<vtkIdType> cur;
+    for (vtkIdType i = 0; i < selected_ids_->GetNumberOfValues(); ++i)
+        cur.insert(selected_ids_->GetValue(i));
+    std::unordered_set<vtkIdType> result;
+    switch (op) {
+    case SelectOp::Append:
+        result = cur;
+        result.insert(solid_ids.begin(), solid_ids.end());
+        break;
+    case SelectOp::Remove:
+        for (auto id : cur)
+            if (solid_ids.find(id) == solid_ids.end())
+                result.insert(id);
+        break;
+    case SelectOp::Toggle:
+        for (auto id : cur)
+            if (solid_ids.find(id) == solid_ids.end())
+                result.insert(id);
+        for (auto id : solid_ids)
             if (cur.find(id) == cur.end())
                 result.insert(id);
         break;

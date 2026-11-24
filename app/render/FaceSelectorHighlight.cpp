@@ -373,7 +373,7 @@ void FaceSelectorHighlight::selectArea(
     const std::unordered_map<vtkProp*, std::unordered_set<vtkIdType>>& hits,
     int /*xmin*/, int /*ymin*/, int /*xmax*/, int /*ymax*/, SelectOp op)
 {
-    // face actor 的命中即面 render cell id（MeshSelectManager 一次多 actor 拾取、已清空后分发）
+    // face actor 的命中即面 render cell id（MeshSelectManager 一次多 actor 拾取后分发）
     auto it = hits.find(&select_op_.getFaceActor());
     if (it == hits.end())
         return;
