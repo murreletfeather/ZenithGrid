@@ -2318,3 +2318,236 @@ TEST_CASE("Actual undo clears offscreen selectors only after successful restorat
     CHECK(selection_state->property("listeningSelectorIndex").toInt() == -1);
     CHECK_FALSE(*system.params("ManySelectors")->value(49).get<ArgTypeEnum::Selector>());
 }
+
+namespace {
+//! @brief 只替换渲染线程发布边界，选择载荷、对象树和实际 QML 接线保持真实。
+struct ViewportTreeFixture {
+    QmlFixture qml;
+    QQuickWindow host;
+    QSelection payload;
+    std::unique_ptr<QObject> source;
+    QObject* registry = nullptr;
+    TreeModel* tree = nullptr;
+    QObject* view = nullptr;
+    QQuickItem* page = nullptr;
+    QQuickItem* view_item = nullptr;
+    QItemSelectionModel* selection = nullptr;
+
+    ViewportTreeFixture()
+    {
+        qml.manager->getModelManager()->setUndoRecorder(nullptr);
+        tree = qml.tree->findChild<TreeModel*>();
+        view = qml.tree->findChild<QObject*>("objectTreeView");
+        page = qobject_cast<QQuickItem*>(qml.tree.get());
+        view_item = qobject_cast<QQuickItem*>(view);
+        REQUIRE(tree);
+        REQUIRE(view);
+        REQUIRE(page);
+        REQUIRE(view_item);
+        selection = view->property("selectionModel").value<QItemSelectionModel*>();
+        REQUIRE(selection);
+        registry = qml.app->property("registry").value<QObject*>();
+        REQUIRE(registry);
+
+        QQmlComponent component(&qml.engine);
+        component.setData(R"QML(import QtQml
+QtObject {
+    property var selectedIDs: null
+    signal selectedChanged()
+})QML",
+            QUrl("qrc:/undo-ui/ViewportSelectionSource.qml"));
+        REQUIRE(waitForCondition([&] { return !component.isLoading(); }));
+        INFO(component.errorString().toStdString());
+        REQUIRE(component.isReady());
+        source.reset(component.create());
+        REQUIRE(source);
+        REQUIRE(registry->setProperty("renderWindow", QVariant::fromValue(source.get())));
+        REQUIRE(qml.selection_state->property("listeningSelectorIndex").toInt() == -1);
+
+        host.resize(300, 180);
+        page->setParentItem(host.contentItem());
+        page->setSize(QSizeF(300, 180));
+        host.show();
+        settle();
+    }
+    ~ViewportTreeFixture()
+    {
+        registry->setProperty("renderWindow", QVariant::fromValue<QObject*>(nullptr));
+        host.hide();
+        page->setParentItem(nullptr);
+    }
+    Index addModel(const std::string& name, int component_count, bool refresh = true)
+    {
+        ComponentDatas components;
+        for (int i = 0; i < component_count; ++i) {
+            auto component = std::make_unique<ComponentData>();
+            component->mesh = std::make_unique<MeshData>();
+            components.push_back(std::move(component));
+        }
+        const auto id = qml.manager->getModelManager()->addModel(name, std::move(components));
+        if (refresh)
+            REQUIRE(tree->refresh());
+        return id;
+    }
+    void publish(ElementEnum::Type type, const QList<Index>& ids)
+    {
+        auto data = std::make_shared<Selection>();
+        data->type = type;
+        data->ids.assign(ids.begin(), ids.end());
+        payload.set(std::move(data));
+        REQUIRE(source->setProperty("selectedIDs", QVariant::fromValue(&payload)));
+        REQUIRE(QMetaObject::invokeMethod(source.get(), "selectedChanged"));
+    }
+    void settle()
+    {
+        REQUIRE(QMetaObject::invokeMethod(view, "forceLayout"));
+        pumpEvents();
+    }
+    int rowOf(const QModelIndex& index) const
+    {
+        int row = -1;
+        QMetaObject::invokeMethod(view, "rowAtIndex", Q_RETURN_ARG(int, row), Q_ARG(QModelIndex, index));
+        return row;
+    }
+    bool containsVisibleDelegate(const QModelIndex& index) const
+    {
+        QQuickItem* delegate = nullptr;
+        if (!QMetaObject::invokeMethod(view, "itemAtIndex", Q_RETURN_ARG(QQuickItem*, delegate),
+                Q_ARG(QModelIndex, index))
+            || !delegate)
+            return false;
+        const auto top = view_item->mapFromItem(delegate, QPointF(0, 0)).y();
+        return delegate->property("selected").toBool() && top >= -1
+            && top + delegate->height() <= view_item->height() + 1;
+    }
+};
+}
+
+TEST_CASE("Actual QML mirrors viewport component picks to the exact tree row", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    const Index first_model = f.addModel("first model", 2);
+    const Index second_model = f.addModel("second model", 1);
+    const auto components = model.modelById(first_model)->componentIds();
+    const Index picked_id = components[1];
+    // 模型和组件各有自己的 ID 域；这里特意构造数值相同的不同类型节点。
+    REQUIRE(picked_id == second_model);
+    const auto picked_index = f.tree->findIndexByNodeId(picked_id, 1);
+    const auto same_number_model = f.tree->findIndexByNodeId(second_model, 0);
+    REQUIRE(picked_index.isValid());
+    REQUIRE(same_number_model.isValid());
+    REQUIRE(picked_index != same_number_model);
+    REQUIRE(f.qml.selection_state->setProperty("activeModelId", first_model));
+    REQUIRE(f.qml.selection_state->setProperty("activeComponentId", components[0]));
+    f.settle();
+
+    QQuickItem keyboard_target(f.host.contentItem());
+    keyboard_target.forceActiveFocus();
+    REQUIRE(f.host.activeFocusItem() == &keyboard_target);
+    // 普通视口拾取不监听参数，不能依赖 selectionUpdated 才驱动树联动。
+    f.publish(ElementEnum::Component, { picked_id });
+    REQUIRE(waitForCondition([&] { return f.selection->isSelected(picked_index); }));
+    CHECK(f.selection->selectedIndexes().size() == 1);
+    CHECK(f.selection->currentIndex() == picked_index);
+    CHECK_FALSE(f.selection->isSelected(same_number_model));
+    CHECK(picked_index.parent() == f.tree->findIndexByNodeId(first_model, 0));
+    CHECK(f.qml.selection_state->property("activeModelId").toInt() == first_model);
+    CHECK(f.qml.selection_state->property("activeComponentId").toInt() == components[0]);
+    CHECK(f.host.activeFocusItem() == &keyboard_target);
+    // 参数区和工具栏的普通点击不会取消仍在视口选中的组件行。
+    REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
+        Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
+    CHECK(f.selection->isSelected(picked_index));
+    f.publish(ElementEnum::Component, {});
+    REQUIRE(waitForCondition([&] { return !f.selection->hasSelection(); }));
+}
+
+TEST_CASE("Actual QML reveals viewport picks under collapsed offscreen models", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    Index picked_model = -1;
+    for (int i = 0; i < 20; ++i)
+        picked_model = f.addModel("collapsed model " + std::to_string(i), 2);
+    REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
+    f.settle();
+    CHECK(f.view->property("contentY").toDouble() == 0);
+
+    SECTION("existing collapsed parent") { }
+    SECTION("selection arrives before the model refresh timer")
+    {
+        picked_model = f.addModel("pending model", 2, false);
+        const Index pending_component = model.modelById(picked_model)->componentIds()[1];
+        REQUIRE_FALSE(f.tree->findIndexByNodeId(pending_component, 1).isValid());
+    }
+    const Index picked_id = model.modelById(picked_model)->componentIds()[1];
+    const auto before = f.tree->findIndexByNodeId(picked_id, 1);
+    CHECK(f.rowOf(before) == -1);
+    f.publish(ElementEnum::Component, { picked_id });
+    REQUIRE(waitForCondition([&] {
+        const auto index = f.tree->findIndexByNodeId(picked_id, 1);
+        return index.isValid() && f.selection->currentIndex() == index && f.containsVisibleDelegate(index);
+    }));
+    const auto picked_index = f.tree->findIndexByNodeId(picked_id, 1);
+    const auto parent_index = f.tree->findIndexByNodeId(picked_model, 0);
+    REQUIRE(parent_index.isValid());
+    bool expanded = false;
+    REQUIRE(QMetaObject::invokeMethod(f.view, "isExpanded", Q_RETURN_ARG(bool, expanded),
+        Q_ARG(int, f.rowOf(parent_index))));
+    CHECK(expanded);
+    CHECK(picked_index.parent() == parent_index);
+    CHECK(f.selection->selectedIndexes().size() == 1);
+    CHECK(f.view->property("contentY").toDouble() > 0);
+    CHECK(f.qml.selection_state->property("activeModelId").toInt() == -1);
+    CHECK(f.qml.selection_state->property("activeComponentId").toInt() == -1);
+}
+
+TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    const auto model_id = f.addModel("selection ownership", 2);
+    const auto components = model.modelById(model_id)->componentIds();
+    const auto first = f.tree->findIndexByNodeId(components[0], 1);
+    const auto second = f.tree->findIndexByNodeId(components[1], 1);
+    REQUIRE(first.isValid());
+    REQUIRE(second.isValid());
+    f.publish(ElementEnum::Component, { components[0] });
+    REQUIRE(waitForCondition([&] { return f.selection->isSelected(first); }));
+
+    SECTION("empty component selection") { f.publish(ElementEnum::Component, {}); }
+    SECTION("multiple components are not reduced to an arbitrary first row")
+    {
+        f.publish(ElementEnum::Component, { components[0], components[1] });
+    }
+    SECTION("face IDs do not masquerade as component IDs")
+    {
+        f.publish(ElementEnum::Face, { components[0] });
+    }
+    SECTION("unknown components do not leave a stale highlight")
+    {
+        f.publish(ElementEnum::Component, { 1000000 });
+    }
+    SECTION("manual row selection releases viewport ownership")
+    {
+        REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "selectRow",
+            Q_ARG(QVariant, QVariant::fromValue(second)), Q_ARG(QVariant, false)));
+        REQUIRE(f.selection->isSelected(second));
+        f.publish(ElementEnum::Component, {});
+        f.settle();
+        CHECK(f.selection->selectedIndexes().size() == 1);
+        CHECK(f.selection->currentIndex() == second);
+        CHECK(f.selection->isSelected(second));
+        REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
+            Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
+        CHECK_FALSE(f.selection->hasSelection());
+        return;
+    }
+    REQUIRE(waitForCondition([&] { return !f.selection->hasSelection(); }));
+    CHECK(f.qml.selection_state->property("activeModelId").toInt() == -1);
+    CHECK(f.qml.selection_state->property("activeComponentId").toInt() == -1);
+}

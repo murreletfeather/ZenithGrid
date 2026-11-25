@@ -47,6 +47,56 @@ Pane {
     //! @brief 自身菜单打开期间不响应外部左键清空。
     property bool _menuOpen: false
 
+    // 只清理由视口联动建立的行选择，用户主动导航后不再拥有该行。
+    property int _viewportComponentId: -1
+
+    function syncViewportSelection() {
+        const viewport = App.registry.renderWindow
+        const selection = viewport ? viewport.selectedIDs : null
+        const componentIds = selection ? selection.getAsComponentIds() : []
+        if (componentIds.length !== 1 || !QModelManager.query.hasComponent(componentIds[0])) {
+            if (_viewportComponentId >= 0)
+                clearRowSelection()
+            return
+        }
+
+        const componentId = componentIds[0]
+        let index = treeModel.findIndexByNodeId(componentId, 1)
+        if (!index || !index.valid) {
+            // 模型通知按 50ms 合并，新组件可能已可拾取但尚未进入对象树。
+            treeModel.refresh()
+            index = treeModel.findIndexByNodeId(componentId, 1)
+        }
+        if (!index || !index.valid) {
+            if (_viewportComponentId >= 0)
+                clearRowSelection()
+            return
+        }
+
+        treeView.expandToIndex(index)
+        treeView.forceLayout()
+        treeView.selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
+        _viewportComponentId = componentId
+        treeView.positionViewAtIndex(index, TableView.Contain)
+    }
+
+    Timer {
+        id: viewportSelectionSync
+        interval: 0
+        // 只保存组件身份；合并信号后读取最新快照，不跨事件轮次持有 QSelection/索引。
+        onTriggered: objectTree.syncViewportSelection()
+    }
+
+    Connections {
+        target: App.registry.renderWindow
+        function onSelectedChanged() { viewportSelectionSync.restart() }
+    }
+
+    Connections {
+        target: App.registry
+        function onRenderWindowChanged() { viewportSelectionSync.restart() }
+    }
+
     // 加粗行：仅活动 Model/Component；更深层级只高亮，不加粗。
     function isNodeEmphasized(nodeId, depth) {
         if (depth === 0)
@@ -58,11 +108,15 @@ Pane {
 
     // 清空行选择，保留导航位置与活动对象。
     function clearRowSelection() {
+        viewportSelectionSync.stop()
+        _viewportComponentId = -1
         treeView.selectionModel.clearSelection()
     }
 
     // 清空行选择与导航位置（undo/redo 等全量重置）。
     function resetSelection() {
+        viewportSelectionSync.stop()
+        _viewportComponentId = -1
         treeView.selectionModel.clear()
     }
 
@@ -98,6 +152,8 @@ Pane {
     function selectRow(index, toggle = false) {
         if (!index || !index.valid)
             return
+        viewportSelectionSync.stop()
+        _viewportComponentId = -1
         treeView.forceActiveFocus()
         if (toggle && treeView.selectionModel.isSelected(index)) {
             clearRowSelection()
@@ -150,11 +206,11 @@ Pane {
         return objectTree.contains(objectTree.mapFromGlobal(x, y))
     }
 
-    // 应用级左键按下：点击对象树外部时清空行选择，活动对象保持不变。
+    // 树主动选择沿用树外清空；视口联动行跟随真实选择，不被参数区点击清除。
     function handleGlobalLeftPress(x, y) {
         if (_menuOpen)
             return
-        if (!objectTree.containsGlobalPoint(x, y))
+        if (_viewportComponentId < 0 && !objectTree.containsGlobalPoint(x, y))
             objectTree.clearRowSelection()
     }
 
@@ -857,5 +913,6 @@ Pane {
     Component.onCompleted: {
         App.registry.treeModel = treeModel
         App.registry.objectTree = objectTree
+        viewportSelectionSync.restart()
     }
 }
