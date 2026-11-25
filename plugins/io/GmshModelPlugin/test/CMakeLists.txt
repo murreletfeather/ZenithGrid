@@ -1,2 +1,0 @@
-precess_add_test(TestGmshModelHandler TestGmshModelHandler.cpp)
-precess_test_link_libraries(TestGmshModelHandler GmshModelPluginlib DataTest)

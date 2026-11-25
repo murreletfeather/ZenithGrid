@@ -27,10 +27,6 @@
 class ModelLayer;
 class UndoStack;
 
-namespace systems::io {
-class ModelIOSystem;
-}
-
 namespace systems::job {
 class JobRunner;
 struct JobWork;
@@ -53,7 +49,7 @@ struct HandlerMetaData {
 /**
  * @brief 功能系统：管理功能插件的注册、注销、调用与事件路由
  *
- * 非单例，由 Session 组合持有。与算法/编辑系统不同，功能在注册后即常驻，
+ * 非单例，由 Session 组合持有。与旧编辑系统不同，功能在注册后即常驻，
  * 可持续响应按键、参数变更与模型事件；并随活动操作切换被反复
  * 进入 activate() / 退出 deactivate()（见 setFeatureActive）。
  */
@@ -63,16 +59,9 @@ public:
     using SystemHandlerPtr = ::systems::SystemHandlerPtr<SystemHandler>; //> 兼容跨 dll 边界析构的智能指针
     static const std::string name; //> 系统唯一名称，用于插件注册时的识别
 
-    /**
-     * @brief 装配功能系统，可借用宿主的模型 IO 系统作为迁移入口
-     * @param io_system 非拥有指针，可空；宿主须保证其存活覆盖功能系统的生命周期
-     */
-    FeatureSystem(ModelLayer& model_layer, core::EventBus& event_bus, UndoStack* undo_stack = nullptr,
-        io::ModelIOSystem* io_system = nullptr);
+    /** @brief 将功能系统装配到宿主模型、事件总线与可选 undo 栈。 */
+    FeatureSystem(ModelLayer& model_layer, core::EventBus& event_bus, UndoStack* undo_stack = nullptr);
     ~FeatureSystem();
-
-    /** @brief 获取宿主注入的模型 IO 系统；未注入时返回空指针。 */
-    io::ModelIOSystem* ioSystem() const noexcept { return io_system_; }
 
     /**
      * @brief 空闲时注册功能：装配上下文 → setup 收集声明 → 载入参数默认值；占用期拒绝
@@ -173,7 +162,6 @@ public:
     void flushDeferredEvents();
 
 private:
-    friend class FeatureIOSystemRegister;
     friend struct FeatureContext;
     friend class UndoContext;
     friend class InteractionContext;
@@ -233,7 +221,6 @@ private:
     ModelLayer* model_layer_; //< 模型层引用，用于装配功能上下文
     core::EventBus* event_bus_; //< 事件总线引用
     UndoStack* undo_stack_ { nullptr }; //< undo 栈引用（可空：无栈时边界退化为仅 flush）
-    io::ModelIOSystem* io_system_ { nullptr }; //< 非拥有的 IO 系统指针，由宿主维护生命周期
     std::unordered_map<std::string, FeatureEntry> entries_; //< 功能条目，key 为功能唯一名称
     std::vector<FeatureNavigationMenu> navigation_menus_;
     std::vector<FeatureNavigationGroup> navigation_groups_;

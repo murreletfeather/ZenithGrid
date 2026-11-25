@@ -11,7 +11,6 @@ import QtQuick.Dialogs
 
 import app.core
 import app.model
-import app.model.systems.algo
 
 Item{
     id: root

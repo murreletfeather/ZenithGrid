@@ -1,2 +1,0 @@
-precess_add_test(TestVtkXmlModelHandler TestVtkXmlModelHandler.cpp)
-precess_test_link_libraries(TestVtkXmlModelHandler VtkXmlModelPluginlib DataTest)

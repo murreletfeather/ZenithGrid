@@ -2,7 +2,6 @@
 #
 # 本文件随 PreCess 安装到 <prefix>/lib/cmake/PreCess/，由 PreCessConfig.cmake 自动
 # include；in-tree 由 plugins/CMakeLists.txt include。两种语境下调用方写法完全一致：
-#   precess_add_io_plugin / precess_add_algo_plugin /
 #   precess_add_edit_plugin / precess_add_feature_plugin
 #   precess_plugin_link_libraries   插件私有三方依赖（可选）
 #   precess_plugin_install          安装到 PreCess 插件目录（外部工程必调；in-tree 自动安装）
@@ -195,26 +194,6 @@ endfunction()
 # 各系统注册函数的公共装配逻辑在 _add_plugin 中；模型层归并（PreCess::Base）后
 # 系统差异链接库不再需要，保留函数名以兼容既有插件工程写法。
 
-# precess_add_io_plugin(<target>
-#     SOURCES <source1> <source2> ...
-#     PLUGIN_H <headerPlugin.h>
-#     [STATIC]
-# )
-function(precess_add_io_plugin TARGET)
-    _add_plugin(${TARGET} ${ARGN})
-endfunction()
-
-# precess_add_algo_plugin(<target>
-#     SOURCES <source1> <source2> ...
-#     PLUGIN_H <headerPlugin.h>
-#     [STATIC]
-# )
-function(precess_add_algo_plugin TARGET)
-    message(DEPRECATION
-        "${TARGET}: AlgorithmSystem is frozen. New algorithm plugins must use precess_add_feature_plugin and FeatureHandler.")
-    _add_plugin(${TARGET} ${ARGN})
-endfunction()
-
 # precess_add_edit_plugin(<target>
 #     SOURCES <source1> <source2> ...
 #     PLUGIN_H <headerPlugin.h>
@@ -258,7 +237,7 @@ function(precess_plugin_link_libraries TARGET)
     endif()
 
     # OCCT 扫描目录兜底：仅从显式传入依赖推导扫描目录并不够——
-    # 未显式传 TK* 但经 PreCess::Base 链入 OCCT 符号的插件（如 VtkLegacyModelPlugin）
+    # 未显式传 TK* 但经 PreCess::Base 链入 OCCT 符号的插件（如 VtkLegacyImportPlugin）
     # 在无 OCCT 于 PATH 的环境下安装即报 "Could not resolve runtime dependencies:
     # TKBRep.dll/TKernel.dll"。TKernel 的 IMPORTED_LOCATION 为 per-config DLL 路径
     # （Debug=bind、Release=bin），恒可作扫描目录；freetype/spdlog 本就 PRE_EXCLUDE 不收拢。

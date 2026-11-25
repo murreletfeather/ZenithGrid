@@ -1,7 +1,0 @@
-{
-    "system": "ModelIOSystem",
-    "handler": {
-        "file_type": "Qhex hexahedral mesh file",
-        "extensions": [ "qhex" ]
-    }
-}

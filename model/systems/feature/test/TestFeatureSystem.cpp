@@ -1,5 +1,3 @@
-#include "AlgorithmHandler.h"
-#include "AlgorithmSystem.h"
 #include "ComponentData.h"
 #include "EventBus.h"
 #include "FeatureContext.h"
@@ -13,7 +11,6 @@
 #include "JobRunner.h"
 #include "MeshData.h"
 #include "ModelData.h"
-#include "ModelIOSystem.h"
 #include "ModelLayer.h"
 #include "UndoStack.h"
 #include "test/OwnerQueue.h"
@@ -2655,43 +2652,6 @@ TEST_CASE("Rejected repeated model task never releases the running model operati
     REQUIRE(pointCount(layer, comp) == 3);
 }
 
-TEST_CASE("Synchronous algorithm cannot bypass a free task's model operation", "[FeatureSystem][operation]")
-{
-    class WritingAlgorithm final : public systems::algo::AlgorithmHandler {
-    public:
-        std::any execute(systems::algo::HandlerContext& ctx, const std::vector<core::ArgObject>&) override
-        {
-            ctx.cur_component.appendPoint({ 8, 8, 8 });
-            return { };
-        }
-        std::vector<core::ArgType> args_type() const override { return { }; }
-    };
-    core::EventBus bus;
-    ModelLayer layer;
-    const Index comp = addTriangleComponent(layer);
-    FeatureSystem system(layer, bus);
-    systems::io::ModelIOSystem io(layer);
-    systems::algo::AlgorithmSystem algorithms(io, layer);
-    systems::algo::HandlerMetaData meta;
-    meta.name = "Writer";
-    REQUIRE(algorithms.registerHandler(meta, systems::algo::AlgorithmSystem::SystemHandlerPtr { new WritingAlgorithm }));
-    PendingHarness h;
-    systems::job::JobRunner runner(layer, nullptr, h.dispatcher());
-    system.setJobRunner(&runner);
-    h.bindFinished(runner);
-    auto* raw = new WritebackJobFeature;
-    raw->task = [](systems::job::ProgressFn) { };
-    REQUIRE(system.registerHandler(makeWritebackMeta(), FeatureSystem::SystemHandlerPtr { raw }));
-    system.invoke("WritebackJobFeature");
-    auto commit = h.takeOne();
-    algorithms.call("Writer", comp, { });
-    REQUIRE(pointCount(layer, comp) == 3);
-    REQUIRE(layer.writesPending());
-    commit();
-    h.waitFinished();
-    algorithms.call("Writer", comp, { });
-    REQUIRE(pointCount(layer, comp) == 4);
-}
 TEST_CASE("Captured writeback owns all three phases and releases preparation failures", "[FeatureSystem][operation]")
 {
     class CapturedFeature final : public FeatureHandler {

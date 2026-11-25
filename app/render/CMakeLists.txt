@@ -37,7 +37,7 @@ target_include_directories(vtkPart PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}   # 头文件路径
 )
 target_link_libraries(vtkPart PUBLIC Core)
-target_link_libraries(vtkPart PUBLIC AlgorithmSystem) # 交互公共类型头文件随 vtkPart 头文件传播（经 SystemCore）
+target_link_libraries(vtkPart PUBLIC SystemCore) # 交互公共类型头文件随 vtkPart 头文件传播
 target_link_libraries(vtkPart
     PRIVATE
         Data

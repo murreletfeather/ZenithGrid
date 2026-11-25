@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.VtkXml",
+    "display_name": "VTK XML mesh file"
+  }
+}

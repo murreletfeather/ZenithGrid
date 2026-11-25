@@ -1,2 +1,0 @@
-precess_add_test(TestVtkLegacyModelHandler TestVtkLegacyModelHandler.cpp)
-precess_test_link_libraries(TestVtkLegacyModelHandler VtkLegacyModelPluginlib DataTest)

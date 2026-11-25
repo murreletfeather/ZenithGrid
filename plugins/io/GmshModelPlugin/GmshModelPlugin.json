@@ -1,7 +1,0 @@
-{
-    "system": "ModelIOSystem",
-    "handler": {
-        "file_type": "Gmsh mesh file",
-        "extensions": [ "msh" ]
-    }
-}

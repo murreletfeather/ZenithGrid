@@ -1,7 +1,0 @@
-{
-  "system": "ModelIOSystem",
-  "handler": {
-    "file_type": "Stanford PLY file",
-    "extensions": [ "ply" ]
-  }
-}

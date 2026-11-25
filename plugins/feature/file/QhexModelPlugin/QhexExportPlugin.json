@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.Qhex",
+    "display_name": "Qhex hexahedral mesh file"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.Off",
+    "display_name": "OFF file format"
+  }
+}

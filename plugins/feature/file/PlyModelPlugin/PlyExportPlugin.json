@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.Ply",
+    "display_name": "Stanford PLY file"
+  }
+}

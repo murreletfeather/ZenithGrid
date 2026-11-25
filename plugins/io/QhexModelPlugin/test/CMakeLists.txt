@@ -1,2 +1,0 @@
-precess_add_test(TestQhexModelHandler TestQhexModelHandler.cpp)
-precess_test_link_libraries(TestQhexModelHandler QhexModelPluginlib DataTest)

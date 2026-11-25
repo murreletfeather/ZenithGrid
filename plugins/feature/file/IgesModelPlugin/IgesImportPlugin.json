@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.Iges",
+    "display_name": "IGES"
+  }
+}

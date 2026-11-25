@@ -1,5 +1,5 @@
 /** @file TestToolbarNavigation.cpp
- * @brief 通用功能导航、旧算法列表兼容及实际工具栏加载测试
+ * @brief 通用功能导航、文件入口及实际工具栏加载测试
  */
 #include "FeatureContext.h"
 #include "FeatureEvents.h"
@@ -8,7 +8,6 @@
 #include "FeatureRegistrar.h"
 #include "FeatureSystem.h"
 #include "Job.h"
-#include "QAlgorithmInfo.h"
 #include "QFeatureInfo.h"
 #include "QFeatureSystemAdaptor.h"
 #include "QModelManager.h"
@@ -53,8 +52,6 @@ Q_IMPORT_QML_PLUGIN(app_corePlugin)
 Q_IMPORT_QML_PLUGIN(app_modelPlugin)
 Q_IMPORT_QML_PLUGIN(app_renderPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systemsPlugin)
-Q_IMPORT_QML_PLUGIN(app_model_systems_algoPlugin)
-Q_IMPORT_QML_PLUGIN(app_model_systems_ioPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systems_editPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systems_featurePlugin)
 
@@ -295,6 +292,7 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     systems::feature::QFeatureSystemAdaptor adaptor(system);
     QQmlEngine engine;
     engine.rootContext()->setContextProperty("backend", &adaptor);
+    engine.rootContext()->setContextProperty("startupFilePaths", QStringList { "relative path.DAT", "C:/next.dat" });
     QQmlComponent component(&engine);
     component.setData(R"QML(
         import QtQuick
@@ -317,13 +315,16 @@ TEST_CASE("File completion follows accepted submission without creating windows"
             }
             Component.onCompleted: App.registry.renderWindow = viewport
             function selectFile() { importFiles(["file:///C:/input%20one.dat", "file:///C:/input%20two.dat"]) }
+            function openStartup() { importPaths(Array.from(startupFilePaths)) }
+            function openEmptyStartup() { importPaths([]) }
             function selectExplicitFile() { importFiles(["explicit.dat"], importTypes.find(type => type.feature === "Completion")) }
             function rejectBusyDrop() { taskStatus.writePending = true; importFiles(["file:///C:/busy.dat"]); taskStatus.writePending = false }
             function executeFile() { return App.activeOperation.execute() }
             function finishFile() { taskStatus.taskFinished() }
             function failFile() { taskStatus.taskFailed("failed"); finishFile() }
             function cancelFile() { taskStatus.taskCancelled(); finishFile() }
-            function clearFile() { App.activeOperation = null; App.registry.renderWindow = null }
+            function clearOperation() { App.activeOperation = null }
+            function clearFile() { clearOperation(); App.registry.renderWindow = null }
         }
     )QML",
         QUrl("qrc:/navigation-ui/CompletionHarness.qml"));
@@ -331,14 +332,19 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     REQUIRE(component.isReady());
     std::unique_ptr<QObject> flow(component.create());
     REQUIRE(flow);
-    REQUIRE(QMetaObject::invokeMethod(flow.get(), "selectFile"));
+    const auto invoke = [&](const char* method) { REQUIRE(QMetaObject::invokeMethod(flow.get(), method)); };
+    invoke("openEmptyStartup");
+    CHECK(flow->property("panelTitle").toString() == "操作面板");
+    CHECK(adaptor.getParameterValues("Completion").front().toStringList().isEmpty());
+    CHECK(feature.calls == 0);
+
+    invoke("selectFile");
     CHECK(flow->property("panelTitle").toString() == "操作面板 - 导入样例");
     const auto paths = adaptor.getParameterValues("Completion").front().toStringList();
     CHECK(paths == QStringList { "C:/input one.dat", "C:/input two.dat" });
     CHECK(feature.calls == 0); // 拖入只准备参数，执行仍由侧栏触发。
     REQUIRE(QMetaObject::invokeMethod(flow.get(), "rejectBusyDrop"));
     CHECK(adaptor.getParameterValues("Completion").front().toStringList() == paths);
-    const auto invoke = [&](const char* method) { REQUIRE(QMetaObject::invokeMethod(flow.get(), method)); };
     const auto resets = [&] { return flow->property("resets").toInt(); };
     feature.result = std::make_shared<systems::job::Job>("import");
     invoke("executeFile");
@@ -363,6 +369,18 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     invoke("executeFile");
     invoke("cancelFile");
     CHECK(resets() == 2);
+
+    invoke("clearOperation");
+    CHECK(flow->property("panelTitle").toString() == "操作面板");
+    const int calls_before_startup = feature.calls;
+    invoke("openStartup");
+    CHECK(feature.calls == calls_before_startup);
+    CHECK(flow->property("panelTitle").toString() == "操作面板 - 导入样例");
+    CHECK(adaptor.getParameterValues("Completion").front().toStringList() == QStringList { "relative path.DAT", "C:/next.dat" });
+    invoke("executeFile");
+    CHECK(feature.calls == calls_before_startup + 1);
+    invoke("finishFile");
+    CHECK(resets() == 3);
     auto other_handler = std::make_unique<FileCompletionFeature>();
     REQUIRE(system.registerHandler({ "Other" }, systems::feature::FeatureSystem::SystemHandlerPtr { other_handler.release() }));
     invoke("selectExplicitFile");
@@ -613,86 +631,6 @@ TEST_CASE("Feature menus use declared parents and give unlisted features one def
     CHECK(default_menus.toString() == R"([[{"id":"features","name":"功能","group":"default","items":["feature:unlisted"]}],[{"id":"features","name":"注册功能","group":"default","items":["category:declared","feature:unlisted"]}]])");
 }
 
-TEST_CASE("Legacy algorithm tab availability preserves feature page identity", "[navigation][QML][legacy]")
-{
-    application();
-    QTemporaryDir directory;
-    REQUIRE(directory.isValid());
-    const auto executable = (directory.path() + "/isolated/Test.exe").toStdString();
-    QModelManager::argv0 = executable;
-    QQmlEngine engine;
-    static const int theme_type = qmlRegisterSingletonType(QUrl("qrc:/navigation-ui/Theme.qml"), "LegacyNavigationUi", 1, 0, "Theme");
-    engine.rootContext()->setContextProperty("Theme", engine.singletonInstance<QObject*>(theme_type));
-
-    // 仅控制已有算法的可用性，不依赖已删除插件或执行旧算法。
-    QAlgorithmInfo info("legacy-regression", "旧算法", "", {});
-    auto algorithms = engine.newArray(1);
-    algorithms.setProperty(0, engine.newQObject(&info));
-    auto populated_provider = engine.newObject();
-    populated_provider.setProperty("algorithmsInfo", algorithms);
-    auto empty_provider = engine.newObject();
-    empty_provider.setProperty("algorithmsInfo", engine.newArray());
-    QQmlComponent component(&engine, QUrl("qrc:/navigation-ui/AppToolbar.qml"));
-    INFO(component.errorString().toStdString());
-    REQUIRE(component.isReady());
-    std::unique_ptr<QObject> toolbar(component.createWithInitialProperties({ { "algorithmSystem", QVariant::fromValue(empty_provider) } }));
-    REQUIRE(toolbar);
-    auto* item = qobject_cast<QQuickItem*>(toolbar.get());
-    REQUIRE(item);
-    QQuickWindow window;
-    window.resize(900, 180);
-    item->setParentItem(window.contentItem());
-    item->setSize(QSizeF(900, 180));
-    window.show();
-    const auto settle = [] {
-        QEventLoop loop;
-        QTimer::singleShot(60, &loop, &QEventLoop::quit);
-        loop.exec();
-    };
-    settle();
-    CHECK_FALSE(findItem(item, "otherAlgorithmTab"));
-    auto* feature_tab = findItem(item, "featureTab_mesh-generation");
-    REQUIRE(feature_tab);
-    clickItem(window, feature_tab);
-    settle();
-    const auto feature_page = toolbar->property("activeCategory").toInt();
-    CHECK(feature_page == 3);
-
-    REQUIRE(toolbar->setProperty("algorithmSystem", QVariant::fromValue(populated_provider)));
-    settle();
-    CHECK(toolbar->property("activeCategory").toInt() == feature_page);
-    auto* legacy_tab = findItem(item, "otherAlgorithmTab");
-    REQUIRE(legacy_tab);
-    feature_tab = findItem(item, "featureTab_mesh-generation");
-    REQUIRE(feature_tab);
-    CHECK(feature_tab->mapToItem(item, QPointF()).x() + feature_tab->width() <= legacy_tab->mapToItem(item, QPointF()).x());
-    clickItem(window, legacy_tab);
-    settle();
-    CHECK(toolbar->property("activeCategory").toInt() == 2);
-    auto* legacy_page = findItem(item, "algorithmPage_other");
-    REQUIRE(legacy_page);
-    CHECK(legacy_page->isVisible());
-
-    REQUIRE(toolbar->setProperty("algorithmSystem", QVariant::fromValue(empty_provider)));
-    settle();
-    CHECK_FALSE(findItem(item, "otherAlgorithmTab"));
-    CHECK(toolbar->property("activeCategory").toInt() == -1);
-    CHECK_FALSE(legacy_page->isVisible());
-    feature_tab = findItem(item, "featureTab_mesh-generation");
-    REQUIRE(feature_tab);
-    clickItem(window, feature_tab);
-    settle();
-    CHECK(toolbar->property("activeCategory").toInt() == feature_page);
-    REQUIRE(toolbar->setProperty("algorithmSystem", QVariant::fromValue(populated_provider)));
-    REQUIRE(toolbar->setProperty("algorithmSystem", QVariant::fromValue(empty_provider)));
-    settle();
-    CHECK(toolbar->property("activeCategory").toInt() == feature_page);
-    auto* page = findItem(item, "featureMenuPage_mesh-generation");
-    REQUIRE(page);
-    CHECK(page->isVisible());
-    QModelManager::argv0 = {};
-}
-
 TEST_CASE("Actual toolbar renders declared feature entries and preserves active operation", "[navigation][QML]")
 {
     application();
@@ -739,7 +677,7 @@ TEST_CASE("Actual toolbar renders declared feature entries and preserves active 
     REQUIRE(tab->setProperty("checked", true));
     REQUIRE(QMetaObject::invokeMethod(tab, "clicked"));
     QCoreApplication::processEvents();
-    CHECK(toolbar->property("activeCategory").toInt() == 3);
+    CHECK(toolbar->property("activeCategory").toInt() == 2);
     REQUIRE(findItem(item, "featureMenuPage_mesh-generation"));
     CHECK(findItem(item, "featureMenuPage_mesh-generation")->isVisible());
     CHECK(app->property("activeOperation").value<QJSValue>().strictlyEquals(operation));
@@ -888,7 +826,7 @@ TEST_CASE("Actual toolbar renders declared feature entries and preserves active 
     REQUIRE(edit);
     REQUIRE(QMetaObject::invokeMethod(edit, "clicked"));
     CHECK(app->property("activeOperation").value<QJSValue>().property("info").property("name").toString() == "second");
-    REQUIRE(toolbar->setProperty("activeCategory", 3));
+    REQUIRE(toolbar->setProperty("activeCategory", 2));
     // 注册表更新会重建工具栏委托，不能继续使用替换前的按钮指针。
     triangle = findItem(item, "featureEntry_category:triangle");
     REQUIRE(triangle);

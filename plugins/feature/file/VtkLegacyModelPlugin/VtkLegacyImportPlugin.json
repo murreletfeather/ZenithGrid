@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.VtkLegacy",
+    "display_name": "VTK Simple Legacy Formats"
+  }
+}

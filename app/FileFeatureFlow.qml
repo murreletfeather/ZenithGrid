@@ -70,9 +70,14 @@ Item {
         exportDialog.open();
     }
 
-    // 同一批文件共用一个 Feature 及其参数，扩展名仅缩小候选。
     function importFiles(urls, selectedType) {
-        const paths = Array.from(urls).map(url => App.localFilePath(url));
+        importPaths(Array.from(urls, url => App.localFilePath(url)), selectedType);
+    }
+
+    // 同一批文件共用一个 Feature 及其参数，扩展名仅缩小候选。
+    function importPaths(paths, selectedType) {
+        if (!paths.length)
+            return;
         if (taskStatus.writePending) {
             releaseFiles(paths);
             return;
@@ -139,7 +144,7 @@ Item {
                 };
                 const result = root.featureSystem.invoke(name);
                 if (result && result.submitted !== undefined) {
-                    // 本次确实占用了单槽才等待；主线程此处不让出事件循环。
+                    // 只有实际占用了单槽的任务才接收本次完成回调。
                     if (result.submitted)
                         root._afterTask = finish;
                     return;

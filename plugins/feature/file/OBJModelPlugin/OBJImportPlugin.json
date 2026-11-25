@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.OBJ",
+    "display_name": "Wavefront .obj file"
+  }
+}

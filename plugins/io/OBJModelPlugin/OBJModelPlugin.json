@@ -1,7 +1,0 @@
-{
-  "system": "ModelIOSystem",
-  "handler": {
-    "file_type": "Wavefront .obj file",
-    "extensions": [ "obj" ]
-  }
-}

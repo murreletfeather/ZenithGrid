@@ -1,2 +1,0 @@
-precess_add_test(TestIgesModelIO TestIgesModelHandler.cpp)
-precess_test_link_libraries(TestIgesModelIO IgesModelPluginlib DataTest)

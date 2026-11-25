@@ -7,7 +7,7 @@ description: 使用已安装的 ZenithGrid / PreCess SDK 开发、构建、测�
 
 项目网址与源码主仓库：[PreCess](https://gitee.com/precess/PreCess)。仅有二进制分发包、需要查看实现或完整示例时，可到这里查阅源码；优先使用发行版对应的 tag/commit，接口以本次 SDK 头文件为准。
 
-SDK 包与 API 仍叫 PreCess，插件使用 C++20。新增算法一律使用 FeatureHandler；AlgorithmHandler / AlgorithmSystem 已废弃并冻结，不得新增旧算法插件或扩展旧接口。按项目预设、PreCess_DIR 或 PRECESS_SDK_PATH 定位用户指定的 SDK；本 skill 随 SDK 安装时，其上两级目录为 SDK 前缀。
+SDK 包与 API 仍叫 PreCess，插件使用 C++20。算法、模型文件导入导出和通用功能均使用 FeatureHandler。按项目预设、PreCess_DIR 或 PRECESS_SDK_PATH 定位用户指定的 SDK；本 skill 随 SDK 安装时，其上两级目录为 SDK 前缀。
 
 - 构建、测试、加载、安装、打包：读取 [references/build.md](references/build.md)。
 - Handler、选择器、事件、模型写入、任务、预览、交互：读取 [references/development.md](references/development.md)，以已安装头文件确认签名。

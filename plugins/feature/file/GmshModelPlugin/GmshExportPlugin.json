@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.Gmsh",
+    "display_name": "Gmsh mesh file"
+  }
+}

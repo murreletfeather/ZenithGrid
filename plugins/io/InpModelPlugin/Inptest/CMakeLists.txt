@@ -1,2 +1,0 @@
-precess_add_test(TestInpModelIO TestInpModelIO.cpp)
-precess_test_link_libraries(TestInpModelIO InpModelPluginlib DataTest)

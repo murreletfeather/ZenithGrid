@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.Inp",
+    "display_name": "Abaqus Input File"
+  }
+}

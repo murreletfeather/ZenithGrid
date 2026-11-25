@@ -25,7 +25,7 @@
 
 #include <QGuiApplication>
 #include <QKeyEvent>
-#include <QUrl>
+#include <QStringList>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 
@@ -129,11 +129,8 @@ bool QApplicationStartup::initialize()
         dock::init(engine_.get());
         engine_->addImageProvider(QStringLiteral("wallpaper"), new WallpaperProvider);
 
-        QList<QUrl> arguments;
-        for (const auto& argument : app_.arguments().mid(1))
-            arguments << QUrl::fromLocalFile(argument);
         engine_->rootContext()->setContextProperty("QLogManager", QLogManager::instance());
-        engine_->rootContext()->setContextProperty("commandLineArgs", QVariant::fromValue(arguments));
+        engine_->rootContext()->setContextProperty("startupFilePaths", app_.arguments().mid(1));
 #ifdef __EMSCRIPTEN__
         engine_->rootContext()->setContextProperty("QWasmBridge", new QWasmBridge(&app_));
 #endif

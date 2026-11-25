@@ -4,7 +4,9 @@
  */
 #include "FeatureContext.h"
 #include "FeatureSystem.h"
+#include "JobRunner.h"
 #include "ModelLayer.h"
+#include "ModelPayload.h"
 #include "UndoStack.h"
 
 namespace systems::feature {
@@ -85,6 +87,42 @@ std::shared_ptr<systems::job::Job> FeatureContext::runComputeJob(std::string lab
 {
     UndoStack::OwnerScope owner_scope(system_.undo_stack_, owner_);
     return system_.submitComputeJob(std::move(label), std::move(task), owner_);
+}
+
+std::any FeatureContext::runFileImport(std::string label,
+    std::function<std::vector<ModelPayload>(systems::job::ProgressFn)> parse)
+{
+    const auto install = [](ModelLayer& layer, std::vector<ModelPayload>& models, systems::job::ProgressFn) {
+        for (auto& payload : models)
+            layer.addModel(u8Narrow(payload.model_name), std::move(payload.components));
+    };
+#ifndef __EMSCRIPTEN__
+    if (system_.job_runner_) {
+        return runWritebackJob(std::move(label), [](const ModelLayer&) { return 0; },
+            [parse = std::move(parse)](int&, systems::job::ProgressFn report) {
+                return parse(std::move(report));
+            }, install, true);
+    }
+#endif
+    auto models = parse([](double, const std::string&) { });
+    install(model, models, { });
+    return { };
+}
+
+std::any FeatureContext::runFileExport(std::string label,
+    std::function<void(const ModelLayer&, systems::job::ProgressFn)> write)
+{
+#ifndef __EMSCRIPTEN__
+    if (auto* runner = system_.job_runner_) {
+        return runner->run(std::move(label), [layer = &model, write = std::move(write)]() mutable {
+            return systems::job::JobWork { [layer, write = std::move(write)](systems::job::ProgressFn report) {
+                write(*layer, std::move(report));
+            } };
+        }, { owner_, true });
+    }
+#endif
+    write(model, [](double, const std::string&) { });
+    return { };
 }
 
 std::shared_ptr<systems::job::Job> FeatureContext::runComponentJob(std::string label, Index component_id, ComponentJobTaskFn task)
