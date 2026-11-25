@@ -163,7 +163,7 @@ Item {
             return
         } else if (cmd.trim() === "components") {
             outputText.text += "← 全局对象: App (App.selection, App.registry, App.activeOperation)\n"
-            outputText.text += "← 系统对象: QModelManager (observer, query, algorithmSystem, ioSystem, editSystem)\n"
+            outputText.text += "← 系统对象: QModelManager (observer, query, featureSystem, editSystem)\n"
             outputText.text += "← 注册控件: App.registry.renderWindow, App.registry.treeModel, App.registry.scalarRanges\n\n"
             return
         }

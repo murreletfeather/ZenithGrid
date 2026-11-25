@@ -42,9 +42,9 @@
 - `model/`：业务逻辑层，依赖 `core`。
   - `model/data/`：底层数据结构（`ModelData`、`MeshData`、`ModelLayer` 等）。
   - `model/ops/`：基于数据结构的操作，依赖 `model/data`。
-  - `model/systems/`：系统层（算法系统、模型 IO 系统、编辑系统、功能系统），负责插件注册与按字符串分发调用，依赖 `model/data`、`core`。
+  - `model/systems/`：系统层（功能系统、旧编辑系统），负责插件注册与按字符串分发调用，依赖 `model/data`、`core`。
     - `model/systems/feature/`：功能系统 `FeatureSystem`，事件驱动的功能注册与调用：功能可注册参数/菜单/按键绑定，经 `EventBus` 订阅按键、参数变更、模型事件，通过 `FeatureContext` 访问模型层；声明 `interactive` 的功能另经 `InteractionContext` 订阅渲染线程驱动的视口交互（见第 10 节线程约定）。
-  - `model/session/`：会话层，无 Qt 的组合根 `Session`（装配模型层 / undo 栈 / `EventBus` / 四系统并有序拆解，内部转发观察者把模型通知桥接为 `ModelEvent`）与原生查询 `SessionQuery`（返回类型化结构体），供 QML 适配层与脚本宿主共用，依赖 `model/data`、`model/ops`、`model/systems`、`core`。
+  - `model/session/`：会话层，无 Qt 的组合根 `Session`（装配模型层 / undo 栈 / `EventBus` / 插件系统并有序拆解，内部转发观察者把模型通知桥接为 `ModelEvent`）与原生查询 `SessionQuery`（返回类型化结构体），供 QML 适配层与脚本宿主共用，依赖 `model/data`、`model/ops`、`model/systems`、`core`。
 - `app/`：程序与界面实现，依赖 `model`、`core`。
   - `app/core/` → `core`
   - `app/model/` → `model`、`core`、`app/core`（model 的 Qt 接口、数据绑定；可选内嵌 Python 运行时 `QPythonRuntime`，见第 10 节 Python 嵌入约定）
@@ -54,11 +54,11 @@
 - `plugins/`：项目内产品插件，依赖 `model/systems`、`model/data`、`core`，随主工程构建，不依赖 `app`。
 - `examples/`：同时支持随主程序构建和 SDK 独立构建的示例，源码及测试随 SDK 分发；主工程通过 `PRECESS_BUILD_EXAMPLES` 决定是否构建。
 - `python/`：precess Python 绑定模块（pyd）与内嵌解释器宿主 `python::Runtime`（LGPLv3，无 Qt；依赖 `model/session`）。
-  - `plugins/edit/`：已废弃的旧编辑插件，仅保留已有调用者；`plugins/io/`：模型 IO 插件；`plugins/feature/`：功能插件（`FeatureHandler`，json 的 `system` 字段为 `FeatureSystem`）。
+  - `plugins/edit/`：已废弃的旧编辑插件，仅保留已有调用者；`plugins/feature/`：功能插件（`FeatureHandler`，json 的 `system` 字段为 `FeatureSystem`），其中 `plugins/feature/file/` 按格式提供独立的导入与导出插件。
 
 **依赖速记**：`app → model → core`；`plugins → model + core`；QML 只调依赖包功能、不写主业务逻辑。
 
-**新增业务功能统一走 Feature**：新增算法、编辑与通用业务功能使用 `FeatureHandler` / `FeatureSystem`，在 setup 声明参数、菜单或分类导航，经 `FeatureContext` 执行。`AlgorithmHandler` / `AlgorithmSystem`、`EditHandler` / `EditSystem` 及其插件构建入口均已废弃并冻结，仅保留既有插件和脚本调用；不新增旧插件、不扩展旧接口、不借常规清理重构旧实现。仅为既有缺陷修复或后续明确安排的迁移、删除修改旧路径，并保留回归验证。本次导航调整不要求迁移或删除全部旧插件。维护范围与后续移除条件见 `model/systems/algo/README.md`、`model/systems/edit/README.md`。
+**新增业务功能统一走 Feature**：新增算法、编辑、文件导入导出与通用业务功能使用 `FeatureHandler` / `FeatureSystem`，在 setup 声明参数、菜单或分类导航，经 `FeatureContext` 执行。`EditHandler` / `EditSystem` 及其插件构建入口已废弃并冻结，仅保留既有插件和脚本调用；不新增旧插件、不扩展旧接口、不借常规清理重构旧实现。仅为既有缺陷修复或后续明确安排的迁移、删除修改旧路径，并保留回归验证。维护范围与后续移除条件见 `model/systems/edit/README.md`。
 
 ---
 
@@ -157,10 +157,9 @@
 ## 10. 插件开发要点
 
 - 功能 `Handler` 封装进插件 `PluginHandler`，由 `SystemPluginManager` 注册到对应系统。
-- 每类插件须实现对应系统接口完成数据交换；旧算法系统通过模型 IO 系统以文件读写交换模型数据。
+- 文件插件在 `setup` 用 `registrar.setFileType` 声明方向与扩展名。各格式的导入与导出使用独立 Feature，共享编解码器。
 - **目标组件不依赖对象树选中态**：按组件执行的操作，框架允许时不要强制要求用户在执行功能前于对象树中选中 component，插件不得依赖该行为；对象树传入的组件身份一律不优先依赖、只视作一种提示，目标组件应优先由参数中的选择器让用户自行选择并解析（`Selection` 的全局点 id 经 `ModelLayer::pointIdMap()` 反查所属组件，面/边类局部 id 选择携带 `component_id`）。各系统落点：
   - 旧编辑系统兼容实现：`EditHandler::execute` 接收 `ModelLayer&` 与 `fallback_component_id`（对象树当前组件，仅提示、可为 -1）；目标组件由选择器参数解析，fallback 仅在选择未携带组件身份时兜底；示例见 `plugins/edit/CreateFacePlugin/`、`plugins/edit/DeleteFacePlugin/`。
-  - 旧算法系统兼容实现：覆盖 `AlgorithmHandler::resolveComponentId` 按参数解析目标组件，不依赖对象树传入的 `fallback_component_id`；`HandlerContext::cur_component` 同样只视作提示。
   - 功能系统：`FeatureContext::activeModel` / `activeComponent` 是对象树选中态的动态查询，只作提示；优先注册 `Selector` 类型参数（`FeatureParams`）让用户显式选择目标。
 - **统一 Feature 功能入口**：
   - setup 用 `registrar.addNavigationMenu/addNavigationGroup` 声明父节点，`registrar.navigation().addEntry` 引用稳定 ID；相同入口自动聚合，同一功能的多个入口共享参数和状态。
@@ -175,7 +174,8 @@
   - `Button` 类型参数为无值触发器：计数器载荷，功能约定忽略值、只读参数下标；点击经 `ParameterChangedEvent` 回到功能（GUI 线程）。
 - **视口交互线程约定**（声明 `interactive` 的功能，改动前先读 `InteractionState.h` 注释）：交互回调（`onPick`/`onHover`）由 **渲染线程** 调用，`annotations` 为拉取契约（功能在回调中直写、渲染层拉取绘制）；**GUI 线程不得直接修改交互状态与标注**，变更经 `requestRefresh()`（纯刷新通知，重复置位自动合并）或 `deferRefresh(op)`（操作延迟到渲染线程执行后再刷新）通知，渲染线程 `InteractionService::syncPending()` 统一消费；`setActive` 启停均自动 notify，单激活约定由 FeatureSystem 装配。会话边界的现场清理走 feature 级 `deactivate()` + `deferRefresh`：框架定序保证 `deactivate()` 先于交互下线（`setActive(false)`），下线迁移（`syncState`）先消费 `deferred_op` 再 `clearSession`，清理必执行并触发重绘。
 - **GUI、渲染与 worker 的同步前提**：`QQuickVTKItem::initializeVTK`、`destroyingVTK` 和 `dispatch_async` 回调在渲染线程执行时，GUI 线程被阻塞；这一同步不包含独立的 worker。`JobRunner` 的模型操作占用约束模型写入与管理操作，不会暂停渲染线程。
-- **任务（job）线程约定**（`model/systems/job` 的 `JobRunner`：全局唯一单槽、单工作进程、无队列——占坑成功或拒绝（返回空），算法与功能共用同一个坑；执行器由无 Qt 的 `Session` 组合持有并注入算法系统与 `FeatureSystem`，Qt 宿主只提供所属线程投递和展示）：
+- **任务（job）线程约定**（`model/systems/job` 的 `JobRunner`：全局唯一单槽、单工作进程、无队列——占坑成功或拒绝（返回空）；执行器由无 Qt 的 `Session` 组合持有并注入 `FeatureSystem`，Qt 宿主只提供所属线程投递和展示）：
+  - **文件任务**：`ctx.runFileImport` 接收已捕获文件参数的解析函数，一次提交批次中成功解析的模型。编解码器返回空结果的文件记录原因后跳过，全部解析失败时报告任务失败。解析抛异常或提交前取消时丢弃未提交的结果。`ctx.runFileExport` 在模型操作占用期间向写出器提供只读模型，写出器须避免修改共享数据或缓存，导出不入 undo。浏览器和原生同步会话直接执行文件任务。
   - **纯计算任务 `ctx.runComputeJob(name, task)`**：任务体返回 void，不持活模型句柄，不回写模型、不创建 undo 记录、不关闭预览。需要读取模型时，先在 GUI 复制输入。失败抛异常；信号或文件输出仍可。纯计算任务也持续占用模型操作直到 GUI 清理结束，忙/未注入执行器返回空。
   - **通用模型回写**：`ctx.runWritebackJob(label, capture, compute, write, masked=false)` 的 capture/write 接收 `const ModelLayer&`／`ModelLayer& + Result& + ProgressFn`，支持多目标、结构修改和插件结果安装。带 component_id 的便利重载只要求目标存在，不硬性要求 mesh。capture 须只读、输入自持，worker 不带真实模型句柄。同步计算就是 execute 中的直接调用，无公共 Inline／Worker 参数；后台发布忙／未装配 Runner 返回空，禁止以发布失败为由绕过占用同步写。
   - **正式后台 execute 接续**：输入准备成功后 Runner 接管本次捕获与已有同 owner 预览，关闭临时层；同步作用域正常退出，不把正式边界留到事件循环。成功只成一条记录，标签与 owner 沿用原 execute；计算失败／取消回滚接管预览，不增加历史。本次 execute 写过后发布仍拒绝，包括重复写旧预览已有组件；发布后 execute 抛异常取消所属新任务。事件任务只回写原身份预览，不创建正式历史。提交体开始后抛异常保留实际部分效果的可撤销记录，不承诺通用事务回滚。
@@ -183,11 +183,11 @@
   - **几何责任边界**：几何输入使用、复制、共享 TShape 的不可变性与新结果构造暂由插件维护；不得原地修改 undo 前像共享的旧形状。框架不深复制或检查底层别名，只在 GUI 经受控写接口安装结果并维护身份、索引、通知与记账。ExtrudeFace 范式由插件在 GUI 捕获独立截面副本，worker 构造与检查实体，GUI 追加并发布结果；共享 Runner 提供遮罩、阶段进度、取消和正式操作记账。
   - **组件类型化回写 `ctx.runWritebackJob(label, component_id, capture, compute, write)`**：先占用模型操作，GUI capture 接收 const ComponentOperator，worker compute 接收 Input& 与 ProgressFn，GUI write 接收 ComponentOperator&、Result& 与 ProgressFn。目标不存在返回空；准备异常释放占用。无层事件与 setup/activate 无正式边界调用在捕获前拒绝；预览回写只进入发布时同身份层。已有纯计算输入可省略 capture。masked 默认 false，只控制展示；正式缩放用 true、预览 false。遮罩禁用业务区域，GUI 事件循环、进度与取消保持响应。插件不使用通用 JobResult、隐式 apply 或共享结果槽。
   - **影子组件任务 `ctx.runComponentJob(label, component_id, task)`**（undo-writing）：任务体只拿**影子目标组件**的 `ComponentOperator` 写面（单组件 scope、无 io）；提交/丢弃由框架托管——任务以 `label` 展示，正式记录沿用发布时 execute 外层边界的标签与 owner，失败/取消原子丢弃、undo 零记录。**仅从正式执行入口发布；事件不允许隐式发起正式模型任务。调用须在当前操作边界任何模型写或非空预览之前，框架检查并拒绝逆序发布**（execute/事件回调开头）：影子 copy-in 定格于调用时刻，先写真实模型再提交会丢更新。v1 拒绝几何/映射组件与层会话进行中调用（返回空）。模型 job 不允许在预览层打开时发布；运行期模型冻结由框架驱动（忙碌遮罩 + 模型通知延后、`dispatchKeyEvent` 拒绝；其他事件可处理非模型状态，模型写在底层拒绝，用户命令不排队重放），功能无需关心。
-  - **心跳与取消**：计算段进度回调每次上报即心跳（取消检查点），GUI 提交段上报只展示，无上报的任务不可中断（诚实语义）；另有两个无心跳取消点——**任务体成功返回后、提交开始前**与**提交体排队期（真正执行前的最后一刻）**，取消均生效并按取消丢弃结果（提交体一旦开始则原子完成）；所有任务进度由 `QTaskStatus` 的唯一进度槽合流，GUI 每 33ms 取最新值；计算段上报仍逐次检查取消，不受界面刷新节流影响。算法与功能的启动、终态、取消及遮罩展示均来自同一个 Runner，适配器不再另存任务状态。算法侧 `HandlerContext::report_progress` 同为心跳；三类任务范式见 `examples/TaskDemoPlugin/`；插件层预览 + 工作线程非阻塞组合范式（每轮固定因子、GUI 只移动结果、终态 ModelEvent 回放按最新参数接续、失败路径按框架契约丢弃；未预览直接执行也走带遮罩的类型化回写）见 `examples/ScalePreviewPlugin/`。
+  - **心跳与取消**：计算段进度回调每次上报即心跳（取消检查点），GUI 提交段上报只展示，无上报的任务不可中断（诚实语义）；另有两个无心跳取消点——**任务体成功返回后、提交开始前**与**提交体排队期（真正执行前的最后一刻）**，取消均生效并按取消丢弃结果（提交体一旦开始则原子完成）；所有任务进度由 `QTaskStatus` 的唯一进度槽合流，GUI 每 33ms 取最新值；计算段上报仍逐次检查取消，不受界面刷新节流影响。任务的启动、终态、取消及遮罩展示均来自同一个 Runner，适配器不再另存任务状态。三类任务范式见 `examples/TaskDemoPlugin/`；插件层预览 + 工作线程非阻塞组合范式（每轮固定因子、GUI 只移动结果、终态 ModelEvent 回放按最新参数接续、失败路径按框架契约丢弃；未预览直接执行也走带遮罩的类型化回写）见 `examples/ScalePreviewPlugin/`。
   - **undo/redo 与任务互斥**：所有 job（含无回写自由任务）从 GUI 准备、计算到提交/丢弃及 GUI 清理结束持续占用模型操作写权。`UndoStack::undo/redo` 在占用期记日志返回 false，不取消任务、不动模型与栈；任务真实终态后可重试。取消仅请求停止，无心跳计算真正返回前不释放写权。Qt 适配层只有恢复成功才发 `applied`。
-  - **功能退出与忙时管理**：当前 `Job` 携发布功能 owner，功能切出按身份取消自己的任务；无 owner 的算法任务及其他功能任务不被误取消。`setFeatureActive` 在占用期只保留最后一个有效目标并登记一次清理，A→B→C 只进入 C，A→B→A 保持 A 的会话；非法目标不覆盖有效请求、不取消任务，清理回调中再次切换也延后应用。实际退出流程统一为 deactivate → 残留预览回滚 → 会话折叠 → 交互下线；计算未退出前保留 handler 与模型占用。功能、算法、编辑与 IO 的注册、替换、注销在占用期均抛 `ModelOperationBusy`，不取消任务、不提前移除插件列表，终态后可重试；注销空闲时同步完成。会话析构先 stop/join 再退出功能与 teardown，插件不自建退出作废令牌。主动放弃（重按预览／取消按钮）仍使用 `job->cancel()`；`Job` 内部持有 `std::stop_source`，外部仅查询 `isCancellationRequested()`，取消请求不等于真实终态。
-  - handler/功能的 job 在唯一工作线程**串行**执行，插件不得自建线程写模型；进度回调在计算／提交的当前线程触发，展示方经统一进度槽交给 GUI；准备、提交/丢弃、退出清理及终态通知均在宿主线程，worker 不等待 GUI。`stop` 仅在宿主线程且准备/计算/提交回调之外调用：取消、join，再复用一次收尾，不泵事件；Runner 构造即绑定 `ModelLayer&`、可空 `UndoStack*` 和有效所属线程分发器，没有无模型／后绑定模式；外借注入只验证宿主一致。原生同步宿主不创建 Runner，继续调用 `AlgorithmSystem::call`。Runner 只保留 `run` 发布入口，内部 `JobWork::inline_compute` 支持几何／映射同步回退，准备阶段只解析一次目标，回退执行复用已解析身份与同步入口的私有执行段；算法完整异步入口为已注入共享执行器的 `AlgorithmSystem::callAsync`，不逐次传执行器或任务回调，影子准备与应用原语不公开配对。
-  - **会话任务收尾**：配置异步分发器的 `Session` 创建共享 Runner，终态先释放模型占用、呈现旧任务状态，再自动重放合法模型通知；展示回调异常不跳过业务重放。`QTaskStatus` 不再以 Qt 信号驱动模型收尾。默认同步会话没有 Runner，功能异步入口返回空；外借 Runner 的独立系统宿主自行装配通知重放并在系统析构前 stop。会话拆解先 stop/join 与 GUI 清理，再退出功能和断开模型记录钩子。算法与功能共用内部 `ShadowComponent` 的复制、标脏检测与 gid 回写；算法 IO 导入仍由算法系统负责。四系统 handler 的注册变更与 Algorithm／Feature 的 Runner 重装配经 ModelLayer::assertOperationIdle 统一先检查所属线程、再检查模型占用，写段授权不豁免管理变更；任务占用期禁止注册／注销／替换，Qt 插件管理桥保持原列表并提示忙碌拒绝。
+  - **功能退出与忙时管理**：当前 `Job` 携发布功能 owner，功能切出按身份取消自己的任务；其他归属的任务继续运行。`setFeatureActive` 在占用期只保留最后一个有效目标并登记一次清理，A→B→C 只进入 C，A→B→A 保持 A 的会话；非法目标不覆盖有效请求、不取消任务，清理回调中再次切换也延后应用。实际退出流程统一为 deactivate → 残留预览回滚 → 会话折叠 → 交互下线；计算未退出前保留 handler 与模型占用。功能与旧编辑插件的注册、替换、注销在占用期均抛 `ModelOperationBusy`，不取消任务、不提前移除插件列表，终态后可重试；注销空闲时同步完成。会话析构先 stop/join 再退出功能与 teardown，插件不自建退出作废令牌。主动放弃（重按预览／取消按钮）仍使用 `job->cancel()`；`Job` 内部持有 `std::stop_source`，外部仅查询 `isCancellationRequested()`，取消请求不等于真实终态。
+  - handler/功能的 job 在唯一工作线程**串行**执行，插件不得自建线程写模型；进度回调在计算／提交的当前线程触发，展示方经统一进度槽交给 GUI；准备、提交/丢弃、退出清理及终态通知均在宿主线程，worker 不等待 GUI。`stop` 仅在宿主线程且准备/计算/提交回调之外调用：取消、join，再复用一次收尾，不泵事件；Runner 构造即绑定 `ModelLayer&`、可空 `UndoStack*` 和有效所属线程分发器，没有无模型／后绑定模式；外借注入只验证宿主一致。原生同步宿主通过 `FeatureSystem::invoke` 调用功能。Runner 的发布入口为 `run`。
+  - **会话任务收尾**：配置异步分发器的 `Session` 创建共享 Runner，终态先释放模型占用、呈现旧任务状态，再自动重放合法模型通知；展示回调异常不跳过业务重放。`QTaskStatus` 不再以 Qt 信号驱动模型收尾。默认同步会话没有 Runner，通用异步任务入口返回空；外借 Runner 的独立系统宿主自行装配通知重放并在系统析构前 stop。会话拆解先 stop/join 与 GUI 清理，再退出功能和断开模型记录钩子。`ShadowComponent` 负责影子组件的复制、标脏检测与 gid 回写。插件 handler 的注册变更与 Feature 的 Runner 重装配经 ModelLayer::assertOperationIdle 统一先检查所属线程、再检查模型占用，写段授权不豁免管理变更；任务占用期禁止注册／注销／替换，Qt 插件管理桥保持原列表并提示忙碌拒绝。
   - **模型写权限**：`ModelLayer::WriteOperation` 是带身份的唯一操作占用，以 `unique_ptr` 独占持有凭证；忙时在创建凭证前拒绝，旧身份不能释放后继操作。底层 `WriteAuthority` 控制块仍共享，保留模型移动与凭证生命周期保证。真实层组件与结构写共用模型写闸，先检查 GUI 线程亲和与当前操作写段授权，再由记录器统一判定记账归属；无归属写在修改数据、gid 与缓存前抛 ModelOperationBusy 并带调用点，记录钩子只负责捕获；worker 真实层写始终抛异常，影子层明确豁免线程闸。`WritePrivilege` 仅在框架提交/同步计算/退出清理段携有效操作身份授予，功能 owner 不作写权限凭证；`writesPending` 读同一占用，`writesFrozen` 仅派生遮罩类别。通知 flush 暂停写段授权，避免监听者在记账完成后插入写；占用由 `JobRunner` 在 GUI 一次申请与释放，没有操作回调桥；写权状态仅由所属线程维护。`ModelScope` 仅管记账与通知，不授予写权限；Job 状态、错误写入、执行闭包与回调由 Runner 私有持有，插件只查询或取消。
 - **功能与界面解耦（声明 / 事件 / 上下文三原则）**：通用界面（`SideBar`、菜单、渲染窗口等）禁止按插件名 / 功能名特判。
   - **静态能力走声明链**：视口交互能力（`interactive`）等一律经 json → `HandlerMetaData` → `FeatureInfo` → `QFeatureInfo` → QML 按声明渲染；新增交互功能不得改动通用界面代码。
@@ -195,10 +195,10 @@
   - **环境状态走上下文访问**：活动模型 / 组件、选择集经 `FeatureContext` 固定查询方法与 `App.selection` 获取，功能不反向依赖 app 层。
   - 启停类逻辑做成幂等的状态应用（以目标状态为守卫，重复触发无副作用），避免多触发源的命令式调用堆积。
 - **写路径收口（写必脏 + 操作边界 flush）**：写模型数据必须经 `ComponentOperator` 语义接口（`appendPoint`/`appendFace`/`replaceMesh`/`materializeEdge` 等）或可写入口 `editableMesh(kind)`；**获取可写入口即标脏**（Topology 类立即失效邻接懒表并记入待通知集合（去重），NonTopology 仅记集合不失效懒表），**通知由操作边界 `ModelLayer::flushNotifications()` 统一发出，插件不得手调通知**（`ComponentOperator::notifyChanged` 已删除）；`component()`/`mesh()` 只读（返回 const），只读访问不标脏。结构操作（`addGeometryComponent`/`addModel`/`removeModel`/`removeComponent`）保持即时通知，不进待通知集合。
-- **操作与通知边界分离**：正式 undo 边界由 `EditSystem::call`、`AlgorithmSystem::call`、`ModelIOSystem::read`、`Session` 删除入口、`FeatureSystem::invoke`（execute）和正式 job 的 GUI 提交段建立。同步子调用共用唯一正式捕获与深度，外层决定标签、owner 与预览处置；不建立子捕获栈。结构写也须有明确边界，取消边界外即时组记录的特例；初始化与退出清理由框架显式使用 `ModelScope::Kind::Cleanup`／`UndoStack::RecordingPause`，不产生历史，仍受线程与占用约束。`FeatureEventGateway`、普通 `onKeyEvent` 与生命周期回调只 flush，不创建正式记录；网关暂存器在构造时固定绑定，仅 ModelEvent 持延后回放令牌，其他事件同步经 const& 投递；事件写必须归本功能预览。注册 `KeyBinding::execute=true` 明确声明一次性快捷命令，由框架路由 `invoke`；默认按键绑定仍为预览/非模型回调。按键在原始 EventBus 发布后经 `ModelScope::Notify` 收尾，通知异常记日志、不覆盖路由业务异常。预览 job 回写只更新发布时同身份的层，不开正式记录。通知边界还包括既有 app/QML 入口；新增执行路径须明确属于正式操作、临时预览或只读路径。
+- **操作与通知边界分离**：正式 undo 边界由 `EditSystem::call`、`Session` 删除入口、`FeatureSystem::invoke`（execute）和正式 job 的 GUI 提交段建立。同步子调用共用唯一正式捕获与深度，外层决定标签、owner 与预览处置；不建立子捕获栈。结构写也须有明确边界，取消边界外即时组记录的特例；初始化与退出清理由框架显式使用 `ModelScope::Kind::Cleanup`／`UndoStack::RecordingPause`，不产生历史，仍受线程与占用约束。`FeatureEventGateway`、普通 `onKeyEvent` 与生命周期回调只 flush，不创建正式记录；网关暂存器在构造时固定绑定，仅 ModelEvent 持延后回放令牌，其他事件同步经 const& 投递；事件写必须归本功能预览。注册 `KeyBinding::execute=true` 明确声明一次性快捷命令，由框架路由 `invoke`；默认按键绑定仍为预览/非模型回调。按键在原始 EventBus 发布后经 `ModelScope::Notify` 收尾，通知异常记日志、不覆盖路由业务异常。预览 job 回写只更新发布时同身份的层，不开正式记录。通知边界还包括既有 app/QML 入口；新增执行路径须明确属于正式操作、临时预览或只读路径。
 - **网格数据与点 id 约定**（详见 `MeshData.h` / `ComponentData.h` 注释）：`MeshData` 自包含（坐标常驻 `vertex_positions_`，连通性数组存组件内局部点索引）；局部点索引只增不改号、不重排（`MeshAdjacency` 持久边身份与快照恢复依赖）；`Selection` / `PickInfo` 携带全局点 id（gid），写连通性前经 `ModelLayer::pointIdMap()` 换算；整网格替换经 `ComponentOperator::replaceMesh`（gid 纪律内建），运行期加点经 `ComponentOperator::appendPoint`（原子四连），其余 gid 伴生表受控点经 `ComponentData::ensurePointGlobalIds` 补缺。
 - **快照原语约定**：组件级 `ComponentOperator::takeSnapshot/restoreSnapshot`、模型级 `ModelLayer::takeModelSnapshot/restoreModel/restoreComponent` 为快照/恢复统一入口；快照只装源数据与身份数据（派生缓存——邻接边表、几何子形状 type_maps——不进快照、恢复后重建；几何 gid 向量是身份数据随快照保留），恢复含 gid 对账（点/边 gid 经 `MeshIDMap::reclaim`、几何 gid 经 `GeometryRegistry::reclaim*` 均按原值拿回、组件/模型按原 id 插回）；`restoreSnapshot` 恢复后标脏（Topology），通知延迟到操作边界 flush 统一发出；undo 后选择集清空（Selection 持有的 gid/稳定 id 不作跨 undo 保证，尽管 gid 实际按原值恢复）。
-- **undo/redo 系统（混合记录模式）**：`model/data/UndoStack` 实现 `UndoRecorder` 钩子挂接 `ModelLayer::setUndoRecorder`；无 Qt 的 `Session` 构造栈并注入 IO/Edit/Algo/Feature 系统，QML 经 `QModelManager.undoStack`（`QUndoStackAdaptor`）访问。
+- **undo/redo 系统（混合记录模式）**：`model/data/UndoStack` 实现 `UndoRecorder` 钩子挂接 `ModelLayer::setUndoRecorder`；无 Qt 的 `Session` 构造栈并注入 Edit / Feature 系统，QML 经 `QModelManager.undoStack`（`QUndoStackAdaptor`）访问。
   - **默认边界自动记录**：操作边界（`beginOperation/commitOperation`，挂点同第 10 节"操作与通知边界分离"）内组件**首次标脏**经写前钩子克隆 before-image，commit 补 after-image 成一条记录；空操作丢弃，栈深上限 `kMaxDepth=32` 溢出丢最旧。简单操作零插件代码。
   - **插件预览层（savepoint）**：`ctx.undo.beginScope(label)` 开层，`revertScope` 回起点并保持层，`cancelScope` 回滚关闭。插件控制两次 execute 之间的预览更新，层可跨事件存活，不形成快照链或正式历史项。插件面不暴露 `commitScope`/`inOperation` 配对责任。execute 收尾由框架吸收临时捕获、关闭层、补 after-image 并提交正式操作；正常与异常收尾都保留部分效果的可撤销语义。无模型改动则丢弃空记录。
   - **预览归属与收尾**：捕获覆盖层内全部组件和结构修改。事件只写自己的层，不借用其他层或外层正式边界；无层写与结构写均在动数据前拒绝，事件不能入栈、清 redo、折叠会话或确认层。唯一预览捕获独立于正式边界栈；相同 owner 的 execute 继续预览捕获，写保留最早 before-image；执行结束后关闭层，含 execute 内新开层及已有非空预览但 execute 无新增写的情况。其他正式入口在解析目标或准备影子快照之前先回滚旧预览；execute 内同步嵌套调用继续外层捕获；只读事件不抢占。预览回写带发布时层身份，迟到结果不能落入重开的层。

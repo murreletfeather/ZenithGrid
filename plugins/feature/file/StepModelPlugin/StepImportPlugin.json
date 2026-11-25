@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.Step",
+    "display_name": "STEP. ISO 10303"
+  }
+}

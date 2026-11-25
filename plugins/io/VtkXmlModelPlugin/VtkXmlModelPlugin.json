@@ -1,7 +1,0 @@
-{
-    "system": "ModelIOSystem",
-    "handler": {
-        "file_type": "VTK XML mesh file",
-        "extensions": [ "vtp", "vtu" ]
-    }
-}

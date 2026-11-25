@@ -1,9 +1,9 @@
 /**
  * @file Session.h
- * @brief 会话组合根：模型层、undo 栈、事件总线与四个系统的装配与有序拆解（不依赖 Qt）
+ * @brief 会话组合根：模型层、undo 栈、事件总线与插件系统的装配与有序拆解（不依赖 Qt）
  *
  * Session 是原 app 层 QModelManager 装配逻辑的无 Qt 下沉：构造时按依赖序组装
- * ModelLayer / UndoStack / EventBus / ModelIO / Algo / Edit / Feature 系统，
+ * ModelLayer / UndoStack / EventBus / Edit / Feature 系统，
  * 并经内部转发观察者把模型层通知桥接为 ModelEvent（功能系统的 ModelEvent
  * 订阅在无 Qt 宿主下照常工作）。Qt 侧适配器（QML 信号、参数回写桥）仍由
  * app 层 QModelManager 挂接。析构（或 teardown）按依赖逆序有序拆解。
@@ -23,12 +23,6 @@
 
 namespace systems {
 class SystemPluginManager;
-}
-namespace systems::io {
-class ModelIOSystem;
-}
-namespace systems::algo {
-class AlgorithmSystem;
 }
 namespace systems::edit {
 class EditSystem;
@@ -70,8 +64,6 @@ public:
     SessionQuery& query() { return query_; }
     UndoStack& undoStack() { return *undo_stack_; }
     core::EventBus& events() { return event_bus_; }
-    systems::io::ModelIOSystem& ioSystem() { return *io_system_; }
-    systems::algo::AlgorithmSystem& algorithmSystem() { return *algo_system_; }
     systems::edit::EditSystem& editSystem() { return *edit_system_; }
     systems::feature::FeatureSystem& featureSystem() { return *feature_system_; }
     systems::SystemPluginManager& pluginManager() { return *plugin_manager_; }
@@ -109,8 +101,6 @@ private:
     ModelLayer model_;
     SessionQuery query_;
     std::unique_ptr<UndoStack> undo_stack_;
-    std::unique_ptr<systems::io::ModelIOSystem> io_system_;
-    std::unique_ptr<systems::algo::AlgorithmSystem> algo_system_;
     std::unique_ptr<systems::edit::EditSystem> edit_system_;
     std::unique_ptr<systems::feature::FeatureSystem> feature_system_;
     std::unique_ptr<systems::SystemPluginManager> plugin_manager_;

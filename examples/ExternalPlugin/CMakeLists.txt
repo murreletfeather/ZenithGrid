@@ -3,7 +3,6 @@
 #
 # == SDK 插件构建接口（find_package(PreCess) 之后即可直接使用）==
 #
-# precess_add_io_plugin / precess_add_algo_plugin /
 # precess_add_edit_plugin / precess_add_feature_plugin
 #     precess_add_<系统>_plugin(<目标名>
 #         SOURCES <实现源文件...>   插件实现（Handler 及其配套源）

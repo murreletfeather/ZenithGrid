@@ -7,3 +7,5 @@ target_link_libraries(Job PRIVATE
 target_include_directories(Job PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}   # 当前文件所在路径
 )
+
+add_subdirectory(test)

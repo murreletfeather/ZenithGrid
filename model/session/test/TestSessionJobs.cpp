@@ -1,8 +1,6 @@
 /** @file TestSessionJobs.cpp
  * @brief 无 Qt 宿主的任务拥有关系、终态重放与拆解回归。
  */
-#include "AlgorithmHandler.h"
-#include "AlgorithmSystem.h"
 #include "ArgObject.h"
 #include "FeatureHandler.h"
 #include "FeatureRegistrar.h"
@@ -83,17 +81,8 @@ Feature& installFeature(session::Session& session, Index target)
         systems::feature::FeatureSystem::SystemHandlerPtr { feature.release() }));
     return *raw;
 }
-class Algorithm final : public systems::algo::AlgorithmHandler {
-public:
-    std::vector<core::ArgType> args_type() const override { return { }; }
-    std::any execute(systems::algo::HandlerContext& ctx, const std::vector<core::ArgObject>&) override
-    {
-        ctx.cur_component.appendPoint({ 2, 0, 0 });
-        return { };
-    }
-};
 }
-TEST_CASE("Native session replays feature and algorithm notifications despite observer failure", "[session][job]")
+TEST_CASE("Native session replays feature notifications despite observer failure", "[session][job]")
 {
     OwnerQueue queue;
     session::Session session(nullptr, queue.dispatcher());
@@ -106,24 +95,8 @@ TEST_CASE("Native session replays feature and algorithm notifications despite ob
         ++finished;
         throw std::runtime_error("display observer failed");
     });
-    std::shared_ptr<Job> job;
-    SECTION("feature")
-    {
-        session.featureSystem().invoke("Feature");
-        job = feature.job;
-    }
-    SECTION("algorithm")
-    {
-        systems::algo::HandlerMetaData meta { "Algorithm", "algorithm" };
-        REQUIRE(session.algorithmSystem().registerHandler(meta,
-            systems::algo::AlgorithmSystem::SystemHandlerPtr { std::make_unique<Algorithm>().release() }));
-        job = session.algorithmSystem().callAsync("Algorithm", target, { });
-        REQUIRE_THROWS_AS(session.algorithmSystem().unregisterHandler(meta), ModelOperationBusy);
-        REQUIRE_THROWS_AS(session.algorithmSystem().registerHandler(meta,
-                              systems::algo::AlgorithmSystem::SystemHandlerPtr { std::make_unique<Algorithm>().release() }),
-            ModelOperationBusy);
-        REQUIRE(session.algorithmSystem().getArgTypes("Algorithm"));
-    }
+    session.featureSystem().invoke("Feature");
+    auto job = feature.job;
     REQUIRE(job);
     auto completion = queue.take();
     CHECK(feature.notifications == 0);
@@ -212,5 +185,4 @@ TEST_CASE("Native synchronous session has no asynchronous runner", "[session][jo
 {
     session::Session session;
     REQUIRE_FALSE(session.jobRunner());
-    REQUIRE_FALSE(session.algorithmSystem().callAsync("unavailable", -1, { }));
 }

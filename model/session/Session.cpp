@@ -3,16 +3,12 @@
  * @brief 会话组合根实现：子系统装配、观察者转发桥与有序拆解
  */
 #include "Session.h"
-#include "AlgorithmSystem.h"
-#include "AlgorithmSystemRegister.h"
 #include "EditSystem.h"
 #include "EditSystemRegister.h"
 #include "FeatureEvents.h"
-#include "FeatureIOSystemRegister.h"
 #include "FeatureSystem.h"
 #include "FeatureSystemRegister.h"
 #include "JobRunner.h"
-#include "ModelIOSystem.h"
 #include "ModelObserver.h"
 #include "ModelScope.h"
 #include "SystemPluginManager.h"
@@ -92,10 +88,8 @@ Session::Session(ModelObserver* observer, std::function<void(std::function<void(
     , model_(relay_.get())
     , query_(model_)
     , undo_stack_(std::make_unique<UndoStack>(model_))
-    , io_system_(std::make_unique<systems::io::ModelIOSystem>(model_, undo_stack_.get()))
-    , algo_system_(std::make_unique<systems::algo::AlgorithmSystem>(*io_system_, model_, undo_stack_.get()))
     , edit_system_(std::make_unique<systems::edit::EditSystem>(model_, undo_stack_.get()))
-    , feature_system_(std::make_unique<systems::feature::FeatureSystem>(model_, event_bus_, undo_stack_.get(), io_system_.get()))
+    , feature_system_(std::make_unique<systems::feature::FeatureSystem>(model_, event_bus_, undo_stack_.get()))
     , plugin_manager_(std::make_unique<systems::SystemPluginManager>())
 {
     // undo 栈挂接模型层记录钩子（写前/结构操作时机回调）
@@ -104,13 +98,10 @@ Session::Session(ModelObserver* observer, std::function<void(std::function<void(
     if (dispatcher) {
         job_runner_ = std::make_unique<systems::job::JobRunner>(model_, undo_stack_.get(), std::move(dispatcher));
         feature_system_->setJobRunner(job_runner_.get());
-        algo_system_->setJobRunner(job_runner_.get());
         setTaskCallbacks();
     }
 
     // 注册系统：插件按元数据的 system 字段路由到对应注册器
-    plugin_manager_->addSystemRegister(systems::io::ModelIOSystem::name, std::make_unique<systems::feature::FeatureIOSystemRegister>(*feature_system_));
-    plugin_manager_->addSystemRegister(systems::algo::AlgorithmSystem::name, std::make_unique<systems::algo::AlgorithmSystemRegister>(*algo_system_));
     plugin_manager_->addSystemRegister(systems::edit::EditSystem::name, std::make_unique<systems::edit::EditSystemRegister>(*edit_system_));
     plugin_manager_->addSystemRegister(systems::feature::FeatureSystem::name, std::make_unique<systems::feature::FeatureSystemRegister>(*feature_system_));
 }

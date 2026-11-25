@@ -5,14 +5,13 @@
  * 插件目录经编译期宏 PRECESS_PLUGIN_DIR 注入（构建树 plugins 目录），
  * 用以验证 Session 的系统装配与插件注册链路端到端可用。
  */
-#include "AlgorithmSystem.h"
 #include "Session.h"
 
 #include "FeatureInfo.h"
 #include "FeatureParams.h"
 #include "FeatureSystem.h"
 #include "JobRunner.h"
-#include "ModelIOSystem.h"
+#include "Selection.h"
 #include "SystemPluginManager.h"
 #include "UndoStack.h"
 #include "test/OwnerQueue.h"
@@ -36,6 +35,18 @@ using namespace session;
 namespace {
 //! @brief OBJ 文件功能应发布的面组号属性名。
 constexpr char expected_group_attribute_name[] = "xxx";
+
+std::filesystem::path findPlugin(const std::filesystem::path& directory, const std::string& name)
+{
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        const auto& path = entry.path();
+        const auto extension = path.extension().string();
+        if (path.stem().string().ends_with(name)
+            && (extension == ".dll" || extension == ".so" || extension == ".dylib"))
+            return path;
+    }
+    return { };
+}
 
 int static_standard_attempts = 0;
 int static_unknown_attempts = 0;
@@ -89,7 +100,7 @@ TEST_CASE("Session loads plugins and registers feature infos", "[session][plugin
     SECTION("OBJ 文件功能提供分组选项并导入面属性")
     {
         auto& features = s.featureSystem();
-        const std::string importing = "LegacyIO.Import/Wavefront .obj file";
+        const std::string importing = "Import.OBJ";
         const auto* params = features.params(importing);
         REQUIRE(params);
         REQUIRE(params->count() == 2);
@@ -137,7 +148,7 @@ TEST_CASE("Session loads plugins and registers feature infos", "[session][plugin
     }
 }
 
-TEST_CASE("Busy plugin unload keeps feature or IO registration until a successful retry", "[session][plugins][job]")
+TEST_CASE("Busy plugin unload keeps feature registration until a successful retry", "[session][plugins][job]")
 {
     int argc = 0;
     QCoreApplication app(argc, nullptr);
@@ -149,26 +160,17 @@ TEST_CASE("Busy plugin unload keeps feature or IO registration until a successfu
     std::string plugin_fragment;
     // 使用默认构建的产品插件，不能依赖 PRECESS_BUILD_EXAMPLES=ON。
     SECTION("feature") { plugin_fragment = "CreatePointPlugin"; }
-    SECTION("IO") { plugin_fragment = "OffModelPlugin"; }
-    std::filesystem::path plugin_path;
-    for (const auto& entry : std::filesystem::directory_iterator(plugin_dir)) {
-        const auto path = entry.path();
-        const auto extension = path.extension().string();
-        if (path.stem().string().find(plugin_fragment) != std::string::npos
-            && (extension == ".dll" || extension == ".so" || extension == ".dylib")) {
-            plugin_path = path;
-            break;
-        }
-    }
+    SECTION("file import") { plugin_fragment = "OffImportPlugin"; }
+    SECTION("file export") { plugin_fragment = "OffExportPlugin"; }
+    const auto plugin_path = findPlugin(plugin_dir, plugin_fragment);
     REQUIRE_FALSE(plugin_path.empty());
     OwnerQueue queue;
     Session session(nullptr, queue.dispatcher());
     REQUIRE(session.pluginManager().registerPlugin(plugin_path));
     const auto names = session.pluginManager().getPluginNames();
     const auto infos = session.featureSystem().getFeatureInfos();
-    const auto io_infos = session.ioSystem().registeredFileTypeInfos();
     REQUIRE(names.size() == 1);
-    REQUIRE(infos.size() + io_infos.size() == (plugin_fragment == "OffModelPlugin" ? 3 : 1));
+    REQUIRE(infos.size() == 1);
     auto job = session.jobRunner()->run("pure", [] {
         return systems::job::JobWork { [](systems::job::ProgressFn) { } };
     });
@@ -177,14 +179,133 @@ TEST_CASE("Busy plugin unload keeps feature or IO registration until a successfu
     REQUIRE_THROWS_AS(session.pluginManager().unregisterPlugin(plugin_path), ModelOperationBusy);
     REQUIRE(session.pluginManager().getPluginNames() == names);
     REQUIRE(session.featureSystem().getFeatureInfos() == infos);
-    REQUIRE(session.ioSystem().registeredFileTypeInfos() == io_infos);
     REQUIRE_FALSE(job->isCancellationRequested());
     complete();
     REQUIRE(job->state() == systems::job::JobState::Done);
     REQUIRE_NOTHROW(session.pluginManager().unregisterPlugin(plugin_path));
     REQUIRE(session.pluginManager().getPluginNames().empty());
     REQUIRE(session.featureSystem().getFeatureInfos().empty());
-    REQUIRE(session.ioSystem().registeredFileTypeInfos().empty());
+}
+
+TEST_CASE("Separate OFF plugins import and export through Feature jobs", "[session][plugins][file]")
+{
+    int argc = 0;
+    QCoreApplication app(argc, nullptr);
+    const std::filesystem::path plugin_dir(PRECESS_PLUGIN_DIR);
+    const auto reader = findPlugin(plugin_dir, "OffImportPlugin");
+    const auto writer = findPlugin(plugin_dir, "OffExportPlugin");
+    REQUIRE_FALSE(reader.empty());
+    REQUIRE_FALSE(writer.empty());
+
+    QTemporaryDir directory;
+    REQUIRE(directory.isValid());
+    QFile off(directory.filePath(QStringLiteral("三角形.off")));
+    REQUIRE(off.open(QIODevice::WriteOnly));
+    REQUIRE(off.write("OFF\n3 1 0\n0 0 0\n1 0 0\n0 1 0\n3 0 1 2\n") > 0);
+    off.close();
+    const auto input = QFileInfo(off).filesystemFilePath();
+    const auto output_name = directory.filePath(QStringLiteral("复制.off"));
+    const auto output = QFileInfo(output_name).filesystemFilePath();
+
+    OwnerQueue queue;
+    Session session(nullptr, queue.dispatcher());
+    auto& features = session.featureSystem();
+    using systems::feature::FileDirection;
+    using systems::job::Job;
+    using systems::job::JobState;
+    REQUIRE(session.pluginManager().registerPlugin(reader));
+    REQUIRE(features.getFileTypes(FileDirection::Import).size() == 1);
+    CHECK(features.getFileTypes(FileDirection::Export).empty());
+    REQUIRE(session.pluginManager().registerPlugin(writer));
+    REQUIRE(features.getFileTypes(FileDirection::Export).size() == 1);
+
+    SECTION("导入成功后可导出，且导出没有新增 undo 记录")
+    {
+        REQUIRE(features.setParameter("Import.Off", 0, core::ArgObject::create<ArgTypeEnum::Paths>({ input, input })));
+        auto imported = std::any_cast<std::shared_ptr<Job>>(features.invoke("Import.Off"));
+        REQUIRE(imported);
+        auto finish_import = queue.take();
+        CHECK(session.query().listModels().empty());
+        finish_import();
+        REQUIRE(imported->state() == JobState::Done);
+        const auto models = session.query().listModels();
+        REQUIRE(models.size() == 2);
+        auto selection = std::make_shared<Selection>();
+        selection->type = ElementEnum::Component;
+        selection->ids = { session.query().componentSummaries(models.front().model_id).front().component_id };
+        REQUIRE(features.setParameter("Export.Off", 0, core::ArgObject::create<ArgTypeEnum::Path>(output)));
+        REQUIRE(features.setParameter("Export.Off", 1, core::ArgObject::create<ArgTypeEnum::Selector>(selection)));
+        auto exported = std::any_cast<std::shared_ptr<Job>>(features.invoke("Export.Off"));
+        REQUIRE(exported);
+        queue.take()();
+        REQUIRE(exported->state() == JobState::Done);
+        QFile result(output_name);
+        REQUIRE(result.open(QIODevice::ReadOnly));
+        CHECK(result.readAll().startsWith("OFF"));
+
+        session.pluginManager().unregisterPlugin(reader);
+        CHECK(features.getFileTypes(FileDirection::Import).empty());
+        CHECK(features.getFileTypes(FileDirection::Export).size() == 1);
+        REQUIRE(session.undoStack().undo());
+        CHECK(session.query().listModels().empty());
+        CHECK_FALSE(session.undoStack().canUndo());
+    }
+
+    SECTION("批量导入跳过坏文件，成功项一次撤销")
+    {
+        REQUIRE(features.setParameter("Import.Off", 0, core::ArgObject::create<ArgTypeEnum::Paths>({ input, output, input })));
+        auto imported = std::any_cast<std::shared_ptr<Job>>(features.invoke("Import.Off"));
+        REQUIRE(imported);
+        queue.take()();
+        REQUIRE(imported->state() == JobState::Done);
+        REQUIRE(session.query().listModels().size() == 2);
+        REQUIRE(session.undoStack().undo());
+        CHECK(session.query().listModels().empty());
+        CHECK_FALSE(session.undoStack().canUndo());
+    }
+
+    SECTION("全部文件解析失败时报告任务失败")
+    {
+        REQUIRE(features.setParameter("Import.Off", 0, core::ArgObject::create<ArgTypeEnum::Paths>({ output })));
+        auto imported = std::any_cast<std::shared_ptr<Job>>(features.invoke("Import.Off"));
+        REQUIRE(imported);
+        queue.take()();
+        CHECK(imported->state() == JobState::Failed);
+        CHECK(session.query().listModels().empty());
+        CHECK_FALSE(session.undoStack().canUndo());
+    }
+
+    SECTION("原生调用传入错型或空参数时拒绝执行")
+    {
+        using core::ArgObject;
+        REQUIRE(features.setParameter("Import.Off", 0, ArgObject::create<ArgTypeEnum::Bool>(true)));
+        CHECK(std::any_cast<std::string>(features.invoke("Import.Off")) == "请选择文件路径。");
+        REQUIRE(features.setParameter("Import.Off", 0, { }));
+        CHECK(std::any_cast<std::string>(features.invoke("Import.Off")) == "请选择文件路径。");
+
+        REQUIRE(features.setParameter("Export.Off", 0, { }));
+        CHECK(std::any_cast<std::string>(features.invoke("Export.Off")) == "请选择文件路径。");
+        REQUIRE(features.setParameter("Export.Off", 0, ArgObject::create<ArgTypeEnum::Path>(output)));
+        REQUIRE(features.setParameter("Export.Off", 1, ArgObject::create<ArgTypeEnum::Bool>(true)));
+        CHECK(std::any_cast<std::string>(features.invoke("Export.Off")) == "请选择要导出的组件。");
+        REQUIRE(features.setParameter("Export.Off", 1, ArgObject::create<ArgTypeEnum::Selector>({ })));
+        CHECK(std::any_cast<std::string>(features.invoke("Export.Off")) == "请选择要导出的组件。");
+        CHECK_FALSE(session.jobRunner()->currentJob());
+        CHECK_FALSE(QFile::exists(output_name));
+    }
+
+    SECTION("导入提交前取消时丢弃解析结果")
+    {
+        REQUIRE(features.setParameter("Import.Off", 0, core::ArgObject::create<ArgTypeEnum::Paths>({ input })));
+        auto imported = std::any_cast<std::shared_ptr<Job>>(features.invoke("Import.Off"));
+        REQUIRE(imported);
+        auto finish_import = queue.take();
+        imported->cancel();
+        finish_import();
+        CHECK(imported->state() == JobState::Cancelled);
+        CHECK(session.query().listModels().empty());
+        CHECK_FALSE(session.undoStack().canUndo());
+    }
 }
 
 TEST_CASE("Binary feature setup supplies navigation and survives reload", "[session][plugins][setup][navigation]")
@@ -220,7 +341,6 @@ TEST_CASE("Binary feature setup supplies navigation and survives reload", "[sess
         CHECK(infos.front()->arg_types.front().type == ArgTypeEnum::Paths);
         CHECK(infos.front()->arg_types[1].type == ArgTypeEnum::Float);
         CHECK(infos.front()->arg_types[1].name == "Size");
-        CHECK(session.ioSystem().registeredFileTypeInfos().empty());
         const auto files = session.featureSystem().getFileTypes(systems::feature::FileDirection::Import);
         REQUIRE(files.size() == 1);
         CHECK(files.front().feature == "setupNavigationTest");

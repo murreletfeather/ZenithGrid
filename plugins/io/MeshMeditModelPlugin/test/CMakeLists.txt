@@ -1,2 +1,0 @@
-precess_add_test(TestLibMeshIO TestLibMeshbIO.cpp)
-precess_test_link_libraries(TestLibMeshIO MeshMeditModelPluginlib DataTest)

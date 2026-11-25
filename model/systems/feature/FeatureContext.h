@@ -17,6 +17,7 @@
 #include <utility>
 
 class ModelLayer;
+struct ModelPayload;
 
 namespace systems::feature {
 class FeatureParams;
@@ -89,6 +90,22 @@ struct FeatureContext {
      * 进度是计算线程的取消检查点；提交、清理与终态均由框架回所属线程完成。
      */
     std::shared_ptr<systems::job::Job> runComputeJob(std::string label, systems::job::JobTaskFn task);
+
+    /**
+     * @brief 一次安装批次中成功解析的模型，桌面使用共享任务，同步会话在当前执行边界安装。
+     * @param parse 解析已捕获的文件参数，批次失败时抛异常，闭包在后台运行时不持有模型句柄。
+     * @return 异步返回 Job 智能指针，忙时指针为空。同步成功返回空 any。
+     */
+    std::any runFileImport(std::string label,
+        std::function<std::vector<ModelPayload>(systems::job::ProgressFn)> parse);
+
+    /**
+     * @brief 执行只读文件导出，桌面在模型操作占用期间借用模型，浏览器与同步会话直接执行。
+     * writer 不得修改共享模型和缓存，写入磁盘不进入 undo 历史。
+     * @return 异步返回 Job 智能指针，忙时指针为空。同步成功返回空 any。
+     */
+    std::any runFileExport(std::string label,
+        std::function<void(const ModelLayer&, systems::job::ProgressFn)> write);
     /**
      * @brief 单组件影子修改；仅正式入口且无预览时发布，GUI 自动提交或丢弃。
      * worker 只操作影子写面，失败抛异常；几何／映射目标暂不支持。遮罩只影响展示。

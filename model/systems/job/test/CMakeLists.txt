@@ -1,0 +1,2 @@
+precess_add_test(TestJobRunner TestJobRunner.cpp)
+precess_test_link_libraries(TestJobRunner Job Data)

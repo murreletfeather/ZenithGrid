@@ -1,2 +1,0 @@
-precess_add_test(TestStlModelHandler TestStlModelHandler.cpp)
-precess_test_link_libraries(TestStlModelHandler StlModelPluginlib DataTest)

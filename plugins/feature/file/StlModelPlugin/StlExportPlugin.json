@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.Stl",
+    "display_name": "STL stereolithography triangle mesh file"
+  }
+}

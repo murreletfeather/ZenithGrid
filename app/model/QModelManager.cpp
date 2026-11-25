@@ -1,9 +1,7 @@
 #include "QModelManager.h"
-#include "AlgorithmSystem.h"
 #include "EditSystem.h"
 #include "FeatureEvents.h"
 #include "FeatureSystem.h"
-#include "ModelIOSystem.h"
 #include "ModelLayer.h"
 #include "QModelObserver.h"
 #include "QPythonRuntime.h"
@@ -21,7 +19,7 @@
 QModelManager::QModelManager(std::string_view argv0, QObject* parent)
     : QObject(parent)
 {
-    // 1) 会话组合根：模型层 + undo 栈 + 事件总线 + 四系统（内部经转发观察者桥接 ModelEvent）
+    // 1) 会话组合根：模型层 + undo 栈 + 事件总线 + 插件系统（内部经转发观察者桥接 ModelEvent）
     observer_ = std::make_unique<QModelObserver>();
     connect(observer_.get(), &QModelObserver::modelRemoved, this, &QModelManager::modelRemoved);
     session_ = std::make_unique<session::Session>(observer_.get(), [this](std::function<void()> fn) {
@@ -56,12 +54,10 @@ QModelManager::QModelManager(std::string_view argv0, QObject* parent)
 
     query_ = std::make_unique<QModelQuery>(&session_->query(), this);
 
-    // 2) 共享任务基建：全局单槽执行器（算法与功能任务共用一个坑）+ 状态栏统一数据源。
+    // 2) 共享任务基建：全局单槽执行器+ 状态栏统一数据源。
     // 提交闭包经本对象（GUI 线程）分发：工作线程投递时为 Queued，事件循环空闲即可执行
     task_status_ = std::make_unique<QTaskStatus>();
     // 3) Qt 适配器包装会话内子系统
-    algo_adaptor_ = std::make_unique<systems::algo::QAlgorithmSystemAdaptor>(session_->algorithmSystem(), *task_status_);
-    io_adaptor_ = std::make_unique<systems::io::QModelIOSystemAdaptor>(session_->ioSystem());
     edit_adaptor_ = std::make_unique<systems::edit::QEditSystemAdaptor>(session_->editSystem());
     feature_adaptor_ = std::make_unique<systems::feature::QFeatureSystemAdaptor>(session_->featureSystem());
     connect(feature_adaptor_.get(), &systems::feature::QFeatureSystemAdaptor::invocationFailed,
@@ -195,19 +191,9 @@ QModelQuery* QModelManager::getModelQuery() const
     return query_.get();
 }
 
-systems::algo::QAlgorithmSystemAdaptor* QModelManager::getAlgorithmSystemAdaptor() const
-{
-    return algo_adaptor_.get();
-}
-
 systems::edit::QEditSystemAdaptor* QModelManager::getEditSystemAdaptor() const
 {
     return edit_adaptor_.get();
-}
-
-systems::io::QModelIOSystemAdaptor* QModelManager::getModelIOSystemAdaptor() const
-{
-    return io_adaptor_.get();
 }
 
 systems::feature::QFeatureSystemAdaptor* QModelManager::getFeatureSystemAdaptor() const

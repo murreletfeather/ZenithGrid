@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.MeshMedit",
+    "display_name": "Gamma Mesh Format @Medit"
+  }
+}

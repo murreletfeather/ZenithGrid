@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Export.VtkXml",
+    "display_name": "VTK XML mesh file"
+  }
+}

@@ -5,7 +5,7 @@
 ## 注册、参数和导航
 
 - 插件继承 `QObject` 和 `systems::PluginBase`，通过 `HandlerCreatorDestroyerFactory` 在插件侧创建、销毁 Handler，保持 DLL 边界两侧分配释放配对。
-- 新增算法、编辑和业务功能统一使用 `FeatureHandler`，JSON 的 `system` 为 `FeatureSystem`；IO 使用 `ModelIOHandler` / `ModelIOSystem`。旧 Algorithm / Edit 接口仅兼容已有调用者，已废弃并冻结。
+- 算法、编辑、模型文件导入导出和通用功能使用 `FeatureHandler`，JSON 的 `system` 为 `FeatureSystem`。文件功能在 `setup` 通过 `registrar.setFileType` 声明方向与扩展名，并在 `execute` 中使用 `ctx.runFileImport` 或 `ctx.runFileExport`。旧 Edit 接口仅服务已有调用者。
 - `setup` 声明参数、菜单、按键和事件订阅；`activate/deactivate` 对应反复进出功能，`teardown` 对应注销。上下文服务始终可调用，查询或任务结果可空；订阅句柄须保活并随生命周期退订。
 - `ctx.events.subscribe<ParameterChangedEvent>` 自动按所属功能过滤，全局监听用 `ctx.events.bus()`；Button 参数只处理参数下标。目标优先用 Selector，活动组件只作提示；点 gid 经 `ModelLayer::pointIdMap()` 解析组件，局部边/面选择携 `component_id`。
 

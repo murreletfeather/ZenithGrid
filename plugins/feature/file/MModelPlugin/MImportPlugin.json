@@ -1,0 +1,7 @@
+{
+  "system": "FeatureSystem",
+  "handler": {
+    "name": "Import.M",
+    "display_name": "Mesh .m file"
+  }
+}

@@ -7,25 +7,21 @@ import "FeatureNavigation.js" as FeatureNavigation
 import app.core
 import app.model
 import app.model.systems
-import app.model.systems.algo
 import app.model.systems.edit
 
 ColumnLayout {
     id: root
     spacing: 0
 
-    // 冻结任务在飞（算法执行 ∨ 功能冻结任务）禁用工具栏：inline 执行中不得触发运行/编辑等模型操作
+    // 冻结任务在飞时禁用工具栏，避免触发新的模型操作
     enabled: !QModelManager.taskStatus.frozenBusy
 
     property int activeCategory: -1
-    property var algorithmSystem: QModelManager.algorithmSystem
     property var featureSystem: QModelManager.featureSystem
     readonly property var navigationOrder: root.featureSystem.navigationOrder || []
     readonly property var navigationEntries: FeatureNavigation.buildEntries(root.featureSystem.featuresInfo, root.featureSystem.navigationDefinitions, root.navigationOrder)
-    readonly property var algorithmInfos: root.algorithmSystem.algorithmsInfo
-    // StackLayout: 文件 0、编辑 1、旧算法 2，后续均由功能菜单声明生成。
-    readonly property int algorithmPageStart: 2
-    readonly property int featurePageStart: algorithmPageStart + 1
+    // StackLayout: 文件 0、编辑 1，后续均由功能菜单声明生成。
+    readonly property int featurePageStart: 2
     property real windowHeight: 600
 
     // 限制页高范围，给小窗口保留文字空间，避免大窗口工具栏过度放大。
@@ -55,25 +51,17 @@ ColumnLayout {
         fileFlow.importFiles(urls)
     }
 
-    // 算法与编辑系统尚无图标声明字段，暂保留其名称映射。
+    function openStartupFiles(urls) {
+        fileFlow.openStartupFiles(urls)
+    }
+
+    // 旧编辑系统尚无图标声明字段，暂保留其名称映射。
     readonly property var pluginIconMap: ({
         "CreateFacePlugin": "qrc:/images/toolbar/Edit/create-face.svg",
         "DeleteFacePlugin": "qrc:/images/toolbar/Edit/delete-face.svg"
     })
     function getIconForPlugin(pluginName) {
         return pluginIconMap[pluginName] || "qrc:/images/toolbar/precess_extra_plugin.svg"
-    }
-
-    function activatePlugin(systemList, pluginName, system) {
-        for (var i = 0; i < systemList.length; i++) {
-            if (systemList[i].name === pluginName) {
-                App.activeOperation = {
-                    info: systemList[i],
-                    execute: function(model, args) { system.call(pluginName, model, args) }
-                };
-                break;
-            }
-        }
     }
 
     // 导出默认文件名：活动模型名（导入模型即为导入文件名，自带扩展名）。
@@ -108,16 +96,8 @@ ColumnLayout {
             {id: "edit", name: qsTr("编辑"), objectName: "editCategory", pageIndex: 1},
             {id: "view", name: qsTr("视图"), objectName: "viewCategory", pageIndex: -1, popup: true}
         ]
-        // 无旧算法时隐藏页签；页面索引保持不变，页签隐藏即不可达。
-        if (root.algorithmInfos.length > 0)
-            tabs.push({id: "other-algorithms", name: qsTr("其他算法"), objectName: "otherAlgorithmTab", pageIndex: root.algorithmPageStart})
         return FeatureNavigation.buildTabs(root.featureMenus, tabs, root.featurePageStart, root.navigationOrder)
     }
-
-    // 算法清空后收起正停留的其他算法页（幂等状态应用）。
-    onAlgorithmInfosChanged: if (root.algorithmInfos.length === 0
-        && root.activeCategory === root.algorithmPageStart)
-        root.activeCategory = -1
 
     // 普通单项与聚合入口共用菜单声明；注册变化后按菜单身份保持当前页。
     function rebuildFeatureMenus() {
@@ -359,52 +339,6 @@ ColumnLayout {
             }
 
             Item { Layout.fillWidth: true }
-        }
-
-        // 其他算法沿用原有按钮与参数面板入口。
-        Flickable {
-            id: algorithmPage
-            objectName: "algorithmPage_other"
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            contentWidth: algorithmGroups.implicitWidth
-            contentHeight: height
-            flickableDirection: Flickable.HorizontalFlick
-            boundsBehavior: Flickable.StopAtBounds
-            clip: true
-
-            RowLayout {
-                id: algorithmGroups
-                height: algorithmPage.height
-                spacing: Theme.spacingSm
-
-                Repeater {
-                    model: root.algorithmInfos
-                    RibbonActionButton {
-                        id: algorithmAction
-                        required property var modelData
-                        topPadding: 4
-                        bottomPadding: 4
-                        objectName: "algorithmAction_" + modelData.name
-                        icon.source: root.getIconForPlugin(modelData.name)
-                        // 正方形图标边长用局部源；避免 icon.width 绑定 icon.height
-                        // （同组子属性互绑会经 iconChanged 自触绑定循环）
-                        readonly property real actionIconSize: Math.max(16, Math.min(root.ribbonIconSize,
-                            root.ribbonPageHeight - topPadding - bottomPadding
-                            - spacing - actionFontMetrics.height))
-                        icon.width: actionIconSize
-                        icon.height: actionIconSize
-                        icon.color: "transparent"
-                        Layout.fillHeight: true
-                        text: modelData.display_name
-                        onClicked: root.activatePlugin(root.algorithmInfos, modelData.name, root.algorithmSystem)
-                        FontMetrics {
-                            id: actionFontMetrics
-                            font: algorithmAction.font
-                        }
-                    }
-                }
-            }
         }
 
         // 单项与多子功能入口共用横向菜单页。

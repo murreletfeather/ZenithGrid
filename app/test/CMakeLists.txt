@@ -115,7 +115,7 @@ qt_add_resources(TestThemeWindowPalette theme_window
     BASE "${CMAKE_CURRENT_SOURCE_DIR}/.."
     FILES ../Main.qml)
 
-# 加载实际工具栏，覆盖通用父入口和旧算法列表入口。
+# 加载实际工具栏，覆盖通用父入口和文件入口。
 precess_add_test(TestToolbarNavigation TestToolbarNavigation.cpp)
 precess_test_link_libraries(TestToolbarNavigation modelQml modelQmlplugin SystemQmlplugin renderQmlplugin renderQml Qt6::QuickControls2 Qt6::Svg)
 target_compile_definitions(TestToolbarNavigation PRIVATE

@@ -20,8 +20,6 @@ import PreCess.Docking as Docking
 import app.model
 import app.core
 import app.model.systems
-import app.model.systems.io
-import app.model.systems.algo
 
 import app.render
 
@@ -91,7 +89,7 @@ ApplicationWindow {
         }
     }
 
-    // 冻结任务忙碌态（聚合位经共享任务状态源单点暴露）：算法执行 ∨ 功能冻结任务——
+    // 冻结任务忙碌态经共享任务状态源统一暴露——
     // 忙碌遮罩、快捷键与工具栏禁用据此驱动；自由任务不置位（不打断用户操作）
     readonly property bool frozenBusy: QModelManager.taskStatus.frozenBusy
     // 操作状态由窗口持有，侧栏隐藏或重建不会结束当前操作。
@@ -426,19 +424,6 @@ ApplicationWindow {
         QModelManager.featureSystem.setActiveModel(App.selection.activeModelId)
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
-        Qt.callLater(function() {
-            let imported = false
-            for (let i = 0; i < commandLineArgs.length; ++i) {
-                let ok = QModelManager.ioSystem.read("All files", commandLineArgs[i], [])
-                if (!ok) {
-                    console.exception("启动打开失败: " + commandLineArgs[i]);
-                } else {
-                    imported = true
-                }
-            }
-            // 导入通知先排队加载 Actor，再重置相机。
-            if (imported && App.registry.renderWindow)
-                App.registry.renderWindow.resetCamera()
-        })
+        Qt.callLater(() => toolbar.openStartupFiles(commandLineArgs))
     }
 }

@@ -45,8 +45,6 @@ Q_IMPORT_QML_PLUGIN(app_corePlugin)
 Q_IMPORT_QML_PLUGIN(app_modelPlugin)
 Q_IMPORT_QML_PLUGIN(app_renderPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systemsPlugin)
-Q_IMPORT_QML_PLUGIN(app_model_systems_algoPlugin)
-Q_IMPORT_QML_PLUGIN(app_model_systems_ioPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systems_editPlugin)
 Q_IMPORT_QML_PLUGIN(app_model_systems_featurePlugin)
 
