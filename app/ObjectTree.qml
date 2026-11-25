@@ -48,36 +48,71 @@ Pane {
     property bool _menuOpen: false
 
     // 只清理由视口联动建立的行选择，用户主动导航后不再拥有该行。
-    property int _viewportComponentId: -1
+    property var _viewportComponentIds: []
 
     function syncViewportSelection() {
         const viewport = App.registry.renderWindow
         const selection = viewport ? viewport.selectedIDs : null
-        const componentIds = selection ? selection.getAsComponentIds() : []
-        if (componentIds.length !== 1 || !QModelManager.query.hasComponent(componentIds[0])) {
-            if (_viewportComponentId >= 0)
+        const pickedIds = selection ? selection.getAsComponentIds() : []
+        const componentIds = []
+        const seenIds = new Set()
+        for (const componentId of pickedIds) {
+            if (!seenIds.has(componentId) && QModelManager.query.hasComponent(componentId)) {
+                seenIds.add(componentId)
+                componentIds.push(componentId)
+            }
+        }
+        if (componentIds.length === 0) {
+            if (_viewportComponentIds.length > 0)
                 clearRowSelection()
             return
         }
 
-        const componentId = componentIds[0]
-        let index = treeModel.findIndexByNodeId(componentId, 1)
-        if (!index || !index.valid) {
+        let indexes = componentIds.map(componentId => treeModel.findIndexByNodeId(componentId, 1))
+        if (indexes.some(index => !index || !index.valid)) {
             // 模型通知按 50ms 合并，新组件可能已可拾取但尚未进入对象树。
             treeModel.refresh()
-            index = treeModel.findIndexByNodeId(componentId, 1)
+            indexes = componentIds.map(componentId => treeModel.findIndexByNodeId(componentId, 1))
         }
-        if (!index || !index.valid) {
-            if (_viewportComponentId >= 0)
+
+        const validIds = []
+        const validIndexes = []
+        for (let i = 0; i < indexes.length; ++i) {
+            if (indexes[i] && indexes[i].valid) {
+                validIds.push(componentIds[i])
+                validIndexes.push(indexes[i])
+            }
+        }
+        if (validIds.length === 0) {
+            if (_viewportComponentIds.length > 0)
                 clearRowSelection()
             return
         }
 
-        treeView.expandToIndex(index)
+        const currentIndex = treeView.selectionModel.currentIndex
+        const currentId = currentIndex && currentIndex.valid
+                && treeModel.data(currentIndex, TreeModel.NodeTypeRole) === _nodeTypeComponent
+                ? treeModel.data(currentIndex, TreeModel.NodeIdRole) : -1
+        const currentPosition = validIds.indexOf(currentId)
+        const previousIds = new Set(_viewportComponentIds)
+        let addedPosition = -1
+        for (let i = 0; i < validIds.length; ++i) {
+            if (!previousIds.has(validIds[i]))
+                addedPosition = i
+            treeView.expandToIndex(validIndexes[i])
+        }
         treeView.forceLayout()
-        treeView.selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
-        _viewportComponentId = componentId
-        treeView.positionViewAtIndex(index, TableView.Contain)
+        treeView.selectionModel.clearSelection()
+        for (const index of validIndexes)
+            treeView.selectionModel.select(index, ItemSelectionModel.Select)
+
+        // 增选跟随新项；取消其他项或仅改变顺序时，保留当前行和用户滚动位置。
+        const targetPosition = addedPosition >= 0 ? addedPosition
+                : currentPosition >= 0 ? currentPosition : 0
+        treeView.selectionModel.setCurrentIndex(validIndexes[targetPosition], ItemSelectionModel.NoUpdate)
+        _viewportComponentIds = validIds
+        if (addedPosition >= 0 || currentPosition < 0)
+            treeView.positionViewAtIndex(validIndexes[targetPosition], TableView.Contain)
     }
 
     Timer {
@@ -109,14 +144,14 @@ Pane {
     // 清空行选择，保留导航位置与活动对象。
     function clearRowSelection() {
         viewportSelectionSync.stop()
-        _viewportComponentId = -1
+        _viewportComponentIds = []
         treeView.selectionModel.clearSelection()
     }
 
     // 清空行选择与导航位置（undo/redo 等全量重置）。
     function resetSelection() {
         viewportSelectionSync.stop()
-        _viewportComponentId = -1
+        _viewportComponentIds = []
         treeView.selectionModel.clear()
     }
 
@@ -153,9 +188,10 @@ Pane {
         if (!index || !index.valid)
             return
         viewportSelectionSync.stop()
-        _viewportComponentId = -1
+        _viewportComponentIds = []
         treeView.forceActiveFocus()
-        if (toggle && treeView.selectionModel.isSelected(index)) {
+        if (toggle && treeView.selectionModel.selectedIndexes.length === 1
+                && treeView.selectionModel.isSelected(index)) {
             clearRowSelection()
             return
         }
@@ -210,7 +246,7 @@ Pane {
     function handleGlobalLeftPress(x, y) {
         if (_menuOpen)
             return
-        if (_viewportComponentId < 0 && !objectTree.containsGlobalPoint(x, y))
+        if (_viewportComponentIds.length === 0 && !objectTree.containsGlobalPoint(x, y))
             objectTree.clearRowSelection()
     }
 
@@ -822,10 +858,10 @@ Pane {
         return depth
     }
 
-    // Delete 快捷键入口：仅取得实际选中行并调用既有删除入口。
+    // Delete 快捷键入口：仅单行选中时调用既有删除入口。
     function deleteSelectedNode() {
         const indexes = treeView.selectionModel.selectedIndexes
-        if (indexes.length === 0)
+        if (indexes.length !== 1)
             return false
         const idx = indexes[0]
         const depth = nodeDepth(idx)

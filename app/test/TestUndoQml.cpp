@@ -2516,14 +2516,13 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
     const auto second = f.tree->findIndexByNodeId(components[1], 1);
     REQUIRE(first.isValid());
     REQUIRE(second.isValid());
-    f.publish(ElementEnum::Component, { components[0] });
-    REQUIRE(waitForCondition([&] { return f.selection->isSelected(first); }));
+    f.publish(ElementEnum::Component, { components[0], components[1] });
+    REQUIRE(waitForCondition([&] {
+        return f.selection->selectedIndexes().size() == 2
+            && f.selection->isSelected(first) && f.selection->isSelected(second);
+    }));
 
     SECTION("empty component selection") { f.publish(ElementEnum::Component, {}); }
-    SECTION("multiple components are not reduced to an arbitrary first row")
-    {
-        f.publish(ElementEnum::Component, { components[0], components[1] });
-    }
     SECTION("face IDs do not masquerade as component IDs")
     {
         f.publish(ElementEnum::Face, { components[0] });
@@ -2535,7 +2534,7 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
     SECTION("manual row selection releases viewport ownership")
     {
         REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "selectRow",
-            Q_ARG(QVariant, QVariant::fromValue(second)), Q_ARG(QVariant, false)));
+            Q_ARG(QVariant, QVariant::fromValue(second)), Q_ARG(QVariant, true)));
         REQUIRE(f.selection->isSelected(second));
         f.publish(ElementEnum::Component, {});
         f.settle();
@@ -2548,6 +2547,150 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
         return;
     }
     REQUIRE(waitForCondition([&] { return !f.selection->hasSelection(); }));
+    CHECK(f.qml.selection_state->property("activeModelId").toInt() == -1);
+    CHECK(f.qml.selection_state->property("activeComponentId").toInt() == -1);
+}
+
+TEST_CASE("Actual QML mirrors multiple viewport components across model parents", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    const Index first_model = f.addModel("multiple first", 3);
+    const Index second_model = f.addModel("multiple second", 2);
+    const auto first_components = model.modelById(first_model)->componentIds();
+    const auto second_components = model.modelById(second_model)->componentIds();
+    const auto first = f.tree->findIndexByNodeId(first_components[1], 1);
+    QList<Index> picked_ids;
+    QList<Index> expected_ids;
+    SECTION("same model")
+    {
+        picked_ids = { first_components[1], first_components[2] };
+        expected_ids = picked_ids;
+    }
+    SECTION("different models")
+    {
+        picked_ids = { first_components[1], second_components[0] };
+        expected_ids = picked_ids;
+    }
+    SECTION("unknown IDs are filtered and repeated IDs select one row")
+    {
+        picked_ids = { first_components[1], -1, 1000000, second_components[0], first_components[1] };
+        expected_ids = { first_components[1], second_components[0] };
+    }
+    SECTION("a repeated single component remains a single row")
+    {
+        picked_ids = { first_components[1], first_components[1] };
+        expected_ids = { first_components[1] };
+    }
+    REQUIRE(first.isValid());
+    REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
+    f.settle();
+    REQUIRE(f.qml.selection_state->setProperty("activeModelId", first_model));
+    REQUIRE(f.qml.selection_state->setProperty("activeComponentId", first_components[0]));
+    f.publish(ElementEnum::Component, picked_ids);
+    REQUIRE(waitForCondition([&] {
+        if (f.selection->selectedIndexes().size() != expected_ids.size())
+            return false;
+        for (const auto id : expected_ids) {
+            if (!f.selection->isSelected(f.tree->findIndexByNodeId(id, 1)))
+                return false;
+        }
+        return true;
+    }));
+    CHECK(f.selection->currentIndex() == f.tree->findIndexByNodeId(expected_ids.back(), 1));
+    for (const auto id : expected_ids) {
+        const auto index = f.tree->findIndexByNodeId(id, 1);
+        REQUIRE(index.isValid());
+        CHECK(f.tree->data(index, TreeModel::NodeTypeRole).toInt()
+            == static_cast<int>(TreeNode::NodeType::Component));
+        const auto parent = index.parent();
+        bool expanded = false;
+        REQUIRE(QMetaObject::invokeMethod(f.view, "isExpanded", Q_RETURN_ARG(bool, expanded),
+            Q_ARG(int, f.rowOf(parent))));
+        CHECK(expanded);
+        CHECK_FALSE(f.selection->isSelected(parent));
+    }
+    CHECK(f.qml.selection_state->property("activeModelId").toInt() == first_model);
+    CHECK(f.qml.selection_state->property("activeComponentId").toInt() == first_components[0]);
+
+    REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
+        Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
+    CHECK(f.selection->selectedIndexes().size() == expected_ids.size());
+    if (expected_ids.size() > 1) {
+        // 联动产生多行时，单目标删除命令不得任意挑中第一行。
+        auto* query = f.qml.manager->getModelQuery();
+        const auto models_before = query->listModels();
+        const auto first_before = query->getComponentsSummary(first_model);
+        const auto second_before = query->getComponentsSummary(second_model);
+        QVariant deleted;
+        REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "deleteSelectedNode",
+            Q_RETURN_ARG(QVariant, deleted)));
+        CHECK_FALSE(deleted.toBool());
+        CHECK(query->listModels() == models_before);
+        CHECK(query->getComponentsSummary(first_model) == first_before);
+        CHECK(query->getComponentsSummary(second_model) == second_before);
+    }
+    f.publish(ElementEnum::Component, {});
+    REQUIRE(waitForCondition([&] { return !f.selection->hasSelection(); }));
+}
+
+TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    const Index near_model = f.addModel("near selection", 1);
+    for (int i = 0; i < 16; ++i)
+        f.addModel("between " + std::to_string(i), 1);
+    const Index far_model = f.addModel("far selection", 1);
+    const Index near_id = model.modelById(near_model)->componentIds()[0];
+    const Index far_id = model.modelById(far_model)->componentIds()[0];
+    const auto near = f.tree->findIndexByNodeId(near_id, 1);
+    const auto far = f.tree->findIndexByNodeId(far_id, 1);
+    REQUIRE(near.isValid());
+    REQUIRE(far.isValid());
+    REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
+    f.settle();
+
+    f.publish(ElementEnum::Component, { near_id });
+    REQUIRE(waitForCondition([&] { return f.containsVisibleDelegate(near); }));
+    const auto near_scroll = f.view->property("contentY").toDouble();
+    f.publish(ElementEnum::Component, { near_id, far_id });
+    REQUIRE(waitForCondition([&] {
+        return f.selection->selectedIndexes().size() == 2
+            && f.selection->isSelected(near) && f.selection->currentIndex() == far
+            && f.containsVisibleDelegate(far);
+    }));
+    const auto far_scroll = f.view->property("contentY").toDouble();
+    REQUIRE(far_scroll > near_scroll);
+
+    // 只改变快照内的 ID 顺序，不应把 current 或滚动位置跳回首项。
+    f.publish(ElementEnum::Component, { far_id, near_id });
+    f.settle();
+    CHECK(f.selection->selectedIndexes().size() == 2);
+    CHECK(f.selection->currentIndex() == far);
+    CHECK(std::abs(f.view->property("contentY").toDouble() - far_scroll) < 1);
+
+    // 取消非 current 行后，保留剩余联动行与当前导航位置。
+    f.publish(ElementEnum::Component, { far_id });
+    REQUIRE(waitForCondition([&] { return f.selection->selectedIndexes().size() == 1; }));
+    CHECK(f.selection->isSelected(far));
+    CHECK_FALSE(f.selection->isSelected(near));
+    CHECK(f.selection->currentIndex() == far);
+    CHECK(std::abs(f.view->property("contentY").toDouble() - far_scroll) < 1);
+
+    // 新增近处组件时才回到该新增项；取消 current 后定位到剩余组件。
+    f.publish(ElementEnum::Component, { far_id, near_id });
+    REQUIRE(waitForCondition([&] {
+        return f.selection->selectedIndexes().size() == 2 && f.selection->currentIndex() == near
+            && f.containsVisibleDelegate(near);
+    }));
+    f.publish(ElementEnum::Component, { far_id });
+    REQUIRE(waitForCondition([&] {
+        return f.selection->selectedIndexes().size() == 1 && f.selection->currentIndex() == far
+            && f.containsVisibleDelegate(far);
+    }));
     CHECK(f.qml.selection_state->property("activeModelId").toInt() == -1);
     CHECK(f.qml.selection_state->property("activeComponentId").toInt() == -1);
 }
