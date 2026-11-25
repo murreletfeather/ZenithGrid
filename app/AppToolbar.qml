@@ -51,8 +51,8 @@ ColumnLayout {
         fileFlow.importFiles(urls)
     }
 
-    function openStartupFiles(urls) {
-        fileFlow.openStartupFiles(urls)
+    function importPaths(paths) {
+        fileFlow.importPaths(Array.from(paths))
     }
 
     // 旧编辑系统尚无图标声明字段，暂保留其名称映射。

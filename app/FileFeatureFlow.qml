@@ -23,47 +23,10 @@ Item {
     property var _operation: null
     property var _types: []
     property var _afterTask: null
-    property var _startupFiles: []
     signal parametersRequested
 
     function filters(types) {
         return types.map(type => type.display_name + " (" + (type.extensions.length ? type.extensions.map(ext => "*." + ext).join(" ") : "*") + ")");
-    }
-
-    function matchingImportTypes(paths) {
-        const suffixes = paths.map(path => path.split(/[\\/]/).pop().split(".").pop().toLowerCase());
-        return importTypes.filter(type => suffixes.every(suffix => type.extensions.some(ext => ext.toLowerCase() === suffix)));
-    }
-
-    function openStartupFiles(urls) {
-        _startupFiles = Array.from(urls, url => App.localFilePath(url));
-        runNextStartupImport();
-    }
-
-    function resetCamera() {
-        if (App.registry.renderWindow)
-            App.registry.renderWindow.resetCamera();
-    }
-
-    function runNextStartupImport() {
-        while (_startupFiles.length && !taskStatus.writePending) {
-            const path = _startupFiles.shift();
-            const type = matchingImportTypes([path])[0];
-            const info = type && featureSystem.featuresInfo.find(item => item.name === type.feature);
-            if (!info || !featureSystem.setParameter(type.feature, 0, info.arg_types[0].type === QArgType.Paths ? [path] : path)) {
-                taskStatus.reportFailure(qsTr("无法打开文件 %1").arg(path));
-                continue;
-            }
-            const result = featureSystem.invoke(type.feature);
-            if (result && result.submitted) {
-                _afterTask = root.resetCamera;
-                return;
-            }
-            if (result === undefined || result === null)
-                resetCamera();
-            else
-                taskStatus.reportFailure(qsTr("无法打开文件 %1").arg(path));
-        }
     }
 
     function openImport() {
@@ -107,9 +70,14 @@ Item {
         exportDialog.open();
     }
 
-    // 同一批文件共用一个 Feature 及其参数，扩展名仅缩小候选。
     function importFiles(urls, selectedType) {
-        const paths = Array.from(urls).map(url => App.localFilePath(url));
+        importPaths(Array.from(urls, url => App.localFilePath(url)), selectedType);
+    }
+
+    // 同一批文件共用一个 Feature 及其参数，扩展名仅缩小候选。
+    function importPaths(paths, selectedType) {
+        if (!paths.length)
+            return;
         if (taskStatus.writePending) {
             releaseFiles(paths);
             return;
@@ -120,7 +88,8 @@ Item {
             prepare(selectedType, paths);
             return;
         }
-        const matching = matchingImportTypes(paths);
+        const suffixes = paths.map(path => path.split(/[\\/]/).pop().split(".").pop().toLowerCase());
+        const matching = importTypes.filter(type => suffixes.every(suffix => type.extensions.some(ext => ext.toLowerCase() === suffix)));
         _types = matching.length ? matching : Array.from(importTypes);
         if (_types.length === 1) {
             prepare(_types[0], paths);
@@ -167,14 +136,15 @@ Item {
                     return;
                 const outputPath = root.isWasm && type.direction === "export" ? root.featureSystem.getParameterValues(name)[0] : "";
                 const finish = function () {
-                    if (type.direction === "import")
-                        root.resetCamera();
-                    else if (root.isWasm)
+                    if (type.direction === "import") {
+                        if (App.registry.renderWindow)
+                            App.registry.renderWindow.resetCamera();
+                    } else if (root.isWasm)
                         QWasmBridge.downloadFile(outputPath.split(/[\\/]/).pop(), outputPath);
                 };
                 const result = root.featureSystem.invoke(name);
                 if (result && result.submitted !== undefined) {
-                    // 本次确实占用了单槽才等待；主线程此处不让出事件循环。
+                    // 只有实际占用了单槽的任务才接收本次完成回调。
                     if (result.submitted)
                         root._afterTask = finish;
                     return;
@@ -225,8 +195,6 @@ Item {
             root._afterTask = null;
             if (finish)
                 finish();
-            if (root._startupFiles.length)
-                Qt.callLater(root.runNextStartupImport);
         }
         function onTaskFailed(error) {
             root._afterTask = null;

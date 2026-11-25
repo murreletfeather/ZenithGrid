@@ -292,6 +292,7 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     systems::feature::QFeatureSystemAdaptor adaptor(system);
     QQmlEngine engine;
     engine.rootContext()->setContextProperty("backend", &adaptor);
+    engine.rootContext()->setContextProperty("startupFilePaths", QStringList { "relative path.DAT", "C:/next.dat" });
     QQmlComponent component(&engine);
     component.setData(R"QML(
         import QtQuick
@@ -311,18 +312,19 @@ TEST_CASE("File completion follows accepted submission without creating windows"
                 signal taskFinished()
                 signal taskFailed(string error)
                 signal taskCancelled()
-                function reportFailure(error) { taskFailed(error) }
             }
             Component.onCompleted: App.registry.renderWindow = viewport
             function selectFile() { importFiles(["file:///C:/input%20one.dat", "file:///C:/input%20two.dat"]) }
-            function openStartup() { openStartupFiles(["file:///C:/first.DAT", "file:///C:/unknown.bad", "file:///C:/next.dat"]) }
+            function openStartup() { importPaths(Array.from(startupFilePaths)) }
+            function openEmptyStartup() { importPaths([]) }
             function selectExplicitFile() { importFiles(["explicit.dat"], importTypes.find(type => type.feature === "Completion")) }
             function rejectBusyDrop() { taskStatus.writePending = true; importFiles(["file:///C:/busy.dat"]); taskStatus.writePending = false }
             function executeFile() { return App.activeOperation.execute() }
             function finishFile() { taskStatus.taskFinished() }
             function failFile() { taskStatus.taskFailed("failed"); finishFile() }
             function cancelFile() { taskStatus.taskCancelled(); finishFile() }
-            function clearFile() { App.activeOperation = null; App.registry.renderWindow = null }
+            function clearOperation() { App.activeOperation = null }
+            function clearFile() { clearOperation(); App.registry.renderWindow = null }
         }
     )QML",
         QUrl("qrc:/navigation-ui/CompletionHarness.qml"));
@@ -330,14 +332,19 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     REQUIRE(component.isReady());
     std::unique_ptr<QObject> flow(component.create());
     REQUIRE(flow);
-    REQUIRE(QMetaObject::invokeMethod(flow.get(), "selectFile"));
+    const auto invoke = [&](const char* method) { REQUIRE(QMetaObject::invokeMethod(flow.get(), method)); };
+    invoke("openEmptyStartup");
+    CHECK(flow->property("panelTitle").toString() == "操作面板");
+    CHECK(adaptor.getParameterValues("Completion").front().toStringList().isEmpty());
+    CHECK(feature.calls == 0);
+
+    invoke("selectFile");
     CHECK(flow->property("panelTitle").toString() == "操作面板 - 导入样例");
     const auto paths = adaptor.getParameterValues("Completion").front().toStringList();
     CHECK(paths == QStringList { "C:/input one.dat", "C:/input two.dat" });
     CHECK(feature.calls == 0); // 拖入只准备参数，执行仍由侧栏触发。
     REQUIRE(QMetaObject::invokeMethod(flow.get(), "rejectBusyDrop"));
     CHECK(adaptor.getParameterValues("Completion").front().toStringList() == paths);
-    const auto invoke = [&](const char* method) { REQUIRE(QMetaObject::invokeMethod(flow.get(), method)); };
     const auto resets = [&] { return flow->property("resets").toInt(); };
     feature.result = std::make_shared<systems::job::Job>("import");
     invoke("executeFile");
@@ -362,16 +369,18 @@ TEST_CASE("File completion follows accepted submission without creating windows"
     invoke("executeFile");
     invoke("cancelFile");
     CHECK(resets() == 2);
+
+    invoke("clearOperation");
+    CHECK(flow->property("panelTitle").toString() == "操作面板");
     const int calls_before_startup = feature.calls;
     invoke("openStartup");
+    CHECK(feature.calls == calls_before_startup);
+    CHECK(flow->property("panelTitle").toString() == "操作面板 - 导入样例");
+    CHECK(adaptor.getParameterValues("Completion").front().toStringList() == QStringList { "relative path.DAT", "C:/next.dat" });
+    invoke("executeFile");
     CHECK(feature.calls == calls_before_startup + 1);
-    CHECK(adaptor.getParameterValues("Completion").front().toStringList() == QStringList { "C:/first.DAT" });
     invoke("finishFile");
-    QCoreApplication::processEvents();
-    CHECK(feature.calls == calls_before_startup + 2);
-    CHECK(adaptor.getParameterValues("Completion").front().toStringList() == QStringList { "C:/next.dat" });
-    invoke("finishFile");
-    CHECK(resets() == 4);
+    CHECK(resets() == 3);
     auto other_handler = std::make_unique<FileCompletionFeature>();
     REQUIRE(system.registerHandler({ "Other" }, systems::feature::FeatureSystem::SystemHandlerPtr { other_handler.release() }));
     invoke("selectExplicitFile");

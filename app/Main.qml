@@ -424,6 +424,6 @@ ApplicationWindow {
         QModelManager.featureSystem.setActiveModel(App.selection.activeModelId)
         QModelManager.featureSystem.setActiveComponent(App.selection.activeComponentId)
 
-        Qt.callLater(() => toolbar.openStartupFiles(commandLineArgs))
+        Qt.callLater(() => toolbar.importPaths(startupFilePaths))
     }
 }
