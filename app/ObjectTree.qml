@@ -55,15 +55,15 @@ Pane {
         const selection = viewport ? viewport.selectedIDs : null
         const pickedIds = selection ? selection.getAsComponentIds() : []
 
-        let rows = Array.from(new Set(pickedIds))
+        let rows = pickedIds
                 .filter(id => QModelManager.query.hasComponent(id))
                 .map(id => ({ id, index: treeModel.findIndexByNodeId(id, 1) }))
-        if (rows.some(row => !row.index || !row.index.valid)) {
+        if (rows.some(row => !row.index.valid)) {
             // 模型通知按 50ms 合并，新组件可能已可拾取但尚未进入对象树。
             treeModel.refresh()
             for (const row of rows)
                 row.index = treeModel.findIndexByNodeId(row.id, 1)
-            rows = rows.filter(row => row.index && row.index.valid)
+            rows = rows.filter(row => row.index.valid)
         }
 
         if (rows.length === 0) {
@@ -72,24 +72,35 @@ Pane {
             return
         }
 
+        const componentIds = rows.map(row => row.id)
+        const missingIds = new Set(componentIds)
         const previousIds = new Set(_viewportComponentIds)
+        const selectionModel = treeView.selectionModel
+        for (const index of Array.from(selectionModel.selectedIndexes)) {
+            if (treeModel.data(index, TreeModel.NodeTypeRole) !== _nodeTypeComponent
+                    || !missingIds.delete(treeModel.data(index, TreeModel.NodeIdRole)))
+                selectionModel.select(index, ItemSelectionModel.Deselect)
+        }
+
         let targetIndex = null
+        let expanded = false
         for (const row of rows) {
             if (!previousIds.has(row.id))
                 targetIndex = row.index
-            treeView.expandToIndex(row.index)
+            if (treeView.rowAtIndex(row.index) < 0) {
+                treeView.expandToIndex(row.index)
+                expanded = true
+            }
+            if (missingIds.has(row.id))
+                selectionModel.select(row.index, ItemSelectionModel.Select)
         }
-        treeView.forceLayout()
-
-        const selectionModel = treeView.selectionModel
-        selectionModel.clearSelection()
-        for (const row of rows)
-            selectionModel.select(row.index, ItemSelectionModel.Select)
 
         // 增选跟随新项；取消其他项或仅改变顺序时，保留当前行和用户滚动位置。
         if (!targetIndex && !selectionModel.isSelected(selectionModel.currentIndex))
             targetIndex = rows[0].index
-        _viewportComponentIds = rows.map(row => row.id)
+        _viewportComponentIds = componentIds
+        if (expanded || targetIndex)
+            treeView.forceLayout()
         if (targetIndex) {
             selectionModel.setCurrentIndex(targetIndex, ItemSelectionModel.NoUpdate)
             treeView.positionViewAtIndex(targetIndex, TableView.Contain)
@@ -164,27 +175,31 @@ Pane {
         }
     }
 
-    // 左键选择入口：单行替换选中；显式左键再次点击已选中行时取消。
+    // 首次点击接管联动行；再次点击树自己选中的单行时取消。
     function selectRow(index, toggle = false) {
         if (!index || !index.valid)
             return
-        viewportSelectionSync.stop()
-        _viewportComponentIds = []
         treeView.forceActiveFocus()
-        if (toggle && treeView.selectionModel.selectedIndexes.length === 1
-                && treeView.selectionModel.isSelected(index)) {
+        const selectionModel = treeView.selectionModel
+        if (toggle && _viewportComponentIds.length === 0
+                && selectionModel.selectedIndexes.length === 1 && selectionModel.isSelected(index)) {
             clearRowSelection()
             return
         }
-        treeView.selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
+        viewportSelectionSync.stop()
+        _viewportComponentIds = []
+        selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
     }
 
     // 单目标命令读取当前选中行。
     function selectedTarget() {
         const indexes = treeView.selectionModel.selectedIndexes
-        if (indexes.length !== 1)
+        return indexes.length === 1 ? targetForIndex(indexes[0]) : null
+    }
+
+    function targetForIndex(index) {
+        if (!index.valid)
             return null
-        const index = indexes[0]
         return {
             nodeId: treeModel.data(index, TreeModel.NodeIdRole),
             depth: objectTree.nodeDepth(index),
@@ -193,21 +208,52 @@ Pane {
         }
     }
 
-    function hideSelection() {
-        const target = objectTree.selectedTarget()
-        if (target)
-            hideNode(target.nodeId, target.depth, target.nodeType, target.componentId)
-    }
-
-    function showSelection() {
-        const target = objectTree.selectedTarget()
-        if (target)
-            showNode(target.nodeId, target.depth, target.nodeType, target.componentId)
-    }
-
-    function isolateSelectedNode() {
-        const target = objectTree.selectedTarget()
+    // 菜单打开后行索引可能变化，按节点身份重找，并确认模型数据尚在。
+    function resolveTargetIndex(target) {
         if (!target)
+            return null
+        const index = treeModel.findIndexByNodeId(target.nodeId, target.depth)
+        if (!index.valid)
+            return null
+
+        const query = QModelManager.query
+        switch (target.nodeType) {
+        case _nodeTypeModel:
+            return query.hasModel(target.nodeId) ? index : null
+        case _nodeTypeComponent:
+            return query.hasComponent(target.componentId) ? index : null
+        case _nodeTypeMesh:
+        case _nodeTypeGeometry: {
+            const modelId = query.findModelIdByComponent(target.componentId)
+            const component = query.getComponentsSummary(modelId)
+                    .find(info => info.component_id === target.componentId)
+            if (!component)
+                return null
+            const exists = target.nodeType === _nodeTypeMesh ? component.has_mesh : component.has_geometry
+            return exists ? index : null
+        }
+        default:
+            return null
+        }
+    }
+
+    function toggleActiveTarget(target) {
+        if (!resolveTargetIndex(target))
+            return
+        if (isActiveNode(target.nodeId, target.depth))
+            clearActiveTarget()
+        else
+            makeNodeCurrent(target.nodeId, target.depth, target.componentId)
+    }
+
+    function setTargetVisibility(target, visible) {
+        const index = resolveTargetIndex(target)
+        if (index)
+            treeModel.requestVisibility(index, visible)
+    }
+
+    function isolateTarget(target) {
+        if (!resolveTargetIndex(target))
             return
         if (target.depth === 0)
             isolateModel(target.nodeId)
@@ -215,6 +261,19 @@ Pane {
             isolateNode(target.nodeId)
         else if (target.depth === 2)
             isolateSubNode(target.nodeId, target.nodeType, target.componentId)
+    }
+
+    function setTargetExpanded(target, expanded) {
+        const index = resolveTargetIndex(target)
+        if (!index)
+            return
+        const row = treeView.rowAtIndex(index)
+        if (row < 0)
+            return
+        if (expanded)
+            expandSubtree(row)
+        else
+            collapseSubtree(row)
     }
 
     function containsGlobalPoint(x, y) {
@@ -228,7 +287,7 @@ Pane {
         if (_menuOpen)
             return
         if (_viewportComponentIds.length === 0 && !objectTree.containsGlobalPoint(x, y))
-            objectTree.clearRowSelection()
+            treeView.selectionModel.clearSelection()
     }
 
     function notifyMenuClosed() {
@@ -530,7 +589,7 @@ Pane {
                     }
                     const index = treeView.index(viewDelegate.row, 0)
                     if (mouse.button === Qt.RightButton) {
-                        // 右键只读取当前选择，不改变选中；未选中行使用全局菜单。
+                        // 右键不改变选中；选中行的菜单绑定被点击的节点。
                         if (!viewDelegate.selected) {
                             blankContextMenu.popup()
                         } else if (viewDelegate.depth <= 1) {
@@ -549,54 +608,49 @@ Pane {
             AppMenu {
                 id: nodeContextMenu
                 objectName: "nodeContextMenu"
+                property var nodeTarget: null
 
+                onAboutToShow: nodeTarget = objectTree.targetForIndex(treeView.index(viewDelegate.row, 0))
                 onOpened: objectTree._menuOpen = true
                 onClosed: objectTree.notifyMenuClosed()
 
                 MenuItem {
                     objectName: "activeComponentItem"
-                    text: objectTree.isActiveNode(viewDelegate.model.nodeId, viewDelegate.depth)
+                    text: nodeContextMenu.nodeTarget
+                          && objectTree.isActiveNode(nodeContextMenu.nodeTarget.nodeId, nodeContextMenu.nodeTarget.depth)
                           ? "取消活动组件" : "设置活动组件"
-                    onTriggered: {
-                        if (objectTree.isActiveNode(viewDelegate.model.nodeId, viewDelegate.depth)) {
-                            objectTree.clearActiveTarget()
-                        } else {
-                            objectTree.makeNodeCurrent(
-                                viewDelegate.model.nodeId, viewDelegate.depth,
-                                viewDelegate.model.componentId)
-                        }
-                    }
+                    onTriggered: objectTree.toggleActiveTarget(nodeContextMenu.nodeTarget)
                 }
 
                 MenuSeparator {}
 
                 MenuItem {
                     text: "隐藏"
-                    onTriggered: objectTree.hideSelection()
+                    onTriggered: objectTree.setTargetVisibility(nodeContextMenu.nodeTarget, false)
                 }
 
                 MenuItem {
                     text: "隔离"
-                    onTriggered: objectTree.isolateSelectedNode()
+                    onTriggered: objectTree.isolateTarget(nodeContextMenu.nodeTarget)
                 }
 
                 MenuItem {
                     objectName: "showNode-" + viewDelegate.model.nodeType + "-"
                                 + (viewDelegate.depth === 0 ? viewDelegate.model.nodeId : viewDelegate.model.componentId)
                     text: "显示"
-                    onTriggered: objectTree.showSelection()
+                    onTriggered: objectTree.setTargetVisibility(nodeContextMenu.nodeTarget, true)
                 }
 
                 MenuSeparator {}
 
                 MenuItem {
                     text: "展开"
-                    onTriggered: objectTree.expandSubtree(viewDelegate.row)
+                    onTriggered: objectTree.setTargetExpanded(nodeContextMenu.nodeTarget, true)
                 }
 
                 MenuItem {
                     text: "折叠"
-                    onTriggered: objectTree.collapseSubtree(viewDelegate.row)
+                    onTriggered: objectTree.setTargetExpanded(nodeContextMenu.nodeTarget, false)
                 }
 
                 MenuSeparator {}
@@ -619,8 +673,9 @@ Pane {
                     }
 
                     onTriggered: {
+                        const target = nodeContextMenu.nodeTarget
                         nodeContextMenu.close()
-                        objectTree.deleteSelectedNode()
+                        objectTree.deleteTarget(target)
                     }
                 }
             }
@@ -628,37 +683,39 @@ Pane {
             AppMenu {
                 id: nodeActionsMenu
                 objectName: "nodeActionsMenu"
+                property var nodeTarget: null
 
+                onAboutToShow: nodeTarget = objectTree.targetForIndex(treeView.index(viewDelegate.row, 0))
                 onOpened: objectTree._menuOpen = true
                 onClosed: objectTree.notifyMenuClosed()
 
                 MenuItem {
                     text: "隐藏"
-                    onTriggered: objectTree.hideSelection()
+                    onTriggered: objectTree.setTargetVisibility(nodeActionsMenu.nodeTarget, false)
                 }
 
                 MenuItem {
                     text: "隔离"
-                    onTriggered: objectTree.isolateSelectedNode()
+                    onTriggered: objectTree.isolateTarget(nodeActionsMenu.nodeTarget)
                 }
 
                 MenuItem {
                     objectName: "showNode-" + viewDelegate.model.nodeType + "-"
                                 + (viewDelegate.depth === 0 ? viewDelegate.model.nodeId : viewDelegate.model.componentId)
                     text: "显示"
-                    onTriggered: objectTree.showSelection()
+                    onTriggered: objectTree.setTargetVisibility(nodeActionsMenu.nodeTarget, true)
                 }
 
                 MenuSeparator {}
 
                 MenuItem {
                     text: "展开"
-                    onTriggered: objectTree.expandSubtree(viewDelegate.row)
+                    onTriggered: objectTree.setTargetExpanded(nodeActionsMenu.nodeTarget, true)
                 }
 
                 MenuItem {
                     text: "折叠"
-                    onTriggered: objectTree.collapseSubtree(viewDelegate.row)
+                    onTriggered: objectTree.setTargetExpanded(nodeActionsMenu.nodeTarget, false)
                 }
 
                 MenuSeparator {}
@@ -680,8 +737,9 @@ Pane {
                     }
 
                     onTriggered: {
+                        const target = nodeActionsMenu.nodeTarget
                         nodeActionsMenu.close()
-                        objectTree.deleteSelectedNode()
+                        objectTree.deleteTarget(target)
                     }
                 }
             }
@@ -841,17 +899,13 @@ Pane {
 
     // Delete 快捷键入口：仅单行选中时调用既有删除入口。
     function deleteSelectedNode() {
-        const target = selectedTarget()
-        if (!target)
+        return deleteTarget(selectedTarget())
+    }
+
+    function deleteTarget(target) {
+        if (!resolveTargetIndex(target))
             return false
-        const { depth, nodeType } = target
-        const canDelete = (depth === 0 && nodeType === _nodeTypeModel)
-                || (depth === 1 && nodeType === _nodeTypeComponent)
-                || (depth === 2
-                    && (nodeType === _nodeTypeMesh || nodeType === _nodeTypeGeometry))
-        if (!canDelete)
-            return false
-        deleteNode(target.nodeId, depth, nodeType, target.componentId)
+        deleteNode(target.nodeId, target.depth, target.nodeType, target.componentId)
         return true
     }
 

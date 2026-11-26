@@ -2357,7 +2357,16 @@ struct ViewportTreeFixture {
         QQmlComponent component(&qml.engine);
         component.setData(R"QML(import QtQml
 QtObject {
-    property var selectedIDs: null
+    id: source
+    property var snapshot: null
+    property int selectionReadCount: 0
+    readonly property QtObject selectionReader: QtObject {
+        function getAsComponentIds() {
+            ++source.selectionReadCount
+            return source.snapshot.getAsComponentIds()
+        }
+    }
+    readonly property QtObject selectedIDs: snapshot ? selectionReader : null
     signal selectedChanged()
 })QML",
             QUrl("qrc:/undo-ui/ViewportSelectionSource.qml"));
@@ -2397,8 +2406,14 @@ QtObject {
         data->type = type;
         data->ids.assign(ids.begin(), ids.end());
         payload.set(std::move(data));
-        REQUIRE(source->setProperty("selectedIDs", QVariant::fromValue(&payload)));
+        REQUIRE(source->setProperty("snapshot", QVariant::fromValue(&payload)));
         REQUIRE(QMetaObject::invokeMethod(source.get(), "selectedChanged"));
+    }
+    void publishAndWait(ElementEnum::Type type, const QList<Index>& ids)
+    {
+        const int read_count = source->property("selectionReadCount").toInt();
+        publish(type, ids);
+        REQUIRE(waitForCondition([&] { return source->property("selectionReadCount").toInt() > read_count; }));
     }
     void settle()
     {
@@ -2411,16 +2426,35 @@ QtObject {
         QMetaObject::invokeMethod(view, "rowAtIndex", Q_RETURN_ARG(int, row), Q_ARG(QModelIndex, index));
         return row;
     }
-    bool containsVisibleDelegate(const QModelIndex& index) const
+    QQuickItem* delegateAt(const QModelIndex& index) const
     {
         QQuickItem* delegate = nullptr;
         if (!QMetaObject::invokeMethod(view, "itemAtIndex", Q_RETURN_ARG(QQuickItem*, delegate),
-                Q_ARG(QModelIndex, index))
-            || !delegate)
+                Q_ARG(QModelIndex, index)))
+            return nullptr;
+        return delegate;
+    }
+    bool containsVisibleDelegate(const QModelIndex& index) const
+    {
+        auto* delegate = delegateAt(index);
+        if (!delegate)
             return false;
         const auto top = view_item->mapFromItem(delegate, QPointF(0, 0)).y();
         return delegate->property("selected").toBool() && top >= -1
             && top + delegate->height() <= view_item->height() + 1;
+    }
+    void clickRow(const QModelIndex& index, Qt::MouseButton button = Qt::LeftButton)
+    {
+        auto* delegate = delegateAt(index);
+        REQUIRE(delegate);
+        const QPointF pos = host.contentItem()->mapFromItem(delegate,
+            delegate->width() / 2, delegate->height() / 2);
+        const QPointF global_pos = host.mapToGlobal(pos.toPoint());
+        QMouseEvent press(QEvent::MouseButtonPress, pos, global_pos, button, button, Qt::NoModifier);
+        QCoreApplication::sendEvent(&host, &press);
+        QMouseEvent release(QEvent::MouseButtonRelease, pos, global_pos, button, Qt::NoButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(&host, &release);
+        pumpEvents();
     }
 };
 }
@@ -2451,6 +2485,9 @@ TEST_CASE("Actual QML mirrors viewport component picks to the exact tree row", "
     REQUIRE(f.host.activeFocusItem() == &keyboard_target);
     // 普通视口拾取不监听参数，不能依赖 selectionUpdated 才驱动树联动。
     f.publish(ElementEnum::Component, { picked_id });
+    // 首次拾取尚未同步到树时，参数区点击也不得取消待处理的视口选择。
+    REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
+        Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
     REQUIRE(waitForCondition([&] { return f.selection->isSelected(picked_index); }));
     CHECK(f.selection->selectedIndexes().size() == 1);
     CHECK(f.selection->currentIndex() == picked_index);
@@ -2541,13 +2578,24 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
         REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "selectRow",
             Q_ARG(QVariant, QVariant::fromValue(second)), Q_ARG(QVariant, true)));
         REQUIRE(f.selection->isSelected(second));
-        f.publish(ElementEnum::Component, {});
-        f.settle();
+        f.publishAndWait(ElementEnum::Component, {});
         CHECK(f.selection->selectedIndexes().size() == 1);
         CHECK(f.selection->currentIndex() == second);
         CHECK(f.selection->isSelected(second));
         REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
             Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
+        CHECK_FALSE(f.selection->hasSelection());
+        return;
+    }
+    SECTION("the first click takes ownership of a single viewport row and the next toggles it off")
+    {
+        f.publishAndWait(ElementEnum::Component, { components[1] });
+        REQUIRE(f.selection->selectedIndexes() == QModelIndexList { second });
+        f.clickRow(second);
+        REQUIRE(f.selection->selectedIndexes() == QModelIndexList { second });
+        f.publishAndWait(ElementEnum::Component, {});
+        CHECK(f.selection->selectedIndexes() == QModelIndexList { second });
+        f.clickRow(second);
         CHECK_FALSE(f.selection->hasSelection());
         return;
     }
@@ -2566,20 +2614,8 @@ TEST_CASE("Actual QML mirrors multiple viewport components across model parents"
     REQUIRE(f.tree->refresh());
     const auto first_components = model.modelById(first_model)->componentIds();
     const auto second_components = model.modelById(second_model)->componentIds();
-    const auto first = f.tree->findIndexByNodeId(first_components[1], 1);
-    QList<Index> picked_ids;
-    QList<Index> expected_ids;
-    SECTION("selects siblings and another model, ignoring unknown and repeated IDs")
-    {
-        picked_ids = { first_components[1], -1, first_components[2], 1000000, second_components[0], first_components[1] };
-        expected_ids = { first_components[1], first_components[2], second_components[0] };
-    }
-    SECTION("a repeated single component remains a single row")
-    {
-        picked_ids = { first_components[1], first_components[1] };
-        expected_ids = { first_components[1] };
-    }
-    REQUIRE(first.isValid());
+    const QList<Index> picked_ids { first_components[1], -1, first_components[2], 1000000, second_components[0] };
+    const QList<Index> expected_ids { first_components[1], first_components[2], second_components[0] };
     REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
     f.settle();
     REQUIRE(f.qml.selection_state->setProperty("activeModelId", first_model));
@@ -2613,22 +2649,63 @@ TEST_CASE("Actual QML mirrors multiple viewport components across model parents"
     REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
         Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
     CHECK(f.selection->selectedIndexes().size() == expected_ids.size());
-    if (expected_ids.size() > 1) {
-        // 联动产生多行时，单目标删除命令不得任意挑中第一行。
-        auto* query = f.qml.manager->getModelQuery();
-        const auto models_before = query->listModels();
-        const auto first_before = query->getComponentsSummary(first_model);
-        const auto second_before = query->getComponentsSummary(second_model);
-        QVariant deleted;
-        REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "deleteSelectedNode",
-            Q_RETURN_ARG(QVariant, deleted)));
-        CHECK_FALSE(deleted.toBool());
-        CHECK(query->listModels() == models_before);
-        CHECK(query->getComponentsSummary(first_model) == first_before);
-        CHECK(query->getComponentsSummary(second_model) == second_before);
-    }
+    // 联动产生多行时，单目标删除命令不得任意挑中第一行。
+    auto* query = f.qml.manager->getModelQuery();
+    const auto models_before = query->listModels();
+    const auto first_before = query->getComponentsSummary(first_model);
+    const auto second_before = query->getComponentsSummary(second_model);
+    QVariant deleted;
+    REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "deleteSelectedNode",
+        Q_RETURN_ARG(QVariant, deleted)));
+    CHECK_FALSE(deleted.toBool());
+    CHECK(query->listModels() == models_before);
+    CHECK(query->getComponentsSummary(first_model) == first_before);
+    CHECK(query->getComponentsSummary(second_model) == second_before);
     f.publish(ElementEnum::Component, {});
     REQUIRE(waitForCondition([&] { return !f.selection->hasSelection(); }));
+}
+
+TEST_CASE("Actual QML keeps the tree menu bound to the opened row", "[QML][tree][viewport-selection]")
+{
+    application();
+    ViewportTreeFixture f;
+    auto& model = *f.qml.manager->getModelManager();
+    const auto model_id = f.addModel("context menu", 2);
+    const auto components = model.modelById(model_id)->componentIds();
+    REQUIRE(f.tree->refresh());
+    const auto first = f.tree->findIndexByNodeId(components[0], 1);
+    const auto second = f.tree->findIndexByNodeId(components[1], 1);
+    f.publish(ElementEnum::Component, { components[0], components[1] });
+    REQUIRE(waitForCondition([&] { return f.containsVisibleDelegate(first) && f.selection->isSelected(second); }));
+    f.clickRow(first, Qt::RightButton);
+    auto* delegate = f.delegateAt(first);
+    REQUIRE(delegate);
+    auto* menu = delegate->findChild<QObject*>("nodeContextMenu");
+    REQUIRE(menu);
+    REQUIRE(menu->property("visible").toBool());
+    CHECK(f.selection->selectedIndexes().size() == 2);
+    QObject* delete_item = nullptr;
+    for (auto* child : delegate->findChildren<QObject*>()) {
+        if (child->property("menu").value<QObject*>() == menu && child->property("text").toString() == "删除") {
+            delete_item = child;
+            break;
+        }
+    }
+    REQUIRE(delete_item);
+    REQUIRE(delete_item->property("enabled").toBool());
+
+    f.publishAndWait(ElementEnum::Component, { components[1] });
+    REQUIRE(f.selection->selectedIndexes() == QModelIndexList { second });
+    REQUIRE(menu->property("visible").toBool());
+    SECTION("the clicked row is still present") { }
+    SECTION("the clicked row was removed while the menu was open")
+    {
+        model.removeComponent(components[0]);
+        REQUIRE_FALSE(model.findComponent(components[0]));
+    }
+    REQUIRE(QMetaObject::invokeMethod(delete_item, "triggered"));
+    CHECK_FALSE(model.findComponent(components[0]));
+    CHECK(model.findComponent(components[1]));
 }
 
 TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][tree][viewport-selection]")
@@ -2665,16 +2742,29 @@ TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][
     const auto far_scroll = f.view->property("contentY").toDouble();
     REQUIRE(far_scroll > near_scroll);
 
-    // 只改变快照内的 ID 顺序，不应把 current 或滚动位置跳回首项。
-    f.publish(ElementEnum::Component, { far_id, near_id });
-    f.settle();
+    QModelIndexList added_rows;
+    QModelIndexList removed_rows;
+    int selection_changes = 0;
+    QObject signal_context;
+    QObject::connect(f.selection, &QItemSelectionModel::selectionChanged, &signal_context,
+        [&](const QItemSelection& added, const QItemSelection& removed) {
+            ++selection_changes;
+            added_rows += added.indexes();
+            removed_rows += removed.indexes();
+        });
+    // 相同选择或只改变 ID 顺序时，不应重选行或移动当前行。
+    f.publishAndWait(ElementEnum::Component, { near_id, far_id });
+    f.publishAndWait(ElementEnum::Component, { far_id, near_id });
     CHECK(f.selection->selectedIndexes().size() == 2);
     CHECK(f.selection->currentIndex() == far);
     CHECK(std::abs(f.view->property("contentY").toDouble() - far_scroll) < 1);
+    CHECK(selection_changes == 0);
 
     // 取消非 current 行后，保留剩余联动行与当前导航位置。
-    f.publish(ElementEnum::Component, { far_id });
-    REQUIRE(waitForCondition([&] { return f.selection->selectedIndexes().size() == 1; }));
+    f.publishAndWait(ElementEnum::Component, { far_id });
+    CHECK(f.selection->selectedIndexes() == QModelIndexList { far });
+    CHECK(added_rows.isEmpty());
+    CHECK(removed_rows == QModelIndexList { near });
     CHECK(f.selection->isSelected(far));
     CHECK_FALSE(f.selection->isSelected(near));
     CHECK(f.selection->currentIndex() == far);
