@@ -141,6 +141,26 @@ void pumpEvents()
     QCoreApplication::processEvents();
 }
 
+void clickItem(QQuickWindow& host, QQuickItem& item, Qt::MouseButton button = Qt::LeftButton)
+{
+    const QPointF pos = host.contentItem()->mapFromItem(&item, item.width() / 2, item.height() / 2);
+    const QPointF global_pos = host.mapToGlobal(pos.toPoint());
+    QMouseEvent press(QEvent::MouseButtonPress, pos, global_pos, button, button, Qt::NoModifier);
+    QCoreApplication::sendEvent(&host, &press);
+    QMouseEvent release(QEvent::MouseButtonRelease, pos, global_pos, button, Qt::NoButton, Qt::NoModifier);
+    QCoreApplication::sendEvent(&host, &release);
+    pumpEvents();
+}
+
+QObject* findMenuItem(QQuickItem& delegate, QObject& menu, const QString& text)
+{
+    for (auto* child : delegate.findChildren<QObject*>()) {
+        if (child->property("menu").value<QObject*>() == &menu && child->property("text").toString() == text)
+            return child;
+    }
+    return nullptr;
+}
+
 }
 
 TEST_CASE("Actual scalar editor completes range actions without intermediate requests", "[QML][scalar-range][no-window]")
@@ -1387,45 +1407,26 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     REQUIRE(first_delegate);
     REQUIRE(second_delegate);
 
-    const auto click = [&](QQuickItem* target, Qt::MouseButton button, Qt::KeyboardModifiers modifiers) {
-        const QPointF pos = host.contentItem()->mapFromItem(target,
-            target->width() / 2, target->height() / 2);
-        QMouseEvent press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
-            button, button, modifiers);
-        QCoreApplication::sendEvent(&host, &press);
-        QMouseEvent release(QEvent::MouseButtonRelease, pos, host.mapToGlobal(pos.toPoint()),
-            button, Qt::NoButton, modifiers);
-        QCoreApplication::sendEvent(&host, &release);
-        QCoreApplication::processEvents();
-    };
-    const auto find_menu_item = [](QQuickItem* delegate, const QString& text) -> QObject* {
-        for (auto* child : delegate->findChildren<QObject*>()) {
-            if (child->property("text").toString() == text
-                && child->property("menu").value<QObject*>())
-                return child;
-        }
-        return nullptr;
-    };
     const auto selection_count = [&] {
         return selection_model->selectedIndexes().size();
     };
 
     // 普通点击只改选中，不切换活动对象。
-    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    clickItem(host, *first_delegate);
     CHECK(selection_count() == 1);
     CHECK(selection_model->currentIndex() == first_index);
     CHECK(selection_state->property("activeModelId").toInt() == -1);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
 
     // 再次点击同一行取消选中；再点击恢复。
-    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    clickItem(host, *first_delegate);
     CHECK(selection_count() == 0);
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
-    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    clickItem(host, *first_delegate);
     CHECK(selection_count() == 1);
 
     // 再次普通点击另一行替换选中，活动对象仍不变。
-    click(second_delegate, Qt::LeftButton, Qt::NoModifier);
+    clickItem(host, *second_delegate);
     CHECK(selection_count() == 1);
     CHECK_FALSE(selection_model->isSelected(first_index));
     CHECK(selection_model->isSelected(second_index));
@@ -1433,14 +1434,14 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
 
     // 右键选中行打开菜单；单目标命令保持可用，设置活动组件只切换活动对象。
-    click(second_delegate, Qt::RightButton, Qt::NoModifier);
+    clickItem(host, *second_delegate, Qt::RightButton);
     auto* make_current = second_delegate->findChild<QObject*>("activeComponentItem");
     REQUIRE(make_current);
     CHECK(make_current->property("text").toString() == "设置活动组件");
     auto* menu = make_current->property("menu").value<QObject*>();
     REQUIRE(menu);
     CHECK(menu->property("visible").toBool());
-    auto* delete_item = find_menu_item(second_delegate, "删除");
+    auto* delete_item = findMenuItem(*second_delegate, *menu, "删除");
     REQUIRE(delete_item);
     CHECK(delete_item->property("enabled").toBool());
     REQUIRE(QMetaObject::invokeMethod(make_current, "triggered"));
@@ -1450,7 +1451,7 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK(selection_count() == 1);
 
     // 再选中其他行不会改变活动对象与加粗目标。
-    click(first_delegate, Qt::LeftButton, Qt::NoModifier);
+    clickItem(host, *first_delegate);
     CHECK(selection_count() == 1);
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
     QVariant emphasized;
@@ -1467,8 +1468,8 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK(selection_state->property("activeComponentId").toInt() == component_ids[1]);
 
     // 重新左键选中当前活动 Component，右键菜单项切换为取消。
-    click(second_delegate, Qt::LeftButton, Qt::NoModifier);
-    click(second_delegate, Qt::RightButton, Qt::NoModifier);
+    clickItem(host, *second_delegate);
+    clickItem(host, *second_delegate, Qt::RightButton);
     auto* cancel_current = second_delegate->findChild<QObject*>("activeComponentItem");
     REQUIRE(cancel_current);
     CHECK(cancel_current->property("text").toString() == "取消活动组件");
@@ -1478,25 +1479,23 @@ TEST_CASE("Actual QML separates selection from make-current", "[QML][tree][selec
     CHECK(selection_state->property("activeComponentId").toInt() == -1);
     CHECK(selection_count() == 1);
 
-    // depth=2 的 Mesh 使用独立菜单：不出现设置/取消活动组件。
+    // Mesh 行允许操作网格，但没有设置或取消活动组件的菜单项。
     const QModelIndex mesh_index = tree_model->index(0, 0, first_index);
     REQUIRE(mesh_index.isValid());
     QQuickItem* mesh_delegate = nullptr;
     REQUIRE(QMetaObject::invokeMethod(tree_view_object, "itemAtIndex",
         Q_RETURN_ARG(QQuickItem*, mesh_delegate), Q_ARG(QModelIndex, mesh_index)));
     REQUIRE(mesh_delegate);
-    click(mesh_delegate, Qt::LeftButton, Qt::NoModifier);
-    click(mesh_delegate, Qt::RightButton, Qt::NoModifier);
-    auto* mesh_menu = mesh_delegate->findChild<QObject*>("nodeActionsMenu");
+    clickItem(host, *mesh_delegate);
+    clickItem(host, *mesh_delegate, Qt::RightButton);
+    auto* mesh_menu = mesh_delegate->findChild<QObject*>("nodeContextMenu");
     REQUIRE(mesh_menu);
     CHECK(mesh_menu->property("visible").toBool());
-    bool mesh_has_active_items = false;
-    for (auto* child : mesh_menu->findChildren<QObject*>()) {
-        const QString text = child->property("text").toString();
-        if (text == "设置活动组件" || text == "取消活动组件")
-            mesh_has_active_items = true;
-    }
-    CHECK_FALSE(mesh_has_active_items);
+    auto* mesh_active_item = mesh_delegate->findChild<QObject*>("activeComponentItem");
+    REQUIRE(mesh_active_item);
+    CHECK_FALSE(mesh_active_item->property("visible").toBool());
+    CHECK_FALSE(mesh_active_item->property("enabled").toBool());
+    CHECK(mesh_active_item->property("height").toReal() == 0);
     REQUIRE(QMetaObject::invokeMethod(mesh_menu, "close"));
 }
 
@@ -1553,24 +1552,13 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     REQUIRE(first_delegate);
     REQUIRE(second_delegate);
 
-    const auto click = [&](QQuickItem* target, Qt::MouseButton button) {
-        const QPointF pos = host.contentItem()->mapFromItem(target,
-            target->width() / 2, target->height() / 2);
-        QMouseEvent press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
-            button, button, Qt::NoModifier);
-        QCoreApplication::sendEvent(&host, &press);
-        QMouseEvent release(QEvent::MouseButtonRelease, pos, host.mapToGlobal(pos.toPoint()),
-            button, Qt::NoButton, Qt::NoModifier);
-        QCoreApplication::sendEvent(&host, &release);
-        QCoreApplication::processEvents();
-    };
     const auto active_item = [](QQuickItem* delegate) -> QObject* {
         return delegate->findChild<QObject*>("activeComponentItem");
     };
     const auto open_menu = [&](QQuickItem* delegate, const QModelIndex& index) -> QObject* {
         if (!selection_model->isSelected(index))
             selection_model->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
-        click(delegate, Qt::RightButton);
+        clickItem(host, *delegate, Qt::RightButton);
         auto* item = active_item(delegate);
         REQUIRE(item);
         auto* menu = item->property("menu").value<QObject*>();
@@ -1584,7 +1572,7 @@ TEST_CASE("Actual QML enforces set and cancel active component rules", "[QML][tr
     };
 
     // 右键未选中行不改变选中，只打开全局菜单。
-    click(first_delegate, Qt::RightButton);
+    clickItem(host, *first_delegate, Qt::RightButton);
     CHECK_FALSE(selection_model->hasSelection());
     auto* global_menu = f.tree->findChild<QObject*>("blankContextMenu");
     REQUIRE(global_menu);
@@ -1784,23 +1772,9 @@ TEST_CASE("Actual QML shows unavailable menu for deep rows", "[QML][tree][select
     REQUIRE(selection_model);
 
     // 左键选中深层行后，右键打开深层菜单。
-    const QPointF pos = host.contentItem()->mapFromItem(delegate,
-        delegate->width() / 2, delegate->height() / 2);
-    QMouseEvent left_press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
-        Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-    QCoreApplication::sendEvent(&host, &left_press);
-    QMouseEvent left_release(QEvent::MouseButtonRelease, pos, host.mapToGlobal(pos.toPoint()),
-        Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
-    QCoreApplication::sendEvent(&host, &left_release);
-    QCoreApplication::processEvents();
+    clickItem(host, *delegate);
     CHECK(selection_model->isSelected(sub_index));
-    QMouseEvent press(QEvent::MouseButtonPress, pos, host.mapToGlobal(pos.toPoint()),
-        Qt::RightButton, Qt::RightButton, Qt::NoModifier);
-    QCoreApplication::sendEvent(&host, &press);
-    QMouseEvent release(QEvent::MouseButtonRelease, pos, host.mapToGlobal(pos.toPoint()),
-        Qt::RightButton, Qt::NoButton, Qt::NoModifier);
-    QCoreApplication::sendEvent(&host, &release);
-    QCoreApplication::processEvents();
+    clickItem(host, *delegate, Qt::RightButton);
     CHECK(selection_state->property("activeModelId").toInt() == -1);
 
     auto* menu = delegate->findChild<QObject*>("deepContextMenu");
@@ -2333,22 +2307,19 @@ struct ViewportTreeFixture {
     std::unique_ptr<QObject> source;
     QObject* registry = nullptr;
     TreeModel* tree = nullptr;
-    QObject* view = nullptr;
+    QQuickItem* view = nullptr;
     QQuickItem* page = nullptr;
-    QQuickItem* view_item = nullptr;
     QItemSelectionModel* selection = nullptr;
 
     ViewportTreeFixture()
     {
         qml.manager->getModelManager()->setUndoRecorder(nullptr);
         tree = qml.tree->findChild<TreeModel*>();
-        view = qml.tree->findChild<QObject*>("objectTreeView");
+        view = qml.tree->findChild<QQuickItem*>("objectTreeView");
         page = qobject_cast<QQuickItem*>(qml.tree.get());
-        view_item = qobject_cast<QQuickItem*>(view);
         REQUIRE(tree);
         REQUIRE(view);
         REQUIRE(page);
-        REQUIRE(view_item);
         selection = view->property("selectionModel").value<QItemSelectionModel*>();
         REQUIRE(selection);
         registry = qml.app->property("registry").value<QObject*>();
@@ -2360,14 +2331,12 @@ QtObject {
     id: source
     property var snapshot: null
     property int selectionReadCount: 0
-    readonly property QtObject selectionReader: QtObject {
-        function getAsComponentIds() {
-            ++source.selectionReadCount
-            return source.snapshot.getAsComponentIds()
-        }
-    }
-    readonly property QtObject selectedIDs: snapshot ? selectionReader : null
+    readonly property QtObject selectedIDs: snapshot ? source : null
     signal selectedChanged()
+    function getAsComponentIds() {
+        ++selectionReadCount
+        return snapshot.getAsComponentIds()
+    }
 })QML",
             QUrl("qrc:/undo-ui/ViewportSelectionSource.qml"));
         REQUIRE(waitForCondition([&] { return !component.isLoading(); }));
@@ -2439,22 +2408,15 @@ QtObject {
         auto* delegate = delegateAt(index);
         if (!delegate)
             return false;
-        const auto top = view_item->mapFromItem(delegate, QPointF(0, 0)).y();
+        const auto top = view->mapFromItem(delegate, QPointF(0, 0)).y();
         return delegate->property("selected").toBool() && top >= -1
-            && top + delegate->height() <= view_item->height() + 1;
+            && top + delegate->height() <= view->height() + 1;
     }
     void clickRow(const QModelIndex& index, Qt::MouseButton button = Qt::LeftButton)
     {
         auto* delegate = delegateAt(index);
         REQUIRE(delegate);
-        const QPointF pos = host.contentItem()->mapFromItem(delegate,
-            delegate->width() / 2, delegate->height() / 2);
-        const QPointF global_pos = host.mapToGlobal(pos.toPoint());
-        QMouseEvent press(QEvent::MouseButtonPress, pos, global_pos, button, button, Qt::NoModifier);
-        QCoreApplication::sendEvent(&host, &press);
-        QMouseEvent release(QEvent::MouseButtonRelease, pos, global_pos, button, Qt::NoButton, Qt::NoModifier);
-        QCoreApplication::sendEvent(&host, &release);
-        pumpEvents();
+        clickItem(host, *delegate, button);
     }
 };
 }
@@ -2579,9 +2541,8 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
             Q_ARG(QVariant, QVariant::fromValue(second)), Q_ARG(QVariant, true)));
         REQUIRE(f.selection->isSelected(second));
         f.publishAndWait(ElementEnum::Component, {});
-        CHECK(f.selection->selectedIndexes().size() == 1);
+        CHECK(f.selection->selectedIndexes() == QModelIndexList { second });
         CHECK(f.selection->currentIndex() == second);
-        CHECK(f.selection->isSelected(second));
         REQUIRE(QMetaObject::invokeMethod(f.qml.tree.get(), "handleGlobalLeftPress",
             Q_ARG(QVariant, -1000), Q_ARG(QVariant, -1000)));
         CHECK_FALSE(f.selection->hasSelection());
@@ -2684,13 +2645,7 @@ TEST_CASE("Actual QML keeps the tree menu bound to the opened row", "[QML][tree]
     REQUIRE(menu);
     REQUIRE(menu->property("visible").toBool());
     CHECK(f.selection->selectedIndexes().size() == 2);
-    QObject* delete_item = nullptr;
-    for (auto* child : delegate->findChildren<QObject*>()) {
-        if (child->property("menu").value<QObject*>() == menu && child->property("text").toString() == "删除") {
-            delete_item = child;
-            break;
-        }
-    }
+    auto* delete_item = findMenuItem(*delegate, *menu, "删除");
     REQUIRE(delete_item);
     REQUIRE(delete_item->property("enabled").toBool());
 
@@ -2765,8 +2720,6 @@ TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][
     CHECK(f.selection->selectedIndexes() == QModelIndexList { far });
     CHECK(added_rows.isEmpty());
     CHECK(removed_rows == QModelIndexList { near });
-    CHECK(f.selection->isSelected(far));
-    CHECK_FALSE(f.selection->isSelected(near));
     CHECK(f.selection->currentIndex() == far);
     CHECK(std::abs(f.view->property("contentY").toDouble() - far_scroll) < 1);
 

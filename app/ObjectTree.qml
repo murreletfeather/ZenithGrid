@@ -592,10 +592,8 @@ Pane {
                         // 右键不改变选中；选中行的菜单绑定被点击的节点。
                         if (!viewDelegate.selected) {
                             blankContextMenu.popup()
-                        } else if (viewDelegate.depth <= 1) {
+                        } else if (viewDelegate.depth <= 2) {
                             nodeContextMenu.popup()
-                        } else if (viewDelegate.depth === 2) {
-                            nodeActionsMenu.popup()
                         } else {
                             deepContextMenu.popup()
                         }
@@ -609,6 +607,7 @@ Pane {
                 id: nodeContextMenu
                 objectName: "nodeContextMenu"
                 property var nodeTarget: null
+                readonly property bool canSetActive: !!nodeTarget && nodeTarget.depth <= 1
 
                 onAboutToShow: nodeTarget = objectTree.targetForIndex(treeView.index(viewDelegate.row, 0))
                 onOpened: objectTree._menuOpen = true
@@ -616,13 +615,19 @@ Pane {
 
                 MenuItem {
                     objectName: "activeComponentItem"
+                    visible: nodeContextMenu.canSetActive
+                    height: nodeContextMenu.canSetActive ? implicitHeight : 0
+                    enabled: nodeContextMenu.canSetActive
                     text: nodeContextMenu.nodeTarget
                           && objectTree.isActiveNode(nodeContextMenu.nodeTarget.nodeId, nodeContextMenu.nodeTarget.depth)
                           ? "取消活动组件" : "设置活动组件"
                     onTriggered: objectTree.toggleActiveTarget(nodeContextMenu.nodeTarget)
                 }
 
-                MenuSeparator {}
+                MenuSeparator {
+                    visible: nodeContextMenu.canSetActive
+                    height: nodeContextMenu.canSetActive ? implicitHeight : 0
+                }
 
                 MenuItem {
                     text: "隐藏"
@@ -675,70 +680,6 @@ Pane {
                     onTriggered: {
                         const target = nodeContextMenu.nodeTarget
                         nodeContextMenu.close()
-                        objectTree.deleteTarget(target)
-                    }
-                }
-            }
-
-            AppMenu {
-                id: nodeActionsMenu
-                objectName: "nodeActionsMenu"
-                property var nodeTarget: null
-
-                onAboutToShow: nodeTarget = objectTree.targetForIndex(treeView.index(viewDelegate.row, 0))
-                onOpened: objectTree._menuOpen = true
-                onClosed: objectTree.notifyMenuClosed()
-
-                MenuItem {
-                    text: "隐藏"
-                    onTriggered: objectTree.setTargetVisibility(nodeActionsMenu.nodeTarget, false)
-                }
-
-                MenuItem {
-                    text: "隔离"
-                    onTriggered: objectTree.isolateTarget(nodeActionsMenu.nodeTarget)
-                }
-
-                MenuItem {
-                    objectName: "showNode-" + viewDelegate.model.nodeType + "-"
-                                + (viewDelegate.depth === 0 ? viewDelegate.model.nodeId : viewDelegate.model.componentId)
-                    text: "显示"
-                    onTriggered: objectTree.setTargetVisibility(nodeActionsMenu.nodeTarget, true)
-                }
-
-                MenuSeparator {}
-
-                MenuItem {
-                    text: "展开"
-                    onTriggered: objectTree.setTargetExpanded(nodeActionsMenu.nodeTarget, true)
-                }
-
-                MenuItem {
-                    text: "折叠"
-                    onTriggered: objectTree.setTargetExpanded(nodeActionsMenu.nodeTarget, false)
-                }
-
-                MenuSeparator {}
-
-                MenuItem {
-                    id: deleteActionsItem
-                    text: "删除"
-
-                    contentItem: Text {
-                        text: deleteActionsItem.text
-                        color: Theme.danger
-                        font.pixelSize: Theme.fontSizeCaption
-                        verticalAlignment: Text.AlignVCenter
-                        leftPadding: deleteActionsItem.padding
-                    }
-
-                    background: Rectangle {
-                        color: deleteActionsItem.hovered ? Theme.dangerTint : "transparent"
-                    }
-
-                    onTriggered: {
-                        const target = nodeActionsMenu.nodeTarget
-                        nodeActionsMenu.close()
                         objectTree.deleteTarget(target)
                     }
                 }
