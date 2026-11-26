@@ -54,71 +54,52 @@ Pane {
         const viewport = App.registry.renderWindow
         const selection = viewport ? viewport.selectedIDs : null
         const pickedIds = selection ? selection.getAsComponentIds() : []
-        const componentIds = []
-        const seenIds = new Set()
-        for (const componentId of pickedIds) {
-            if (!seenIds.has(componentId) && QModelManager.query.hasComponent(componentId)) {
-                seenIds.add(componentId)
-                componentIds.push(componentId)
-            }
-        }
-        if (componentIds.length === 0) {
-            if (_viewportComponentIds.length > 0)
-                clearRowSelection()
-            return
-        }
 
-        let indexes = componentIds.map(componentId => treeModel.findIndexByNodeId(componentId, 1))
-        if (indexes.some(index => !index || !index.valid)) {
+        let rows = Array.from(new Set(pickedIds))
+                .filter(id => QModelManager.query.hasComponent(id))
+                .map(id => ({ id, index: treeModel.findIndexByNodeId(id, 1) }))
+        if (rows.some(row => !row.index || !row.index.valid)) {
             // 模型通知按 50ms 合并，新组件可能已可拾取但尚未进入对象树。
             treeModel.refresh()
-            indexes = componentIds.map(componentId => treeModel.findIndexByNodeId(componentId, 1))
+            for (const row of rows)
+                row.index = treeModel.findIndexByNodeId(row.id, 1)
+            rows = rows.filter(row => row.index && row.index.valid)
         }
 
-        const validIds = []
-        const validIndexes = []
-        for (let i = 0; i < indexes.length; ++i) {
-            if (indexes[i] && indexes[i].valid) {
-                validIds.push(componentIds[i])
-                validIndexes.push(indexes[i])
-            }
-        }
-        if (validIds.length === 0) {
+        if (rows.length === 0) {
             if (_viewportComponentIds.length > 0)
                 clearRowSelection()
             return
         }
 
-        const currentIndex = treeView.selectionModel.currentIndex
-        const currentId = currentIndex && currentIndex.valid
-                && treeModel.data(currentIndex, TreeModel.NodeTypeRole) === _nodeTypeComponent
-                ? treeModel.data(currentIndex, TreeModel.NodeIdRole) : -1
-        const currentPosition = validIds.indexOf(currentId)
         const previousIds = new Set(_viewportComponentIds)
-        let addedPosition = -1
-        for (let i = 0; i < validIds.length; ++i) {
-            if (!previousIds.has(validIds[i]))
-                addedPosition = i
-            treeView.expandToIndex(validIndexes[i])
+        let targetIndex = null
+        for (const row of rows) {
+            if (!previousIds.has(row.id))
+                targetIndex = row.index
+            treeView.expandToIndex(row.index)
         }
         treeView.forceLayout()
-        treeView.selectionModel.clearSelection()
-        for (const index of validIndexes)
-            treeView.selectionModel.select(index, ItemSelectionModel.Select)
+
+        const selectionModel = treeView.selectionModel
+        selectionModel.clearSelection()
+        for (const row of rows)
+            selectionModel.select(row.index, ItemSelectionModel.Select)
 
         // 增选跟随新项；取消其他项或仅改变顺序时，保留当前行和用户滚动位置。
-        const targetPosition = addedPosition >= 0 ? addedPosition
-                : currentPosition >= 0 ? currentPosition : 0
-        treeView.selectionModel.setCurrentIndex(validIndexes[targetPosition], ItemSelectionModel.NoUpdate)
-        _viewportComponentIds = validIds
-        if (addedPosition >= 0 || currentPosition < 0)
-            treeView.positionViewAtIndex(validIndexes[targetPosition], TableView.Contain)
+        if (!targetIndex && !selectionModel.isSelected(selectionModel.currentIndex))
+            targetIndex = rows[0].index
+        _viewportComponentIds = rows.map(row => row.id)
+        if (targetIndex) {
+            selectionModel.setCurrentIndex(targetIndex, ItemSelectionModel.NoUpdate)
+            treeView.positionViewAtIndex(targetIndex, TableView.Contain)
+        }
     }
 
     Timer {
         id: viewportSelectionSync
         interval: 0
-        // 只保存组件身份；合并信号后读取最新快照，不跨事件轮次持有 QSelection/索引。
+        // 只应用最新快照，避免被替换的选择展开节点或滚动视图。
         onTriggered: objectTree.syncViewportSelection()
     }
 
@@ -860,23 +841,17 @@ Pane {
 
     // Delete 快捷键入口：仅单行选中时调用既有删除入口。
     function deleteSelectedNode() {
-        const indexes = treeView.selectionModel.selectedIndexes
-        if (indexes.length !== 1)
+        const target = selectedTarget()
+        if (!target)
             return false
-        const idx = indexes[0]
-        const depth = nodeDepth(idx)
-        if (depth < 0 || depth > 2)
-            return false
-        const nodeType = treeModel.data(idx, TreeModel.NodeTypeRole)
+        const { depth, nodeType } = target
         const canDelete = (depth === 0 && nodeType === _nodeTypeModel)
                 || (depth === 1 && nodeType === _nodeTypeComponent)
                 || (depth === 2
                     && (nodeType === _nodeTypeMesh || nodeType === _nodeTypeGeometry))
         if (!canDelete)
             return false
-        const componentId = treeModel.data(idx, TreeModel.ComponentIdRole)
-        const nodeId = treeModel.data(idx, TreeModel.NodeIdRole)
-        deleteNode(nodeId, depth, nodeType, componentId)
+        deleteNode(target.nodeId, depth, nodeType, target.componentId)
         return true
     }
 

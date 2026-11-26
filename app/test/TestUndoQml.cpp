@@ -93,6 +93,8 @@ std::unique_ptr<QObject> load(QQmlEngine& engine, const char* file, const QVaria
     return object;
 }
 struct QmlFixture {
+    enum class Components { All, ObjectTreeOnly };
+
     QTemporaryDir directory;
     std::string executable;
     QQmlEngine engine;
@@ -104,7 +106,7 @@ struct QmlFixture {
     QObject* app;
     QObject* selection_state;
 
-    QmlFixture()
+    explicit QmlFixture(Components components = Components::All)
     {
         static const int tree_type = qmlRegisterType<TreeModel>("UndoUi", 1, 0, "TreeModel");
         static const int theme_type = qmlRegisterSingletonType(QUrl("qrc:/undo-ui/Theme.qml"), "UndoUi", 1, 0, "Theme");
@@ -112,10 +114,13 @@ struct QmlFixture {
         executable = (directory.path() + "/isolated/Test.exe").toStdString();
         QModelManager::argv0 = executable;
         engine.rootContext()->setContextProperty("Theme", engine.singletonInstance<QObject*>(theme_type));
-        session = load(engine, "OperationSession.qml");
-        sidebar = load(engine, "SideBar.qml", { { "session", QVariant::fromValue(session.get()) } });
+        if (components == Components::All) {
+            session = load(engine, "OperationSession.qml");
+            sidebar = load(engine, "SideBar.qml", { { "session", QVariant::fromValue(session.get()) } });
+        }
         tree = load(engine, "ObjectTree.qml");
-        viewport = load(engine, "CentralRenderArea.qml");
+        if (components == Components::All)
+            viewport = load(engine, "CentralRenderArea.qml");
         manager = engine.singletonInstance<QModelManager*>("app.model", "QModelManager");
         app = engine.singletonInstance<QObject*>("app.core", "App");
         REQUIRE(manager);
@@ -2322,7 +2327,7 @@ TEST_CASE("Actual undo clears offscreen selectors only after successful restorat
 namespace {
 //! @brief 只替换渲染线程发布边界，选择载荷、对象树和实际 QML 接线保持真实。
 struct ViewportTreeFixture {
-    QmlFixture qml;
+    QmlFixture qml { QmlFixture::Components::ObjectTreeOnly };
     QQuickWindow host;
     QSelection payload;
     std::unique_ptr<QObject> source;
@@ -2376,7 +2381,7 @@ QtObject {
         host.hide();
         page->setParentItem(nullptr);
     }
-    Index addModel(const std::string& name, int component_count, bool refresh = true)
+    Index addModel(const std::string& name, int component_count)
     {
         ComponentDatas components;
         for (int i = 0; i < component_count; ++i) {
@@ -2384,10 +2389,7 @@ QtObject {
             component->mesh = std::make_unique<MeshData>();
             components.push_back(std::move(component));
         }
-        const auto id = qml.manager->getModelManager()->addModel(name, std::move(components));
-        if (refresh)
-            REQUIRE(tree->refresh());
-        return id;
+        return qml.manager->getModelManager()->addModel(name, std::move(components));
     }
     void publish(ElementEnum::Type type, const QList<Index>& ids)
     {
@@ -2430,6 +2432,7 @@ TEST_CASE("Actual QML mirrors viewport component picks to the exact tree row", "
     auto& model = *f.qml.manager->getModelManager();
     const Index first_model = f.addModel("first model", 2);
     const Index second_model = f.addModel("second model", 1);
+    REQUIRE(f.tree->refresh());
     const auto components = model.modelById(first_model)->componentIds();
     const Index picked_id = components[1];
     // 模型和组件各有自己的 ID 域；这里特意构造数值相同的不同类型节点。
@@ -2472,6 +2475,7 @@ TEST_CASE("Actual QML reveals viewport picks under collapsed offscreen models", 
     Index picked_model = -1;
     for (int i = 0; i < 20; ++i)
         picked_model = f.addModel("collapsed model " + std::to_string(i), 2);
+    REQUIRE(f.tree->refresh());
     REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
     f.settle();
     CHECK(f.view->property("contentY").toDouble() == 0);
@@ -2479,7 +2483,7 @@ TEST_CASE("Actual QML reveals viewport picks under collapsed offscreen models", 
     SECTION("existing collapsed parent") { }
     SECTION("selection arrives before the model refresh timer")
     {
-        picked_model = f.addModel("pending model", 2, false);
+        picked_model = f.addModel("pending model", 2);
         const Index pending_component = model.modelById(picked_model)->componentIds()[1];
         REQUIRE_FALSE(f.tree->findIndexByNodeId(pending_component, 1).isValid());
     }
@@ -2511,6 +2515,7 @@ TEST_CASE("Actual QML clears only viewport-owned tree selection", "[QML][tree][v
     ViewportTreeFixture f;
     auto& model = *f.qml.manager->getModelManager();
     const auto model_id = f.addModel("selection ownership", 2);
+    REQUIRE(f.tree->refresh());
     const auto components = model.modelById(model_id)->componentIds();
     const auto first = f.tree->findIndexByNodeId(components[0], 1);
     const auto second = f.tree->findIndexByNodeId(components[1], 1);
@@ -2558,25 +2563,16 @@ TEST_CASE("Actual QML mirrors multiple viewport components across model parents"
     auto& model = *f.qml.manager->getModelManager();
     const Index first_model = f.addModel("multiple first", 3);
     const Index second_model = f.addModel("multiple second", 2);
+    REQUIRE(f.tree->refresh());
     const auto first_components = model.modelById(first_model)->componentIds();
     const auto second_components = model.modelById(second_model)->componentIds();
     const auto first = f.tree->findIndexByNodeId(first_components[1], 1);
     QList<Index> picked_ids;
     QList<Index> expected_ids;
-    SECTION("same model")
+    SECTION("selects siblings and another model, ignoring unknown and repeated IDs")
     {
-        picked_ids = { first_components[1], first_components[2] };
-        expected_ids = picked_ids;
-    }
-    SECTION("different models")
-    {
-        picked_ids = { first_components[1], second_components[0] };
-        expected_ids = picked_ids;
-    }
-    SECTION("unknown IDs are filtered and repeated IDs select one row")
-    {
-        picked_ids = { first_components[1], -1, 1000000, second_components[0], first_components[1] };
-        expected_ids = { first_components[1], second_components[0] };
+        picked_ids = { first_components[1], -1, first_components[2], 1000000, second_components[0], first_components[1] };
+        expected_ids = { first_components[1], first_components[2], second_components[0] };
     }
     SECTION("a repeated single component remains a single row")
     {
@@ -2644,6 +2640,7 @@ TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][
     for (int i = 0; i < 16; ++i)
         f.addModel("between " + std::to_string(i), 1);
     const Index far_model = f.addModel("far selection", 1);
+    REQUIRE(f.tree->refresh());
     const Index near_id = model.modelById(near_model)->componentIds()[0];
     const Index far_id = model.modelById(far_model)->componentIds()[0];
     const auto near = f.tree->findIndexByNodeId(near_id, 1);
@@ -2653,8 +2650,11 @@ TEST_CASE("Actual QML keeps viewport multi-selection navigation stable", "[QML][
     REQUIRE(QMetaObject::invokeMethod(f.view, "collapseRecursively", Q_ARG(int, -1)));
     f.settle();
 
+    // 同一轮只应用最后一次选择，临时快照不能展开另一棵子树。
+    f.publish(ElementEnum::Component, { far_id });
     f.publish(ElementEnum::Component, { near_id });
     REQUIRE(waitForCondition([&] { return f.containsVisibleDelegate(near); }));
+    CHECK(f.rowOf(far) == -1);
     const auto near_scroll = f.view->property("contentY").toDouble();
     f.publish(ElementEnum::Component, { near_id, far_id });
     REQUIRE(waitForCondition([&] {
