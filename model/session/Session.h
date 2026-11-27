@@ -20,6 +20,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace systems {
 class SystemPluginManager;
@@ -85,6 +86,8 @@ public:
     // —— 模型结构操作入口（QML 适配层与脚本宿主共用）——
     void removeModel(Index model_id);
     void removeComponent(Index component_id);
+    //! @brief 在同一撤销记录中删除仍存在的组件，跳过失效或重复的 ID。
+    void removeComponents(std::vector<Index> component_ids);
     //! @brief 移除组件网格（操作边界：undo 自动记录 + 通知统一 flush）
     void removeMesh(Index component_id);
     //! @brief 移除组件几何（操作边界：undo 自动记录 + 通知统一 flush）

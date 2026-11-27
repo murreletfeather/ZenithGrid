@@ -22,6 +22,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
+#include <utility>
 #include <vector>
 
 using namespace session;
@@ -187,6 +188,74 @@ TEST_CASE("Session works without host observer", "[session]")
     CHECK(counter.added == 1);
     CHECK(s.query().listModels().size() == 1);
     CHECK(s.undoStack().canUndo());
+}
+
+TEST_CASE("Session deletes components from multiple models in one operation", "[session][undo]")
+{
+    RecordingObserver observer;
+    Session session(&observer);
+    auto& model = session.model();
+    auto& history = session.undoStack();
+
+    Index first_model;
+    Index second_model;
+    {
+        ModelScope scope(model, &history, "添加测试模型");
+        ComponentDatas first_components;
+        first_components.push_back(std::make_unique<ComponentData>());
+        first_components.push_back(std::make_unique<ComponentData>());
+        ComponentDatas second_components;
+        second_components.push_back(std::make_unique<ComponentData>());
+        first_model = model.addModel("first", std::move(first_components));
+        second_model = model.addModel("second", std::move(second_components));
+    }
+    const auto first_components = session.query().componentIds(first_model);
+    const auto second_components = session.query().componentIds(second_model);
+    REQUIRE(first_components.size() == 2);
+    REQUIRE(second_components.size() == 1);
+    const Index first_removed = first_components.back();
+    const Index second_removed = second_components.front();
+    history.clear();
+
+    SECTION("valid IDs across models are removed once and share an undo record")
+    {
+        session.removeComponents({ first_removed, -1, second_removed, first_removed });
+        CHECK(session.query().componentIds(first_model) == std::vector<Index> { first_components.front() });
+        CHECK(session.query().componentIds(second_model).empty());
+        CHECK(observer.component_removed == 2);
+
+        REQUIRE(history.undo());
+        CHECK(session.query().componentIds(first_model) == first_components);
+        CHECK(session.query().componentIds(second_model) == second_components);
+        CHECK_FALSE(history.canUndo());
+
+        REQUIRE(history.redo());
+        CHECK_FALSE(session.query().hasComponent(first_removed));
+        CHECK_FALSE(session.query().hasComponent(second_removed));
+        CHECK(observer.component_removed == 4);
+    }
+
+    SECTION("empty and stale inputs leave preview and history unchanged")
+    {
+        REQUIRE(history.beginScope("预览"));
+        session.removeComponents({});
+        session.removeComponents({ -1 });
+        CHECK(history.scopeActive());
+        CHECK(observer.component_removed == 0);
+        history.cancelScope();
+        CHECK_FALSE(history.canUndo());
+    }
+
+    SECTION("a pending write operation refuses the whole batch")
+    {
+        const auto operation = model.beginWriteOperation();
+        REQUIRE(operation);
+        REQUIRE_THROWS_AS(session.removeComponents({ first_removed, second_removed }), ModelOperationBusy);
+        CHECK(session.query().hasComponent(first_removed));
+        CHECK(session.query().hasComponent(second_removed));
+        CHECK(observer.component_removed == 0);
+        CHECK_FALSE(history.canUndo());
+    }
 }
 
 TEST_CASE("FeatureSystem borrows the session IO system without taking ownership", "[session][feature][io]")

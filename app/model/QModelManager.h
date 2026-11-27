@@ -10,6 +10,7 @@
 #include "QSystemPluginManager.h"
 #include "QTaskStatus.h"
 #include "QUndoStackAdaptor.h"
+#include <QList>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -39,6 +40,7 @@ public:
 
     Q_INVOKABLE void removeModel(int id);
     Q_INVOKABLE void removeComponent(int id);
+    Q_INVOKABLE void removeComponents(const QList<int>& componentIds);
     Q_INVOKABLE void removeMesh(int componentId);
     Q_INVOKABLE void removeGeometry(int componentId);
     ModelLayer* getModelManager();

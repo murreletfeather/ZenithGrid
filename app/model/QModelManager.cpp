@@ -162,6 +162,15 @@ void QModelManager::removeComponent(int id)
     }
 }
 
+void QModelManager::removeComponents(const QList<int>& componentIds)
+{
+    try {
+        session_->removeComponents(std::vector<Index>(componentIds.cbegin(), componentIds.cend()));
+    } catch (const ModelOperationBusy& e) {
+        spdlog::warn("QModelManager: {}", e.what());
+    }
+}
+
 void QModelManager::removeMesh(int componentId)
 {
     try {

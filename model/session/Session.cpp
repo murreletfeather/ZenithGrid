@@ -18,6 +18,7 @@
 #include "SystemPluginManager.h"
 #include "UndoStack.h"
 
+#include <algorithm>
 #include <spdlog/spdlog.h>
 
 namespace session {
@@ -175,6 +176,20 @@ void Session::removeComponent(Index component_id)
 {
     ModelScope scope(model_, undo_stack_.get(), "删除组件");
     model_.removeComponent(component_id);
+}
+
+void Session::removeComponents(std::vector<Index> component_ids)
+{
+    model_.assertOwnerThread();
+    const auto exists = [this](Index component_id) { return model_.findComponent(component_id) != nullptr; };
+    if (std::ranges::none_of(component_ids, exists))
+        return;
+
+    ModelScope scope(model_, undo_stack_.get(), "删除组件");
+    for (const Index component_id : component_ids) {
+        if (exists(component_id))
+            model_.removeComponent(component_id);
+    }
 }
 
 void Session::boundaryWrite(Index component_id, std::string label, const std::function<void(ComponentOperator&)>& write)

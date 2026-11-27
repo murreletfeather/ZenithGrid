@@ -47,63 +47,54 @@ Pane {
     //! @brief 自身菜单打开期间不响应外部左键清空。
     property bool _menuOpen: false
 
-    // 只清理由视口联动建立的行选择，用户主动导航后不再拥有该行。
+    // 联动高亮只参与展示和批量命令，树内选择仍由 ItemSelectionModel 维护。
     property var _viewportComponentIds: []
+
+    function clearViewportHighlight() {
+        viewportSelectionSync.stop()
+        if (_viewportComponentIds.length > 0)
+            _viewportComponentIds = []
+    }
 
     function syncViewportSelection() {
         const viewport = App.registry.renderWindow
         const selection = viewport ? viewport.selectedIDs : null
-        const pickedIds = selection ? selection.getAsComponentIds() : []
-
-        let rows = pickedIds
-                .filter(id => QModelManager.query.hasComponent(id))
-                .map(id => ({ id, index: treeModel.findIndexByNodeId(id, 1) }))
-        if (rows.some(row => !row.index.valid)) {
-            // 模型通知按 50ms 合并，新组件可能已可拾取但尚未进入对象树。
-            treeModel.refresh()
-            for (const row of rows)
-                row.index = treeModel.findIndexByNodeId(row.id, 1)
-            rows = rows.filter(row => row.index.valid)
-        }
-
-        if (rows.length === 0) {
-            if (_viewportComponentIds.length > 0)
-                clearRowSelection()
+        const ids = selection ? selection.getAsComponentIds() : []
+        const nextIds = Array.from(QModelManager.query.filterExistingComponentIds(ids))
+        const previous = Object.create(null)
+        for (const id of _viewportComponentIds)
+            previous[id] = true
+        const additions = nextIds.filter(id => !previous[id])
+        // 顺序变化不影响高亮，也不触发查找、展开或布局。
+        if (additions.length === 0 && nextIds.length === _viewportComponentIds.length)
             return
+
+        _viewportComponentIds = nextIds
+        if (additions.length === 0)
+            return
+
+        let indexes = Array.from(treeModel.findComponentIndexes(additions))
+        if (indexes.some(index => !index.valid)) {
+            // 模型通知按 50ms 合并，已可拾取的组件可能尚未进入对象树。
+            treeModel.refresh()
+            indexes = Array.from(treeModel.findComponentIndexes(additions))
         }
 
-        const componentIds = rows.map(row => row.id)
-        const missingIds = new Set(componentIds)
-        const previousIds = new Set(_viewportComponentIds)
-        const selectionModel = treeView.selectionModel
-        for (const index of Array.from(selectionModel.selectedIndexes)) {
-            if (treeModel.data(index, TreeModel.NodeTypeRole) !== _nodeTypeComponent
-                    || !missingIds.delete(treeModel.data(index, TreeModel.NodeIdRole)))
-                selectionModel.select(index, ItemSelectionModel.Deselect)
-        }
-
-        let targetIndex = null
-        let expanded = false
-        for (const row of rows) {
-            if (!previousIds.has(row.id))
-                targetIndex = row.index
-            if (treeView.rowAtIndex(row.index) < 0) {
-                treeView.expandToIndex(row.index)
-                expanded = true
+        const expandedModels = new Set()
+        let target = null
+        for (const index of indexes) {
+            if (!index.valid)
+                continue
+            const modelRow = index.parent.row
+            if (!expandedModels.has(modelRow)) {
+                expandedModels.add(modelRow)
+                treeView.expandToIndex(index)
             }
-            if (missingIds.has(row.id))
-                selectionModel.select(row.index, ItemSelectionModel.Select)
+            target = index
         }
-
-        // 增选跟随新项；取消其他项或仅改变顺序时，保留当前行和用户滚动位置。
-        if (!targetIndex && !selectionModel.isSelected(selectionModel.currentIndex))
-            targetIndex = rows[0].index
-        _viewportComponentIds = componentIds
-        if (expanded || targetIndex)
+        if (target) {
             treeView.forceLayout()
-        if (targetIndex) {
-            selectionModel.setCurrentIndex(targetIndex, ItemSelectionModel.NoUpdate)
-            treeView.positionViewAtIndex(targetIndex, TableView.Contain)
+            treeView.positionViewAtIndex(target, TableView.Contain)
         }
     }
 
@@ -124,6 +115,14 @@ Pane {
         function onRenderWindowChanged() { viewportSelectionSync.restart() }
     }
 
+    Connections {
+        target: App.selection
+        function onSelectModeChanged() {
+            if (App.selection.selectMode !== "Component")
+                objectTree.clearViewportHighlight()
+        }
+    }
+
     // 加粗行：仅活动 Model/Component；更深层级只高亮，不加粗。
     function isNodeEmphasized(nodeId, depth) {
         if (depth === 0)
@@ -135,15 +134,12 @@ Pane {
 
     // 清空行选择，保留导航位置与活动对象。
     function clearRowSelection() {
-        viewportSelectionSync.stop()
-        _viewportComponentIds = []
         treeView.selectionModel.clearSelection()
     }
 
     // 清空行选择与导航位置（undo/redo 等全量重置）。
     function resetSelection() {
-        viewportSelectionSync.stop()
-        _viewportComponentIds = []
+        clearViewportHighlight()
         treeView.selectionModel.clear()
     }
 
@@ -175,31 +171,25 @@ Pane {
         }
     }
 
-    // 首次点击接管联动行；再次点击树自己选中的单行时取消。
+    // 左键选择入口：单行替换选中；显式左键再次点击已选中行时取消。
     function selectRow(index, toggle = false) {
         if (!index || !index.valid)
             return
+        clearViewportHighlight()
         treeView.forceActiveFocus()
-        const selectionModel = treeView.selectionModel
-        if (toggle && _viewportComponentIds.length === 0
-                && selectionModel.selectedIndexes.length === 1 && selectionModel.isSelected(index)) {
+        if (toggle && treeView.selectionModel.isSelected(index)) {
             clearRowSelection()
             return
         }
-        viewportSelectionSync.stop()
-        _viewportComponentIds = []
-        selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
+        treeView.selectionModel.setCurrentIndex(index, ItemSelectionModel.ClearAndSelect)
     }
 
     // 单目标命令读取当前选中行。
     function selectedTarget() {
         const indexes = treeView.selectionModel.selectedIndexes
-        return indexes.length === 1 ? targetForIndex(indexes[0]) : null
-    }
-
-    function targetForIndex(index) {
-        if (!index.valid)
+        if (indexes.length !== 1)
             return null
+        const index = indexes[0]
         return {
             nodeId: treeModel.data(index, TreeModel.NodeIdRole),
             depth: objectTree.nodeDepth(index),
@@ -208,52 +198,21 @@ Pane {
         }
     }
 
-    // 菜单打开后行索引可能变化，按节点身份重找，并确认模型数据尚在。
-    function resolveTargetIndex(target) {
+    function hideSelection() {
+        const target = objectTree.selectedTarget()
+        if (target)
+            hideNode(target.nodeId, target.depth, target.nodeType, target.componentId)
+    }
+
+    function showSelection() {
+        const target = objectTree.selectedTarget()
+        if (target)
+            showNode(target.nodeId, target.depth, target.nodeType, target.componentId)
+    }
+
+    function isolateSelectedNode() {
+        const target = objectTree.selectedTarget()
         if (!target)
-            return null
-        const index = treeModel.findIndexByNodeId(target.nodeId, target.depth)
-        if (!index.valid)
-            return null
-
-        const query = QModelManager.query
-        switch (target.nodeType) {
-        case _nodeTypeModel:
-            return query.hasModel(target.nodeId) ? index : null
-        case _nodeTypeComponent:
-            return query.hasComponent(target.componentId) ? index : null
-        case _nodeTypeMesh:
-        case _nodeTypeGeometry: {
-            const modelId = query.findModelIdByComponent(target.componentId)
-            const component = query.getComponentsSummary(modelId)
-                    .find(info => info.component_id === target.componentId)
-            if (!component)
-                return null
-            const exists = target.nodeType === _nodeTypeMesh ? component.has_mesh : component.has_geometry
-            return exists ? index : null
-        }
-        default:
-            return null
-        }
-    }
-
-    function toggleActiveTarget(target) {
-        if (!resolveTargetIndex(target))
-            return
-        if (isActiveNode(target.nodeId, target.depth))
-            clearActiveTarget()
-        else
-            makeNodeCurrent(target.nodeId, target.depth, target.componentId)
-    }
-
-    function setTargetVisibility(target, visible) {
-        const index = resolveTargetIndex(target)
-        if (index)
-            treeModel.requestVisibility(index, visible)
-    }
-
-    function isolateTarget(target) {
-        if (!resolveTargetIndex(target))
             return
         if (target.depth === 0)
             isolateModel(target.nodeId)
@@ -263,31 +222,18 @@ Pane {
             isolateSubNode(target.nodeId, target.nodeType, target.componentId)
     }
 
-    function setTargetExpanded(target, expanded) {
-        const index = resolveTargetIndex(target)
-        if (!index)
-            return
-        const row = treeView.rowAtIndex(index)
-        if (row < 0)
-            return
-        if (expanded)
-            expandSubtree(row)
-        else
-            collapseSubtree(row)
-    }
-
     function containsGlobalPoint(x, y) {
         if (!objectTree.visible)
             return false
         return objectTree.contains(objectTree.mapFromGlobal(x, y))
     }
 
-    // 树主动选择沿用树外清空；视口联动行跟随真实选择，不被参数区点击清除。
+    // 应用级左键按下：点击对象树外部时清空行选择，活动对象保持不变。
     function handleGlobalLeftPress(x, y) {
         if (_menuOpen)
             return
-        if (_viewportComponentIds.length === 0 && !objectTree.containsGlobalPoint(x, y))
-            treeView.selectionModel.clearSelection()
+        if (!objectTree.containsGlobalPoint(x, y))
+            objectTree.clearRowSelection()
     }
 
     function notifyMenuClosed() {
@@ -433,6 +379,9 @@ Pane {
         delegate: TreeViewDelegate {
             id: viewDelegate
             height: _rowHeight
+            readonly property bool viewportHighlighted:
+                depth === 1 && objectTree._viewportComponentIds.includes(model.nodeId)
+            readonly property bool rowHighlighted: selected || viewportHighlighted
 
             readonly property real _padding: 6
             readonly property real _rowHeight: 22
@@ -450,10 +399,10 @@ Pane {
 
             background: Rectangle {
                 anchors.fill: parent
-                color: viewDelegate.selected ? Theme.primaryTint
+                color: viewDelegate.rowHighlighted ? Theme.primaryTint
                      : viewDelegate.hovered ? Theme.hoverOverlay
                      : "transparent"
-                border.width: viewDelegate.selected ? 1 : 0
+                border.width: viewDelegate.rowHighlighted ? 1 : 0
                 border.color: Theme.primary
 
                 // 导航 current 与 selection 分离：当前行用左侧强调条标记。
@@ -589,11 +538,15 @@ Pane {
                     }
                     const index = treeView.index(viewDelegate.row, 0)
                     if (mouse.button === Qt.RightButton) {
-                        // 右键不改变选中；选中行的菜单绑定被点击的节点。
-                        if (!viewDelegate.selected) {
+                        // 右键保持当前范围，联动多选用共享批量菜单。
+                        if (viewDelegate.viewportHighlighted && objectTree._viewportComponentIds.length > 1) {
+                            viewportBatchMenu.popup()
+                        } else if (!viewDelegate.selected) {
                             blankContextMenu.popup()
-                        } else if (viewDelegate.depth <= 2) {
+                        } else if (viewDelegate.depth <= 1) {
                             nodeContextMenu.popup()
+                        } else if (viewDelegate.depth === 2) {
+                            nodeActionsMenu.popup()
                         } else {
                             deepContextMenu.popup()
                         }
@@ -606,56 +559,54 @@ Pane {
             AppMenu {
                 id: nodeContextMenu
                 objectName: "nodeContextMenu"
-                property var nodeTarget: null
-                readonly property bool canSetActive: !!nodeTarget && nodeTarget.depth <= 1
 
-                onAboutToShow: nodeTarget = objectTree.targetForIndex(treeView.index(viewDelegate.row, 0))
                 onOpened: objectTree._menuOpen = true
                 onClosed: objectTree.notifyMenuClosed()
 
                 MenuItem {
                     objectName: "activeComponentItem"
-                    visible: nodeContextMenu.canSetActive
-                    height: nodeContextMenu.canSetActive ? implicitHeight : 0
-                    enabled: nodeContextMenu.canSetActive
-                    text: nodeContextMenu.nodeTarget
-                          && objectTree.isActiveNode(nodeContextMenu.nodeTarget.nodeId, nodeContextMenu.nodeTarget.depth)
+                    text: objectTree.isActiveNode(viewDelegate.model.nodeId, viewDelegate.depth)
                           ? "取消活动组件" : "设置活动组件"
-                    onTriggered: objectTree.toggleActiveTarget(nodeContextMenu.nodeTarget)
+                    onTriggered: {
+                        if (objectTree.isActiveNode(viewDelegate.model.nodeId, viewDelegate.depth)) {
+                            objectTree.clearActiveTarget()
+                        } else {
+                            objectTree.makeNodeCurrent(
+                                viewDelegate.model.nodeId, viewDelegate.depth,
+                                viewDelegate.model.componentId)
+                        }
+                    }
                 }
 
-                MenuSeparator {
-                    visible: nodeContextMenu.canSetActive
-                    height: nodeContextMenu.canSetActive ? implicitHeight : 0
-                }
+                MenuSeparator {}
 
                 MenuItem {
                     text: "隐藏"
-                    onTriggered: objectTree.setTargetVisibility(nodeContextMenu.nodeTarget, false)
+                    onTriggered: objectTree.hideSelection()
                 }
 
                 MenuItem {
                     text: "隔离"
-                    onTriggered: objectTree.isolateTarget(nodeContextMenu.nodeTarget)
+                    onTriggered: objectTree.isolateSelectedNode()
                 }
 
                 MenuItem {
                     objectName: "showNode-" + viewDelegate.model.nodeType + "-"
                                 + (viewDelegate.depth === 0 ? viewDelegate.model.nodeId : viewDelegate.model.componentId)
                     text: "显示"
-                    onTriggered: objectTree.setTargetVisibility(nodeContextMenu.nodeTarget, true)
+                    onTriggered: objectTree.showSelection()
                 }
 
                 MenuSeparator {}
 
                 MenuItem {
                     text: "展开"
-                    onTriggered: objectTree.setTargetExpanded(nodeContextMenu.nodeTarget, true)
+                    onTriggered: objectTree.expandSubtree(viewDelegate.row)
                 }
 
                 MenuItem {
                     text: "折叠"
-                    onTriggered: objectTree.setTargetExpanded(nodeContextMenu.nodeTarget, false)
+                    onTriggered: objectTree.collapseSubtree(viewDelegate.row)
                 }
 
                 MenuSeparator {}
@@ -678,9 +629,69 @@ Pane {
                     }
 
                     onTriggered: {
-                        const target = nodeContextMenu.nodeTarget
                         nodeContextMenu.close()
-                        objectTree.deleteTarget(target)
+                        objectTree.deleteTreeSelection()
+                    }
+                }
+            }
+
+            AppMenu {
+                id: nodeActionsMenu
+                objectName: "nodeActionsMenu"
+
+                onOpened: objectTree._menuOpen = true
+                onClosed: objectTree.notifyMenuClosed()
+
+                MenuItem {
+                    text: "隐藏"
+                    onTriggered: objectTree.hideSelection()
+                }
+
+                MenuItem {
+                    text: "隔离"
+                    onTriggered: objectTree.isolateSelectedNode()
+                }
+
+                MenuItem {
+                    objectName: "showNode-" + viewDelegate.model.nodeType + "-"
+                                + (viewDelegate.depth === 0 ? viewDelegate.model.nodeId : viewDelegate.model.componentId)
+                    text: "显示"
+                    onTriggered: objectTree.showSelection()
+                }
+
+                MenuSeparator {}
+
+                MenuItem {
+                    text: "展开"
+                    onTriggered: objectTree.expandSubtree(viewDelegate.row)
+                }
+
+                MenuItem {
+                    text: "折叠"
+                    onTriggered: objectTree.collapseSubtree(viewDelegate.row)
+                }
+
+                MenuSeparator {}
+
+                MenuItem {
+                    id: deleteActionsItem
+                    text: "删除"
+
+                    contentItem: Text {
+                        text: deleteActionsItem.text
+                        color: Theme.danger
+                        font.pixelSize: Theme.fontSizeCaption
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: deleteActionsItem.padding
+                    }
+
+                    background: Rectangle {
+                        color: deleteActionsItem.hovered ? Theme.dangerTint : "transparent"
+                    }
+
+                    onTriggered: {
+                        nodeActionsMenu.close()
+                        objectTree.deleteTreeSelection()
                     }
                 }
             }
@@ -782,6 +793,38 @@ Pane {
     }
 
     AppMenu {
+        id: viewportBatchMenu
+        objectName: "viewportBatchMenu"
+        property var componentIds: []
+
+        onAboutToShow: componentIds = objectTree._viewportComponentIds.slice()
+        onOpened: objectTree._menuOpen = true
+        onClosed: objectTree.notifyMenuClosed()
+
+        MenuItem {
+            text: "隐藏"
+            onTriggered: objectTree.setComponentsVisible(viewportBatchMenu.componentIds, false)
+        }
+
+        MenuItem {
+            text: "隔离"
+            onTriggered: objectTree.isolateSelection(viewportBatchMenu.componentIds)
+        }
+
+        MenuItem {
+            text: "显示"
+            onTriggered: objectTree.setComponentsVisible(viewportBatchMenu.componentIds, true)
+        }
+
+        MenuSeparator {}
+
+        MenuItem {
+            text: "删除"
+            onTriggered: objectTree.deleteComponents(viewportBatchMenu.componentIds)
+        }
+    }
+
+    AppMenu {
         id: blankContextMenu
         objectName: "blankContextMenu"
 
@@ -815,6 +858,12 @@ Pane {
         treeModel.requestVisibility(idx, true)
     }
 
+    function setComponentsVisible(ids, visible) {
+        const liveIds = QModelManager.query.filterExistingComponentIds(ids)
+        for (const index of treeModel.findComponentIndexes(liveIds))
+            treeModel.requestVisibility(index, visible)
+    }
+
     function deleteNode(nodeId, depth, nodeType, componentId) {
         if (depth === 0) {
             QModelManager.removeModel(nodeId)
@@ -824,7 +873,10 @@ Pane {
             QModelManager.removeMesh(componentId)
         } else if (depth === 2 && nodeType === objectTree._nodeTypeGeometry) {
             QModelManager.removeGeometry(componentId)
+        } else {
+            return false
         }
+        return true
     }
 
     // 模型索引深度：根节点为 0，逐级向下递增。
@@ -838,16 +890,26 @@ Pane {
         return depth
     }
 
-    // Delete 快捷键入口：仅单行选中时调用既有删除入口。
-    function deleteSelectedNode() {
-        return deleteTarget(selectedTarget())
+    function deleteTreeSelection() {
+        const target = selectedTarget()
+        return target ? deleteNode(target.nodeId, target.depth, target.nodeType, target.componentId) : false
     }
 
-    function deleteTarget(target) {
-        if (!resolveTargetIndex(target))
+    function deleteComponents(ids) {
+        const liveIds = QModelManager.query.filterExistingComponentIds(ids)
+        if (liveIds.length === 0)
             return false
-        deleteNode(target.nodeId, target.depth, target.nodeType, target.componentId)
+        QModelManager.removeComponents(liveIds)
         return true
+    }
+
+    // 快照待同步时，Delete 不能使用上一组高亮或原来的单选。
+    function deleteSelectedNode() {
+        if (viewportSelectionSync.running)
+            return false
+        if (_viewportComponentIds.length > 1)
+            return deleteComponents(_viewportComponentIds)
+        return deleteTreeSelection()
     }
 
     function hideAllNodes() {
@@ -901,13 +963,16 @@ Pane {
     }
 
     function isolateSelection(ids) {
+        const keep = new Set(QModelManager.query.filterExistingComponentIds(ids))
+        if (keep.size === 0)
+            return
         const models = QModelManager.query.listModels()
         for (const model of models) {
             const components = QModelManager.query.getComponentsSummary(model.model_id)
             for (const component of components) {
                 const idx = treeModel.findIndexByNodeId(component.component_id, 1)
                 if (!idx || !idx.valid) continue
-                treeModel.requestVisibility(idx, ids.includes(component.component_id))
+                treeModel.requestVisibility(idx, keep.has(component.component_id))
             }
         }
     }
