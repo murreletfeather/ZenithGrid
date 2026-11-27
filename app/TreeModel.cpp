@@ -779,6 +779,38 @@ QModelIndex TreeModel::findIndexByNodeId(int nodeId, int depth) const
     return find(rootNode, QModelIndex(), 0);
 }
 
+QVariantList TreeModel::findComponentIndexes(const QList<int>& componentIds) const
+{
+    if (componentIds.isEmpty())
+        return {};
+
+    std::unordered_map<int, QModelIndex> indexes;
+    indexes.reserve(componentIds.size());
+    for (const int id : componentIds)
+        indexes.try_emplace(id);
+
+    auto missing_count = indexes.size();
+    for (const TreeNode* model : rootNode->children) {
+        if (missing_count == 0)
+            break;
+        for (int row = 0; row < model->children.size(); ++row) {
+            TreeNode* component = model->children[row];
+            const auto found = indexes.find(component->nodeId);
+            if (found == indexes.end() || found->second.isValid())
+                continue;
+            found->second = createIndex(row, 0, component);
+            if (--missing_count == 0)
+                break;
+        }
+    }
+
+    QVariantList result;
+    result.reserve(componentIds.size());
+    for (const int id : componentIds)
+        result.push_back(QVariant::fromValue(indexes.at(id)));
+    return result;
+}
+
 void TreeModel::setModelQuery(QObject* query)
 {
     QModelQuery* next = qobject_cast<QModelQuery*>(query);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractItemModel>
+#include <QList>
 #include <QVariant>
 #include <QVector>
 #include <QtQml/qqmlregistration.h>
@@ -70,6 +71,8 @@ public:
     //! @brief 只发送节点显隐意图；展示状态由管线回传后更新。
     Q_INVOKABLE bool requestVisibility(const QModelIndex& idx, bool visible);
     Q_INVOKABLE QModelIndex findIndexByNodeId(int nodeId, int depth) const;
+    //! @brief 按输入顺序批量查找组件行，未入树的组件返回无效索引。
+    Q_INVOKABLE QVariantList findComponentIndexes(const QList<int>& componentIds) const;
     //! @brief 按模型发送全部节点的显隐请求，不提前修改展示副本。
     Q_INVOKABLE void requestAllVisibility(bool visible);
 

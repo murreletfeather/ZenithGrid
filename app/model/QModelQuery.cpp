@@ -57,6 +57,17 @@ bool QModelQuery::hasComponent(Index component_id) const
     return m_query->hasComponent(component_id);
 }
 
+QList<int> QModelQuery::filterExistingComponentIds(const QList<int>& componentIds) const
+{
+    QList<int> result;
+    result.reserve(componentIds.size());
+    for (const auto component_id : componentIds) {
+        if (hasComponent(component_id))
+            result.push_back(component_id);
+    }
+    return result;
+}
+
 QString QModelQuery::getModelName(Index model_id) const
 {
     const auto name = m_query->modelName(model_id);

@@ -12,6 +12,7 @@
 #pragma once
 #include "Core.h"
 
+#include <QList>
 #include <QObject>
 #include <QQmlEngine> // 提供 QML 元素导出宏 (Qt6)
 #include <QVariant>
@@ -74,6 +75,8 @@ QML_ELEMENT // Qt6+: 导出为 QML 可用类型（Qt5 请使用 qmlRegisterType�
      * @param component_id 组件 ID
      */
     Q_INVOKABLE bool hasComponent(Index component_id) const;
+    //! @brief 保留输入中仍存在的组件 ID，顺序与输入一致。
+    Q_INVOKABLE QList<int> filterExistingComponentIds(const QList<int>& componentIds) const;
 
     /**
      * @brief 获取指定模型的名称（导入模型即为导入文件名）

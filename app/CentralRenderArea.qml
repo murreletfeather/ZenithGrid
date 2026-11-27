@@ -841,10 +841,8 @@ Page {
                 onTriggered: {
                     if (viewportMenu.faceMode)
                         myItem.hideSelectedFaces()
-                    else {
-                        for (let i = 0; i < viewportMenu.pickedIds.length; i++)
-                            App.registry.objectTree.hideNode(viewportMenu.pickedIds[i], 1)
-                    }
+                    else
+                        App.registry.objectTree.setComponentsVisible(viewportMenu.pickedIds, false)
                 }
             }
 
@@ -865,10 +863,8 @@ Page {
                 onTriggered: {
                     if (viewportMenu.faceMode)
                         myItem.showSelectedFaces()
-                    else {
-                        for (let i = 0; i < viewportMenu.pickedIds.length; i++)
-                            App.registry.objectTree.showNode(viewportMenu.pickedIds[i], 1)
-                    }
+                    else
+                        App.registry.objectTree.setComponentsVisible(viewportMenu.pickedIds, true)
                 }
             }
 
